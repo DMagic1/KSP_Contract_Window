@@ -23,10 +23,11 @@ namespace Contracts_Window
 				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 				version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
 				WindowCaption = string.Format("Contracts {0}", version);
-				WindowRect = new Rect(0, 0, 150, 100);
+				WindowRect = new Rect(0, 0, 250, 100);
 				Visible = true;
 				DragEnabled = true;
-				SkinsLibrary.SetCurrent("DefaultSkin");
+				DragRect = new Rect(WindowRect.x, WindowRect.y, WindowRect.width, 20);
+				SkinsLibrary.SetCurrent("UnitySkin");
 			}
 		}
 
@@ -49,14 +50,75 @@ namespace Contracts_Window
 
 		internal override void DrawWindow(int id)
 		{
-
-			GUILayout.Label(new GUIContent("Contracts", "Get Contracts"));
-			GUILayout.Label(string.Format("Active Contracts: {0}", ContractSystem.Instance.Contracts.Count));
+			GUILayout.Label(string.Format("Active Contracts: {0}", cList.Count));
 			GUILayout.BeginVertical();
 			foreach (contractContainer c in cList)
-				GUILayout.Box(c.contract.Title);
+			{
+				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState)))
+				{
+					GUILayout.BeginVertical();
+					parameterBox(c, 250);
+					GUILayout.EndVertical();
+				}
+
+				//GUILayout.BeginVertical();
+				//foreach (ContractParameter cP in c.contract.AllParameters)
+				//{
+
+				//    GUILayout.BeginHorizontal();
+				//    GUILayout.Space(10);
+				//    GUILayout.Box(cP.Title, paramState(cP.State));
+				//    GUILayout.EndHorizontal();
+				//}
+				//GUILayout.EndVertical();
+				
+			}
 			GUILayout.EndVertical();
 
+		}
+
+		private void parameterBox(contractContainer c, int i)
+		{
+			GUILayout.BeginVertical();
+			GUILayout.Space(5);
+			foreach (ContractParameter cP in c.contract.AllParameters)
+			{
+
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(10);
+				GUILayout.Box(cP.Title, paramState(cP.State));
+				GUILayout.EndHorizontal();
+			}
+			GUILayout.EndVertical();
+		}
+
+		private GUIStyle titleState(Contract.State s)
+		{
+			switch (s)
+			{
+				case Contract.State.Completed:
+					return contractSkins.contractCompleted;
+				case Contract.State.Cancelled:
+				case Contract.State.DeadlineExpired:
+				case Contract.State.Failed:
+				case Contract.State.Withdrawn:
+					return contractSkins.contractFailed;
+				default:
+					return contractSkins.contractActive;
+			}
+		}
+
+		private GUIStyle paramState(ParameterState s)
+		{
+			switch (s)
+			{
+				case ParameterState.Complete:
+					return contractSkins.paramCompleted;
+				case ParameterState.Failed:
+					return contractSkins.paramFailed;
+				default:
+					return contractSkins.paramText;
+			}
 		}
 
 		private void contractAccepted(Contract c)
