@@ -16,9 +16,18 @@ namespace Contracts_Window
 			contractKSP.button = SkinsLibrary.DefKSPSkin.button;
 			SkinsLibrary.AddSkin("DefaultSkin", contractKSP);
 
+
+
 			GUISkin contractUnity = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.Unity);
 			contractUnity.button = SkinsLibrary.DefUnitySkin.button;
 			SkinsLibrary.AddSkin("UnitySkin", contractUnity);
+
+			GUIStyle styleText = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
+			styleText.fontSize = 10;
+			styleText.normal.textColor = new Color(200, 200, 200);
+			styleText.wordWrap = true;
+
+			SkinsLibrary.List["DefaultSkin"].box = new GUIStyle(styleText);
 		}
 	}
 }
