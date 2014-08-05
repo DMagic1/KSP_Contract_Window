@@ -22,9 +22,11 @@ namespace Contracts_Window
 			{
 				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 				version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
-				WindowCaption = string.Format("Contracts v{0}", "version");
+				WindowCaption = string.Format("Contracts {0}", version);
 				WindowRect = new Rect(0, 0, 150, 100);
 				Visible = true;
+				DragEnabled = true;
+				SkinsLibrary.SetCurrent("DefaultSkin");
 			}
 		}
 
@@ -47,6 +49,13 @@ namespace Contracts_Window
 
 		internal override void DrawWindow(int id)
 		{
+
+			GUILayout.Label(new GUIContent("Contracts", "Get Contracts"));
+			GUILayout.Label(string.Format("Active Contracts: {0}", ContractSystem.Instance.Contracts.Count));
+			GUILayout.BeginVertical();
+			foreach (contractContainer c in cList)
+				GUILayout.Box(c.contract.Title);
+			GUILayout.EndVertical();
 
 		}
 
