@@ -15,6 +15,7 @@ namespace Contracts_Window
 		private List<contractContainer> cList = new List<contractContainer>();
 		private string version;
 		private Assembly assembly;
+		private Vector2 scroll;
 		
 		internal override void Awake()
 		{
@@ -23,7 +24,8 @@ namespace Contracts_Window
 				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 				version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
 				WindowCaption = string.Format("Contracts {0}", version);
-				WindowRect = new Rect(0, 0, 250, 100);
+				WindowRect = new Rect(0, 0, 250, 300);
+				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(300) };
 				Visible = true;
 				DragEnabled = true;
 				DragRect = new Rect(WindowRect.x, WindowRect.y, WindowRect.width, 20);
@@ -52,28 +54,30 @@ namespace Contracts_Window
 		{
 			GUILayout.Label(string.Format("Active Contracts: {0}", cList.Count));
 			GUILayout.BeginVertical();
+			scroll = GUILayout.BeginScrollView(scroll);
 			foreach (contractContainer c in cList)
 			{
-				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState)))
-				{
+				GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState));
+				
 					GUILayout.BeginVertical();
-					parameterBox(c, 250);
+					//parameterBox(c, 250);
+					foreach (ContractParameter cP in c.contract.AllParameters)
+					{
+
+						GUILayout.BeginHorizontal();
+						GUILayout.Space(10);
+						GUILayout.Box(cP.Title, paramState(cP.State));
+						GUILayout.EndHorizontal();
+					}
+
 					GUILayout.EndVertical();
-				}
+				
 
-				//GUILayout.BeginVertical();
-				//foreach (ContractParameter cP in c.contract.AllParameters)
-				//{
-
-				//    GUILayout.BeginHorizontal();
-				//    GUILayout.Space(10);
-				//    GUILayout.Box(cP.Title, paramState(cP.State));
-				//    GUILayout.EndHorizontal();
-				//}
-				//GUILayout.EndVertical();
+				
 				
 			}
 			GUILayout.EndVertical();
+			GUILayout.EndScrollView();
 
 		}
 
