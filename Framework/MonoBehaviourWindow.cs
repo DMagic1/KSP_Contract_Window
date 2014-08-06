@@ -13,7 +13,7 @@ using System.Text;
 using KSP;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
@@ -150,6 +150,8 @@ namespace Contracts_Window
             }
         }
 
+		internal bool Toggle;
+
         /// <summary>
         /// This is the Code that draws the window and sets the skin
         /// !!!! You have to set the skin before drawing the window or you will scratch your head for ever
@@ -162,16 +164,18 @@ namespace Contracts_Window
             //keep the window locked to the screen if its supposed to be
             if (ClampToScreen)
                 WindowRect = WindowRect.ClampToScreen(ClampToScreenOffset);
-
-            //Are we using a custom style of the skin style for the window
-            if (WindowStyle == null)
-            {
-                WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowOptions);
-            }
-            else
-            {
-                WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle, WindowOptions);
-            }
+			if (Toggle)
+			{
+				//Are we using a custom style of the skin style for the window
+				if (WindowStyle == null)
+				{
+					WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowOptions);
+				}
+				else
+				{
+					WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle, WindowOptions);
+				}
+			}
 
             //Draw the tooltip of its there to be drawn
             if (TooltipsEnabled)
