@@ -154,7 +154,7 @@ namespace Contracts_Window
         /// This is the Code that draws the window and sets the skin
         /// !!!! You have to set the skin before drawing the window or you will scratch your head for ever
         /// </summary>
-        private void DrawGUI()
+        internal virtual void DrawGUI()
         {
             //this sets the skin on each draw loop
             GUI.skin = SkinsLibrary.CurrentSkin;

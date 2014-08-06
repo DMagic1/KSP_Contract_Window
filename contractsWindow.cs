@@ -81,8 +81,42 @@ namespace Contracts_Window
 			GUILayout.EndScrollView();
 			GUILayout.Space(15);
 
-			Rect resizer = new Rect(WindowRect.x + WindowRect.width - 10, WindowRect.y + WindowRect.height + 8, 16, 16);
+			//Rect resizer = new Rect(WindowRect.x + WindowRect.width - 10, WindowRect.y + WindowRect.height + 8, 16, 16);
+			//GUI.Box(resizer, "//");
+			
+			//if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
+			//{
+			//    if (resizer.Contains(Event.current.mousePosition))
+			//    {
+			//        resizing = true;
+			//        dragStart = Input.mousePosition.y;
+			//        windowHeight = WindowRect.height;
+			//    }
+			//    else if (Event.current.type == EventType.mouseUp && resizing)
+			//    {
+			//        resizing = false;
+			//        WindowRect.height = windowHeight;
+			//    }
+			//    else if (resizing)
+			//    {
+			//        float height = Input.mousePosition.y;
+			//        windowHeight += height - dragStart;
+			//        dragStart = height;
+			//    }
+			//}
+
+			GUILayout.EndVertical();
+
+			
+
+		}
+
+		internal override void DrawGUI()
+		{
+			base.DrawGUI();
+			Rect resizer = new Rect(WindowRect.x + WindowRect.width - 24, WindowRect.y + WindowRect.height - 24, 16, 16);
 			GUI.Box(resizer, "//");
+
 			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 			{
 				if (resizer.Contains(Event.current.mousePosition))
@@ -90,24 +124,23 @@ namespace Contracts_Window
 					resizing = true;
 					dragStart = Input.mousePosition.y;
 					windowHeight = WindowRect.height;
+					Event.current.Use();
 				}
-				else if (Event.current.type == EventType.mouseUp && resizing)
+			}
+			if (resizing)
+			{
+				if (Input.GetMouseButtonUp(0))
 				{
 					resizing = false;
 					WindowRect.height = windowHeight;
 				}
-				else if (resizing)
+				else
 				{
 					float height = Input.mousePosition.y;
 					windowHeight += height - dragStart;
 					dragStart = height;
 				}
 			}
-
-			GUILayout.EndVertical();
-
-			
-
 		}
 
 		private void parameterBox(contractContainer c, int i)
