@@ -13,7 +13,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
 
 	[AttributeUsage(AttributeTargets.Class)]

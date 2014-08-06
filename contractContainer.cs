@@ -5,13 +5,14 @@ using System.Linq;
 using Contracts;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
 	class contractContainer
 	{
 		internal Contract contract;
 		internal float science, repReward, repPenalty, totalScience, totalRepReward, totalRepPenalty;
 		internal double expiration, acceptance, duration, reward, advance, penalty, totalReward, totalPenalty;
+		internal bool showParams;
 
 		internal contractContainer(Contract Contract)
 		{
@@ -25,6 +26,7 @@ namespace Contracts_Window
 			science = totalScience = contract.ScienceCompletion;
 			repReward = totalRepReward = contract.ReputationCompletion;
 			repPenalty = totalRepPenalty = contract.ReputationFailure;
+			showParams = true;
 
 			foreach (ContractParameter param in contract.AllParameters)
 			{

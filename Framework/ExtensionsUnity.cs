@@ -13,7 +13,7 @@ using System.Text;
 using KSP;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
     /// <summary>
     /// CLass containing some extension methods for Unity Objects

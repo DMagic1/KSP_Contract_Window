@@ -13,7 +13,7 @@ using System.Text;
 using KSP;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
     internal static class SkinsLibrary
     {

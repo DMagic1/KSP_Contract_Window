@@ -5,7 +5,7 @@ using System.Linq;
 using KSP;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	class contractSkins: MonoBehaviourExtended
