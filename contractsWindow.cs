@@ -16,6 +16,8 @@ namespace Contracts_Window
 		private string version;
 		private Assembly assembly;
 		private Vector2 scroll;
+		private bool resizing;
+		private float dragStart, windowHeight;
 		
 		internal override void Awake()
 		{
@@ -76,8 +78,35 @@ namespace Contracts_Window
 				
 				
 			}
-			GUILayout.EndVertical();
 			GUILayout.EndScrollView();
+			GUILayout.Space(15);
+
+			Rect resizer = new Rect(WindowRect.x + WindowRect.width - 10, WindowRect.y + WindowRect.height + 8, 16, 16);
+			GUI.Box(resizer, "//");
+			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
+			{
+				if (resizer.Contains(Event.current.mousePosition))
+				{
+					resizing = true;
+					dragStart = Input.mousePosition.y;
+					windowHeight = WindowRect.height;
+				}
+				else if (Event.current.type == EventType.mouseUp && resizing)
+				{
+					resizing = false;
+					WindowRect.height = windowHeight;
+				}
+				else if (resizing)
+				{
+					float height = Input.mousePosition.y;
+					windowHeight += height - dragStart;
+					dragStart = height;
+				}
+			}
+
+			GUILayout.EndVertical();
+
+			
 
 		}
 
