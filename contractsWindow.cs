@@ -7,11 +7,12 @@ using System.Reflection;
 using Contracts;
 using UnityEngine;
 
-namespace Contracts_Window
+namespace ContractsWindow
 {
 	[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
 	class contractsWindow: MonoBehaviourWindow
 	{
+		internal static bool IsVisible;
 		private List<contractContainer> cList = new List<contractContainer>();
 		private string version;
 		private Assembly assembly;
@@ -26,11 +27,11 @@ namespace Contracts_Window
 				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 				version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
 				WindowCaption = string.Format("Contracts {0}", version);
-				WindowRect = new Rect(0, 0, 250, 300);
-				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(300) };
+				WindowRect = new Rect(40, 80, 250, 300);
+				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 				Visible = true;
 				DragEnabled = true;
-				DragRect = new Rect(WindowRect.x, WindowRect.y, WindowRect.width, 20);
+				DragRect = new Rect(WindowRect.x - 35, WindowRect.y - 75, 230, 30);
 				SkinsLibrary.SetCurrent("UnitySkin");
 			}
 		}
@@ -59,86 +60,64 @@ namespace Contracts_Window
 			scroll = GUILayout.BeginScrollView(scroll);
 			foreach (contractContainer c in cList)
 			{
-				GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState));
-				
+				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState)))
+					c.showParams = !c.showParams;
+				if (c.showParams)
+				{
 					GUILayout.BeginVertical();
-					//parameterBox(c, 250);
 					foreach (ContractParameter cP in c.contract.AllParameters)
 					{
-
 						GUILayout.BeginHorizontal();
 						GUILayout.Space(10);
 						GUILayout.Box(cP.Title, paramState(cP.State));
 						GUILayout.EndHorizontal();
 					}
-
 					GUILayout.EndVertical();
-				
-
-				
-				
+				}
 			}
 			GUILayout.EndScrollView();
 			GUILayout.Space(15);
-
-			//Rect resizer = new Rect(WindowRect.x + WindowRect.width - 10, WindowRect.y + WindowRect.height + 8, 16, 16);
-			//GUI.Box(resizer, "//");
-			
-			//if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
-			//{
-			//    if (resizer.Contains(Event.current.mousePosition))
-			//    {
-			//        resizing = true;
-			//        dragStart = Input.mousePosition.y;
-			//        windowHeight = WindowRect.height;
-			//    }
-			//    else if (Event.current.type == EventType.mouseUp && resizing)
-			//    {
-			//        resizing = false;
-			//        WindowRect.height = windowHeight;
-			//    }
-			//    else if (resizing)
-			//    {
-			//        float height = Input.mousePosition.y;
-			//        windowHeight += height - dragStart;
-			//        dragStart = height;
-			//    }
-			//}
-
 			GUILayout.EndVertical();
-
-			
-
 		}
 
 		internal override void DrawGUI()
 		{
+			Toggle = IsVisible;
+			DragRect.height = WindowRect.height - 50;
 			base.DrawGUI();
-			Rect resizer = new Rect(WindowRect.x + WindowRect.width - 24, WindowRect.y + WindowRect.height - 24, 16, 16);
-			GUI.Box(resizer, "//");
+			if (Toggle)
+			{
+				Rect resizer = new Rect(WindowRect.x + WindowRect.width - 28, WindowRect.y + WindowRect.height - 28, 24, 24);
+				GUI.Box(resizer, "\u2195");
 
-			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
-			{
-				if (resizer.Contains(Event.current.mousePosition))
+				if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 				{
-					resizing = true;
-					dragStart = Input.mousePosition.y;
-					windowHeight = WindowRect.height;
-					Event.current.Use();
+					if (resizer.Contains(Event.current.mousePosition))
+					{
+						resizing = true;
+						dragStart = Input.mousePosition.y;
+						windowHeight = WindowRect.yMax;
+						Event.current.Use();
+					}
 				}
-			}
-			if (resizing)
-			{
-				if (Input.GetMouseButtonUp(0))
+				if (resizing)
 				{
-					resizing = false;
-					WindowRect.height = windowHeight;
-				}
-				else
-				{
-					float height = Input.mousePosition.y;
-					windowHeight += height - dragStart;
-					dragStart = height;
+					if (Input.GetMouseButtonUp(0))
+					{
+						resizing = false;
+						WindowRect.yMax = windowHeight;
+					}
+					else
+					{
+						float height = Input.mousePosition.y;
+						if (Input.mousePosition.y < 0)
+							height = 0;
+						windowHeight -= height - dragStart;
+						dragStart = height;
+						WindowRect.yMax = windowHeight;
+						if (WindowRect.yMax > Screen.height)
+							WindowRect.yMax = Screen.height;
+					}
 				}
 			}
 		}
