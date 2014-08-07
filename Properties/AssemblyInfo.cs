@@ -24,4 +24,5 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("1.0.0.1")]
 [assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyInformationalVersion("v0.1")]
 [assembly: KSPAssembly("Contracts_Window", 0, 1)]
