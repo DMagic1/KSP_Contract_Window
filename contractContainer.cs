@@ -41,6 +41,7 @@ namespace ContractsWindow
 		internal bool showParams;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
+		//Store info on contracts
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
@@ -67,6 +68,7 @@ namespace ContractsWindow
 		}
 	}
 
+	//Store some info about contract parameters
 	internal class parameterContainer
 	{
 		internal ContractParameter cParam;
@@ -77,6 +79,15 @@ namespace ContractsWindow
 			cParam = cP;
 			showNote = false;
 		}
+	}
+
+	enum sortClass
+	{
+		Default = 1,
+		Expiration = 2,
+		Acceptance = 3,
+		Duration = 4,
+		Reward = 5,
 	}
 
 }

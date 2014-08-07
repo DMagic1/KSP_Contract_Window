@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -47,6 +48,8 @@ namespace ContractsWindow
 		private bool resizing, visible, fileFound;
 		private float dragStart, windowHeight, windowX, windowY, windowW, windowH, windowMaxY;
 		private Texture2D iconTex;
+		private sortClass sort;
+		private int order;
 		
 		internal override void Awake()
 		{
@@ -62,6 +65,7 @@ namespace ContractsWindow
 
 				iconTex = GameDatabase.Instance.GetTexture("Contracts Window/ResizeIcon", false);
 
+				sort = sortClass.Default;
 				WindowCaption = string.Format("Contracts {0}", version);
 				WindowRect = new Rect(40, 80, 250, 300);
 				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
@@ -96,6 +100,9 @@ namespace ContractsWindow
 		internal override void DrawWindow(int id)
 		{
 			GUILayout.Label(string.Format("Active Contracts: {0}", cList.Count));
+
+
+			//Contract List Begins
 			GUILayout.BeginVertical();
 			scroll = GUILayout.BeginScrollView(scroll);
 			foreach (contractContainer c in cList)
@@ -104,11 +111,13 @@ namespace ContractsWindow
 					c.showParams = !c.showParams;
 				if (c.showParams)
 				{
+					//Contract Parameter list for each contract
 					GUILayout.BeginVertical();
 					foreach (parameterContainer cP in c.paramList)
 					{
 						if (!string.IsNullOrEmpty(cP.cParam.Title))
 						{
+							//Check if each parameter has notes associated with it
 							if (cP.cParam.State != ParameterState.Complete && !string.IsNullOrEmpty(cP.cParam.Notes))
 							{
 								GUILayout.BeginHorizontal();
@@ -123,6 +132,7 @@ namespace ContractsWindow
 									GUILayout.Box(cP.cParam.Notes, contractSkins.noteText);
 								}
 							}
+							//If no notes are present just display the title
 							else
 							{
 							GUILayout.BeginHorizontal();
@@ -142,14 +152,22 @@ namespace ContractsWindow
 
 		internal override void DrawGUI()
 		{
+			//Bool toggled by Toolbar icon
 			Toggle = IsVisible;
+
+			//Update the drag rectangle
 			DragRect.height = WindowRect.height - 50;
+
+			//Draw the window
 			base.DrawGUI();
+
+			//Draw the resizer in rectangle
 			if (Toggle)
 			{
 				Rect resizer = new Rect(WindowRect.x + WindowRect.width - 27, WindowRect.y + WindowRect.height - 27, 24, 24);
 				GUI.Box(resizer, iconTex);
 
+				//Resize window when the resizer is grabbed by the mouse
 				if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 				{
 					if (resizer.Contains(Event.current.mousePosition))
@@ -170,6 +188,7 @@ namespace ContractsWindow
 					}
 					else
 					{
+						//Only consider y direction of mouse input
 						float height = Input.mousePosition.y;
 						if (Input.mousePosition.y < 0)
 							height = 0;
@@ -183,6 +202,40 @@ namespace ContractsWindow
 			}
 		}
 
+		//Function to sort the list based on several criteria
+		private List<contractContainer> sortList(List<contractContainer> cL, sortClass s, int i)
+		{
+			List<contractContainer> sortedList = new List<contractContainer>();
+			if (i == 0)
+			{
+				if (s == sortClass.Default)
+					sortedList = cL;
+				else if (s == sortClass.Expiration)
+					sortedList = cL.OrderBy(o => o.expiration).ToList();
+				else if (s == sortClass.Acceptance)
+					sortedList = cL.OrderBy(o => o.acceptance).ToList();
+				else if (s == sortClass.Duration)
+					sortedList = cL.OrderBy(o => o.duration).ToList();
+				else if (s == sortClass.Reward)
+					sortedList = cL.OrderBy(o => o.totalReward).ToList();
+			}
+			else
+			{
+				if (s == sortClass.Default)
+					sortedList = cL;
+				else if (s == sortClass.Expiration)
+					sortedList = cL.OrderByDescending(o => o.expiration).ToList();
+				else if (s == sortClass.Acceptance)
+					sortedList = cL.OrderByDescending(o => o.acceptance).ToList();
+				else if (s == sortClass.Duration)
+					sortedList = cL.OrderByDescending(o => o.duration).ToList();
+				else if (s == sortClass.Reward)
+					sortedList = cL.OrderByDescending(o => o.totalReward).ToList();
+			}
+			return sortedList;
+		}
+
+		//Change the contract titel's GUIStyle based on its current state
 		private GUIStyle titleState(Contract.State s)
 		{
 			switch (s)
@@ -199,6 +252,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Change parameter title GUIStyle based on its current state
 		private GUIStyle paramState(ParameterState s)
 		{
 			switch (s)
@@ -212,11 +266,13 @@ namespace ContractsWindow
 			}
 		}
 
+		//Adds new contracts when they are accepted in Mission Control
 		private void contractAccepted(Contract c)
 		{
 			cList.Add(new contractContainer(c));
 		}
 
+		//Rebuild contract list when the scene changes
 		private void contractLoaded()
 		{
 			cList.Clear();
@@ -229,6 +285,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Load window position and size settings
 		private void PersistenceLoad()
 		{
 			if (fileFound)
@@ -268,6 +325,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Save window size and position settings to config file
 		private void PersistenceSave()
 		{
 			if (fileFound)
