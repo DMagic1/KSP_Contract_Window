@@ -18,6 +18,8 @@ namespace ContractsWindow
 		internal static GUIStyle paramCompleted;
 		internal static GUIStyle paramFailed;
 
+		internal static GUIStyle noteText;
+
 		internal override void OnGUIOnceOnly()
 		{
 			GUISkin contractKSP = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -62,6 +64,14 @@ namespace ContractsWindow
 			paramFailed.name = "ParameterFailedText";
 			paramFailed.normal.textColor = XKCDColors.Red;
 
+			//Note Skin
+
+			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			noteText.name = "ContractNoteText";
+			noteText.fontSize = 11;
+			noteText.wordWrap = true;
+			noteText.alignment = TextAnchor.UpperLeft;
+			noteText.normal.textColor = XKCDColors.AquaBlue;
 
 			SkinsLibrary.List["UnitySkin"].button = new GUIStyle(contractActive);
 			SkinsLibrary.List["UnitySkin"].box = new GUIStyle(paramText);
@@ -71,6 +81,7 @@ namespace ContractsWindow
 			SkinsLibrary.AddStyle("UnitySkin", "ContractActiveText", contractActive);
 			SkinsLibrary.AddStyle("UnitySkin", "ContractCompleteText", contractCompleted);
 			SkinsLibrary.AddStyle("UnitySkin", "ContractFailedText", contractFailed);
+			SkinsLibrary.AddStyle("UnitySkin", "ContractNoteText", noteText);
 
 		}
 	}

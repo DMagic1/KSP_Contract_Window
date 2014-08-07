@@ -12,7 +12,7 @@ namespace ContractsWindow
 		internal Contract contract;
 		internal float science, repReward, repPenalty, totalScience, totalRepReward, totalRepPenalty;
 		internal double expiration, acceptance, duration, reward, advance, penalty, totalReward, totalPenalty;
-		internal bool showParams;
+		internal bool showParams, showNotes;
 
 		internal contractContainer(Contract Contract)
 		{
@@ -27,6 +27,7 @@ namespace ContractsWindow
 			repReward = totalRepReward = contract.ReputationCompletion;
 			repPenalty = totalRepPenalty = contract.ReputationFailure;
 			showParams = true;
+			showNotes = false;
 
 			foreach (ContractParameter param in contract.AllParameters)
 			{

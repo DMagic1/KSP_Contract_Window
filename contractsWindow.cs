@@ -14,24 +14,28 @@ namespace ContractsWindow
 	{
 		internal static bool IsVisible;
 		private List<contractContainer> cList = new List<contractContainer>();
-		private string version;
+		private string version, assemblyLocation;
 		private Assembly assembly;
 		private Vector2 scroll;
 		private bool resizing;
 		private float dragStart, windowHeight;
+		private Texture2D iconTex;
 		
 		internal override void Awake()
 		{
 			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
 			{
 				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
-				version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+				assemblyLocation = assembly.Location.Replace("\\", "/");
+				version = FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion;
+				iconTex = GameDatabase.Instance.GetTexture("Contracts Window/ResizeIcon", false);
+
 				WindowCaption = string.Format("Contracts {0}", version);
 				WindowRect = new Rect(40, 80, 250, 300);
 				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 				Visible = true;
 				DragEnabled = true;
-				DragRect = new Rect(WindowRect.x - 35, WindowRect.y - 75, 230, 30);
+				DragRect = new Rect(WindowRect.x - 35, WindowRect.y - 77, 230, 30);
 				SkinsLibrary.SetCurrent("UnitySkin");
 			}
 		}
@@ -67,10 +71,27 @@ namespace ContractsWindow
 					GUILayout.BeginVertical();
 					foreach (ContractParameter cP in c.contract.AllParameters)
 					{
-						GUILayout.BeginHorizontal();
-						GUILayout.Space(10);
-						GUILayout.Box(cP.Title, paramState(cP.State));
-						GUILayout.EndHorizontal();
+						if (!string.IsNullOrEmpty(cP.Title))
+						{
+							GUILayout.BeginHorizontal();
+							GUILayout.Space(10);
+							GUILayout.Box(cP.Title, paramState(cP.State));
+							GUILayout.EndHorizontal();
+							if (cP.State != ParameterState.Complete && !string.IsNullOrEmpty(cP.Notes))
+							{
+								GUILayout.BeginHorizontal();
+								if (GUILayout.Button("[+] Note:", contractSkins.noteText, GUILayout.MaxWidth(45)))
+								{
+									c.showNotes = !c.showNotes;
+								}
+								if (c.showNotes)
+								{
+									GUILayout.Space(3);
+									GUILayout.Box(cP.Notes, contractSkins.noteText);
+								}
+								GUILayout.EndHorizontal();
+							}
+						}
 					}
 					GUILayout.EndVertical();
 				}
@@ -87,8 +108,8 @@ namespace ContractsWindow
 			base.DrawGUI();
 			if (Toggle)
 			{
-				Rect resizer = new Rect(WindowRect.x + WindowRect.width - 28, WindowRect.y + WindowRect.height - 28, 24, 24);
-				GUI.Box(resizer, "\u2195");
+				Rect resizer = new Rect(WindowRect.x + WindowRect.width - 27, WindowRect.y + WindowRect.height - 27, 24, 24);
+				GUI.Box(resizer, iconTex);
 
 				if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 				{
@@ -120,21 +141,6 @@ namespace ContractsWindow
 					}
 				}
 			}
-		}
-
-		private void parameterBox(contractContainer c, int i)
-		{
-			GUILayout.BeginVertical();
-			GUILayout.Space(5);
-			foreach (ContractParameter cP in c.contract.AllParameters)
-			{
-
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(10);
-				GUILayout.Box(cP.Title, paramState(cP.State));
-				GUILayout.EndHorizontal();
-			}
-			GUILayout.EndVertical();
 		}
 
 		private GUIStyle titleState(Contract.State s)
