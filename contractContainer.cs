@@ -1,18 +1,45 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+Contract Container - Object to hold contract info
+
+Copyright (c) 2014 DMagic
+
+KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
 using System.Collections.Generic;
-using System.Linq;
 
 using Contracts;
 using UnityEngine;
 
 namespace ContractsWindow
 {
-	class contractContainer
+	internal class contractContainer
 	{
 		internal Contract contract;
 		internal float science, repReward, repPenalty, totalScience, totalRepReward, totalRepPenalty;
 		internal double expiration, acceptance, duration, reward, advance, penalty, totalReward, totalPenalty;
-		internal bool showParams, showNotes;
+		internal bool showParams;
+		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		internal contractContainer(Contract Contract)
 		{
@@ -27,10 +54,10 @@ namespace ContractsWindow
 			repReward = totalRepReward = contract.ReputationCompletion;
 			repPenalty = totalRepPenalty = contract.ReputationFailure;
 			showParams = true;
-			showNotes = false;
 
 			foreach (ContractParameter param in contract.AllParameters)
 			{
+				paramList.Add(new parameterContainer(param));
 				totalReward += param.FundsCompletion;
 				totalPenalty += param.FundsFailure;
 				totalRepReward += param.ReputationCompletion;
@@ -38,6 +65,18 @@ namespace ContractsWindow
 				totalScience += param.ScienceCompletion;
 			}
 		}
-
 	}
+
+	internal class parameterContainer
+	{
+		internal ContractParameter cParam;
+		internal bool showNote;
+
+		internal parameterContainer(ContractParameter cP)
+		{
+			cParam = cP;
+			showNote = false;
+		}
+	}
+
 }
