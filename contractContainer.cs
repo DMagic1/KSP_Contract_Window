@@ -91,7 +91,7 @@ namespace ContractsWindow
 					s += " ";
 				s += string.Format("{0}h", time[2]);
 			}
-			if (time[2] <= 0 && time[1] > 0)
+			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
 				s = string.Format("{0}m", time[1]);
 
 			return s;
