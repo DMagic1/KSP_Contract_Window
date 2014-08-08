@@ -101,7 +101,7 @@ namespace ContractsWindow
 			noteButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			noteButton.name = "ContractNoteButton";
 			noteButton.fontSize = 12;
-			noteButton.alignment = TextAnchor.MiddleCenter;
+			noteButton.alignment = TextAnchor.MiddleLeft;
 			noteButton.normal.textColor = XKCDColors.AquaBlue;
 
 			SkinsLibrary.List["UnitySkin"].button = new GUIStyle(contractActive);
