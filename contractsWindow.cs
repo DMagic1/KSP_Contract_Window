@@ -50,7 +50,6 @@ namespace ContractsWindow
 		private Vector2 scroll;
 		private bool resizing, visible, fileFound, showSort;
 		private float dragStart, windowHeight, windowX, windowY, windowW, windowH, windowMaxY;
-		private Texture2D iconTex;
 		private sortClass sort;
 		private int order; //0 is descending, 1 is ascending
 		private int windowMode; //0 is compact, 1 is expiration display, 2 is full display
@@ -68,8 +67,6 @@ namespace ContractsWindow
 				if (System.IO.File.Exists(fileLocation))
 					fileFound = true;
 
-				iconTex = GameDatabase.Instance.GetTexture("Contracts Window/ResizeIcon", false);
-
 				sort = sortClass.Default;
 				order = 0;
 				WindowCaption = string.Format("Contracts {0}", version);
@@ -78,13 +75,14 @@ namespace ContractsWindow
 				Visible = true;
 				DragEnabled = true;
 
-				dropDownSort = new Rect(WindowRect.x - 26, WindowRect.y - 15, 100, 115);
+				dropDownSort = new Rect(WindowRect.x - 26, WindowRect.y - 15, 100, 145);
 
 				PersistenceLoad();
 
 				DragRect = new Rect(0, 0, WindowRect.width - 20, WindowRect.height - 25);
 				PersistenceSave();
 
+				InputLockManager.RemoveControlLock(_AssemblyName.GetHashCode().ToString());
 
 				SkinsLibrary.SetCurrent("UnitySkin");
 			}
@@ -98,6 +96,7 @@ namespace ContractsWindow
 
 		internal override void OnDestroy()
 		{
+			EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
 			PersistenceSave();
@@ -118,12 +117,28 @@ namespace ContractsWindow
 
 			//Menu Bar
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button("Sort", contractSkins.contractActive, GUILayout.MaxWidth(50)))
+			if (GUILayout.Button("Sort", contractSkins.sortMenu, GUILayout.MaxWidth(50)))
 				showSort = !showSort;
-			GUILayout.Space(110);
+			GUILayout.Space(5);
+			if (order == 0)
+			{
+				if (GUILayout.Button("Asc.", contractSkins.sortOrder, GUILayout.MaxWidth(45)))
+				{
+					order = 1;
+					cList = sortList(cList, sort, order);
+				}
+			}
+			if (order == 1)
+			{
+				if (GUILayout.Button("Desc.", contractSkins.sortOrder, GUILayout.MaxWidth(45)))
+				{
+					order = 0;
+					cList = sortList(cList, sort, order);
+				}
+			}
+			GUILayout.Space(90);
 			if (windowMode == 0)
 			{
-				GUILayout.Space(30);
 				if (GUILayout.Button("+", contractSkins.contractActive, GUILayout.MaxWidth(20)))
 				{
 					windowMode = 1;
@@ -133,7 +148,7 @@ namespace ContractsWindow
 			}
 			if (windowMode == 1)
 			{
-				GUILayout.Space(75);
+				GUILayout.Space(45);
 				if (GUILayout.Button("-", contractSkins.contractActive, GUILayout.MaxWidth(20)))
 				{
 					windowMode = 0;
@@ -150,7 +165,7 @@ namespace ContractsWindow
 			}
 			if (windowMode == 2)
 			{
-				GUILayout.Space(180);
+				GUILayout.Space(150);
 				if (GUILayout.Button("-", contractSkins.contractActive, GUILayout.MaxWidth(20)))
 				{
 					windowMode = 1;
@@ -165,19 +180,30 @@ namespace ContractsWindow
 			foreach (contractContainer c in cList)
 			{
 				GUILayout.BeginHorizontal();
-				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210)))
-					c.showParams = !c.showParams;
+				if (!showSort)
+				{
+					if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210)))
+						c.showParams = !c.showParams;
+				}
+				else
+					GUILayout.Box(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210));
 				if (windowMode == 1)
 				{
 					GUILayout.Space(3);
-					GUILayout.Box(c.daysToExpire, contractSkins.paramText, GUILayout.MaxWidth(50));
+					if (c.expiration >= 21600)
+						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.MaxWidth(50));
+					else
+						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.MaxWidth(50));
 				}
 				if (windowMode == 2)
 				{
 					GUILayout.Space(3);
-					GUILayout.Box(c.daysToExpire, contractSkins.paramText, GUILayout.MaxWidth(50));
+					if (c.expiration >= 21600)
+						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.MaxWidth(50));
+					else
+						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.MaxWidth(50));
 					GUILayout.Space(10);
-					GUILayout.Box(c.totalReward.ToString("N1"), contractSkins.paramText, GUILayout.MaxWidth(70));
+					GUILayout.Label(c.reward.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(70));
 				}
 
 				GUILayout.EndHorizontal();
@@ -198,6 +224,14 @@ namespace ContractsWindow
 									cP.showNote = !cP.showNote;
 								GUILayout.Space(5);
 								GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(226));
+								if (windowMode == 2)
+								{
+									if (cP.cParam.FundsCompletion > 0)
+									{
+										GUILayout.Space(5);
+										GUILayout.Label(cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
+									}
+								}
 								GUILayout.EndHorizontal();
 								if (cP.showNote)
 								{
@@ -211,6 +245,14 @@ namespace ContractsWindow
 							GUILayout.BeginHorizontal();
 							GUILayout.Space(15);
 							GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(250));
+							if (windowMode == 2)
+							{
+								if (cP.cParam.FundsCompletion > 0)
+								{
+									GUILayout.Space(5);
+									GUILayout.Label(cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
+								}
+							}
 							GUILayout.EndHorizontal();
 							}
 						}
@@ -225,7 +267,7 @@ namespace ContractsWindow
 			if (showSort)
 			{
 				GUILayout.BeginVertical();
-				GUI.Box(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 100), "");
+				GUI.Box(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 100), "", contractSkins.dropDown);
 				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 25), "Expiration"))
 				{
 					showSort = false;
@@ -270,7 +312,7 @@ namespace ContractsWindow
 			if (Toggle)
 			{
 				Rect resizer = new Rect(WindowRect.x + WindowRect.width - 25, WindowRect.y + WindowRect.height - 25, 22, 22);
-				GUI.Box(resizer, iconTex);
+				GUI.Box(resizer, contractSkins.expandIcon);
 
 				//Resize window when the resizer is grabbed by the mouse
 				if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
@@ -305,9 +347,37 @@ namespace ContractsWindow
 					}
 				}
 			}
+			// Hide part rightclick menu.
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				if (WindowRect.Contains(Input.mousePosition) && GUIUtility.hotControl == 0 && Input.GetMouseButton(0))
+				{
+					foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
+					{
+						window.enabled = false;
+						window.displayDirty = true;
+					}
+				}
+			}
+
+			if (HighLogic.LoadedSceneIsEditor)
+			{
+				if (WindowRect.Contains(Input.mousePosition))
+				{
+					EditorTooltip.Instance.HideToolTip();
+					EditorLogic.fetch.Lock(false, false, false, _AssemblyName.GetHashCode().ToString());
+				}
+				else if (!WindowRect.Contains(Input.mousePosition))
+				{
+					EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+				}
+			}
+
 		}
 
 		#endregion
+
+		#region Methods
 
 		//Function to sort the list based on several criteria
 		private List<contractContainer> sortList(List<contractContainer> cL, sortClass s, int i)
@@ -393,6 +463,8 @@ namespace ContractsWindow
 			}
 			cList = sortList(cList, sort, order);
 		}
+
+		#endregion
 
 		#region Persistence
 
