@@ -39,6 +39,7 @@ namespace ContractsWindow
 		internal float science, repReward, repPenalty, totalScience, totalRepReward, totalRepPenalty;
 		internal double expiration, acceptance, duration, reward, advance, penalty, totalReward, totalPenalty;
 		internal bool showParams;
+		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
@@ -46,6 +47,7 @@ namespace ContractsWindow
 		{
 			contract = Contract;
 			expiration = contract.DateDeadline;
+			daysToExpire = timeInDays(expiration - Planetarium.GetUniversalTime());
 			acceptance = contract.DateAccepted;
 			duration = expiration - acceptance;
 			advance = contract.FundsAdvance;
@@ -65,6 +67,34 @@ namespace ContractsWindow
 				totalRepPenalty += param.ReputationFailure;
 				totalScience += param.ScienceCompletion;
 			}
+		}
+
+		private string timeInDays(double D)
+		{
+			if (D < 0)
+				return "---";
+
+			int[] time = KSPUtil.GetDateFromUT((int)D);
+			string s = "";
+
+			if (time[4] > 0)
+				s = string.Format("{0}y", time[4]);
+			if (time[3] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}d", time[3]);
+			}
+			if (time[4] <= 0 && time[2] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}h", time[2]);
+			}
+			if (time[2] <= 0 && time[1] > 0)
+				s = string.Format("{0}m", time[1]);
+
+			return s;
 		}
 	}
 
