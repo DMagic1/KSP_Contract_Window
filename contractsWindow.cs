@@ -78,11 +78,13 @@ namespace ContractsWindow
 				Visible = true;
 				DragEnabled = true;
 
-				DragRect = new Rect(WindowRect.x - 45, WindowRect.y - 77, 230, 30);
 				dropDownSort = new Rect(WindowRect.x - 26, WindowRect.y - 15, 100, 115);
 
 				PersistenceLoad();
+
+				DragRect = new Rect(0, 0, WindowRect.width - 20, WindowRect.height - 25);
 				PersistenceSave();
+
 
 				SkinsLibrary.SetCurrent("UnitySkin");
 			}
@@ -126,8 +128,7 @@ namespace ContractsWindow
 				{
 					windowMode = 1;
 					WindowRect.width = 325;
-					DragRect.width += 75;
-					DragRect.x += 15;
+					DragRect.width = WindowRect.width - 20;
 				}
 			}
 			if (windowMode == 1)
@@ -137,16 +138,14 @@ namespace ContractsWindow
 				{
 					windowMode = 0;
 					WindowRect.width = 250;
-					DragRect.width -= 75;
-					DragRect.x -= 15;
+					DragRect.width = WindowRect.width - 20;
 				}
 				GUILayout.Space(5);
 				if (GUILayout.Button("+", contractSkins.contractActive, GUILayout.MaxWidth(20)))
 				{
 					windowMode = 2;
 					WindowRect.width = 400;
-					DragRect.width += 75;
-					DragRect.x += 10;
+					DragRect.width = WindowRect.width - 20;
 				}
 			}
 			if (windowMode == 2)
@@ -156,8 +155,7 @@ namespace ContractsWindow
 				{
 					windowMode = 1;
 					WindowRect.width = 325;
-					DragRect.width -= 75;
-					DragRect.x -= 10;
+					DragRect.width = WindowRect.width - 20;
 				}
 			}
 			GUILayout.EndHorizontal();
@@ -172,7 +170,7 @@ namespace ContractsWindow
 				if (windowMode == 1)
 				{
 					GUILayout.Space(3);
-					GUILayout.Box(c.daysToExpire, contractSkins.paramText, GUILayout.MaxWidth(70));
+					GUILayout.Box(c.daysToExpire, contractSkins.paramText, GUILayout.MaxWidth(50));
 				}
 				if (windowMode == 2)
 				{
@@ -263,7 +261,7 @@ namespace ContractsWindow
 			Toggle = IsVisible;
 
 			//Update the drag rectangle
-			DragRect.height = WindowRect.height - 27;
+			DragRect.height = WindowRect.height - 24;
 
 			//Draw the window
 			base.DrawGUI();
