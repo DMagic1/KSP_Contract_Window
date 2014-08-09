@@ -63,22 +63,28 @@ namespace ContractsWindow
 		internal static GUIStyle scienceReward;
 
 		internal static Texture2D fundsGreen;
-		internal static Texture2D fundsRed;
-		internal static Texture2D repGreen;
-		internal static Texture2D repRed;
-		internal static Texture2D science;
+		//internal static Texture2D fundsRed;
+		//internal static Texture2D repGreen;
+		//internal static Texture2D repRed;
+		//internal static Texture2D science;
 		internal static Texture2D expandIcon;
+		internal static Texture2D dropDownTex;
+
 		internal override void OnGUIOnceOnly()
 		{
 
 			//Fetch icon textures
 			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);
-			fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
-			repGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepGreenIcon", false);
-			repRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepRedIcon", false);
-			science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
+			//fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
+			//repGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepGreenIcon", false);
+			//repRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepRedIcon", false);
+			//science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
 			expandIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResizeIcon", false);
+			dropDownTex = new Texture2D(1, 1);
+			dropDownTex.SetPixel(0, 0, XKCDColors.AlmostBlack);
+			dropDownTex.Apply();
 
+			//Initialize Skins
 			GUISkin contractKSP = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
 			contractKSP.button = SkinsLibrary.DefKSPSkin.button;
 			SkinsLibrary.AddSkin("DefaultSkin", contractKSP);
@@ -88,7 +94,7 @@ namespace ContractsWindow
 			contractUnity.box = SkinsLibrary.DefUnitySkin.box;
 			SkinsLibrary.AddSkin("UnitySkin", contractUnity);
 
-			//Contract Title Skin
+			//Contract Title Style
 			contractActive = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			contractActive.name = "ContractActiveText";
 			contractActive.fontSize = 12;
@@ -104,8 +110,7 @@ namespace ContractsWindow
 			contractFailed.name = "ContractFailedText";
 			contractFailed.normal.textColor = XKCDColors.Red;
 
-			//Parameter Skin
-
+			//Parameter Style
 			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			paramText.name = "ParameterText";
 			paramText.fontSize = 11;
@@ -121,8 +126,7 @@ namespace ContractsWindow
 			paramFailed.name = "ParameterFailedText";
 			paramFailed.normal.textColor = XKCDColors.Red;
 
-			//Note Skin
-
+			//Note Style
 			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			noteText.name = "ContractNoteText";
 			noteText.fontSize = 11;
@@ -136,8 +140,7 @@ namespace ContractsWindow
 			noteButton.alignment = TextAnchor.MiddleLeft;
 			noteButton.normal.textColor = XKCDColors.AquaBlue;
 
-			//Expanded styles
-
+			//Expanded Style
 			timerGood = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			timerGood.name = "TimerGood";
 			timerGood.fontSize = 11;
@@ -154,7 +157,7 @@ namespace ContractsWindow
 			fundsReward.fontSize = 10;
 			fundsReward.normal.textColor = XKCDColors.FreshGreen;
 			fundsReward.wordWrap = false;
-			fundsReward.alignment = TextAnchor.MiddleCenter;
+			fundsReward.alignment = TextAnchor.MiddleLeft;
 
 			fundsAdvance = new GUIStyle(fundsReward);
 			fundsAdvance.name = "FundsAdvance";
@@ -174,10 +177,10 @@ namespace ContractsWindow
 			scienceReward.name = "ScienceReward";
 			scienceReward.normal.textColor = XKCDColors.AquaBlue;
 
-			//Other styles
-
+			//Other Styles
 			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			dropDown.name = "DropDown";
+			dropDown.normal.background = dropDownTex;
 
 			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			sortMenu.name = "SortMenu";
@@ -192,6 +195,7 @@ namespace ContractsWindow
 			//Add skins and styles to the library
 			SkinsLibrary.List["UnitySkin"].button = new GUIStyle(contractActive);
 			SkinsLibrary.List["UnitySkin"].box = new GUIStyle(paramText);
+
 			SkinsLibrary.AddStyle("UnitySkin", "ParameterText", paramText);
 			SkinsLibrary.AddStyle("UnitySkin", "ParameterCompleteText", paramCompleted);
 			SkinsLibrary.AddStyle("UnitySkin", "ParameterFailedText", paramFailed);
