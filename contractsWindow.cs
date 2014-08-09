@@ -190,7 +190,7 @@ namespace ContractsWindow
 				if (windowMode == 1)
 				{
 					GUILayout.Space(3);
-					if (c.expiration >= 21600)
+					if (c.deadline >= 21600)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.MaxWidth(50));
 					else
 						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.MaxWidth(50));
@@ -198,12 +198,14 @@ namespace ContractsWindow
 				if (windowMode == 2)
 				{
 					GUILayout.Space(3);
-					if (c.expiration >= 21600)
+					if (c.deadline >= 21600)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.MaxWidth(50));
 					else
 						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.MaxWidth(50));
 					GUILayout.Space(10);
-					GUILayout.Label(c.reward.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(70));
+					GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxWidth(13));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + c.contract.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(70));
 				}
 
 				GUILayout.EndHorizontal();
@@ -229,7 +231,9 @@ namespace ContractsWindow
 									if (cP.cParam.FundsCompletion > 0)
 									{
 										GUILayout.Space(5);
-										GUILayout.Label(cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
+										GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxWidth(13));
+										GUILayout.Space(-5);
+										GUILayout.Label("+" + cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
 									}
 								}
 								GUILayout.EndHorizontal();
@@ -250,7 +254,9 @@ namespace ContractsWindow
 								if (cP.cParam.FundsCompletion > 0)
 								{
 									GUILayout.Space(5);
-									GUILayout.Label(cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
+									GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxWidth(13));
+									GUILayout.Space(-5);
+									GUILayout.Label("+" + cP.cParam.FundsCompletion.ToString("N1"), contractSkins.fundsReward, GUILayout.MaxWidth(60));
 								}
 							}
 							GUILayout.EndHorizontal();
@@ -267,26 +273,26 @@ namespace ContractsWindow
 			if (showSort)
 			{
 				GUILayout.BeginVertical();
-				GUI.Box(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 100), "", contractSkins.dropDown);
-				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 25), "Expiration"))
+				GUI.Box(new Rect(dropDownSort.x, dropDownSort.y, dropDownSort.width, 113), "", contractSkins.dropDown);
+				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y+2, dropDownSort.width, 25), "Expiration", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Expiration;
 					cList = sortList(cList, sort, order);
 				}
-				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 29, dropDownSort.width, 25) , "Acceptance"))
+				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 30, dropDownSort.width, 25) , "Acceptance", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Acceptance;
 					cList = sortList(cList, sort, order);
 				}
-				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 58, dropDownSort.width, 25), "Duration"))
+				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 58, dropDownSort.width, 25), "Difficulty", contractSkins.sortMenu))
 				{
 					showSort = false;
-					sort = sortClass.Duration;
+					sort = sortClass.Difficulty;
 					cList = sortList(cList, sort, order);
 				}
-				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 90, dropDownSort.width, 25), "Reward"))
+				if (GUI.Button(new Rect(dropDownSort.x, dropDownSort.y + 86, dropDownSort.width, 25), "Reward", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Reward;
@@ -346,30 +352,31 @@ namespace ContractsWindow
 							WindowRect.yMax = Screen.height;
 					}
 				}
-			}
-			// Hide part rightclick menu.
-			if (HighLogic.LoadedSceneIsFlight)
-			{
-				if (WindowRect.Contains(Input.mousePosition) && GUIUtility.hotControl == 0 && Input.GetMouseButton(0))
+
+				// Hide part rightclick menu.
+				if (HighLogic.LoadedSceneIsFlight)
 				{
-					foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
+					if (WindowRect.Contains(Input.mousePosition) && GUIUtility.hotControl == 0 && Input.GetMouseButton(0))
 					{
-						window.enabled = false;
-						window.displayDirty = true;
+						foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
+						{
+							window.enabled = false;
+							window.displayDirty = true;
+						}
 					}
 				}
-			}
 
-			if (HighLogic.LoadedSceneIsEditor)
-			{
-				if (WindowRect.Contains(Input.mousePosition))
+				if (HighLogic.LoadedSceneIsEditor)
 				{
-					EditorTooltip.Instance.HideToolTip();
-					EditorLogic.fetch.Lock(false, false, false, _AssemblyName.GetHashCode().ToString());
-				}
-				else if (!WindowRect.Contains(Input.mousePosition))
-				{
-					EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+					if (WindowRect.Contains(Input.mousePosition))
+					{
+						EditorTooltip.Instance.HideToolTip();
+						EditorLogic.fetch.Lock(false, false, false, _AssemblyName.GetHashCode().ToString());
+					}
+					else if (!WindowRect.Contains(Input.mousePosition))
+					{
+						EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+					}
 				}
 			}
 
@@ -386,33 +393,33 @@ namespace ContractsWindow
 			if (i == 0)
 			{
 				if (s == sortClass.Default)
-					sortedList = cL;
+					return cL;
 				else if (s == sortClass.Expiration)
-					sortedList = cL.OrderBy(o => o.expiration).ToList();
+					cL.Sort((a, b) => a.deadline.CompareTo(b.deadline));
 				else if (s == sortClass.Acceptance)
-					sortedList = cL.OrderBy(o => o.acceptance).ToList();
-				else if (s == sortClass.Duration)
-					sortedList = cL.OrderBy(o => o.duration).ToList();
+					cL.Sort((a, b) => a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
 				else if (s == sortClass.Reward)
-					sortedList = cL.OrderBy(o => o.totalReward).ToList();
+					cL.Sort((a, b) => a.totalReward.CompareTo(b.totalReward));
+				else if (s == sortClass.Difficulty)
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
 			}
 			else
 			{
 				if (s == sortClass.Default)
-					sortedList = cL;
+					return cL;
 				else if (s == sortClass.Expiration)
-					sortedList = cL.OrderByDescending(o => o.expiration).ToList();
+					cL.Sort((a, b) => -a.deadline.CompareTo(b.deadline));
 				else if (s == sortClass.Acceptance)
-					sortedList = cL.OrderByDescending(o => o.acceptance).ToList();
-				else if (s == sortClass.Duration)
-					sortedList = cL.OrderByDescending(o => o.duration).ToList();
+					cL.Sort((a, b) => -a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
 				else if (s == sortClass.Reward)
-					sortedList = cL.OrderByDescending(o => o.totalReward).ToList();
+					cL.Sort((a, b) => -a.totalReward.CompareTo(b.totalReward));
+				else if (s == sortClass.Difficulty)
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
 			}
-			return sortedList;
+			return cL;
 		}
 
-		//Change the contract titel's GUIStyle based on its current state
+		//Change the contract title's GUIStyle based on its current state
 		private GUIStyle titleState(Contract.State s)
 		{
 			switch (s)
@@ -498,7 +505,7 @@ namespace ContractsWindow
 						if (float.TryParse(windowNode.GetValue("Window MaxY"), out windowMaxY))
 							WindowRect.yMax = windowMaxY;
 						else
-							WindowRect.yMax = 300;
+							WindowRect.yMax = 380;
 						if (bool.TryParse(windowNode.GetValue("Window Visible"), out visible))
 							IsVisible = visible;
 						else
