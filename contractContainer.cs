@@ -36,23 +36,30 @@ namespace ContractsWindow
 	internal class contractContainer
 	{
 		internal Contract contract;
-		internal float science, repReward, repPenalty, totalScience, totalRepReward, totalRepPenalty;
-		internal double expiration, acceptance, duration, reward, advance, penalty, totalReward, totalPenalty;
+		internal float totalScience, totalRepReward, totalRepPenalty;
+		internal double deadline, totalReward, totalPenalty;
 		internal bool showParams;
+		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
+		//Store info on contracts
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
-			expiration = contract.DateDeadline;
-			acceptance = contract.DateAccepted;
-			duration = expiration - acceptance;
-			advance = contract.FundsAdvance;
-			reward = totalReward = contract.FundsCompletion;
-			penalty = totalPenalty = contract.FundsFailure;
-			science = totalScience = contract.ScienceCompletion;
-			repReward = totalRepReward = contract.ReputationCompletion;
-			repPenalty = totalRepPenalty = contract.ReputationFailure;
+
+			//No-expiration date contracts have negative DateExpire values
+			deadline = contract.DateDeadline;
+			if (deadline <= 0 && contract.ContractState == Contracts.Contract.State.Active)
+				deadline = double.MaxValue;
+
+			//Calculate time in day values using Kerbin or Earth days
+			daysToExpire = timeInDays(contract.DateDeadline - Planetarium.GetUniversalTime());
+
+			totalReward = contract.FundsCompletion;
+			totalPenalty = contract.FundsFailure;
+			totalScience = contract.ScienceCompletion;
+			totalRepReward = contract.ReputationCompletion;
+			totalRepPenalty = contract.ReputationFailure;
 			showParams = true;
 
 			foreach (ContractParameter param in contract.AllParameters)
@@ -65,8 +72,37 @@ namespace ContractsWindow
 				totalScience += param.ScienceCompletion;
 			}
 		}
+
+		private string timeInDays(double D)
+		{
+			if (D <= 0)
+				return "---";
+
+			int[] time = KSPUtil.GetDateFromUT((int)D);
+			string s = "";
+
+			if (time[4] > 0)
+				s = string.Format("{0}y", time[4]);
+			if (time[3] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}d", time[3]);
+			}
+			if (time[4] <= 0 && time[2] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}h", time[2]);
+			}
+			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
+				s = string.Format("{0}m", time[1]);
+
+			return s;
+		}
 	}
 
+	//Store some info about contract parameters
 	internal class parameterContainer
 	{
 		internal ContractParameter cParam;
@@ -77,6 +113,15 @@ namespace ContractsWindow
 			cParam = cP;
 			showNote = false;
 		}
+	}
+
+	enum sortClass
+	{
+		Default = 1,
+		Expiration = 2,
+		Acceptance = 3,
+		Difficulty = 4,
+		Reward = 5,
 	}
 
 }
