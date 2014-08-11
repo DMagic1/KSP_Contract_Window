@@ -37,9 +37,18 @@ namespace ContractsWindow
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	class contractSkins: MonoBehaviourExtended
 	{
+		internal static GUISkin contractUnitySkin;
+		internal static GUISkin contractKSPSkin;
+
+		internal static GUIStyle newWindowStyle;
+
 		internal static GUIStyle contractActive;
 		internal static GUIStyle contractCompleted;
 		internal static GUIStyle contractFailed;
+
+		internal static GUIStyle contractActiveBehind;
+		internal static GUIStyle contractCompletedBehind;
+		internal static GUIStyle contractFailedBehind;
 
 		internal static GUIStyle paramText;
 		internal static GUIStyle paramCompleted;
@@ -54,45 +63,68 @@ namespace ContractsWindow
 
 		internal static GUIStyle timerGood;
 		internal static GUIStyle timerBad;
+		internal static GUIStyle timerFinished;
 
-		internal static GUIStyle fundsReward;
-		internal static GUIStyle fundsAdvance;
-		internal static GUIStyle fundsPenalty;
-		internal static GUIStyle repReward;
-		internal static GUIStyle repPenalty;
+		internal static GUIStyle reward;
+		internal static GUIStyle advance;
+		internal static GUIStyle penalty;
 		internal static GUIStyle scienceReward;
+		internal static GUIStyle texLabel;
+
+		internal static GUIStyle texButton;
+		internal static GUIStyle dragButton;
 
 		internal static Texture2D fundsGreen;
-		//internal static Texture2D fundsRed;
-		//internal static Texture2D repGreen;
-		//internal static Texture2D repRed;
-		//internal static Texture2D science;
+		internal static Texture2D fundsRed;
+		internal static Texture2D repGreen;
+		internal static Texture2D repRed;
+		internal static Texture2D science;
 		internal static Texture2D expandIcon;
 		internal static Texture2D dropDownTex;
+		internal static Texture2D expandRight;
+		internal static Texture2D expandRightStop;
+		internal static Texture2D collapseLeft;
+		internal static Texture2D collapseLeftStop;
+		internal static Texture2D orderAsc;
+		internal static Texture2D orderDesc;
+		internal static Texture2D windowTex;
+		internal static Texture2D sortIcon;
 
 		internal override void OnGUIOnceOnly()
 		{
 
 			//Fetch icon textures
 			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);
-			//fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
-			//repGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepGreenIcon", false);
-			//repRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepRedIcon", false);
-			//science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
+			fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
+			repGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepGreenIcon", false);
+			repRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepRedIcon", false);
+			science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
 			expandIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResizeIcon", false);
-			dropDownTex = new Texture2D(1, 1);
-			dropDownTex.SetPixel(0, 0, XKCDColors.AlmostBlack);
-			dropDownTex.Apply();
+			expandRight = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ExpandRight", false);
+			expandRightStop = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ExpandRightStop", false);
+			collapseLeft = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CollapseLeft", false);
+			collapseLeftStop = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CollapseLeftStop", false);
+			orderAsc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderAsc", false);
+			orderDesc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderDesc", false);
+			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
+			dropDownTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DropDownTex", false);
+			sortIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SortIcon", false);
 
 			//Initialize Skins
-			GUISkin contractKSP = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
-			contractKSP.button = SkinsLibrary.DefKSPSkin.button;
-			SkinsLibrary.AddSkin("DefaultSkin", contractKSP);
+			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
+			contractKSPSkin.button = SkinsLibrary.DefKSPSkin.button;
+			SkinsLibrary.AddSkin("ContractKSPSkin", contractKSPSkin);
 
-			GUISkin contractUnity = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.Unity);
-			contractUnity.button = SkinsLibrary.DefUnitySkin.button;
-			contractUnity.box = SkinsLibrary.DefUnitySkin.box;
-			SkinsLibrary.AddSkin("UnitySkin", contractUnity);
+			contractUnitySkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.Unity);
+			SkinsLibrary.AddSkin("ContractUnitySkin", contractUnitySkin);
+
+			//Main Window Style
+			newWindowStyle = new GUIStyle(SkinsLibrary.DefUnitySkin.window);
+			newWindowStyle.name = "WindowStyle";
+			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
+			newWindowStyle.normal.background = windowTex;
+			newWindowStyle.focused.background = newWindowStyle.normal.background;
+			newWindowStyle.onNormal.background = newWindowStyle.normal.background;
 
 			//Contract Title Style
 			contractActive = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
@@ -101,17 +133,33 @@ namespace ContractsWindow
 			contractActive.alignment = TextAnchor.UpperLeft;
 			contractActive.normal.textColor = XKCDColors.DustyOrange;
 			contractActive.wordWrap = true;
+			contractActive.margin = new RectOffset(1, 3, 2, 2);
+
+			contractActiveBehind = new GUIStyle(contractActive);
+			contractActiveBehind.name = "ContractActiveTextBehind";
+			contractActiveBehind.hover.background = contractActiveBehind.normal.background;
+			contractActiveBehind.hover.textColor = contractActiveBehind.normal.textColor;
 
 			contractCompleted = new GUIStyle(contractActive);
 			contractCompleted.name = "ContractCompleteText";
 			contractCompleted.normal.textColor = XKCDColors.FreshGreen;
 
+			contractCompletedBehind = new GUIStyle(contractCompleted);
+			contractCompletedBehind.name = "ContractCompletedTextBehind";
+			contractCompletedBehind.hover.background = contractCompletedBehind.normal.background;
+			contractCompletedBehind.hover.textColor = contractCompletedBehind.normal.textColor;
+
 			contractFailed = new GUIStyle(contractActive);
 			contractFailed.name = "ContractFailedText";
 			contractFailed.normal.textColor = XKCDColors.Red;
 
+			contractFailedBehind = new GUIStyle(contractFailed);
+			contractFailedBehind.name = "ContractFailedTextBehind";
+			contractFailedBehind.hover.background = contractFailedBehind.normal.background;
+			contractFailedBehind.hover.textColor = contractFailedBehind.normal.textColor;
+
 			//Parameter Style
-			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
+			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			paramText.name = "ParameterText";
 			paramText.fontSize = 11;
 			paramText.normal.textColor = new Color(220, 220, 220);
@@ -127,7 +175,7 @@ namespace ContractsWindow
 			paramFailed.normal.textColor = XKCDColors.Red;
 
 			//Note Style
-			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
+			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			noteText.name = "ContractNoteText";
 			noteText.fontSize = 11;
 			noteText.wordWrap = true;
@@ -136,7 +184,8 @@ namespace ContractsWindow
 
 			noteButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			noteButton.name = "ContractNoteButton";
-			noteButton.fontSize = 12;
+			noteButton.fontSize = 10;
+			noteButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
 			noteButton.alignment = TextAnchor.MiddleLeft;
 			noteButton.normal.textColor = XKCDColors.AquaBlue;
 
@@ -146,34 +195,37 @@ namespace ContractsWindow
 			timerGood.fontSize = 11;
 			timerGood.normal.textColor = XKCDColors.FreshGreen;
 			timerGood.wordWrap = false;
-			timerGood.alignment = TextAnchor.MiddleCenter;
+			timerGood.alignment = TextAnchor.LowerCenter;
 
 			timerBad = new GUIStyle(timerGood);
 			timerBad.name = "TimerBad";
 			timerBad.normal.textColor = XKCDColors.VomitYellow;
 
-			fundsReward = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
-			fundsReward.name = "FundsReward";
-			fundsReward.fontSize = 10;
-			fundsReward.normal.textColor = XKCDColors.FreshGreen;
-			fundsReward.wordWrap = false;
-			fundsReward.alignment = TextAnchor.MiddleLeft;
+			timerFinished = new GUIStyle(timerGood);
+			timerFinished.name = "TimerFinished";
+			timerFinished.normal.textColor = XKCDColors.Red;
 
-			fundsAdvance = new GUIStyle(fundsReward);
-			fundsAdvance.name = "FundsAdvance";
-			fundsAdvance.normal.textColor = XKCDColors.SunYellow;
+			reward = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			reward.name = "FundsReward";
+			reward.fontSize = 10;
+			reward.normal.textColor = XKCDColors.FreshGreen;
+			//reward.normal.background = SkinsLibrary.DefUnitySkin.box.normal.background;
+			reward.wordWrap = false;
+			reward.alignment = TextAnchor.MiddleLeft;
 
-			fundsPenalty = new GUIStyle(fundsReward);
-			fundsPenalty.name = "FundsPenalty";
-			fundsPenalty.normal.textColor = XKCDColors.Red;
+			advance = new GUIStyle(reward);
+			advance.name = "FundsAdvance";
+			advance.normal.textColor = XKCDColors.SunYellow;
 
-			repReward = new GUIStyle(fundsReward);
-			repReward.name = "RepReward";
+			penalty = new GUIStyle(reward);
+			penalty.name = "FundsPenalty";
+			penalty.normal.textColor = XKCDColors.OrangeyRed;
 
-			repPenalty = new GUIStyle(fundsPenalty);
-			repPenalty.name = "RepPenalty";
+			texLabel = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			texLabel.name = "TexLabel";
+			texLabel.padding = new RectOffset(0, 0, 0, 0);
 
-			scienceReward = new GUIStyle(fundsReward);
+			scienceReward = new GUIStyle(reward);
 			scienceReward.name = "ScienceReward";
 			scienceReward.normal.textColor = XKCDColors.AquaBlue;
 
@@ -181,40 +233,48 @@ namespace ContractsWindow
 			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			dropDown.name = "DropDown";
 			dropDown.normal.background = dropDownTex;
+			//dropDown.normal.background.SetPixel(1, 1, XKCDColors.AlmostBlack);
+			//dropDown.normal.background.Apply();
 
-			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			sortMenu.name = "SortMenu";
 			sortMenu.fontSize = 12;
+			sortMenu.padding = new RectOffset(2, 2, 2, 2);
 			sortMenu.normal.textColor = XKCDColors.White;
+			sortMenu.hover.textColor = XKCDColors.AlmostBlack;
+			Texture2D sortBackground = new Texture2D(1, 1);
+			sortBackground.SetPixel(1, 1, XKCDColors.OffWhite);
+			sortBackground.Apply();
+			sortMenu.hover.background = sortBackground;
 			sortMenu.alignment = TextAnchor.MiddleLeft;
 
 			sortOrder = new GUIStyle(sortMenu);
 			sortOrder.name = "SortOrder";
-			sortOrder.alignment = TextAnchor.MiddleCenter;
+			//sortOrder.padding
+
+			texButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			texButton.name = "TexButton";
+			texButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
+			texButton.hover.background = SkinsLibrary.DefUnitySkin.label.normal.background;
+			texButton.padding = new RectOffset(1, 1, 2, 2);
+			//texButton.border = new RectOffset(9, 4, 6, 3);
+
+			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			dragButton.name = "DragButton";
+			dragButton.padding = new RectOffset(1, 2, 0, 0);
 
 			//Add skins and styles to the library
-			SkinsLibrary.List["UnitySkin"].button = new GUIStyle(contractActive);
-			SkinsLibrary.List["UnitySkin"].box = new GUIStyle(paramText);
+			SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
+			SkinsLibrary.List["ContractUnitySkin"].button = new GUIStyle(texButton);
+			SkinsLibrary.List["ContractUnitySkin"].box = new GUIStyle(noteText);
+			SkinsLibrary.List["ContractUnitySkin"].label = new GUIStyle(texLabel);
 
-			SkinsLibrary.AddStyle("UnitySkin", "ParameterText", paramText);
-			SkinsLibrary.AddStyle("UnitySkin", "ParameterCompleteText", paramCompleted);
-			SkinsLibrary.AddStyle("UnitySkin", "ParameterFailedText", paramFailed);
-			SkinsLibrary.AddStyle("UnitySkin", "ContractActiveText", contractActive);
-			SkinsLibrary.AddStyle("UnitySkin", "ContractCompleteText", contractCompleted);
-			SkinsLibrary.AddStyle("UnitySkin", "ContractFailedText", contractFailed);
-			SkinsLibrary.AddStyle("UnitySkin", "ContractNoteText", noteText);
-			SkinsLibrary.AddStyle("UnitySkin", "ContractNoteButton", noteButton);
-			SkinsLibrary.AddStyle("UnitySkin", "TimerGood", timerGood);
-			SkinsLibrary.AddStyle("UnitySkin", "TimerBad", timerBad);
-			SkinsLibrary.AddStyle("UnitySkin", "FundsReward", fundsReward);
-			SkinsLibrary.AddStyle("UnitySkin", "FundsAdvance", fundsAdvance);
-			SkinsLibrary.AddStyle("UnitySkin", "FundsPenalty", fundsPenalty);
-			SkinsLibrary.AddStyle("UnitySkin", "RepReward", repReward);
-			SkinsLibrary.AddStyle("UnitySkin", "RepPenalty", repPenalty);
-			SkinsLibrary.AddStyle("UnitySkin", "ScienceReward", scienceReward);
-			SkinsLibrary.AddStyle("UnitySkin", "DropDown", dropDown);
-			SkinsLibrary.AddStyle("UnitySkin", "SortMenu", sortMenu);
-			SkinsLibrary.AddStyle("UnitySkin", "SortOrder", sortOrder);
+			SkinsLibrary.AddStyle("ContractUnitySkin", newWindowStyle);
+			SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
+			SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
+			SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
+
+			
 
 		}
 	}
