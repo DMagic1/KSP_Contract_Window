@@ -46,15 +46,19 @@ namespace ContractsWindow
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
-
-			//No-expiration date contracts have negative DateExpire values
 			deadline = contract.DateDeadline;
-			duration = deadline - Planetarium.GetUniversalTime();
-			if (deadline <= 0 && contract.ContractState == Contracts.Contract.State.Active)
-				deadline = double.MaxValue;
 
-			//Calculate time in day values using Kerbin or Earth days
-			daysToExpire = timeInDays(duration);
+			if (deadline <= 0)
+			{
+				duration = double.MaxValue;
+				daysToExpire = "----";
+			}
+			else
+			{
+				duration = deadline - Planetarium.GetUniversalTime();
+				//Calculate time in day values using Kerbin or Earth days
+				daysToExpire = timeInDays(duration);
+			}
 
 			fundsReward = totalReward = contract.FundsCompletion;
 			fundsPenalty = totalPenalty = contract.FundsFailure;
@@ -77,7 +81,7 @@ namespace ContractsWindow
 		internal static string timeInDays(double D)
 		{
 			if (D <= 0)
-				return "---";
+				return "----";
 
 			int[] time = KSPUtil.GetDateFromUT((int)D);
 			string s = "";
