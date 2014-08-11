@@ -39,15 +39,20 @@ namespace ContractsWindow
 
 		internal contractToolbar()
 		{
-			contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractManager");
+			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+			{
+				contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractManager");
 
-			if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/Contracts Window/Textures/ContractsIcon.png").Replace("\\", "/")))
-				contractButton.TexturePath = "Contracts Window/Textures/ContractsIcon";
+				if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/Contracts Window/Textures/ContractsIcon.png").Replace("\\", "/")))
+					contractButton.TexturePath = "Contracts Window/Textures/ContractsIcon";
+				else
+					contractButton.TexturePath = "000_Toolbar/resize-cursor";
+
+				contractButton.ToolTip = "Contract Manager";
+				contractButton.OnClick += (e) => contractsWindow.IsVisible = !contractsWindow.IsVisible;
+			}
 			else
-				contractButton.TexturePath = "000_Toolbar/resize-cursor";
-
-			contractButton.ToolTip = "Contract Manager";
-			contractButton.OnClick += (e) => contractsWindow.IsVisible = !contractsWindow.IsVisible;
+				return;
 		}
 
 		internal void OnDestroy()
