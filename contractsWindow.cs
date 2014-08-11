@@ -207,8 +207,10 @@ namespace ContractsWindow
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 					else if (c.duration > 0)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
-					else
+					else if (c.contract.ContractState != Contract.State.Active)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
+					else
+						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 				}
 				if (windowMode == 2)
 				{
@@ -217,10 +219,12 @@ namespace ContractsWindow
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 					else if (c.duration > 0)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
-					else
+					else if (c.contract.ContractState != Contract.State.Active)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
+					else
+						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 
-					GUILayout.FlexibleSpace();
+					//GUILayout.FlexibleSpace();
 					GUILayout.BeginVertical();
 					if (c.fundsReward > 0)
 					{
@@ -298,7 +302,7 @@ namespace ContractsWindow
 
 								if (windowMode == 2)
 								{
-									GUILayout.FlexibleSpace();
+									//GUILayout.FlexibleSpace();
 									GUILayout.BeginVertical();
 									if (cP.cParam.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
 									{
@@ -371,7 +375,7 @@ namespace ContractsWindow
 								GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(250));
 								if (windowMode == 2)
 								{
-									GUILayout.FlexibleSpace();
+									//GUILayout.FlexibleSpace();
 									GUILayout.BeginVertical();
 									if (cP.cParam.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
 									{
@@ -563,7 +567,7 @@ namespace ContractsWindow
 				if (s == sortClass.Default)
 					return cL;
 				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => a.deadline.CompareTo(b.deadline));
+					cL.Sort((a, b) => a.duration.CompareTo(b.duration));
 				else if (s == sortClass.Acceptance)
 					cL.Sort((a, b) => a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
 				else if (s == sortClass.Reward)
@@ -576,7 +580,7 @@ namespace ContractsWindow
 				if (s == sortClass.Default)
 					return cL;
 				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => -a.deadline.CompareTo(b.deadline));
+					cL.Sort((a, b) => -a.duration.CompareTo(b.duration));
 				else if (s == sortClass.Acceptance)
 					cL.Sort((a, b) => -a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
 				else if (s == sortClass.Reward)
@@ -677,10 +681,17 @@ namespace ContractsWindow
 					continue;
 				}
 				//Update contract timers
-				cC.duration = cC.deadline - Planetarium.GetUniversalTime();
-				if (cC.deadline <= 0 && cC.contract.ContractState == Contracts.Contract.State.Active)
-					cC.deadline = double.MaxValue;
-				cC.daysToExpire = contractContainer.timeInDays(cC.duration);
+				if (cC.contract.DateDeadline <= 0)
+				{
+					cC.duration = double.MaxValue;
+					cC.daysToExpire = "----";
+				}
+				else
+				{
+					cC.duration = cC.deadline - Planetarium.GetUniversalTime();
+					//Calculate time in day values using Kerbin or Earth days
+					cC.daysToExpire = contractContainer.timeInDays(cC.duration);
+				}
 			}
 		}
 
