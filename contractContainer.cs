@@ -36,8 +36,8 @@ namespace ContractsWindow
 	internal class contractContainer
 	{
 		internal Contract contract;
-		internal float totalScience, totalRepReward, totalRepPenalty;
-		internal double deadline, totalReward, totalPenalty;
+		internal float totalScience, totalRepReward, totalRepPenalty, science, repReward, repPenalty;
+		internal double deadline, totalReward, totalPenalty, fundsReward, fundsPenalty, duration;
 		internal bool showParams;
 		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
@@ -49,17 +49,18 @@ namespace ContractsWindow
 
 			//No-expiration date contracts have negative DateExpire values
 			deadline = contract.DateDeadline;
+			duration = deadline - Planetarium.GetUniversalTime();
 			if (deadline <= 0 && contract.ContractState == Contracts.Contract.State.Active)
 				deadline = double.MaxValue;
 
 			//Calculate time in day values using Kerbin or Earth days
-			daysToExpire = timeInDays(contract.DateDeadline - Planetarium.GetUniversalTime());
+			daysToExpire = timeInDays(duration);
 
-			totalReward = contract.FundsCompletion;
-			totalPenalty = contract.FundsFailure;
-			totalScience = contract.ScienceCompletion;
-			totalRepReward = contract.ReputationCompletion;
-			totalRepPenalty = contract.ReputationFailure;
+			fundsReward = totalReward = contract.FundsCompletion;
+			fundsPenalty = totalPenalty = contract.FundsFailure;
+			science = totalScience = contract.ScienceCompletion;
+			repReward = totalRepReward = contract.ReputationCompletion;
+			repPenalty = totalRepPenalty = contract.ReputationFailure;
 			showParams = true;
 
 			foreach (ContractParameter param in contract.AllParameters)
@@ -73,7 +74,7 @@ namespace ContractsWindow
 			}
 		}
 
-		private string timeInDays(double D)
+		internal static string timeInDays(double D)
 		{
 			if (D <= 0)
 				return "---";
