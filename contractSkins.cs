@@ -89,6 +89,11 @@ namespace ContractsWindow
 		internal static Texture2D orderDesc;
 		internal static Texture2D windowTex;
 		internal static Texture2D sortIcon;
+		internal static Texture2D hiddenListIcon;
+		internal static Texture2D defaultListIcon;
+		internal static Texture2D pinIcon;
+		internal static Texture2D hideIcon;
+		internal static Texture2D showIcon;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -109,6 +114,11 @@ namespace ContractsWindow
 			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
 			dropDownTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DropDownTex", false);
 			sortIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SortIcon", false);
+			hiddenListIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HiddenList", false);
+			defaultListIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DefaultList", false);
+			pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
+			hideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HideIcon", false);
+			showIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ShowIcon", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
