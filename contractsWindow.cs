@@ -44,7 +44,7 @@ namespace ContractsWindow
 		#region Initialization
 
 		internal static bool IsVisible;
-		private List<contractContainer> cList = new List<contractContainer>();
+		private List<contractContainer> cList, hiddenList = new List<contractContainer>();
 		private string version, assemblyLocation, assemblyFolder, fileLocation;
 		private Assembly assembly;
 		private Vector2 scroll;
@@ -53,7 +53,8 @@ namespace ContractsWindow
 		private sortClass sort;
 		private int order; //0 is descending, 1 is ascending
 		private int windowMode; //0 is compact, 1 is expiration display, 2 is full display
-		private Rect dropDownSort, resizer;
+		private int showHideList; //0 is standard list, 1 is hidden list
+		//private Rect dropDownSort, resizer;
 		
 		internal override void Awake()
 		{
@@ -69,7 +70,7 @@ namespace ContractsWindow
 
 				sort = sortClass.Default;
 				order = 0;
-				WindowCaption = string.Format("Contracts {0}", version);
+				WindowCaption = "Contracts +";
 				WindowRect = new Rect(40, 80, 250, 300);
 				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 				WindowStyle = contractSkins.newWindowStyle;
@@ -79,9 +80,9 @@ namespace ContractsWindow
 
 
 				PersistenceLoad();
-				dropDownSort = new Rect(10, 20, 80, 88);
+				//dropDownSort = new Rect(10, 20, 80, 88);
 				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
-				resizer = new Rect(WindowRect.width - 15, WindowRect.height - 30, 20, 26);
+				//resizer = new Rect(WindowRect.width - 15, WindowRect.height - 30, 20, 26);
 				PersistenceSave();
 
 				SetRepeatRate(10);
@@ -128,7 +129,8 @@ namespace ContractsWindow
 			GUILayout.BeginVertical();
 
 			//Menu Bar
-			GUILayout.BeginHorizontal();
+
+			//Sort icons
 			if (GUI.Button(new Rect(5, 1, 30, 17), contractSkins.sortIcon))
 				showSort = !showSort;
 			if (order == 0)
@@ -136,7 +138,10 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(36, 1, 24, 17), contractSkins.orderAsc))
 				{
 					order = 1;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 			}
 			if (order == 1)
@@ -144,10 +149,32 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(36, 1, 24, 17), contractSkins.orderDesc))
 				{
 					order = 0;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 			}
-			GUILayout.Space(90);
+
+			//Show and hide icons
+			if (showHideList == 0)
+			{
+				if (GUI.Button(new Rect(70, 1, 26, 17), contractSkins.hiddenListIcon))
+				{
+					showHideList = 1;
+					refreshContracts(hiddenList);
+				}
+			}
+			if (showHideList == 1)
+			{
+				if (GUI.Button(new Rect(70, 1, 26, 17), contractSkins.defaultListIcon))
+				{
+					showHideList = 0;
+					refreshContracts(cList);
+				}
+			}
+
+			//Expand and contract icons
 			if (windowMode == 0)
 			{
 				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRight))
@@ -185,11 +212,12 @@ namespace ContractsWindow
 					PersistenceSave();
 				}
 			}
-			GUILayout.EndHorizontal();
+
 			GUILayout.Space(8);
 
-			//Contract List Begins
 			scroll = GUILayout.BeginScrollView(scroll);
+
+			//Contract List Begins
 			foreach (contractContainer c in cList)
 			{
 				GUILayout.BeginHorizontal();
@@ -199,10 +227,22 @@ namespace ContractsWindow
 						c.showParams = !c.showParams;
 				}
 				else
-					GUILayout.Box(c.contract.Title, hoverTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
+					GUILayout.Box(c.contract.Title, backgroundTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
+
+				GUILayout.BeginVertical();
+				if (showHideList == 0)
+				{
+
+				}
+				if (showHideList == 1)
+				{
+					
+				}
+				GUILayout.EndVertical();
+
 				if (windowMode == 1)
 				{
-					GUILayout.Space(5);
+					GUILayout.Space(1);
 					if (c.duration >= 2160000)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 					else if (c.duration > 0)
@@ -214,7 +254,7 @@ namespace ContractsWindow
 				}
 				if (windowMode == 2)
 				{
-					GUILayout.Space(5);
+					GUILayout.Space(1);
 					if (c.duration >= 2160000)
 						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 					else if (c.duration > 0)
@@ -441,37 +481,55 @@ namespace ContractsWindow
 			if (showSort)
 			{
 				GUILayout.BeginVertical();
+				Rect dropDownSort = new Rect(10, 20, 80, 88);
 				GUI.Box(dropDownSort, "", contractSkins.dropDown);
 				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 2, dropDownSort.width - 4, 20), "Expiration", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Expiration;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 23, dropDownSort.width - 4, 20), "Acceptance", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Acceptance;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 44, dropDownSort.width - 4, 20), "Difficulty", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Difficulty;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 65, dropDownSort.width - 4, 20), "Reward", contractSkins.sortMenu))
 				{
 					showSort = false;
 					sort = sortClass.Reward;
-					cList = sortList(cList, sort, order);
+					if (showHideList == 0)
+						refreshContracts(cList);
+					if (showHideList == 1)
+						refreshContracts(hiddenList);
 				}
 
 				GUILayout.EndVertical();
 			}
-			resizer = new Rect(WindowRect.width - 19, WindowRect.height - 28, 20, 26);
+
+			//Version label
+			GUI.Label(new Rect(2, WindowRect.height - 8, 30, 20), version, contractSkins.paramText);
+
+			//Resize rectangle
+			Rect resizer = new Rect(WindowRect.width - 19, WindowRect.height - 28, 20, 26);
 			GUI.Label(resizer, contractSkins.expandIcon, contractSkins.dragButton);
-			//Resize window when the resizer is grabbed by the mouse
+
 			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 			{
 				if (resizer.Contains(Event.current.mousePosition))
@@ -608,7 +666,8 @@ namespace ContractsWindow
 			}
 		}
 
-		private GUIStyle hoverTitleState(Contract.State s)
+		//Use this when a foreground menu is open
+		private GUIStyle backgroundTitleState(Contract.State s)
 		{
 			switch (s)
 			{
@@ -659,6 +718,7 @@ namespace ContractsWindow
 			cList = sortList(cList, sort, order);
 		}
 
+		//This one is called by the repeating worker
 		private void refreshContracts(List<contractContainer> cL)
 		{
 			foreach (contractContainer cC in cL)
@@ -689,11 +749,29 @@ namespace ContractsWindow
 				else
 				{
 					cC.duration = cC.deadline - Planetarium.GetUniversalTime();
-					//Calculate time in day values using Kerbin or Earth days
 					cC.daysToExpire = contractContainer.timeInDays(cC.duration);
 				}
 			}
+			cL = sortList(cL, sort, order);
 		}
+
+		//Remove contract from primary list and update
+		private void showHideContract(contractContainer c)
+		{
+			if (showHideList == 0)
+			{
+				hiddenList.Add(c);
+				cList.Remove(c);
+				refreshContracts(cList);
+			}
+			else
+			{
+				cList.Add(c);
+				hiddenList.Remove(c);
+				refreshContracts(hiddenList);
+			}
+		}
+
 
 		#endregion
 
