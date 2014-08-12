@@ -95,6 +95,7 @@ namespace ContractsWindow
 		internal static Texture2D revealHideIcon;
 		internal static Texture2D revealShowIcon;
 		internal static Texture2D tooltipIcon;
+		internal static Texture2D buttonHover;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -121,6 +122,7 @@ namespace ContractsWindow
 			revealHideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealHideIcon", false);
 			revealShowIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealShowIcon", false);
 			tooltipIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ToolTipIcon", false);
+			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -262,14 +264,12 @@ namespace ContractsWindow
 
 			sortOrder = new GUIStyle(sortMenu);
 			sortOrder.name = "SortOrder";
-			//sortOrder.padding
 
 			texButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			texButton.name = "TexButton";
 			texButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
-			texButton.hover.background = SkinsLibrary.DefUnitySkin.label.normal.background;
+			texButton.hover.background = buttonHover;
 			texButton.padding = new RectOffset(1, 1, 2, 2);
-			//texButton.border = new RectOffset(9, 4, 6, 3);
 
 			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
