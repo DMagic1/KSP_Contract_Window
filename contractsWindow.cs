@@ -37,7 +37,7 @@ using UnityEngine;
 
 namespace ContractsWindow
 {
-	[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
+	//[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
 	class contractsWindow: MonoBehaviourWindow
 	{
 
@@ -48,74 +48,53 @@ namespace ContractsWindow
 		private List<contractContainer> showList = new List<contractContainer>();
 		private List<contractContainer> hiddenList = new List<contractContainer>();
 		private List<contractContainer> nextRemoveList = new List<contractContainer>();
-		private string version, assemblyLocation, assemblyFolder, fileLocation;
+		private string version;
 		private Assembly assembly;
 		private Vector2 scroll;
-		private bool resizing, visible, fileFound, showSort;
-		private float dragStart, windowHeight, windowX, windowY, windowW, windowH, windowMaxY;
+		private bool resizing, showSort;
+		private float dragStart, windowHeight;
 		private sortClass sort;
 		private int order; //0 is descending, 1 is ascending
 		private int windowMode; //0 is compact, 1 is expiration display, 2 is full display
 		private int showHideList; //0 is standard, 1 shows hidden contracts
-		
+
+		private contractScenario contract = contractScenario.Instance;
+
 		internal override void Awake()
 		{
-			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
-			{
-				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
-				assemblyLocation = assembly.Location.Replace("\\", "/");
-				version = FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion;
-				assemblyFolder = System.IO.Path.GetDirectoryName(assemblyLocation).Replace("\\", "/");
-				fileLocation = assemblyFolder + "/WindowSettings.cfg";
-				if (System.IO.File.Exists(fileLocation))
-					fileFound = true;
+			assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
+			version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
 
-				sort = sortClass.Default;
-				order = 0;
-				WindowCaption = "Contracts +";
-				WindowRect = new Rect(40, 80, 250, 300);
-				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
-				WindowStyle = contractSkins.newWindowStyle;
-				Visible = true;
-				DragEnabled = true;
-				TooltipsEnabled = true;
-				TooltipMouseOffset = new Vector2d(-10, -20);
-				IsVisible = false;
+			WindowCaption = "Contracts +";
+			WindowRect = new Rect(40, 80, 250, 300);
+			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
+			WindowStyle = contractSkins.newWindowStyle;
+			Visible = true;
+			DragEnabled = true;
+			TooltipMouseOffset = new Vector2d(-10, -25);
 
-				PersistenceLoad();
-				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
+			SetRepeatRate(10);
+			RepeatingWorkerInitialWait = 15;
+			StartRepeatingWorker();
 
-				PersistenceSave();
+			InputLockManager.RemoveControlLock("ContractsWindow".GetHashCode().ToString());
 
-				SetRepeatRate(10);
-				RepeatingWorkerInitialWait = 15;
-				StartRepeatingWorker();
+			SkinsLibrary.SetCurrent("ContractUnitySkin");
 
-				InputLockManager.RemoveControlLock(_AssemblyName.GetHashCode().ToString());
-
-				SkinsLibrary.SetCurrent("ContractUnitySkin");
-			}
-			else
-			{
-				//Shutdown everything if we aren't in career mode
-				Visible = false;
-				Toggle = false;
-				WindowRect = new Rect(0, 0, 0, 0);
-			}
 		}
 
 		internal override void Start()
 		{
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
+			PersistenceLoad();
 		}
 
 		internal override void OnDestroy()
 		{
-			EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+			EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
-			PersistenceSave();
 		}
 
 		internal override void Update()
@@ -170,6 +149,7 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(33, 1, 24, 17), new GUIContent(contractSkins.orderAsc, "Ascending Order")))
 				{
 					order = 1;
+					contractScenario.Instance.setOrderMode(order);
 					refreshContracts(cList);
 				}
 			}
@@ -178,6 +158,7 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(33, 1, 24, 17), new GUIContent(contractSkins.orderDesc, "Descending Order")))
 				{
 					order = 0;
+					contractScenario.Instance.setOrderMode(order);
 					refreshContracts(cList);
 				}
 			}
@@ -185,18 +166,20 @@ namespace ContractsWindow
 			//Show and hide icons
 			if (showHideList == 0)
 			{
-				if (GUI.Button(new Rect(60, 1, 26, 17), new GUIContent(contractSkins.revealShowIcon, "Show Hidden Contracts")))
+				if (GUI.Button(new Rect(60, 1, 26, 19), new GUIContent(contractSkins.revealShowIcon, "Show Hidden Contracts")))
 				{
 					showHideList = 1;
+					contractScenario.Instance.setShowHideMode(showHideList);
 					cList = hiddenList;
 					refreshContracts(cList);
 				}
 			}
 			else if (showHideList == 1)
 			{
-				if (GUI.Button(new Rect(60, 1, 26, 17), new GUIContent(contractSkins.revealHideIcon, "Show Standard Contracts")))
+				if (GUI.Button(new Rect(60, 1, 26, 19), new GUIContent(contractSkins.revealHideIcon, "Show Standard Contracts")))
 				{
 					showHideList = 0;
+					contractScenario.Instance.setShowHideMode(showHideList);
 					cList = showList;
 					refreshContracts(cList);
 				}
@@ -208,9 +191,10 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRight))
 				{
 					windowMode = 1;
+					contractScenario.Instance.setWindowMode(windowMode);
 					WindowRect.width = 290;
+					contractScenario.Instance.setWindowPosition((int)WindowRect.x, (int)WindowRect.y, (int)WindowRect.width, (int)WindowRect.height);
 					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
 				}
 			}
 			else if (windowMode == 1)
@@ -218,16 +202,18 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(WindowRect.width - 48, 1, 24, 18), contractSkins.collapseLeftStop))
 				{
 					windowMode = 0;
+					contractScenario.Instance.setWindowMode(windowMode);
 					WindowRect.width = 250;
+					contractScenario.Instance.setWindowPosition((int)WindowRect.x, (int)WindowRect.y, (int)WindowRect.width, (int)WindowRect.height);
 					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
 				}
 				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRightStop))
 				{
 					windowMode = 2;
+					contractScenario.Instance.setWindowMode(windowMode);
 					WindowRect.width = 480;
+					contractScenario.Instance.setWindowPosition((int)WindowRect.x, (int)WindowRect.y, (int)WindowRect.width, (int)WindowRect.height);
 					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
 				}
 			}
 			else if (windowMode == 2)
@@ -235,9 +221,10 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.collapseLeft))
 				{
 					windowMode = 1;
+					contractScenario.Instance.setWindowMode(windowMode);
 					WindowRect.width = 290;
+					contractScenario.Instance.setWindowPosition((int)WindowRect.x, (int)WindowRect.y, (int)WindowRect.width, (int)WindowRect.height);
 					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
 				}
 			}
 		}
@@ -520,24 +507,28 @@ namespace ContractsWindow
 			{
 				showSort = false;
 				sort = sortClass.Expiration;
+				contractScenario.Instance.setSortMode(sort);
 				refreshContracts(cList);
 			}
 			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 23, dropDownSort.width - 4, 20), "Acceptance", contractSkins.sortMenu))
 			{
 				showSort = false;
 				sort = sortClass.Acceptance;
+				contractScenario.Instance.setSortMode(sort);
 				refreshContracts(cList);
 			}
 			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 44, dropDownSort.width - 4, 20), "Difficulty", contractSkins.sortMenu))
 			{
 				showSort = false;
 				sort = sortClass.Difficulty;
+				contractScenario.Instance.setSortMode(sort);
 				refreshContracts(cList);
 			}
 			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 65, dropDownSort.width - 4, 20), "Reward", contractSkins.sortMenu))
 			{
 				showSort = false;
 				sort = sortClass.Reward;
+				contractScenario.Instance.setSortMode(sort);
 				refreshContracts(cList);
 			}
 			GUILayout.EndVertical();
@@ -554,7 +545,10 @@ namespace ContractsWindow
 
 			//Tooltip toggle icon
 			if (GUI.Button(new Rect(40, WindowRect.height - 22, 35, 20), new GUIContent(contractSkins.tooltipIcon, "Toggle Tooltips")))
+			{
 				TooltipsEnabled = !TooltipsEnabled;
+				contractScenario.Instance.setToolTips(TooltipsEnabled);
+			}
 		}
 
 		#endregion
@@ -581,7 +575,7 @@ namespace ContractsWindow
 				{
 					resizing = false;
 					WindowRect.yMax = WindowRect.y + windowHeight;
-					PersistenceSave();
+					contractScenario.Instance.setWindowPosition((int)WindowRect.x, (int)WindowRect.y, (int)WindowRect.width, (int)WindowRect.height);
 				}
 				else
 				{
@@ -623,7 +617,6 @@ namespace ContractsWindow
 				nextRemoveList.Clear();
 			}
 
-			//Draw the resizer in rectangle
 			if (Toggle)
 			{
 				// Hide part rightclick menu.
@@ -644,11 +637,11 @@ namespace ContractsWindow
 					if (WindowRect.Contains(Input.mousePosition))
 					{
 						EditorTooltip.Instance.HideToolTip();
-						EditorLogic.fetch.Lock(false, false, false, _AssemblyName.GetHashCode().ToString());
+						EditorLogic.fetch.Lock(false, false, false, "ContractsWindow".GetHashCode().ToString());
 					}
 					else if (!WindowRect.Contains(Input.mousePosition))
 					{
-						EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+						EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
 					}
 				}
 			}
@@ -668,11 +661,11 @@ namespace ContractsWindow
 				if (s == sortClass.Default)
 					return cL;
 				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => a.duration.CompareTo(b.duration));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => a.totalReward.CompareTo(b.totalReward));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Difficulty)
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
 			}
@@ -681,11 +674,11 @@ namespace ContractsWindow
 				if (s == sortClass.Default)
 					return cL;
 				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => -a.duration.CompareTo(b.duration));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => -a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => -a.totalReward.CompareTo(b.totalReward));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Difficulty)
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
 			}
@@ -744,13 +737,14 @@ namespace ContractsWindow
 		{
 			showList.Add(new contractContainer(c));
 			showList = sortList(cList, sort, order);
-			cList = showList;
+			if (showHideList == 0)
+				cList = showList;
 		}
 
 		//Rebuild contract list when the scene changes
 		private void contractLoaded()
 		{
-			showList.Clear();
+			cList.Clear();
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
 				if (c.ContractState == Contract.State.Active)
@@ -758,8 +752,11 @@ namespace ContractsWindow
 					cList.Add(new contractContainer(c));
 				}
 			}
-			showList = sortList(cList, sort, order);
-			cList = showList;
+			cList = sortList(cList, sort, order);
+			if (showHideList == 0)
+				showList = cList;
+			else if (showHideList == 1)
+				hiddenList = cList;
 		}
 
 		private void refreshContracts(List<contractContainer> cL)
@@ -797,6 +794,10 @@ namespace ContractsWindow
 				}
 			}
 			cL = sortList(cL, sort, order);
+			if (showHideList == 0)
+				contractScenario.Instance.showList = cL;
+			else if (showHideList == 1)
+				contractScenario.Instance.hiddenList = cL;
 		}
 
 		//Remove contract from primary list and update
@@ -836,78 +837,23 @@ namespace ContractsWindow
 		//Load window position and size settings
 		private void PersistenceLoad()
 		{
-			if (fileFound)
-			{
-				ConfigNode node = ConfigNode.Load(fileLocation);
-				if (node != null)
-				{
-					ConfigNode windowNode = node.GetNode("CONTRACT_WINDOW_SETTINGS");
-					if (windowNode != null)
-					{
-						if (float.TryParse(windowNode.GetValue("Window X"), out windowX))
-							WindowRect.x = windowX;
-						else
-							WindowRect.x = 50;
-						if (float.TryParse(windowNode.GetValue("Window Y"), out windowY))
-							WindowRect.y = windowY;
-						else
-							WindowRect.y = 80;
-						if (float.TryParse(windowNode.GetValue("Window Width"), out windowW))
-							WindowRect.width = windowW;
-						else
-							WindowRect.width = 250;
-						if (float.TryParse(windowNode.GetValue("Window Height"), out windowH))
-							WindowRect.height = windowH;
-						else
-							WindowRect.height = 300;
-						if (float.TryParse(windowNode.GetValue("Window MaxY"), out windowMaxY))
-							WindowRect.yMax = windowMaxY;
-						else
-							WindowRect.yMax = 380;
-						if (bool.TryParse(windowNode.GetValue("Window Visible"), out visible))
-							IsVisible = visible;
-						else
-							IsVisible = false;
-						if (!int.TryParse(windowNode.GetValue("Window Mode"), out windowMode))
-							windowMode = 0;
-						if (!int.TryParse(windowNode.GetValue("Sort Mode"), out order))
-							order = 0;
-						int i;
-						if (int.TryParse(windowNode.GetValue("Sort Order"), out i))
-							sort = (sortClass)i;
-						else
-							sort = sortClass.Default;
-					}
-				}
-			}
-		}
+			LogFormatted_DebugOnly("Loading Parameters Now");
+			order = contractScenario.Instance.loadOrderMode();
+			windowMode = contractScenario.Instance.loadWindowMode();
+			sort = contractScenario.Instance.loadSortMode();
+			showHideList = contractScenario.Instance.loadShowHideMode();
+			TooltipsEnabled = contractScenario.Instance.loadToolTips();
+			IsVisible = contractScenario.Instance.loadWindowVisible();
+			int[] i = contractScenario.Instance.loadWindowPosition();
+			WindowRect.x = i[0];
+			WindowRect.y = i[1];
+			WindowRect.width = i[2];
+			WindowRect.height = i[3];
+			DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
 
-		//Save window size and position settings to config file
-		private void PersistenceSave()
-		{
-			if (fileFound)
-			{
-				ConfigNode node = ConfigNode.Load(fileLocation);
-				if (node != null)
-				{
-					node.ClearNodes();
-					ConfigNode windowNode = new ConfigNode("CONTRACT_WINDOW_SETTINGS");
-					if (windowNode != null)
-					{
-						windowNode.AddValue("Window X", WindowRect.x.ToString());
-						windowNode.AddValue("Window Y", WindowRect.y.ToString());
-						windowNode.AddValue("Window Width", WindowRect.width.ToString());
-						windowNode.AddValue("Window Height", WindowRect.height.ToString());
-						windowNode.AddValue("Window MaxY", WindowRect.yMax.ToString());
-						windowNode.AddValue("Window Visible", IsVisible.ToString());
-						windowNode.AddValue("Window Mode", windowMode.ToString());
-						windowNode.AddValue("Sort Mode", order.ToString());
-						windowNode.AddValue("Sort Order", ((int)sort).ToString());
-						node.AddNode(windowNode);
-						node.Save(fileLocation);
-					}
-				}
-			}
+			showList = contractScenario.Instance.showList;
+			hiddenList = contractScenario.Instance.hiddenList;
+			LogFormatted_DebugOnly("Contract Window Loaded");
 		}
 
 		#endregion
