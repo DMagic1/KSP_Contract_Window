@@ -49,7 +49,11 @@ namespace ContractsWindow
 					contractButton.TexturePath = "000_Toolbar/resize-cursor";
 
 				contractButton.ToolTip = "Contract Manager";
-				contractButton.OnClick += (e) => contractsWindow.IsVisible = !contractsWindow.IsVisible;
+				contractButton.OnClick += (e) =>
+					{
+						contractsWindow.IsVisible = !contractsWindow.IsVisible;
+						contractScenario.Instance.setWindowVisible(contractsWindow.IsVisible);
+					};
 			}
 			else
 				return;
