@@ -33,6 +33,7 @@ using System.Diagnostics;
 using System.Reflection;
 
 using Contracts;
+using Contracts.Parameters;
 using UnityEngine;
 
 namespace ContractsWindow
@@ -227,7 +228,10 @@ namespace ContractsWindow
 					DragRect.width = WindowRect.width - 20;
 				}
 			}
+
+			GUI.DrawTexture(new Rect(2, 16, WindowRect.width - 4, 4), contractSkins.headerBar);
 		}
+
 
 		#endregion
 
@@ -305,9 +309,9 @@ namespace ContractsWindow
 					GUILayout.EndHorizontal();
 				}
 				GUILayout.EndVertical();
-
+				
 				//Rep rewards and penalty amounts
-				GUILayout.FlexibleSpace();
+				//GUILayout.FlexibleSpace();
 				GUILayout.BeginVertical();
 				if (c.repReward > 0)
 				{
@@ -330,7 +334,7 @@ namespace ContractsWindow
 				GUILayout.EndVertical();
 
 				//Science reward
-				GUILayout.FlexibleSpace();
+				//GUILayout.FlexibleSpace();
 				if (c.science > 0)
 				{
 					GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
@@ -426,6 +430,12 @@ namespace ContractsWindow
 							GUILayout.Space(-3);
 							GUILayout.Box(cP.cParam.Notes, GUILayout.MaxWidth(261));
 						}
+
+						//Sub parameters
+						if (cP.cParam.ParameterCount > 0)
+						{
+							buildSubParameters(cP.cParam, id);
+						}
 					}
 
 					//If no notes are present just display the title
@@ -489,8 +499,85 @@ namespace ContractsWindow
 							}
 						}
 						GUILayout.EndHorizontal();
+
+						//Sub parameters
+						if (cP.cParam.ParameterCount > 0)
+						{
+							buildSubParameters(cP.cParam, id);
+						}
 					}
 				}
+			}
+		}
+
+		#endregion
+
+		#region Sub Parameters
+
+
+		private void buildSubParameters(ContractParameter cP, int id)
+		{
+			foreach (ContractParameter sP in cP.AllParameters)
+			{
+
+				GUILayout.Space(-2);
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(25);
+				GUILayout.Box(sP.Title, paramState(sP.State), GUILayout.MaxWidth(240));
+
+				//Reward info
+				if (windowMode == 2)
+				{
+					GUILayout.BeginVertical();
+					if (sP.FundsCompletion > 0 && (sP.Root.ContractState == Contract.State.Active || sP.Root.ContractState == Contract.State.Completed))
+					{
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
+						GUILayout.Space(-5);
+						GUILayout.Label("+ " + sP.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65), GUILayout.MaxHeight(13));
+						GUILayout.EndHorizontal();
+					}
+					if (sP.FundsFailure > 0 && (sP.Root.ContractState == Contract.State.Active || sP.Root.ContractState == Contract.State.Failed || sP.Root.ContractState == Contract.State.DeadlineExpired || sP.Root.ContractState == Contract.State.Cancelled))
+					{
+						if (sP.FundsCompletion > 0)
+							GUILayout.Space(-6);
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
+						GUILayout.Space(-5);
+						GUILayout.Label("- " + sP.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65), GUILayout.MaxHeight(13));
+						GUILayout.EndHorizontal();
+					}
+					GUILayout.EndVertical();
+					GUILayout.FlexibleSpace();
+					GUILayout.BeginVertical();
+					if (sP.ReputationCompletion > 0 && (sP.Root.ContractState == Contract.State.Active || sP.Root.ContractState == Contract.State.Completed))
+					{
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+						GUILayout.Space(-5);
+						GUILayout.Label("+ " + sP.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38), GUILayout.MaxHeight(13));
+						GUILayout.EndHorizontal();
+					}
+					if (sP.ReputationFailure > 0 && (sP.Root.ContractState == Contract.State.Active || sP.Root.ContractState == Contract.State.Failed || sP.Root.ContractState == Contract.State.DeadlineExpired || sP.Root.ContractState == Contract.State.Cancelled))
+					{
+						if (sP.ReputationCompletion > 0)
+							GUILayout.Space(-9);
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+						GUILayout.Space(-5);
+						GUILayout.Label("- " + sP.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38), GUILayout.MaxHeight(13));
+						GUILayout.EndHorizontal();
+					}
+					GUILayout.EndVertical();
+					GUILayout.FlexibleSpace();
+					if (sP.ScienceCompletion > 0 && (sP.Root.ContractState == Contract.State.Active || sP.Root.ContractState == Contract.State.Completed))
+					{
+						GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+						GUILayout.Space(-5);
+						GUILayout.Label("+ " + sP.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37), GUILayout.MaxHeight(14));
+					}
+				}
+				GUILayout.EndHorizontal();
 			}
 		}
 
@@ -540,6 +627,8 @@ namespace ContractsWindow
 
 		private void buildBottomBar(int id)
 		{
+			GUI.DrawTexture(new Rect(2, WindowRect.height - 30, WindowRect.width - 4, 4), contractSkins.footerBar);
+
 			//Version label
 			GUI.Label(new Rect(10, WindowRect.height - 20, 30, 20), version, contractSkins.paramText);
 
@@ -668,6 +757,11 @@ namespace ContractsWindow
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Difficulty)
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+				else if (s == sortClass.Type)
+				{
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
+					cL = typeSort(cL, 1);
+				}
 			}
 			else
 			{
@@ -678,9 +772,61 @@ namespace ContractsWindow
 				else if (s == sortClass.Acceptance)
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
 				else if (s == sortClass.Difficulty)
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+				else if (s == sortClass.Type)
+				{
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
+					cL = typeSort(cL, -1);
+				}
+			}
+			return cL;
+		}
+
+		private List<contractContainer> typeSort(List<contractContainer> cL, int s)
+		{
+			if (cL.Any(c => c.contract.GetParameter<ReachAltitudeEnvelope>() != null)) // || c.contract.GetParameter<ReachFlightEnvelope>() != null))
+			{
+				List<int> position = new List<int>();
+				List<contractContainer> altList = new List<contractContainer>();
+				for (int i = 0; i < cL.Count; i++)
+				{
+					if (cL[i].contract.GetParameter<ReachAltitudeEnvelope>() != null)
+					{
+						altList.Add(cL[i]);
+						position.Add(i);
+					}
+				}
+				if (altList.Count > 1)
+				{
+					altList.Sort((a, b) => s * a.contract.GetParameter<ReachAltitudeEnvelope>().minAltitude.CompareTo(b.contract.GetParameter<ReachAltitudeEnvelope>().minAltitude));
+					for (int j = 0; j < position.Count; j++)
+					{
+						cL[position[j]] = altList[j];
+					}
+				}
+			}
+			if (cL.Any(c => c.contract.GetParameter<ReachFlightEnvelope>() != null))
+			{
+				List<int> position = new List<int>();
+				List<contractContainer> altList = new List<contractContainer>();
+				for (int i = 0; i < cL.Count; i++)
+				{
+					if (cL[i].contract.GetParameter<ReachFlightEnvelope>() != null)
+					{
+						altList.Add(cL[i]);
+						position.Add(i);
+					}
+				}
+				if (altList.Count > 1)
+				{
+					altList.Sort((a, b) => s * a.contract.GetParameter<ReachFlightEnvelope>().minAltitude.CompareTo(b.contract.GetParameter<ReachAltitudeEnvelope>().minAltitude));
+					for (int j = 0; j < position.Count; j++)
+					{
+						cL[position[j]] = altList[j];
+					}
+				}
 			}
 			return cL;
 		}
