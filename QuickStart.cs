@@ -43,8 +43,9 @@ namespace QuickStart
                     }
 				HighLogic.LoadScene(GameScenes.SPACECENTER);
 				//FlightDriver.StartAndFocusVessel (game , suitableVessel);
+				CheatOptions.InfiniteFuel = true;
                }
-            CheatOptions.InfiniteFuel = true;
+
           }
      }
 }
