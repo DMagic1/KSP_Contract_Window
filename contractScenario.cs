@@ -77,6 +77,8 @@ namespace ContractsWindow
 		private sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
+		private contractsWindow cWin;
+
 		public override void OnLoad(ConfigNode node)
 		{
 			ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
@@ -100,7 +102,7 @@ namespace ContractsWindow
 					foreach (long l in hiddenIDList)
 						addToList(l, hiddenList);
 
-				gameObject.AddComponent<contractsWindow>();
+				cWin = gameObject.AddComponent<contractsWindow>();
 				MonoBehaviourExtended.LogFormatted_DebugOnly("Contracts Properties Loaded");
 			}
 		}
@@ -110,6 +112,7 @@ namespace ContractsWindow
 			MonoBehaviourExtended.LogFormatted_DebugOnly("Saving Contract Parameters");
 			long[] showListID = contractID(showList);
 			long[] hiddenListID = contractID(hiddenList);
+			setWindowPosition((int)cWin.WindowRect.x, (int)cWin.WindowRect.y, (int)cWin.WindowRect.width, (int)cWin.WindowRect.height);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 			scenes.AddValue("DefaultListID", stringConcat(showListID, showListID.Length));
