@@ -74,8 +74,8 @@ namespace ContractsWindow
 			DragEnabled = true;
 			TooltipMouseOffset = new Vector2d(-10, -25);
 
-			SetRepeatRate(10);
-			RepeatingWorkerInitialWait = 15;
+			SetRepeatRate(5);
+			RepeatingWorkerInitialWait = 10;
 			StartRepeatingWorker();
 
 			InputLockManager.RemoveControlLock("ContractsWindow".GetHashCode().ToString());
@@ -778,41 +778,21 @@ namespace ContractsWindow
 		private List<contractContainer> sortList(List<contractContainer> cL, sortClass s, int i)
 		{
 			List<contractContainer> sortedList = new List<contractContainer>();
-			if (i == 0)
+			bool Order = i < 1;
+			if (s == sortClass.Default)
+				return cL;
+			else if (s == sortClass.Expiration)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Acceptance)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Reward)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Difficulty)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Type)
 			{
-				if (s == sortClass.Default)
-					return cL;
-				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Difficulty)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Type)
-				{
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
-					cL = typeSort(cL, true);
-				}
-			}
-			else
-			{
-				if (s == sortClass.Default)
-					return cL;
-				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Difficulty)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
-				else if (s == sortClass.Type)
-				{
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
-					cL = typeSort(cL, false);
-				}
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
+				cL = typeSort(cL, Order);
 			}
 			return cL;
 		}
@@ -929,19 +909,22 @@ namespace ContractsWindow
 		//Rebuild contract list when the scene changes
 		private void contractLoaded()
 		{
-			cList.Clear();
-			foreach (Contract c in ContractSystem.Instance.Contracts)
+			//Only update this list if the scenario module list is empty
+			if (cList.Count > 0)
+				return;
+			else
 			{
-				if (c.ContractState == Contract.State.Active)
+				foreach (Contract c in ContractSystem.Instance.Contracts)
 				{
-					cList.Add(new contractContainer(c));
+					if (c.ContractState == Contract.State.Active)
+					{
+						cList.Add(new contractContainer(c));
+					}
 				}
-			}
-			cList = sortList(cList, sort, order);
-			if (showHideList == 0)
+				cList = sortList(cList, sort, order);
+				showHideList = 0;
 				showList = cList;
-			else if (showHideList == 1)
-				hiddenList = cList;
+			}
 		}
 
 		private void refreshContracts(List<contractContainer> cL)
@@ -999,9 +982,12 @@ namespace ContractsWindow
 
 		internal override void RepeatingWorker()
 		{
-			LogFormatted_DebugOnly("Refreshing Contract List; Duration of repeat: {0}", RepeatingWorkerDuration);
-			if (cList.Count > 0)
-				refreshContracts(cList);
+			if (Visible)
+			{
+				LogFormatted_DebugOnly("Refreshing Contract List; Duration of repeat: {0}", RepeatingWorkerDuration);
+				if (cList.Count > 0)
+					refreshContracts(cList);
+			}
 		}
 
 		#endregion
@@ -1027,6 +1013,11 @@ namespace ContractsWindow
 
 			showList = contractScenario.Instance.showList;
 			hiddenList = contractScenario.Instance.hiddenList;
+
+			if (showHideList == 0)
+				cList = showList;
+			else
+				cList = hiddenList;
 			LogFormatted_DebugOnly("Contract Window Loaded");
 		}
 
