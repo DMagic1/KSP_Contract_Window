@@ -51,8 +51,8 @@ namespace ContractsWindow
 				contractButton.ToolTip = "Contract Manager";
 				contractButton.OnClick += (e) =>
 					{
-						contractsWindow.IsVisible = !contractsWindow.IsVisible;
-						contractScenario.Instance.setWindowVisible(contractsWindow.IsVisible);
+						contractScenario.Instance.cWin.Visible = !contractScenario.Instance.cWin.Visible;
+						contractScenario.Instance.setWindowVisible(contractScenario.Instance.cWin.Visible);
 					};
 			}
 			else
