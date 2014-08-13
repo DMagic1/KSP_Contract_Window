@@ -127,6 +127,7 @@ namespace ContractsWindow
 		Acceptance = 3,
 		Difficulty = 4,
 		Reward = 5,
+		Type = 6,
 	}
 
 }
