@@ -77,7 +77,7 @@ namespace ContractsWindow
 		private sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
-		private contractsWindow cWin;
+		internal contractsWindow cWin;
 
 		public override void OnLoad(ConfigNode node)
 		{
@@ -103,16 +103,13 @@ namespace ContractsWindow
 						addToList(l, hiddenList);
 
 				cWin = gameObject.AddComponent<contractsWindow>();
-				MonoBehaviourExtended.LogFormatted_DebugOnly("Contracts Properties Loaded");
 			}
 		}
 
 		public override void OnSave(ConfigNode node)
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Saving Contract Parameters");
 			long[] showListID = contractID(showList);
 			long[] hiddenListID = contractID(hiddenList);
-			setWindowPosition((int)cWin.WindowRect.x, (int)cWin.WindowRect.y, (int)cWin.WindowRect.width, (int)cWin.WindowRect.height);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 			scenes.AddValue("DefaultListID", stringConcat(showListID, showListID.Length));
@@ -241,25 +238,21 @@ namespace ContractsWindow
 		internal void setOrderMode(int i)
 		{
 			orderMode[currentScene(HighLogic.LoadedScene)] = i;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Order Mode Set");
 		}
 
 		internal void setWindowMode(int i)
 		{
 			windowMode[currentScene(HighLogic.LoadedScene)] = i;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Window Mode Set");
 		}
 
 		internal void setShowHideMode(int i)
 		{
 			showHideMode[currentScene(HighLogic.LoadedScene)] = i;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Hide Mode Set");
 		}
 
 		internal void setSortMode(sortClass sC)
 		{
 			sortMode[currentScene(HighLogic.LoadedScene)] = sC;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Sort Mode Set");
 		}
 
 		internal void setWindowPosition(int x, int y, int w, int h)
@@ -269,61 +262,51 @@ namespace ContractsWindow
 			windowPos[s + 1] = y;
 			windowPos[s + 2] = w;
 			windowPos[s + 3] = h;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Window Position Set");
 		}
 
 		internal void setWindowVisible(bool b)
 		{
 			windowVisible[currentScene(HighLogic.LoadedScene)] = b;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Window Toggle Set");
 		}
 
 		internal void setToolTips(bool b)
 		{
 			toolTips[currentScene(HighLogic.LoadedScene)] = b;
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Tooltip Toggle Set");
 		}
 
 		internal int loadOrderMode()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Order Mode");
 			return orderMode[currentScene(HighLogic.LoadedScene)];
 		}
 
 		internal int loadWindowMode()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Window Mode");
 			return windowMode[currentScene(HighLogic.LoadedScene)];
 		}
 
 		internal int loadShowHideMode()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Hide Mode");
 			return showHideMode[currentScene(HighLogic.LoadedScene)];
 		}
 
 		internal sortClass loadSortMode()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Sort Mode");
 			return sortMode[currentScene(HighLogic.LoadedScene)];
 		}
 
 		internal int[] loadWindowPosition()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Window Position");
 			int i = currentScene(HighLogic.LoadedScene) * 4;
 			return new int[4] { windowPos[i], windowPos[i + 1], windowPos[i + 2], windowPos[i + 3] };
 		}
 
 		internal bool loadWindowVisible()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded Visibity");
 			return windowVisible[currentScene(HighLogic.LoadedScene)];
 		}
 
 		internal bool loadToolTips()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Loaded ToolTips");
 			return toolTips[currentScene(HighLogic.LoadedScene)];
 		}
 
