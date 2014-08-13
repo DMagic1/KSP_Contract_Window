@@ -819,72 +819,54 @@ namespace ContractsWindow
 
 		private List<contractContainer> typeSort(List<contractContainer> cL, bool B)
 		{
-			bool altParam = false;
 			LogFormatted_DebugOnly("Checking For Altitude Parameters");
-			foreach (contractContainer cC in cL)
+			List<int> position = new List<int>();
+			List<contractContainer> altList = new List<contractContainer>();
+			for (int i = 0; i < cL.Count; i++)
 			{
-				foreach (parameterContainer cP in cC.paramList)
+				foreach (parameterContainer cP in cL[i].paramList)
 				{
 					if (cP.cParam.ID == "testAltitudeEnvelope")
-					{
-						altParam = true;
-						break;
-					}
-				}
-				if (altParam)
-					break;
-			}
-
-			//List<contractContainer> altParam = cL.Where(c => c.contract.GetParameter(ReachAltitudeEnvelope).GetType().Name == "").ToList();
-			if (altParam)
-			{
-				LogFormatted_DebugOnly("Found Altitude Envelope Parameter");
-				List<int> position = new List<int>();
-				List<contractContainer> altList = new List<contractContainer>();
-				for (int i = 0; i < cL.Count; i++)
-				{
-					foreach (parameterContainer cP in cL[i].paramList)
-					{
-						if (cP.cParam.ID == "testAltitudeEnvelope")
-						{
-							altList.Add(cL[i]);
-							position.Add(i);
-						}
-					}
-				}
-				if (altList.Count > 1)
-				{
-					LogFormatted_DebugOnly("Sorting Based On Altitude");
-					altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachAltitudeEnvelope)a.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude.CompareTo(((ReachAltitudeEnvelope)b.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
-					for (int j = 0; j < position.Count; j++)
-					{
-						cL[position[j]] = altList[j];
-					}
-				}
-			}
-			var flightParam = cL.Where(c => c.contract.GetParameter<ReachFlightEnvelope>() != null);
-			if (flightParam.Count() > 0)
-			{
-				LogFormatted_DebugOnly("Found Flight Envelope Parameter");
-				List<int> position = new List<int>();
-				List<contractContainer> altList = new List<contractContainer>();
-				for (int i = 0; i < cL.Count; i++)
-				{
-					if (cL[i].contract.GetParameter<ReachFlightEnvelope>() != null)
 					{
 						altList.Add(cL[i]);
 						position.Add(i);
 					}
 				}
-				if (altList.Count > 1)
+			}
+			if (altList.Count > 1)
+			{
+				LogFormatted_DebugOnly("Sorting Based On Altitude Envelope");
+				altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachAltitudeEnvelope)a.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude.CompareTo(((ReachAltitudeEnvelope)b.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
+				for (int j = 0; j < position.Count; j++)
 				{
-					altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, a.contract.GetParameter<ReachFlightEnvelope>().minAltitude.CompareTo(b.contract.GetParameter<ReachAltitudeEnvelope>().minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
-					for (int j = 0; j < position.Count; j++)
-					{
-						cL[position[j]] = altList[j];
-					}
+					cL[position[j]] = altList[j];
 				}
 			}
+
+			//ReachFlightEnvelop doesn't actually seem to be used by anything
+
+			//position.Clear();
+			//List<contractContainer> flightList = new List<contractContainer>();
+			//for (int i = 0; i < cL.Count; i++)
+			//{
+			//    foreach (parameterContainer cP in cL[i].paramList)
+			//    {
+			//        if (cP.cParam.ID == "testFlightEnvelope")
+			//        {
+			//            flightList.Add(cL[i]);
+			//            position.Add(i);
+			//        }
+			//    }
+			//}
+			//if (flightList.Count > 1)
+			//{
+			//    flightList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachFlightEnvelope)a.contract.AllParameters.First(s => s.ID == "testFlightEnvelope")).minAltitude.CompareTo(((ReachFlightEnvelope)b.contract.AllParameters.First(s => s.ID == "testFlightEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
+			//    for (int j = 0; j < position.Count; j++)
+			//    {
+			//        cL[position[j]] = flightList[j];
+			//    }
+			//}
+
 			return cL;
 		}
 
