@@ -96,6 +96,8 @@ namespace ContractsWindow
 		internal static Texture2D revealShowIcon;
 		internal static Texture2D tooltipIcon;
 		internal static Texture2D buttonHover;
+		internal static Texture2D headerBar;
+		internal static Texture2D footerBar;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -123,6 +125,8 @@ namespace ContractsWindow
 			revealShowIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealShowIcon", false);
 			tooltipIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ToolTipIcon", false);
 			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
+			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
+			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
