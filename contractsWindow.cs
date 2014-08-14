@@ -998,10 +998,18 @@ namespace ContractsWindow
 		private void PersistenceLoad()
 		{
 			LogFormatted_DebugOnly("Loading Parameters Now");
+			showHideList = contractScenario.Instance.loadShowHideMode();
+			showList = contractScenario.Instance.showList;
+			hiddenList = contractScenario.Instance.hiddenList;
+
+			if (showHideList == 0)
+				cList = showList;
+			else
+				cList = hiddenList;
+
 			order = contractScenario.Instance.loadOrderMode();
 			windowMode = contractScenario.Instance.loadWindowMode();
 			sort = contractScenario.Instance.loadSortMode();
-			showHideList = contractScenario.Instance.loadShowHideMode();
 			TooltipsEnabled = contractScenario.Instance.loadToolTips();
 			Visible = contractScenario.Instance.loadWindowVisible();
 			int[] i = contractScenario.Instance.loadWindowPosition();
@@ -1010,14 +1018,6 @@ namespace ContractsWindow
 			WindowRect.width = i[2];
 			WindowRect.height = i[3];
 			DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
-
-			showList = contractScenario.Instance.showList;
-			hiddenList = contractScenario.Instance.hiddenList;
-
-			if (showHideList == 0)
-				cList = showList;
-			else
-				cList = hiddenList;
 			LogFormatted_DebugOnly("Contract Window Loaded");
 		}
 
