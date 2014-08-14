@@ -38,22 +38,22 @@ using UnityEngine;
 
 namespace ContractsWindow
 {
-	//[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
 	class contractsWindow: MonoBehaviourWindow
 	{
 
 		#region Initialization
 
 		private List<contractContainer> cList = new List<contractContainer>();
-		private List<contractContainer> showList = new List<contractContainer>();
-		private List<contractContainer> hiddenList = new List<contractContainer>();
+		internal List<contractContainer> showList = new List<contractContainer>();
+		internal List<contractContainer> hiddenList = new List<contractContainer>();
 		private List<contractContainer> nextRemoveList = new List<contractContainer>();
 		private string version;
 		private Assembly assembly;
 		private Vector2 scroll;
-		private bool resizing, showSort, editorLocked;
+		private bool resizing, showSort, editorLocked, contractsLoading, loaded;
 		private float dragStart, windowHeight;
 		private sortClass sort;
+		private int timer;
 		private int order; //0 is descending, 1 is ascending
 		private int windowMode; //0 is compact, 1 is expiration display, 2 is full display
 		private int showHideList; //0 is standard, 1 shows hidden contracts
@@ -76,7 +76,6 @@ namespace ContractsWindow
 
 			SetRepeatRate(5);
 			RepeatingWorkerInitialWait = 10;
-			StartRepeatingWorker();
 
 			InputLockManager.RemoveControlLock("ContractsWindow".GetHashCode().ToString());
 
@@ -100,6 +99,63 @@ namespace ContractsWindow
 
 		internal override void Update()
 		{
+			if (contractsLoading && !loaded)
+			{
+				if (timer < 30)
+					timer++;
+				else
+				{
+					contractsLoading = false;
+					loaded = true;
+					if (contractScenario.Instance.showIDList.Count > 0)
+					{
+						foreach (Guid id in contractScenario.Instance.showIDList)
+							contractScenario.Instance.addToList(id, contractScenario.Instance.showList);
+						foreach (contractContainer c in contractScenario.Instance.showList)
+							showList.Add(c);
+					}
+					if (contractScenario.Instance.hiddenIDList.Count > 0)
+					{
+						foreach (Guid id in contractScenario.Instance.hiddenIDList)
+							contractScenario.Instance.addToList(id, contractScenario.Instance.hiddenList);
+						foreach (contractContainer c in contractScenario.Instance.hiddenList)
+							hiddenList.Add(c);
+					}
+
+					if (showHideList == 0)
+					{
+						cList = showList;
+						cList = sortList(cList, sort, order);
+						LogFormatted_DebugOnly("{0} Contracts Added To Primary List", showList.Count);
+					}
+					else
+					{
+						cList = hiddenList;
+						cList = sortList(cList, sort, order);
+						LogFormatted_DebugOnly("{0} Contracts Added To Hidden List", hiddenList.Count);
+					}
+
+					if (cList.Count > 0)
+					{
+						LogFormatted_DebugOnly("Contract List Already Populated");
+						return;
+					}
+					else
+					{
+						showHideList = 0;
+						LogFormatted_DebugOnly("Generating Contract List");
+						foreach (Contract c in ContractSystem.Instance.Contracts)
+						{
+							if (c.ContractState == Contract.State.Active)
+							{
+								cList.Add(new contractContainer(c));
+							}
+						}
+						cList = sortList(cList, sort, order);
+						showList = cList;
+					}
+				}
+			}
 		}
 
 		#endregion
@@ -909,21 +965,10 @@ namespace ContractsWindow
 		//Rebuild contract list when the scene changes
 		private void contractLoaded()
 		{
-			//Only update this list if the scenario module list is empty
-			if (cList.Count > 0)
-				return;
-			else
+			if (!contractsLoading && !loaded)
 			{
-				foreach (Contract c in ContractSystem.Instance.Contracts)
-				{
-					if (c.ContractState == Contract.State.Active)
-					{
-						cList.Add(new contractContainer(c));
-					}
-				}
-				cList = sortList(cList, sort, order);
-				showHideList = 0;
-				showList = cList;
+				timer = 0;
+				contractsLoading = true;
 			}
 		}
 
@@ -951,10 +996,10 @@ namespace ContractsWindow
 				}
 			}
 			cL = sortList(cL, sort, order);
-			if (showHideList == 0)
-				contractScenario.Instance.showList = cL;
-			else if (showHideList == 1)
-				contractScenario.Instance.hiddenList = cL;
+			contractScenario.Instance.showList.Clear();
+			contractScenario.Instance.hiddenList.Clear();
+			contractScenario.Instance.showList = showList;
+			contractScenario.Instance.hiddenList = hiddenList;
 		}
 
 		//Remove contract from primary list and update
@@ -982,12 +1027,9 @@ namespace ContractsWindow
 
 		internal override void RepeatingWorker()
 		{
-			if (Visible)
-			{
-				LogFormatted_DebugOnly("Refreshing Contract List; Duration of repeat: {0}", RepeatingWorkerDuration);
-				if (cList.Count > 0)
-					refreshContracts(cList);
-			}
+			LogFormatted_DebugOnly("Refreshing Contract List; Duration of repeat: {0}", RepeatingWorkerDuration);
+			if (cList.Count > 0)
+				refreshContracts(cList);
 		}
 
 		#endregion
@@ -997,16 +1039,11 @@ namespace ContractsWindow
 		//Load window position and size settings
 		private void PersistenceLoad()
 		{
+			showList.Clear();
+			hiddenList.Clear();
+			cList.Clear();
 			LogFormatted_DebugOnly("Loading Parameters Now");
 			showHideList = contractScenario.Instance.loadShowHideMode();
-			showList = contractScenario.Instance.showList;
-			hiddenList = contractScenario.Instance.hiddenList;
-
-			if (showHideList == 0)
-				cList = showList;
-			else
-				cList = hiddenList;
-
 			order = contractScenario.Instance.loadOrderMode();
 			windowMode = contractScenario.Instance.loadWindowMode();
 			sort = contractScenario.Instance.loadSortMode();
@@ -1018,6 +1055,9 @@ namespace ContractsWindow
 			WindowRect.width = i[2];
 			WindowRect.height = i[3];
 			DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
+
+			if (Visible)
+				StartRepeatingWorker();
 			LogFormatted_DebugOnly("Contract Window Loaded");
 		}
 

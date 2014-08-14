@@ -70,8 +70,8 @@ namespace ContractsWindow
 		private int[] orderMode = new int[4];
 		private int[] windowMode = new int[4];
 		private int[] showHideMode = new int[4];
-		private List<long> showIDList = new List<long>();
-		private List<long> hiddenIDList = new List<long>();
+		internal List<Guid> showIDList = new List<Guid>();
+		internal List<Guid> hiddenIDList = new List<Guid>();
 		private bool[] windowVisible = new bool[4];
 		private bool[] toolTips = new bool[4];
 		private sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
@@ -81,11 +81,13 @@ namespace ContractsWindow
 
 		public override void OnLoad(ConfigNode node)
 		{
+			showList.Clear();
+			hiddenList.Clear();
 			ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 			if (scenes != null)
 			{
-				showIDList = stringSplitLong(scenes.GetValue("DefaultListID"));
-				hiddenIDList = stringSplitLong(scenes.GetValue("HiddenListID"));
+				showIDList = stringSplitGuid(scenes.GetValue("DefaultListID"));
+				hiddenIDList = stringSplitGuid(scenes.GetValue("HiddenListID"));
 				showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
 				windowMode = stringSplit(scenes.GetValue("WindowMode"));
 				orderMode = stringSplit(scenes.GetValue("SortOrder"));
@@ -95,21 +97,14 @@ namespace ContractsWindow
 				windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
 				toolTips = stringSplitBool(scenes.GetValue("ToolTips"));
 
-				if (showIDList.Count > 0)
-					foreach (long l in showIDList)
-						addToList(l, showList);
-				if (hiddenIDList.Count > 0)
-					foreach (long l in hiddenIDList)
-						addToList(l, hiddenList);
-
 				cWin = gameObject.AddComponent<contractsWindow>();
 			}
 		}
 
 		public override void OnSave(ConfigNode node)
 		{
-			long[] showListID = contractID(showList);
-			long[] hiddenListID = contractID(hiddenList);
+			Guid[] showListID = contractID(showList);
+			Guid[] hiddenListID = contractID(hiddenList);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 			scenes.AddValue("DefaultListID", stringConcat(showListID, showListID.Length));
@@ -123,6 +118,7 @@ namespace ContractsWindow
 			scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 			scenes.AddValue("ToolTips", stringConcat(toolTips, toolTips.Length));
 			node.AddNode(scenes);
+			Destroy(cWin);
 		}
 
 		#region utilities
@@ -156,7 +152,7 @@ namespace ContractsWindow
 			return string.Concat(s).TrimEnd(',');
 		}
 
-		private string stringConcat(long[] source, int i)
+		private string stringConcat(Guid[] source, int i)
 		{
 			if (i == 0)
 				return "";
@@ -191,15 +187,15 @@ namespace ContractsWindow
 			return i;
 		}
 
-		private List<long> stringSplitLong(string source)
+		private List<Guid> stringSplitGuid(string source)
 		{
 			if (source == "")
-				return new List<long>();
+				return new List<Guid>();
 			string[] s = source.Split(',');
-			List<long> i = new List<long>();
+			List<Guid> i = new List<Guid>();
 			for (int j = 0; j < s.Length; j++)
 			{
-				i.Add(long.Parse(s[j]));
+				i.Add(new Guid(s[j]));
 			}
 			return i;
 		}
@@ -215,17 +211,17 @@ namespace ContractsWindow
 			return b;
 		}
 
-		private long[] contractID(List<contractContainer> c)
+		private Guid[] contractID(List<contractContainer> c)
 		{
-			long[] l = new long[c.Count];
+			Guid[] id = new Guid[c.Count];
 			for (int j = 0; j < c.Count; j++)
-				l[j] = c[j].contract.ContractID;
-			return l;
+				id[j] = c[j].contract.ContractGuid;
+			return id;
 		}
 
-		private void addToList(long ID, List<contractContainer> cL)
+		internal void addToList(Guid ID, List<contractContainer> cL)
 		{
-			Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractID == ID);
+			Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractGuid == ID);
 			if (c != null)
 				cL.Add(new contractContainer(c));
 		}
