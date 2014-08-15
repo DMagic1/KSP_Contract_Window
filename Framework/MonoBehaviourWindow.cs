@@ -150,37 +150,34 @@ namespace ContractsWindow
             }
         }
 
-		internal bool Toggle;
-
         /// <summary>
         /// This is the Code that draws the window and sets the skin
         /// !!!! You have to set the skin before drawing the window or you will scratch your head for ever
         /// </summary>
-        internal virtual void DrawGUI()
-        {
-            //this sets the skin on each draw loop
-            GUI.skin = SkinsLibrary.CurrentSkin;
+		internal void DrawGUI()
+		{
+			//this sets the skin on each draw loop
+			GUI.skin = SkinsLibrary.CurrentSkin;
 
-            //keep the window locked to the screen if its supposed to be
-            if (ClampToScreen)
-                WindowRect = WindowRect.ClampToScreen(ClampToScreenOffset);
-			if (Toggle)
+			//keep the window locked to the screen if its supposed to be
+			if (ClampToScreen)
+				WindowRect = WindowRect.ClampToScreen(ClampToScreenOffset);
+
+			//Are we using a custom style of the skin style for the window
+			if (WindowStyle == null)
 			{
-				//Are we using a custom style of the skin style for the window
-				if (WindowStyle == null)
-				{
-					WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowOptions);
-				}
-				else
-				{
-					WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle, WindowOptions);
-				}
+				WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowOptions);
+			}
+			else
+			{
+				WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle, WindowOptions);
 			}
 
-            //Draw the tooltip of its there to be drawn
-            if (TooltipsEnabled)
-                DrawToolTip();
-        }
+
+			//Draw the tooltip of its there to be drawn
+			if (TooltipsEnabled)
+				DrawToolTip();
+		}
 
         /// <summary>
         /// Time that the last iteration of RepeatingWorkerFunction ran for. Can use this value to see how much impact your code is having

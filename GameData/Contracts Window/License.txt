@@ -22,3 +22,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+
+---------------
+
+License for textures created by DMagic:
+
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License
+
+---------------
+
+Reward and Penalty icons are modified versions of Squad icons from the Unity Assets
+
+---------------
+
+The show/hide icons and reset icons are from the Font Awesome icon library:
+
+http://fortawesome.github.io/Font-Awesome/
+
+Licensed under the SIL Open Font License: 
+
+http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
+
+and the MIT license (see above)

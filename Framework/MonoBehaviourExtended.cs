@@ -147,13 +147,13 @@ namespace ContractsWindow
         /// </summary>
         /// <param name="TimesPerSec">How many times a second should the RepeatingWorker Function be run</param>
         /// <returns>The RunningState of the RepeatinWorker Function</returns>
-        internal Boolean StartRepeatingWorker(Int32 TimesPerSec)
+        internal Boolean StartRepeatingWorker(Single TimesPerSec)
         {
             LogFormatted_DebugOnly("Starting the repeating function");
             //Stop it if its running
             StopRepeatingWorker();
             //Set the new value
-            SetRepeatTimesPerSecond(TimesPerSec);
+            SetRepeatRate(TimesPerSec);
             //Start it and return the result
             return StartRepeatingWorker();
         }

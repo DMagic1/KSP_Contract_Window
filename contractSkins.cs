@@ -74,6 +74,9 @@ namespace ContractsWindow
 		internal static GUIStyle texButton;
 		internal static GUIStyle dragButton;
 
+		internal static GUIStyle resetBox;
+		internal static GUIStyle resetButton;
+
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
 		internal static Texture2D repGreen;
@@ -89,6 +92,16 @@ namespace ContractsWindow
 		internal static Texture2D orderDesc;
 		internal static Texture2D windowTex;
 		internal static Texture2D sortIcon;
+		//internal static Texture2D pinIcon;
+		internal static Texture2D hideIcon;
+		internal static Texture2D showIcon;
+		internal static Texture2D revealHideIcon;
+		internal static Texture2D revealShowIcon;
+		internal static Texture2D tooltipIcon;
+		internal static Texture2D buttonHover;
+		internal static Texture2D headerBar;
+		internal static Texture2D footerBar;
+		internal static Texture2D resetIcon;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -109,6 +122,16 @@ namespace ContractsWindow
 			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
 			dropDownTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DropDownTex", false);
 			sortIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SortIcon", false);
+			//pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
+			hideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HideIcon", false);
+			showIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ShowIcon", false);
+			revealHideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealHideIcon", false);
+			revealShowIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealShowIcon", false);
+			tooltipIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ToolTipIcon", false);
+			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
+			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
+			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
+			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -233,8 +256,6 @@ namespace ContractsWindow
 			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			dropDown.name = "DropDown";
 			dropDown.normal.background = dropDownTex;
-			//dropDown.normal.background.SetPixel(1, 1, XKCDColors.AlmostBlack);
-			//dropDown.normal.background.Apply();
 
 			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			sortMenu.name = "SortMenu";
@@ -250,18 +271,28 @@ namespace ContractsWindow
 
 			sortOrder = new GUIStyle(sortMenu);
 			sortOrder.name = "SortOrder";
-			//sortOrder.padding
 
 			texButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			texButton.name = "TexButton";
 			texButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
-			texButton.hover.background = SkinsLibrary.DefUnitySkin.label.normal.background;
+			texButton.hover.background = buttonHover;
 			texButton.padding = new RectOffset(1, 1, 2, 2);
-			//texButton.border = new RectOffset(9, 4, 6, 3);
 
 			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
 			dragButton.padding = new RectOffset(1, 2, 0, 0);
+
+			resetBox = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			resetBox.name = "ResetBox";
+			resetBox.fontSize = 16;
+			resetBox.normal.textColor = XKCDColors.VomitYellow;
+			resetBox.wordWrap = true;
+			resetBox.alignment = TextAnchor.UpperCenter;
+
+			resetButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			resetButton.name = "ResetButton";
+			resetButton.fontSize = 15;
+			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
 			SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);

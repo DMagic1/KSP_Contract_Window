@@ -36,8 +36,7 @@ namespace ContractsWindow
 	internal class contractContainer
 	{
 		internal Contract contract;
-		internal float totalScience, totalRepReward, totalRepPenalty, science, repReward, repPenalty;
-		internal double deadline, totalReward, totalPenalty, fundsReward, fundsPenalty, duration;
+		internal double totalReward, duration;
 		internal bool showParams;
 		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
@@ -46,35 +45,46 @@ namespace ContractsWindow
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
-			deadline = contract.DateDeadline;
 
-			if (deadline <= 0)
+			if (contract.DateDeadline <= 0)
 			{
 				duration = double.MaxValue;
 				daysToExpire = "----";
 			}
 			else
 			{
-				duration = deadline - Planetarium.GetUniversalTime();
+				duration = contract.DateDeadline - Planetarium.GetUniversalTime();
 				//Calculate time in day values using Kerbin or Earth days
 				daysToExpire = timeInDays(duration);
 			}
 
-			fundsReward = totalReward = contract.FundsCompletion;
-			fundsPenalty = totalPenalty = contract.FundsFailure;
-			science = totalScience = contract.ScienceCompletion;
-			repReward = totalRepReward = contract.ReputationCompletion;
-			repPenalty = totalRepPenalty = contract.ReputationFailure;
+			totalReward = contract.FundsCompletion;
 			showParams = true;
 
-			foreach (ContractParameter param in contract.AllParameters)
+			//Generate four layers of parameters
+			for (int i = 0; i < contract.ParameterCount; i++)
 			{
-				paramList.Add(new parameterContainer(param));
+				ContractParameter param = contract.GetParameter(i);
+				paramList.Add(new parameterContainer(param, 0));
 				totalReward += param.FundsCompletion;
-				totalPenalty += param.FundsFailure;
-				totalRepReward += param.ReputationCompletion;
-				totalRepPenalty += param.ReputationFailure;
-				totalScience += param.ScienceCompletion;
+				for (int j = 0; j < param.ParameterCount; j++)
+				{
+					ContractParameter subParam1 = param.GetParameter(j);
+					paramList.Add(new parameterContainer(subParam1, 1));
+					totalReward += subParam1.FundsCompletion;
+					for (int k = 0; k < subParam1.ParameterCount; k++)
+					{
+						ContractParameter subParam2 = param.GetParameter(k);
+						paramList.Add(new parameterContainer(subParam2, 2));
+						totalReward += subParam2.FundsCompletion;
+						for (int l = 0; l < subParam2.ParameterCount; l++)
+						{
+							ContractParameter subParam3 = param.GetParameter(k);
+							paramList.Add(new parameterContainer(subParam3, 3));
+							totalReward += subParam3.FundsCompletion;
+						}
+					}
+				}
 			}
 		}
 
@@ -112,11 +122,13 @@ namespace ContractsWindow
 	{
 		internal ContractParameter cParam;
 		internal bool showNote;
+		internal int level;
 
-		internal parameterContainer(ContractParameter cP)
+		internal parameterContainer(ContractParameter cP, int Level)
 		{
 			cParam = cP;
 			showNote = false;
+			level = Level;
 		}
 	}
 
@@ -127,6 +139,7 @@ namespace ContractsWindow
 		Acceptance = 3,
 		Difficulty = 4,
 		Reward = 5,
+		Type = 6,
 	}
 
 }

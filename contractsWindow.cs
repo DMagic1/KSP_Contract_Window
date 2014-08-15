@@ -33,445 +33,576 @@ using System.Diagnostics;
 using System.Reflection;
 
 using Contracts;
+using Contracts.Parameters;
 using UnityEngine;
 
 namespace ContractsWindow
 {
-	[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
+
 	class contractsWindow: MonoBehaviourWindow
 	{
 
 		#region Initialization
 
-		internal static bool IsVisible;
 		private List<contractContainer> cList = new List<contractContainer>();
-		private string version, assemblyLocation, assemblyFolder, fileLocation;
-		private Assembly assembly;
+		private List<contractContainer> nextRemoveList = new List<contractContainer>();
+		private string version;
 		private Vector2 scroll;
-		private bool resizing, visible, fileFound, showSort;
-		private float dragStart, windowHeight, windowX, windowY, windowW, windowH, windowMaxY;
-		private sortClass sort;
-		private int order; //0 is descending, 1 is ascending
-		private int windowMode; //0 is compact, 1 is expiration display, 2 is full display
-		private Rect dropDownSort, resizer;
-		
+		private bool resizing, showSort, rebuild, editorLocked, contractsLoading, loaded;
+		private float dragStart, windowHeight;
+		private int timer;
+		private Rect dropDownSort, resetRect;
+		private int sceneInt;
+
+		private contractScenario contract = contractScenario.Instance;
+
 		internal override void Awake()
 		{
-			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
-			{
-				assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
-				assemblyLocation = assembly.Location.Replace("\\", "/");
-				version = FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion;
-				assemblyFolder = System.IO.Path.GetDirectoryName(assemblyLocation).Replace("\\", "/");
-				fileLocation = assemblyFolder + "/WindowSettings.cfg";
-				if (System.IO.File.Exists(fileLocation))
-					fileFound = true;
+			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
+			version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 
-				sort = sortClass.Default;
-				order = 0;
-				WindowCaption = string.Format("Contracts {0}", version);
-				WindowRect = new Rect(40, 80, 250, 300);
-				WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
-				WindowStyle = contractSkins.newWindowStyle;
-				Visible = true;
-				DragEnabled = true;
+			//Set up the various GUI options to their default values here
+			WindowCaption = "Contracts +";
+			WindowRect = new Rect(40, 80, 250, 300);
+			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
+			WindowStyle = contractSkins.newWindowStyle;
+			Visible = false;
+			DragEnabled = true;
+			TooltipMouseOffset = new Vector2d(-10, -25);
+			RepeatingWorkerInitialWait = 10;
 
+			//Make sure our click-through control locks are disabled
+			InputLockManager.RemoveControlLock("ContractsWindow".GetHashCode().ToString());
 
-
-				PersistenceLoad();
-				dropDownSort = new Rect(10, 20, 80, 88);
-				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
-				resizer = new Rect(WindowRect.width - 15, WindowRect.height - 30, 20, 26);
-				PersistenceSave();
-
-				SetRepeatRate(10);
-				RepeatingWorkerInitialWait = 15;
-				StartRepeatingWorker();
-
-				InputLockManager.RemoveControlLock(_AssemblyName.GetHashCode().ToString());
-
-				SkinsLibrary.SetCurrent("ContractUnitySkin");
-			}
-			else
-			{
-				//Shutdown everything if we aren't in career mode
-				Visible = false;
-				Toggle = false;
-				WindowRect = new Rect(0, 0, 0, 0);
-			}
+			SkinsLibrary.SetCurrent("ContractUnitySkin");
 		}
 
 		internal override void Start()
 		{
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
+			PersistenceLoad();
 		}
 
 		internal override void OnDestroy()
 		{
-			EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
+			if (HighLogic.LoadedSceneIsEditor)
+				EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
-			PersistenceSave();
 		}
 
 		internal override void Update()
 		{
+			if (HighLogic.LoadedScene == GameScenes.FLIGHT && !loaded && !contractsLoading)
+			{
+				contractsLoading = true;
+				timer = 0;
+			}
+			//Start a timer after contracts begin loading to ensure that all contracts are loaded before we populate the lists
+			else if (contractsLoading && !loaded)
+			{
+				if (timer < 15)
+					timer++;
+				else
+				{
+					contractsLoading = false;
+					loaded = true;
+					if (contractScenario.Instance.showIDList.Count > 0)
+						contractScenario.Instance.addToList(contractScenario.Instance.showIDList, contractScenario.Instance.showList);
+					if (contractScenario.Instance.hiddenIDList.Count > 0)
+						contractScenario.Instance.addToList(contractScenario.Instance.hiddenIDList, contractScenario.Instance.hiddenList);
+
+					if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+					{
+						cList = contractScenario.Instance.showList;
+						cList = sortList(cList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+						LogFormatted_DebugOnly("{0} Contracts Added To Primary List", contractScenario.Instance.showList.Count);
+					}
+					else
+					{
+						cList = contractScenario.Instance.hiddenList;
+						cList = sortList(cList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+						LogFormatted_DebugOnly("{0} Contracts Added To Hidden List", contractScenario.Instance.hiddenList.Count);
+					}
+
+					if (cList.Count > 0)
+						LogFormatted_DebugOnly("Contract List Already Populated");
+					else
+						rebuildList();
+				}
+			}
 		}
 
 		#endregion
 
 		#region GUI Draw
 
+		internal override void DrawWindowPre(int id)
+		{
+			//Update the drag rectangle
+			DragRect.height = WindowRect.height - 24;
+
+			//Prevent click through from activating part options
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				Vector2 mousePos = Input.mousePosition;
+				mousePos.y = Screen.height - mousePos.y;
+				if (WindowRect.Contains(mousePos) && GUIUtility.hotControl == 0 && Input.GetMouseButton(0))
+				{
+					foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
+					{
+						window.enabled = false;
+						window.displayDirty = true;
+					}
+				}
+			}
+
+			//Lock editor click through
+			if (HighLogic.LoadedSceneIsEditor)
+			{
+				Vector2 mousePos = Input.mousePosition;
+				mousePos.y = Screen.height - mousePos.y;
+				if (WindowRect.Contains(mousePos) && !editorLocked)
+				{
+					EditorLogic.fetch.Lock(true, true, true, "ContractsWindow".GetHashCode().ToString());
+					editorLocked = true;
+				}
+				else if (!WindowRect.Contains(mousePos) && editorLocked)
+				{
+					EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
+					editorLocked = false;
+				}
+			}
+		}
+
 		internal override void DrawWindow(int id)
 		{
-			GUILayout.BeginVertical();
-
 			//Menu Bar
-			GUILayout.BeginHorizontal();
-			if (GUI.Button(new Rect(5, 1, 30, 17), contractSkins.sortIcon))
-				showSort = !showSort;
-			if (order == 0)
-			{
-				if (GUI.Button(new Rect(36, 1, 24, 17), contractSkins.orderAsc))
-				{
-					order = 1;
-					cList = sortList(cList, sort, order);
-				}
-			}
-			if (order == 1)
-			{
-				if (GUI.Button(new Rect(36, 1, 24, 17), contractSkins.orderDesc))
-				{
-					order = 0;
-					cList = sortList(cList, sort, order);
-				}
-			}
-			GUILayout.Space(90);
-			if (windowMode == 0)
-			{
-				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRight))
-				{
-					windowMode = 1;
-					WindowRect.width = 290;
-					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
-				}
-			}
-			if (windowMode == 1)
-			{
-				if (GUI.Button(new Rect(WindowRect.width - 48, 1, 24, 18), contractSkins.collapseLeftStop))
-				{
-					windowMode = 0;
-					WindowRect.width = 250;
-					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
-				}
-				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRightStop))
-				{
-					windowMode = 2;
-					WindowRect.width = 480;
-					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
-				}
-			}
-			if (windowMode == 2)
-			{
-				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.collapseLeft))
-				{
-					windowMode = 1;
-					WindowRect.width = 290;
-					DragRect.width = WindowRect.width - 20;
-					PersistenceSave();
-				}
-			}
-			GUILayout.EndHorizontal();
+			buildMenuBar(id);
+
+			GUILayout.BeginVertical();
 			GUILayout.Space(8);
+			scroll = GUILayout.BeginScrollView(scroll);
 
 			//Contract List Begins
-			scroll = GUILayout.BeginScrollView(scroll);
 			foreach (contractContainer c in cList)
 			{
-				GUILayout.BeginHorizontal();
-				if (!showSort)
-				{
-					if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210)))
-						c.showParams = !c.showParams;
-				}
-				else
-					GUILayout.Box(c.contract.Title, hoverTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
-				if (windowMode == 1)
-				{
-					GUILayout.Space(5);
-					if (c.duration >= 2160000)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
-					else if (c.duration > 0)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
-					else if (c.contract.ContractState != Contract.State.Active)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
-					else
-						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
-				}
-				if (windowMode == 2)
-				{
-					GUILayout.Space(5);
-					if (c.duration >= 2160000)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
-					else if (c.duration > 0)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
-					else if (c.contract.ContractState != Contract.State.Active)
-						GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
-					else
-						GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
 
-					//GUILayout.FlexibleSpace();
-					GUILayout.BeginVertical();
-					if (c.fundsReward > 0)
-					{
-						GUILayout.BeginHorizontal();
-						GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(11), GUILayout.MaxWidth(10));
-						GUILayout.Space(-5);
-						GUILayout.Label("+ " + c.fundsReward.ToString("N0"), contractSkins.reward, GUILayout.Width(65));
-						GUILayout.EndHorizontal();
-					}
-					if (c.fundsPenalty > 0)
-					{
-						if (c.fundsReward > 0)
-							GUILayout.Space(-6);
-						GUILayout.BeginHorizontal();
-						GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(11), GUILayout.MaxWidth(10));
-						GUILayout.Space(-5);
-						GUILayout.Label("- " + c.fundsPenalty.ToString("N0"), contractSkins.penalty, GUILayout.Width(65));
-						GUILayout.EndHorizontal();
-					}
-					GUILayout.EndVertical();
-
-					GUILayout.FlexibleSpace();
-					GUILayout.BeginVertical();
-					if (c.repReward > 0)
-					{
-						GUILayout.BeginHorizontal();
-						GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
-						GUILayout.Space(-5);
-						GUILayout.Label("+ " + c.repReward.ToString("F0"), contractSkins.reward, GUILayout.Width(38));
-						GUILayout.EndHorizontal();
-					}
-					if (c.repPenalty > 0)
-					{
-						if (c.repReward > 0)
-							GUILayout.Space(-9);
-						GUILayout.BeginHorizontal();
-						GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
-						GUILayout.Space(-5);
-						GUILayout.Label("- " + c.repPenalty.ToString("F0"), contractSkins.penalty, GUILayout.Width(38));
-						GUILayout.EndHorizontal();
-					}
-					GUILayout.EndVertical();
-
-					GUILayout.FlexibleSpace();
-					if (c.science > 0)
-					{
-						GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
-						GUILayout.Space(-5);
-						GUILayout.Label("+ " + c.science.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37));
-					}
-				}
-				GUILayout.EndHorizontal();
+				//Contracts
+				buildContractTitle(c, id);
 
 				//Parameters
 				if (c.showParams)
 				{
-					int i = 0;
-					//Contract Parameter list for each contract
 					foreach (parameterContainer cP in c.paramList)
 					{
-						if (!string.IsNullOrEmpty(cP.cParam.Title))
-						{
-							//Check if each parameter has notes associated with it
-							if (cP.cParam.State != ParameterState.Complete && !string.IsNullOrEmpty(cP.cParam.Notes))
-							{
-								if (i == 0)
-									GUILayout.Space(-1);
-								else
-									GUILayout.Space(-3);
-								GUILayout.BeginHorizontal();
-								if (GUILayout.Button("[+]", contractSkins.noteButton, GUILayout.MaxWidth(24)))
-									cP.showNote = !cP.showNote;
-								GUILayout.Space(3);
-								GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(228));
-
-								if (windowMode == 2)
-								{
-									//GUILayout.FlexibleSpace();
-									GUILayout.BeginVertical();
-									if (cP.cParam.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									if (cP.cParam.FundsFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
-									{
-										if (cP.cParam.FundsCompletion > 0)
-											GUILayout.Space(-6);
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
-										GUILayout.Space(-5);
-										GUILayout.Label("- " + cP.cParam.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									GUILayout.EndVertical();
-
-									GUILayout.FlexibleSpace();
-									GUILayout.BeginVertical();
-									if (cP.cParam.ReputationCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									if (cP.cParam.ReputationFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
-									{
-										if (cP.cParam.ReputationCompletion > 0)
-											GUILayout.Space(-9);
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("- " + cP.cParam.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									GUILayout.EndVertical();
-
-									GUILayout.FlexibleSpace();
-									if (cP.cParam.ScienceCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37), GUILayout.MaxHeight(14));
-									}
-								}
-
-								GUILayout.EndHorizontal();
-								if (cP.showNote)
-								{
-									GUILayout.Space(-3);
-									GUILayout.Box(cP.cParam.Notes, GUILayout.MaxWidth(261));
-								}
-							}
-
-							//If no notes are present just display the title
-							else
-							{
-								if (i == 0)
-									GUILayout.Space(-1);
-								else
-									GUILayout.Space(-3);
-								GUILayout.BeginHorizontal();
-								GUILayout.Space(15);
-								GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(250));
-								if (windowMode == 2)
-								{
-									//GUILayout.FlexibleSpace();
-									GUILayout.BeginVertical();
-									if (cP.cParam.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									if (cP.cParam.FundsFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
-									{
-										if (cP.cParam.FundsCompletion > 0)
-											GUILayout.Space(-6);
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
-										GUILayout.Space(-5);
-										GUILayout.Label("- " + cP.cParam.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									GUILayout.EndVertical();
-
-									GUILayout.FlexibleSpace();
-									GUILayout.BeginVertical();
-									if (cP.cParam.ReputationCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									if (cP.cParam.ReputationFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
-									{
-										if (cP.cParam.ReputationCompletion > 0)
-											GUILayout.Space(-9);
-										GUILayout.BeginHorizontal();
-										GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("- " + cP.cParam.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38), GUILayout.MaxHeight(13));
-										GUILayout.EndHorizontal();
-									}
-									GUILayout.EndVertical();
-
-									GUILayout.FlexibleSpace();
-									if (cP.cParam.ScienceCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
-									{
-										GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
-										GUILayout.Space(-5);
-										GUILayout.Label("+ " + cP.cParam.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37), GUILayout.MaxHeight(14));
-									}
-								}
-								GUILayout.EndHorizontal();
-							}
-						}
-						i++;
+						if (cP.level == 0)
+							buildParameterLabel(cP, c, 0, id);
 					}
 				}
 			}
+
 			GUILayout.EndScrollView();
 			GUILayout.Space(18);
 			GUILayout.EndVertical();
 
+			//If the sort menu is open
 			if (showSort)
+				buildSortMenu(id);
+
+			//Bottom bar
+			buildBottomBar(id);
+
+			//Reset warning menu
+			if (rebuild)
+				resetMenu(id);
+
+			//Resize window when the resizer is grabbed by the mouse
+			buildResizer(id);
+		}
+
+		#region Top Menu
+
+		private void buildMenuBar(int ID)
+		{
+			//Sort icons
+			if (GUI.Button(new Rect(4, 1, 30, 17), new GUIContent(contractSkins.sortIcon, "Sort Contracts")))
+				showSort = !showSort;
+
+			if (contractScenario.Instance.orderMode[sceneInt] == 0)
+			{
+				if (GUI.Button(new Rect(33, 1, 24, 17), new GUIContent(contractSkins.orderAsc, "Ascending Order")))
+				{
+					contractScenario.Instance.orderMode[sceneInt] = 1;
+					refreshContracts(cList);
+				}
+			}
+			else
+			{
+				if (GUI.Button(new Rect(33, 1, 24, 17), new GUIContent(contractSkins.orderDesc, "Descending Order")))
+				{
+					contractScenario.Instance.orderMode[sceneInt] = 0;
+					refreshContracts(cList);
+				}
+			}
+
+			//Show and hide icons
+			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+			{
+				if (GUI.Button(new Rect(60, 1, 26, 19), new GUIContent(contractSkins.revealShowIcon, "Show Hidden Contracts")))
+				{
+					contractScenario.Instance.showHideMode[sceneInt] = 1;
+					cList = contractScenario.Instance.hiddenList;
+					refreshContracts(cList);
+				}
+			}
+			else
+			{
+				if (GUI.Button(new Rect(60, 1, 26, 19), new GUIContent(contractSkins.revealHideIcon, "Show Standard Contracts")))
+				{
+					contractScenario.Instance.showHideMode[sceneInt] = 0;
+					cList = contractScenario.Instance.showList;
+					refreshContracts(cList);
+				}
+			}
+
+			//Expand and contract icons
+			if (contractScenario.Instance.windowMode[sceneInt] == 0)
+			{
+				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRight))
+				{
+					contractScenario.Instance.windowMode[sceneInt] = 1;
+					WindowRect.width = 290;
+					DragRect.width = WindowRect.width - 19;
+				}
+			}
+			else if (contractScenario.Instance.windowMode[sceneInt] == 1)
+			{
+				if (GUI.Button(new Rect(WindowRect.width - 48, 1, 24, 18), contractSkins.collapseLeftStop))
+				{
+					contractScenario.Instance.windowMode[sceneInt] = 0;
+					WindowRect.width = 250;
+					DragRect.width = WindowRect.width - 19;
+				}
+				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.expandRightStop))
+				{
+					contractScenario.Instance.windowMode[sceneInt] = 2;
+					WindowRect.width = 480;
+					DragRect.width = WindowRect.width - 19;
+				}
+			}
+			else if (contractScenario.Instance.windowMode[sceneInt] == 2)
+			{
+				if (GUI.Button(new Rect(WindowRect.width - 24, 1, 24, 18), contractSkins.collapseLeft))
+				{
+					contractScenario.Instance.windowMode[sceneInt] = 1;
+					WindowRect.width = 290;
+					DragRect.width = WindowRect.width - 19;
+				}
+			}
+
+			GUI.DrawTexture(new Rect(2, 16, WindowRect.width - 4, 4), contractSkins.headerBar);
+		}
+
+
+		#endregion
+
+		#region Contract Titles
+
+		private void buildContractTitle(contractContainer c, int id)
+		{
+			//Contract title buttons
+			GUILayout.BeginHorizontal();
+			if (!showSort && !rebuild)
+			{
+				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210)))
+					c.showParams = !c.showParams;
+			}
+			else
+				GUILayout.Box(c.contract.Title, hoverTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
+
+			//Show and hide icons
+			GUILayout.Space(-5);
+			GUILayout.BeginVertical();
+			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+			{
+				if (GUILayout.Button(new GUIContent(contractSkins.hideIcon, "Hide Contract"), GUILayout.MaxWidth(15), GUILayout.MaxHeight(15)))
+					nextRemoveList.Add(c);
+			}
+			else
+			{
+				if (GUILayout.Button(new GUIContent(contractSkins.showIcon, "Un-Hide Contract"), GUILayout.MaxWidth(15), GUILayout.MaxHeight(15)))
+					nextRemoveList.Add(c);
+			}
+			GUILayout.EndVertical();
+
+			//Expiration date
+			if (contractScenario.Instance.windowMode[sceneInt] == 1)
+			{
+				if (c.duration >= 2160000)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
+				else if (c.duration > 0)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
+				else if (c.contract.ContractState == Contract.State.Completed)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
+				else
+					GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
+			}
+
+			else if (contractScenario.Instance.windowMode[sceneInt] == 2)
+			{
+				if (c.duration >= 2160000)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
+				else if (c.duration > 0)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
+				else if (c.contract.ContractState == Contract.State.Completed)
+					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
+				else
+					GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
+
+				//Reward and penalty amounts
+				GUILayout.BeginVertical();
+				if (c.contract.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(11), GUILayout.MaxWidth(10));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + c.contract.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65));
+					GUILayout.EndHorizontal();
+				}
+				if (c.contract.FundsFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
+				{
+					if (c.contract.ContractState == Contract.State.Active)
+						GUILayout.Space(-6);
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(11), GUILayout.MaxWidth(10));
+					GUILayout.Space(-5);
+					GUILayout.Label("- " + c.contract.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65));
+					GUILayout.EndHorizontal();
+				}
+				GUILayout.EndVertical();
+				
+				//Rep rewards and penalty amounts
+				//GUILayout.FlexibleSpace();
+				GUILayout.BeginVertical();
+				if (c.contract.ReputationCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + c.contract.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38));
+					GUILayout.EndHorizontal();
+				}
+				if (c.contract.ReputationFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
+				{
+					if (c.contract.ContractState == Contract.State.Active)
+						GUILayout.Space(-9);
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("- " + c.contract.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38));
+					GUILayout.EndHorizontal();
+				}
+				GUILayout.EndVertical();
+
+				//Science reward
+				//GUILayout.FlexibleSpace();
+				if (c.contract.ScienceCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+				{
+					GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(14), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + c.contract.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37));
+				}
+			}
+			GUILayout.EndHorizontal();
+		}
+
+		#endregion
+
+		#region Parameters
+
+		private void buildParameterLabel(parameterContainer cP, contractContainer c, int level, int id)
+		{
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(4 + (level * 5));
+
+			if (cP.cParam.State == ParameterState.Incomplete && !string.IsNullOrEmpty(cP.cParam.Notes))
+			{
+				//Note icon
+				if (GUILayout.Button("[+]", contractSkins.noteButton, GUILayout.MaxWidth(24)))
+					cP.showNote = !cP.showNote;
+				GUILayout.Space(-6);
+			}
+
+			//Contract parameter title
+			GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(240));
+
+			//Contract reward info
+			if (contractScenario.Instance.windowMode[sceneInt] == 2)
 			{
 				GUILayout.BeginVertical();
-				GUI.Box(dropDownSort, "", contractSkins.dropDown);
-				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 2, dropDownSort.width - 4, 20), "Expiration", contractSkins.sortMenu))
+				if (cP.cParam.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
 				{
-					showSort = false;
-					sort = sortClass.Expiration;
-					cList = sortList(cList, sort, order);
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + cP.cParam.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65), GUILayout.MaxHeight(13));
+					GUILayout.EndHorizontal();
 				}
-				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 23, dropDownSort.width - 4, 20), "Acceptance", contractSkins.sortMenu))
+				if (cP.cParam.FundsFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
 				{
-					showSort = false;
-					sort = sortClass.Acceptance;
-					cList = sortList(cList, sort, order);
+					if (c.contract.ContractState == Contract.State.Active)
+						GUILayout.Space(-6);
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(10), GUILayout.MaxWidth(10));
+					GUILayout.Space(-5);
+					GUILayout.Label("- " + cP.cParam.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65), GUILayout.MaxHeight(13));
+					GUILayout.EndHorizontal();
 				}
-				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 44, dropDownSort.width - 4, 20), "Difficulty", contractSkins.sortMenu))
-				{
-					showSort = false;
-					sort = sortClass.Difficulty;
-					cList = sortList(cList, sort, order);
-				}
-				if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 65, dropDownSort.width - 4, 20), "Reward", contractSkins.sortMenu))
-				{
-					showSort = false;
-					sort = sortClass.Reward;
-					cList = sortList(cList, sort, order);
-				}
-
 				GUILayout.EndVertical();
+
+				GUILayout.FlexibleSpace();
+				GUILayout.BeginVertical();
+				if (cP.cParam.ReputationCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + cP.cParam.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38), GUILayout.MaxHeight(13));
+					GUILayout.EndHorizontal();
+				}
+				if (cP.cParam.ReputationFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Failed || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Cancelled))
+				{
+					if (c.contract.ContractState == Contract.State.Active)
+						GUILayout.Space(-9);
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("- " + cP.cParam.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38), GUILayout.MaxHeight(13));
+					GUILayout.EndHorizontal();
+				}
+				GUILayout.EndVertical();
+
+				GUILayout.FlexibleSpace();
+				if (cP.cParam.ScienceCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+				{
+					GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(13), GUILayout.MaxWidth(14));
+					GUILayout.Space(-5);
+					GUILayout.Label("+ " + cP.cParam.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37), GUILayout.MaxHeight(14));
+				}
 			}
-			resizer = new Rect(WindowRect.width - 19, WindowRect.height - 28, 20, 26);
+			GUILayout.EndHorizontal();
+
+			//Display note
+			if (!string.IsNullOrEmpty(cP.cParam.Notes) && cP.showNote && cP.cParam.State == ParameterState.Incomplete)
+			{
+				GUILayout.Space(-3);
+				GUILayout.Box(cP.cParam.Notes, GUILayout.MaxWidth(261));
+			}
+
+			if (level < 4)
+			{
+				foreach (parameterContainer sP in c.paramList)
+				{
+					if (sP.level == level + 1)
+						buildParameterLabel(sP, c, level + 1, id);
+				}
+			}
+
+		}
+
+		#endregion
+
+		#region Sort Menu
+
+		//Sort option buttons to display when the sort button is activated
+		private void buildSortMenu(int id)
+		{
+			dropDownSort = new Rect(10, 20, 80, 110);
+			GUI.Box(dropDownSort, "", contractSkins.dropDown);
+			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 2, dropDownSort.width - 4, 20), "Expiration", contractSkins.sortMenu))
+			{
+				showSort = false;
+				contractScenario.Instance.sortMode[sceneInt] = sortClass.Expiration;
+				refreshContracts(cList);
+			}
+			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 23, dropDownSort.width - 4, 20), "Acceptance", contractSkins.sortMenu))
+			{
+				showSort = false;
+				contractScenario.Instance.sortMode[sceneInt] = sortClass.Acceptance;
+				refreshContracts(cList);
+			}
+			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 44, dropDownSort.width - 4, 20), "Difficulty", contractSkins.sortMenu))
+			{
+				showSort = false;
+				contractScenario.Instance.sortMode[sceneInt] = sortClass.Difficulty;
+				refreshContracts(cList);
+			}
+			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 65, dropDownSort.width - 4, 20), "Reward", contractSkins.sortMenu))
+			{
+				showSort = false;
+				contractScenario.Instance.sortMode[sceneInt] = sortClass.Reward;
+				refreshContracts(cList);
+			}
+			if (GUI.Button(new Rect(dropDownSort.x + 2, dropDownSort.y + 86, dropDownSort.width - 4, 20), "Type", contractSkins.sortMenu))
+			{
+				showSort = false;
+				contractScenario.Instance.sortMode[sceneInt] = sortClass.Type;
+				refreshContracts(cList);
+			}
+		}
+
+		#endregion
+
+		#region Bottom Bar
+
+		private void buildBottomBar(int id)
+		{
+			GUI.DrawTexture(new Rect(2, WindowRect.height - 30, WindowRect.width - 4, 4), contractSkins.footerBar);
+
+			//Version label
+			GUI.Label(new Rect(10, WindowRect.height - 20, 30, 20), version, contractSkins.paramText);
+
+			//Tooltip toggle icon
+			if (GUI.Button(new Rect(40, WindowRect.height - 22, 35, 20), new GUIContent(contractSkins.tooltipIcon, "Toggle Tooltips")))
+			{
+				TooltipsEnabled = !TooltipsEnabled;
+				contractScenario.Instance.toolTips[sceneInt] = TooltipsEnabled;
+			}
+
+			//Clear list button
+			if (GUI.Button(new Rect(85, WindowRect.height - 22, 35, 20), new GUIContent(contractSkins.resetIcon, "Reset Contracts Window Display")))
+				rebuild = !rebuild;
+		}
+
+		#endregion
+
+		#region ResetMenu
+
+		private void resetMenu(int id)
+		{
+			resetRect = new Rect(10, WindowRect.height - 180, 230, 150);
+			GUI.Box(resetRect, "", contractSkins.dropDown);
+			GUI.Label(new Rect(resetRect.x + 7, resetRect.y + 10, resetRect.width - 14, 100), "Rebuild\nContracts Window + Display:\n\n<b>Will Not</b> Affect Contract Status", contractSkins.resetBox);
+			if (GUI.Button(new Rect(resetRect.x + 20, resetRect.y + 110, resetRect.width - 40, 25), "Reset Display", contractSkins.resetButton))
+			{
+				LogFormatted("Rebuilding Contract Window List");
+				rebuildList();
+				rebuild = false;
+			}
+		}
+
+		#endregion
+
+
+		#region Resizer
+
+		private void buildResizer(int id)
+		{
+			Rect resizer = new Rect(WindowRect.width - 19, WindowRect.height - 28, 20, 26);
 			GUI.Label(resizer, contractSkins.expandIcon, contractSkins.dragButton);
-			//Resize window when the resizer is grabbed by the mouse
 			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 			{
 				if (resizer.Contains(Event.current.mousePosition))
@@ -488,7 +619,6 @@ namespace ContractsWindow
 				{
 					resizing = false;
 					WindowRect.yMax = WindowRect.y + windowHeight;
-					PersistenceSave();
 				}
 				else
 				{
@@ -508,86 +638,130 @@ namespace ContractsWindow
 						windowHeight = 200;
 				}
 			}
-
 		}
 
-		internal override void DrawGUI()
+		#endregion
+
+
+		internal override void DrawWindowPost(int id)
 		{
-			//Bool toggled by Toolbar icon
-			Toggle = IsVisible;
-
-			//Update the drag rectangle
-			DragRect.height = WindowRect.height - 24;
-
-			//Draw the window
-			base.DrawGUI();
-
-			//Draw the resizer in rectangle
-			if (Toggle)
+			//Remove any hidden contracts after the window is drawn
+			if (nextRemoveList.Count > 0)
 			{
-				// Hide part rightclick menu.
-				if (HighLogic.LoadedSceneIsFlight)
-				{
-					if (WindowRect.Contains(Input.mousePosition) && GUIUtility.hotControl == 0 && Input.GetMouseButton(0))
-					{
-						foreach (var window in GameObject.FindObjectsOfType(typeof(UIPartActionWindow)).OfType<UIPartActionWindow>().Where(p => p.Display == UIPartActionWindow.DisplayType.Selected))
-						{
-							window.enabled = false;
-							window.displayDirty = true;
-						}
-					}
-				}
-
-				if (HighLogic.LoadedSceneIsEditor)
-				{
-					if (WindowRect.Contains(Input.mousePosition))
-					{
-						EditorTooltip.Instance.HideToolTip();
-						EditorLogic.fetch.Lock(false, false, false, _AssemblyName.GetHashCode().ToString());
-					}
-					else if (!WindowRect.Contains(Input.mousePosition))
-					{
-						EditorLogic.fetch.Unlock(_AssemblyName.GetHashCode().ToString());
-					}
-				}
+				foreach (contractContainer c in nextRemoveList)
+					showHideContract(c);
+				nextRemoveList.Clear();
 			}
 
+			//Close the sort menu if clicked outside of its rectangle
+			if (showSort && Event.current.type == EventType.mouseDown && !dropDownSort.Contains(Event.current.mousePosition))
+				showSort = false;
+
+			//Close the reset warning if clicked outside of its rectangle
+			if (rebuild && Event.current.type == EventType.mouseDown && !resetRect.Contains(Event.current.mousePosition))
+				rebuild = false;
+
+			//Set the persistent window location
+			contractScenario.Instance.windowRects[sceneInt] = WindowRect;
 		}
 
 		#endregion
 
 		#region Methods
 
+		private void rebuildList()
+		{
+			contractScenario.Instance.showHideMode[sceneInt] = 0;
+			LogFormatted_DebugOnly("Generating Contract List");
+			contractScenario.Instance.showList.Clear();
+			contractScenario.Instance.hiddenList.Clear();
+			contractScenario.Instance.showIDList.Clear();
+			contractScenario.Instance.hiddenIDList.Clear();
+			cList = contractScenario.Instance.showList;
+			foreach (Contract c in ContractSystem.Instance.Contracts)
+			{
+				if (c.ContractState == Contract.State.Active)
+				{
+					cList.Add(new contractContainer(c));
+				}
+			}
+			cList = sortList(cList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+		}
+
 		//Function to sort the list based on several criteria
 		private List<contractContainer> sortList(List<contractContainer> cL, sortClass s, int i)
 		{
 			List<contractContainer> sortedList = new List<contractContainer>();
-			if (i == 0)
+			bool Order = i < 1;
+			if (s == sortClass.Default)
+				return cL;
+			else if (s == sortClass.Expiration)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Acceptance)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.DateAccepted.CompareTo(b.contract.DateAccepted), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Reward)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.totalReward.CompareTo(b.totalReward), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Difficulty)
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+			else if (s == sortClass.Type)
 			{
-				if (s == sortClass.Default)
-					return cL;
-				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => a.duration.CompareTo(b.duration));
-				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
-				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => a.totalReward.CompareTo(b.totalReward));
-				else if (s == sortClass.Difficulty)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(true, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
+				cL = typeSort(cL, Order);
 			}
-			else
+			return cL;
+		}
+
+		//Special method for handling altitude based parameters; only ReachAltitudeEnvelope seems to be relevant
+		private List<contractContainer> typeSort(List<contractContainer> cL, bool B)
+		{
+			LogFormatted_DebugOnly("Checking For Altitude Parameters");
+			List<int> position = new List<int>();
+			List<contractContainer> altList = new List<contractContainer>();
+			for (int i = 0; i < cL.Count; i++)
 			{
-				if (s == sortClass.Default)
-					return cL;
-				else if (s == sortClass.Expiration)
-					cL.Sort((a, b) => -a.duration.CompareTo(b.duration));
-				else if (s == sortClass.Acceptance)
-					cL.Sort((a, b) => -a.contract.DateAccepted.CompareTo(b.contract.DateAccepted));
-				else if (s == sortClass.Reward)
-					cL.Sort((a, b) => -a.totalReward.CompareTo(b.totalReward));
-				else if (s == sortClass.Difficulty)
-					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.contract.Prestige.CompareTo(b.contract.Prestige), a.contract.Title.CompareTo(b.contract.Title)));
+				foreach (parameterContainer cP in cL[i].paramList)
+				{
+					if (cP.cParam.ID == "testAltitudeEnvelope")
+					{
+						altList.Add(cL[i]);
+						position.Add(i);
+					}
+				}
 			}
+			if (altList.Count > 1)
+			{
+				LogFormatted_DebugOnly("Sorting Based On Altitude Envelope");
+				altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachAltitudeEnvelope)a.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude.CompareTo(((ReachAltitudeEnvelope)b.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
+				for (int j = 0; j < position.Count; j++)
+				{
+					cL[position[j]] = altList[j];
+				}
+			}
+
+			//ReachFlightEnvelop doesn't actually seem to be used by anything
+
+			//position.Clear();
+			//List<contractContainer> flightList = new List<contractContainer>();
+			//for (int i = 0; i < cL.Count; i++)
+			//{
+			//    foreach (parameterContainer cP in cL[i].paramList)
+			//    {
+			//        if (cP.cParam.ID == "testFlightEnvelope")
+			//        {
+			//            flightList.Add(cL[i]);
+			//            position.Add(i);
+			//        }
+			//    }
+			//}
+			//if (flightList.Count > 1)
+			//{
+			//    flightList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachFlightEnvelope)a.contract.AllParameters.First(s => s.ID == "testFlightEnvelope")).minAltitude.CompareTo(((ReachFlightEnvelope)b.contract.AllParameters.First(s => s.ID == "testFlightEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
+			//    for (int j = 0; j < position.Count; j++)
+			//    {
+			//        cL[position[j]] = flightList[j];
+			//    }
+			//}
+
 			return cL;
 		}
 
@@ -608,6 +782,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Label style for contract titles when the sort menu is open
 		private GUIStyle hoverTitleState(Contract.State s)
 		{
 			switch (s)
@@ -641,24 +816,23 @@ namespace ContractsWindow
 		//Adds new contracts when they are accepted in Mission Control
 		private void contractAccepted(Contract c)
 		{
-			cList.Add(new contractContainer(c));
-			cList = sortList(cList, sort, order);
+			contractScenario.Instance.showList.Add(new contractContainer(c));
+			contractScenario.Instance.showList = sortList(contractScenario.Instance.showList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+				cList = contractScenario.Instance.showList;
 		}
 
-		//Rebuild contract list when the scene changes
+		//Starts the rebuild timer when the contract list is loaded
 		private void contractLoaded()
 		{
-			cList.Clear();
-			foreach (Contract c in ContractSystem.Instance.Contracts)
+			if (!contractsLoading && !loaded)
 			{
-				if (c.ContractState == Contract.State.Active)
-				{
-					cList.Add(new contractContainer(c));
-				}
+				timer = 0;
+				contractsLoading = true;
 			}
-			cList = sortList(cList, sort, order);
 		}
 
+		//Update contract values
 		private void refreshContracts(List<contractContainer> cL)
 		{
 			foreach (contractContainer cC in cL)
@@ -666,18 +840,7 @@ namespace ContractsWindow
 				if (cC.contract.ContractState != Contract.State.Active)
 				{
 					cC.duration = 0;
-					cC.daysToExpire = "---";
-					if (cC.contract.ContractState == Contract.State.Completed)
-					{
-						cC.fundsPenalty = 0;
-						cC.repPenalty = 0;
-					}
-					else if (cC.contract.ContractState == Contract.State.Failed || cC.contract.ContractState == Contract.State.DeadlineExpired || cC.contract.ContractState == Contract.State.Cancelled)
-					{
-						cC.fundsReward = 0;
-						cC.repReward = 0;
-						cC.science = 0;
-					}
+					cC.daysToExpire = "----";
 					continue;
 				}
 				//Update contract timers
@@ -688,10 +851,36 @@ namespace ContractsWindow
 				}
 				else
 				{
-					cC.duration = cC.deadline - Planetarium.GetUniversalTime();
+					cC.duration = cC.contract.DateDeadline - Planetarium.GetUniversalTime();
 					//Calculate time in day values using Kerbin or Earth days
 					cC.daysToExpire = contractContainer.timeInDays(cC.duration);
 				}
+			}
+			cL = sortList(cL, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+				contractScenario.Instance.showList = cList;
+			else
+				contractScenario.Instance.hiddenList = cList;
+		}
+
+		//Remove contract from current list and update
+		private void showHideContract(contractContainer c)
+		{
+			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+			{
+				if (!contractScenario.Instance.hiddenList.Any(i => i.contract.ContractGuid == c.contract.ContractGuid))
+					contractScenario.Instance.hiddenList.Add(c);
+				contractScenario.Instance.showList.Remove(c);
+				cList = contractScenario.Instance.showList;
+				refreshContracts(cList);
+			}
+			else
+			{
+				if (!contractScenario.Instance.showList.Any(i => i.contract.ContractGuid == c.contract.ContractGuid))
+					contractScenario.Instance.showList.Add(c);
+				contractScenario.Instance.hiddenList.Remove(c);
+				cList = contractScenario.Instance.hiddenList;
+				refreshContracts(cList);
 			}
 		}
 
@@ -713,77 +902,15 @@ namespace ContractsWindow
 		//Load window position and size settings
 		private void PersistenceLoad()
 		{
-			if (fileFound)
+			if (contractScenario.Instance.loaded)
 			{
-				ConfigNode node = ConfigNode.Load(fileLocation);
-				if (node != null)
-				{
-					ConfigNode windowNode = node.GetNode("CONTRACT_WINDOW_SETTINGS");
-					if (windowNode != null)
-					{
-						if (float.TryParse(windowNode.GetValue("Window X"), out windowX))
-							WindowRect.x = windowX;
-						else
-							WindowRect.x = 50;
-						if (float.TryParse(windowNode.GetValue("Window Y"), out windowY))
-							WindowRect.y = windowY;
-						else
-							WindowRect.y = 80;
-						if (float.TryParse(windowNode.GetValue("Window Width"), out windowW))
-							WindowRect.width = windowW;
-						else
-							WindowRect.width = 250;
-						if (float.TryParse(windowNode.GetValue("Window Height"), out windowH))
-							WindowRect.height = windowH;
-						else
-							WindowRect.height = 300;
-						if (float.TryParse(windowNode.GetValue("Window MaxY"), out windowMaxY))
-							WindowRect.yMax = windowMaxY;
-						else
-							WindowRect.yMax = 380;
-						if (bool.TryParse(windowNode.GetValue("Window Visible"), out visible))
-							IsVisible = visible;
-						else
-							IsVisible = false;
-						if (!int.TryParse(windowNode.GetValue("Window Mode"), out windowMode))
-							windowMode = 0;
-						if (!int.TryParse(windowNode.GetValue("Sort Mode"), out order))
-							order = 0;
-						int i;
-						if (int.TryParse(windowNode.GetValue("Sort Order"), out i))
-							sort = (sortClass)i;
-						else
-							sort = sortClass.Default;
-					}
-				}
-			}
-		}
-
-		//Save window size and position settings to config file
-		private void PersistenceSave()
-		{
-			if (fileFound)
-			{
-				ConfigNode node = ConfigNode.Load(fileLocation);
-				if (node != null)
-				{
-					node.ClearNodes();
-					ConfigNode windowNode = new ConfigNode("CONTRACT_WINDOW_SETTINGS");
-					if (windowNode != null)
-					{
-						windowNode.AddValue("Window X", WindowRect.x.ToString());
-						windowNode.AddValue("Window Y", WindowRect.y.ToString());
-						windowNode.AddValue("Window Width", WindowRect.width.ToString());
-						windowNode.AddValue("Window Height", WindowRect.height.ToString());
-						windowNode.AddValue("Window MaxY", WindowRect.yMax.ToString());
-						windowNode.AddValue("Window Visible", IsVisible.ToString());
-						windowNode.AddValue("Window Mode", windowMode.ToString());
-						windowNode.AddValue("Sort Mode", order.ToString());
-						windowNode.AddValue("Sort Order", ((int)sort).ToString());
-						node.AddNode(windowNode);
-						node.Save(fileLocation);
-					}
-				}
+				cList.Clear();
+				WindowRect = contractScenario.Instance.windowRects[sceneInt];
+				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 24);
+				Visible = contractScenario.Instance.windowVisible[sceneInt];
+				if (Visible)
+					StartRepeatingWorker(5);
+				LogFormatted_DebugOnly("Contract Window Loaded");
 			}
 		}
 
