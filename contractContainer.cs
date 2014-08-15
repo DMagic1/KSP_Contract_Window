@@ -36,7 +36,7 @@ namespace ContractsWindow
 	internal class contractContainer
 	{
 		internal Contract contract;
-		internal double deadline, totalReward, duration;
+		internal double totalReward, duration;
 		internal bool showParams;
 		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
@@ -45,16 +45,15 @@ namespace ContractsWindow
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
-			deadline = contract.DateDeadline;
 
-			if (deadline <= 0)
+			if (contract.DateDeadline <= 0)
 			{
 				duration = double.MaxValue;
 				daysToExpire = "----";
 			}
 			else
 			{
-				duration = deadline - Planetarium.GetUniversalTime();
+				duration = contract.DateDeadline - Planetarium.GetUniversalTime();
 				//Calculate time in day values using Kerbin or Earth days
 				daysToExpire = timeInDays(duration);
 			}
