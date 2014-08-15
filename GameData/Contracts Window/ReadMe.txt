@@ -1,6 +1,6 @@
 Place the contents of the GameData folder in your KSP/GameData folder:
 
-Kerbal Space Programe/GameData/
+Kerbal Space Program/GameData/
 
 Contracts Window will not function properly if not placed in the correct location.
 
