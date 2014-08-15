@@ -134,8 +134,8 @@ namespace ContractsWindow
 		//Remove our contract window object
 		private void OnDestroy()
 		{
+			MonoBehaviourExtended.LogFormatted_DebugOnly("Destroying Contract Window");
 			Destroy(cWin);
-			print("[CW] Destroying Contract Window");
 		}
 
 		#region utilities
@@ -239,11 +239,25 @@ namespace ContractsWindow
 		}
 
 		//Populate the contract lists based on contract Guid values
-		internal void addToList(Guid ID, List<contractContainer> cL)
+		internal void addToList(List<Guid> IDList, List<contractContainer> cL)
 		{
-			Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractGuid == ID);
-			if (c != null)
-				cL.Add(new contractContainer(c));
+			List<Guid> removeList = new List<Guid>();
+			foreach (Guid ID in IDList)
+			{
+				try
+				{
+					Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractGuid == ID);
+					if (c.ContractState == Contract.State.Active)
+						cL.Add(new contractContainer(c));
+				}
+				catch
+				{
+					MonoBehaviourExtended.LogFormatted_DebugOnly("Contract: {0} Not Found In Loaded Contract List; Removing From Database", ID);
+					removeList.Add(ID);
+				}
+			}
+			foreach (Guid id in removeList)
+				IDList.Remove(id);
 		}
 
 		#endregion
