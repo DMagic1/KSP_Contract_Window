@@ -38,7 +38,7 @@ using UnityEngine;
 
 namespace ContractsWindow
 {
-	[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
+	//[KSPAddonImproved(KSPAddonImproved.Startup.EditorAny | KSPAddonImproved.Startup.TimeElapses, false)]
 	class contractsWindow: MonoBehaviourWindow
 	{
 
@@ -53,7 +53,7 @@ namespace ContractsWindow
 		private int timer;
 		private Rect dropDownSort;
 		private int sceneInt;
-		internal static bool ToolbarOn;
+		//internal static bool ToolbarOn;
 
 		private contractScenario contract = contractScenario.Instance;
 
@@ -95,7 +95,7 @@ namespace ContractsWindow
 
 		internal override void LateUpdate()
 		{
-			Visible = ToolbarOn;
+			//Visible = ToolbarOn;
 		}
 
 		internal override void Update()
@@ -1005,6 +1005,11 @@ namespace ContractsWindow
 			}
 		}
 
+		internal static void setVisible(bool b)
+		{
+			
+		}
+
 		#endregion
 
 		#region Repeating Worker
@@ -1023,14 +1028,17 @@ namespace ContractsWindow
 		//Load window position and size settings
 		private void PersistenceLoad()
 		{
-			cList.Clear();
-			LogFormatted_DebugOnly("Loading Parameters Now");
-			WindowRect = contractScenario.Instance.windowRects[sceneInt];
-			DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
-			ToolbarOn = contractScenario.Instance.windowVisible[sceneInt];
-			LogFormatted_DebugOnly("Contract Window Loaded");
-			if (Visible)
-				StartRepeatingWorker(5);
+			if (contractScenario.Instance.loaded)
+			{
+				cList.Clear();
+				LogFormatted_DebugOnly("Loading Parameters Now");
+				WindowRect = contractScenario.Instance.windowRects[sceneInt];
+				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 25);
+				Visible = contractScenario.Instance.windowVisible[sceneInt];
+				LogFormatted_DebugOnly("Contract Window Loaded");
+				if (Visible)
+					StartRepeatingWorker(5);
+			}
 		}
 
 		#endregion

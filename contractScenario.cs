@@ -63,6 +63,9 @@ namespace ContractsWindow
 			private set { }
 		}
 
+		[KSPField(isPersistant = true)]
+		public bool loaded = false;
+
 		internal List<contractContainer> showList = new List<contractContainer>();
 		internal List<contractContainer> hiddenList = new List<contractContainer>();
 
@@ -78,7 +81,7 @@ namespace ContractsWindow
 		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
-		//internal contractsWindow cWin;
+		internal contractsWindow cWin;
 
 		public override void OnLoad(ConfigNode node)
 		{
@@ -99,9 +102,9 @@ namespace ContractsWindow
 				toolTips = stringSplitBool(scenes.GetValue("ToolTips"));
 				int[] winPos = new int[4] {windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3]};
 				loadWindow(winPos);
-
-				//cWin = gameObject.AddComponent<contractsWindow>();
+				loaded = true;
 			}
+			cWin = gameObject.AddComponent<contractsWindow>();
 		}
 
 		public override void OnSave(ConfigNode node)
