@@ -63,6 +63,7 @@ namespace ContractsWindow
 			private set { }
 		}
 
+		//Make the first load smoother
 		[KSPField(isPersistant = true)]
 		public bool loaded = false;
 
@@ -83,6 +84,7 @@ namespace ContractsWindow
 
 		internal contractsWindow cWin;
 
+		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
 			showList.Clear();
@@ -104,11 +106,13 @@ namespace ContractsWindow
 				loadWindow(winPos);
 				loaded = true;
 			}
+			//Start the window object
 			cWin = gameObject.AddComponent<contractsWindow>();
 		}
 
 		public override void OnSave(ConfigNode node)
 		{
+			//Convert the contract lists into Guid for storage
 			Guid[] showListID = contractID(showList);
 			Guid[] hiddenListID = contractID(hiddenList);
 			saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
@@ -125,6 +129,13 @@ namespace ContractsWindow
 			scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 			scenes.AddValue("ToolTips", stringConcat(toolTips, toolTips.Length));
 			node.AddNode(scenes);
+		}
+
+		//Remove our contract window object
+		private void OnDestroy()
+		{
+			Destroy(cWin);
+			print("[CW] Destroying Contract Window");
 		}
 
 		#region utilities
@@ -146,6 +157,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Convert array types into strings for storage
 		private string stringConcat(int[] source, int i)
 		{
 			if (i == 0)
@@ -182,6 +194,7 @@ namespace ContractsWindow
 			return string.Concat(s).TrimEnd(',');
 		}
 
+		//Convert strings into the appropriate arrays
 		private int[] stringSplit(string source)
 		{
 			string[] s = source.Split(',');
@@ -225,6 +238,7 @@ namespace ContractsWindow
 			return id;
 		}
 
+		//Populate the contract lists based on contract Guid values
 		internal void addToList(Guid ID, List<contractContainer> cL)
 		{
 			Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractGuid == ID);
@@ -236,6 +250,7 @@ namespace ContractsWindow
 
 		#region save/load methods
 
+		//Save and load the window rectangle position
 		private void saveWindow(Rect source)
 		{
 			int i = currentScene(HighLogic.LoadedScene);
