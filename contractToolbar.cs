@@ -39,6 +39,7 @@ namespace ContractsWindow
 
 		internal contractToolbar()
 		{
+			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
 			{
 				contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractManager");
@@ -51,17 +52,18 @@ namespace ContractsWindow
 				contractButton.ToolTip = "Contract Manager";
 				contractButton.OnClick += (e) =>
 					{
-						if (contractScenario.Instance.cWin.Visible)
+						if (contractsWindow.ToolbarOn)
 						{
-							contractScenario.Instance.cWin.Visible = false;
-							contractScenario.Instance.cWin.StopRepeatingWorker();
+							contractsWindow.ToolbarOn = false;
+							//contractScenario.Instance.cWin.StopRepeatingWorker();
+							contractScenario.Instance.windowVisible[sceneInt] = false;
 						}
 						else
 						{
-							contractScenario.Instance.cWin.Visible = true;
-							contractScenario.Instance.cWin.StartRepeatingWorker();
+							contractsWindow.ToolbarOn = true;
+							//contractScenario.Instance.cWin.StartRepeatingWorker(5);
+							contractScenario.Instance.windowVisible[sceneInt] = true;
 						}
-						contractScenario.Instance.setWindowVisible(contractScenario.Instance.cWin.Visible);
 					};
 			}
 			else
@@ -70,7 +72,8 @@ namespace ContractsWindow
 
 		internal void OnDestroy()
 		{
-			contractButton.Destroy();
+			if (contractButton != null)
+				contractButton.Destroy();
 		}
 	}
 }

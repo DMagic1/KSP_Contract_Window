@@ -67,17 +67,18 @@ namespace ContractsWindow
 		internal List<contractContainer> hiddenList = new List<contractContainer>();
 
 		//initialize data for each gamescene
-		private int[] orderMode = new int[4];
-		private int[] windowMode = new int[4];
-		private int[] showHideMode = new int[4];
+		internal int[] orderMode = new int[4];
+		internal int[] windowMode = new int[4];
+		internal int[] showHideMode = new int[4];
 		internal List<Guid> showIDList = new List<Guid>();
 		internal List<Guid> hiddenIDList = new List<Guid>();
-		private bool[] windowVisible = new bool[4];
-		private bool[] toolTips = new bool[4];
-		private sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
+		internal bool[] windowVisible = new bool[4];
+		internal bool[] toolTips = new bool[4] { true, true, true, true };
+		internal sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
+		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
-		internal contractsWindow cWin;
+		//internal contractsWindow cWin;
 
 		public override void OnLoad(ConfigNode node)
 		{
@@ -96,8 +97,10 @@ namespace ContractsWindow
 				windowPos = stringSplit(scenes.GetValue("WindowPosition"));
 				windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
 				toolTips = stringSplitBool(scenes.GetValue("ToolTips"));
+				int[] winPos = new int[4] {windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3]};
+				loadWindow(winPos);
 
-				cWin = gameObject.AddComponent<contractsWindow>();
+				//cWin = gameObject.AddComponent<contractsWindow>();
 			}
 		}
 
@@ -105,6 +108,7 @@ namespace ContractsWindow
 		{
 			Guid[] showListID = contractID(showList);
 			Guid[] hiddenListID = contractID(hiddenList);
+			saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 			scenes.AddValue("DefaultListID", stringConcat(showListID, showListID.Length));
@@ -118,12 +122,11 @@ namespace ContractsWindow
 			scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 			scenes.AddValue("ToolTips", stringConcat(toolTips, toolTips.Length));
 			node.AddNode(scenes);
-			Destroy(cWin);
 		}
 
 		#region utilities
 
-		private int currentScene(GameScenes s)
+		internal static int currentScene(GameScenes s)
 		{
 			switch (s)
 			{
@@ -230,80 +233,18 @@ namespace ContractsWindow
 
 		#region save/load methods
 
-		//Saving and loading info from the window
-		internal void setOrderMode(int i)
+		private void saveWindow(Rect source)
 		{
-			orderMode[currentScene(HighLogic.LoadedScene)] = i;
+			int i = currentScene(HighLogic.LoadedScene);
+			windowPos[i * 4] = (int)source.x;
+			windowPos[(i * 4) + 1] = (int)source.y;
+			windowPos[(i * 4) + 2] = (int)source.width;
+			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
-		internal void setWindowMode(int i)
+		private void loadWindow(int[] window)
 		{
-			windowMode[currentScene(HighLogic.LoadedScene)] = i;
-		}
-
-		internal void setShowHideMode(int i)
-		{
-			showHideMode[currentScene(HighLogic.LoadedScene)] = i;
-		}
-
-		internal void setSortMode(sortClass sC)
-		{
-			sortMode[currentScene(HighLogic.LoadedScene)] = sC;
-		}
-
-		internal void setWindowPosition(int x, int y, int w, int h)
-		{
-			int s = currentScene(HighLogic.LoadedScene) * 4;
-			windowPos[s] = x;
-			windowPos[s + 1] = y;
-			windowPos[s + 2] = w;
-			windowPos[s + 3] = h;
-		}
-
-		internal void setWindowVisible(bool b)
-		{
-			windowVisible[currentScene(HighLogic.LoadedScene)] = b;
-		}
-
-		internal void setToolTips(bool b)
-		{
-			toolTips[currentScene(HighLogic.LoadedScene)] = b;
-		}
-
-		internal int loadOrderMode()
-		{
-			return orderMode[currentScene(HighLogic.LoadedScene)];
-		}
-
-		internal int loadWindowMode()
-		{
-			return windowMode[currentScene(HighLogic.LoadedScene)];
-		}
-
-		internal int loadShowHideMode()
-		{
-			return showHideMode[currentScene(HighLogic.LoadedScene)];
-		}
-
-		internal sortClass loadSortMode()
-		{
-			return sortMode[currentScene(HighLogic.LoadedScene)];
-		}
-
-		internal int[] loadWindowPosition()
-		{
-			int i = currentScene(HighLogic.LoadedScene) * 4;
-			return new int[4] { windowPos[i], windowPos[i + 1], windowPos[i + 2], windowPos[i + 3] };
-		}
-
-		internal bool loadWindowVisible()
-		{
-			return windowVisible[currentScene(HighLogic.LoadedScene)];
-		}
-
-		internal bool loadToolTips()
-		{
-			return toolTips[currentScene(HighLogic.LoadedScene)];
+			windowRects[currentScene(HighLogic.LoadedScene)] = new Rect(window[0], window[1], window[2], window[3]);
 		}
 
 		#endregion
