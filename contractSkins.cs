@@ -74,6 +74,9 @@ namespace ContractsWindow
 		internal static GUIStyle texButton;
 		internal static GUIStyle dragButton;
 
+		internal static GUIStyle resetBox;
+		internal static GUIStyle resetButton;
+
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
 		internal static Texture2D repGreen;
@@ -98,6 +101,7 @@ namespace ContractsWindow
 		internal static Texture2D buttonHover;
 		internal static Texture2D headerBar;
 		internal static Texture2D footerBar;
+		internal static Texture2D resetIcon;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -127,6 +131,7 @@ namespace ContractsWindow
 			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
 			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
 			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
+			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -251,8 +256,6 @@ namespace ContractsWindow
 			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
 			dropDown.name = "DropDown";
 			dropDown.normal.background = dropDownTex;
-			//dropDown.normal.background.SetPixel(1, 1, XKCDColors.AlmostBlack);
-			//dropDown.normal.background.Apply();
 
 			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			sortMenu.name = "SortMenu";
@@ -278,6 +281,18 @@ namespace ContractsWindow
 			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
 			dragButton.padding = new RectOffset(1, 2, 0, 0);
+
+			resetBox = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			resetBox.name = "ResetBox";
+			resetBox.fontSize = 16;
+			resetBox.normal.textColor = XKCDColors.VomitYellow;
+			resetBox.wordWrap = true;
+			resetBox.alignment = TextAnchor.UpperCenter;
+
+			resetButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			resetButton.name = "ResetButton";
+			resetButton.fontSize = 15;
+			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
 			SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
