@@ -214,7 +214,15 @@ namespace ContractsWindow
 			List<Guid> i = new List<Guid>();
 			for (int j = 0; j < s.Length; j++)
 			{
-				i.Add(new Guid(s[j]));
+				try
+				{
+					Guid g = new Guid(s[j]);
+					i.Add(g);
+				}
+				catch (Exception e)
+				{
+					MonoBehaviourWindow.LogFormatted("Guid invalid: {0}", e);
+				}
 			}
 			return i;
 		}
