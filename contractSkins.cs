@@ -232,7 +232,6 @@ namespace ContractsWindow
 			reward.name = "FundsReward";
 			reward.fontSize = 10;
 			reward.normal.textColor = XKCDColors.FreshGreen;
-			//reward.normal.background = SkinsLibrary.DefUnitySkin.box.normal.background;
 			reward.wordWrap = false;
 			reward.alignment = TextAnchor.MiddleLeft;
 
