@@ -436,6 +436,16 @@ namespace ContractsWindow
 				GUILayout.Space(-6);
 			}
 
+			if (cP.part != null)
+			{
+				if (GUILayout.Button("++", contractSkins.noteButton, GUILayout.MaxWidth(30)))
+				{
+					LogFormatted_DebugOnly("Activating Part Icon Window");
+					EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
+					EditorPartList.Instance.RevealPart(cP.part, true);
+				}
+			}
+
 			//Contract parameter title
 			GUILayout.Box(cP.cParam.Title, paramState(cP.cParam.State), GUILayout.MaxWidth(240));
 
@@ -721,10 +731,11 @@ namespace ContractsWindow
 			{
 				foreach (parameterContainer cP in cL[i].paramList)
 				{
-					if (cP.cParam.ID == "testAltitudeEnvelope")
+					if (cP.altElement)
 					{
 						altList.Add(cL[i]);
 						position.Add(i);
+						break;
 					}
 				}
 			}
@@ -816,6 +827,7 @@ namespace ContractsWindow
 		//Adds new contracts when they are accepted in Mission Control
 		private void contractAccepted(Contract c)
 		{
+			LogFormatted_DebugOnly("Adding New Contract To List");
 			contractScenario.Instance.showList.Add(new contractContainer(c));
 			contractScenario.Instance.showList = sortList(contractScenario.Instance.showList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
 			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
@@ -916,5 +928,15 @@ namespace ContractsWindow
 
 		#endregion
 
+	}
+
+	internal enum sortClass
+	{
+		Default = 1,
+		Expiration = 2,
+		Acceptance = 3,
+		Difficulty = 4,
+		Reward = 5,
+		Type = 6,
 	}
 }
