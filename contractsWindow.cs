@@ -53,6 +53,7 @@ namespace ContractsWindow
 		private int timer;
 		private Rect dropDownSort, resetRect;
 		private int sceneInt;
+		private const string lockID = "ContractsWindow_LockID";
 
 		private contractScenario contract = contractScenario.Instance;
 
@@ -73,7 +74,7 @@ namespace ContractsWindow
 			RepeatingWorkerInitialWait = 10;
 
 			//Make sure our click-through control locks are disabled
-			InputLockManager.RemoveControlLock("ContractsWindow".GetHashCode().ToString());
+			InputLockManager.RemoveControlLock(lockID);
 
 			SkinsLibrary.SetCurrent("ContractUnitySkin");
 		}
@@ -87,10 +88,10 @@ namespace ContractsWindow
 
 		internal override void OnDestroy()
 		{
-			if (HighLogic.LoadedSceneIsEditor)
-				EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
+			if (InputLockManager.lockStack.ContainsKey(lockID))
+				EditorLogic.fetch.Unlock(lockID);
 		}
 
 		internal override void Update()
@@ -166,12 +167,12 @@ namespace ContractsWindow
 				mousePos.y = Screen.height - mousePos.y;
 				if (WindowRect.Contains(mousePos) && !editorLocked)
 				{
-					EditorLogic.fetch.Lock(true, true, true, "ContractsWindow".GetHashCode().ToString());
+					EditorLogic.fetch.Lock(true, true, true, lockID);
 					editorLocked = true;
 				}
 				else if (!WindowRect.Contains(mousePos) && editorLocked)
 				{
-					EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
+					EditorLogic.fetch.Unlock(lockID);
 					editorLocked = false;
 				}
 			}
@@ -441,7 +442,7 @@ namespace ContractsWindow
 				if (GUILayout.Button("++", contractSkins.noteButton, GUILayout.MaxWidth(30)))
 				{
 					LogFormatted_DebugOnly("Activating Part Icon Window");
-					EditorLogic.fetch.Unlock("ContractsWindow".GetHashCode().ToString());
+					EditorLogic.fetch.Unlock(lockID);
 					EditorPartList.Instance.RevealPart(cP.part, true);
 				}
 			}
@@ -742,7 +743,7 @@ namespace ContractsWindow
 			if (altList.Count > 1)
 			{
 				LogFormatted_DebugOnly("Sorting Based On Altitude Envelope");
-				altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachAltitudeEnvelope)a.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude.CompareTo(((ReachAltitudeEnvelope)b.contract.AllParameters.First(s => s.ID == "testAltitudeEnvelope")).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
+				altList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(B, ((ReachAltitudeEnvelope)a.contract.AllParameters.First(s => s.GetType() == typeof(ReachAltitudeEnvelope))).minAltitude.CompareTo(((ReachAltitudeEnvelope)b.contract.AllParameters.First(s => s.GetType() == typeof(ReachAltitudeEnvelope))).minAltitude), a.contract.Title.CompareTo(b.contract.Title)));
 				for (int j = 0; j < position.Count; j++)
 				{
 					cL[position[j]] = altList[j];
