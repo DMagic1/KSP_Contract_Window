@@ -43,7 +43,6 @@ namespace ContractsWindow
 		internal bool showParams, altElement;
 		internal string daysToExpire, partTest;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
-		//private string[] partNameParams = new string[14] {"dmmagBoom","rpwsAnt","dmscope","dmImagingPlatform","dmsurfacelaser","","","","","","","","","","","","","", }
 
 		//Store info on contracts
 		internal contractContainer(Contract Contract)
@@ -71,7 +70,8 @@ namespace ContractsWindow
 				altElement = false;
 				partTest = "";
 				ContractParameter param = contract.GetParameter(i);
-				paramCheck(param);
+				altElement = altParamCheck(param);
+				partTest = paramTypeCheck(param);
 				paramList.Add(new parameterContainer(param, 0, altElement, partTest));
 				totalReward += param.FundsCompletion;
 
@@ -80,7 +80,8 @@ namespace ContractsWindow
 					altElement = false;
 					partTest = "";
 					ContractParameter subParam1 = param.GetParameter(j);
-					paramCheck(subParam1);
+					altElement = altParamCheck(subParam1);
+					partTest = paramTypeCheck(subParam1);
 					paramList.Add(new parameterContainer(subParam1, 1, altElement, partTest));
 					totalReward += subParam1.FundsCompletion;
 
@@ -89,7 +90,8 @@ namespace ContractsWindow
 						altElement = false;
 						partTest = "";
 						ContractParameter subParam2 = param.GetParameter(k);
-						paramCheck(subParam2);
+						altElement = altParamCheck(subParam2);
+						partTest = paramTypeCheck(subParam2);
 						paramList.Add(new parameterContainer(subParam2, 2, altElement, partTest));
 						totalReward += subParam2.FundsCompletion;
 
@@ -98,7 +100,8 @@ namespace ContractsWindow
 							altElement = false;
 							partTest = "";
 							ContractParameter subParam3 = param.GetParameter(k);
-							paramCheck(subParam3);
+							altElement = altParamCheck(subParam3);
+							partTest = paramTypeCheck(subParam3);
 							paramList.Add(new parameterContainer(subParam3, 3, altElement, partTest));
 							totalReward += subParam3.FundsCompletion;
 						}
@@ -107,22 +110,40 @@ namespace ContractsWindow
 			}
 		}
 
-		private void paramCheck(ContractParameter param)
+		private bool altParamCheck(ContractParameter param)
 		{
-			if (param.ID == "testAltitudeEnvelope")
-				altElement = true;
+			if (param.GetType() == typeof(ReachAltitudeEnvelope))
+				return true;
 			else
-				altElement = false;
-			if (param.ID == "runTest")
-				partTest = "partTest";
-			else if (param.ID == "collectDMScience")
-				partTest = "DMcollectScience";
-			else if (param.ID == "collectDMAnomaly")
-				partTest = "DManomalyScience";
-			else if (param.ID == "GooExperiment" || param.ID == "sensorThermometer" || param.ID == "sensorBarometer" || param.ID == "sensorGravimeter" || param.ID == "sensorAccelerometer")
-				partTest = "FinePrint";
-			else
-				partTest = "";
+				return false;
+		}
+
+		private string paramTypeCheck(ContractParameter param)
+		{
+			if (param.GetType() == typeof(PartTest))
+				return "partTest";
+
+			if (contractAssembly.FPLoaded)
+			{
+				if (param.GetType() == contractAssembly._FPType)
+					return "FinePrint";
+			}
+
+			if (contractAssembly.DMLoaded)
+			{
+				if (param.GetType() == contractAssembly._DMCType)
+					return "DMcollectScience";
+			}
+
+			if (contractAssembly.DMALoaded)
+			{
+				if (param.GetType() == contractAssembly._DMAType)
+					return "DManomalyScience";
+				else
+					return "";
+			}
+
+			return "";
 		}
 
 		internal static string timeInDays(double D)
@@ -181,10 +202,9 @@ namespace ContractsWindow
 				}
 				else if (partTestName == "DMcollectScience")
 				{
-					//part = PartLoader.getPartInfoByName(cParam.ID);
-					if (ReflectedMethods.DMScienceAvailable())
+					if (contractAssembly.DMLoaded)
 					{
-						part = PartLoader.getPartInfoByName(ReflectedMethods.DMagicSciencePartName(cParam));
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicSciencePartName(cParam));
 						if (part != null)
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Contract");
 						else
@@ -193,10 +213,9 @@ namespace ContractsWindow
 				}
 				else if (partTestName == "DManomalyScience")
 				{
-					//part = PartLoader.getPartInfoByName(cParam.ID);
-					if (ReflectedMethods.DMAnomalyAvailable())
+					if (contractAssembly.DMALoaded)
 					{
-						part = PartLoader.getPartInfoByName(ReflectedMethods.DMagicAnomalySciencePartName(cParam));
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAnomalySciencePartName(cParam));
 						if (part != null)
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Anomaly Contract");
 						else
@@ -217,121 +236,4 @@ namespace ContractsWindow
 		}
 
 	}
-
-	internal class ReflectedMethods
-	{
-		private const string DMCollect = "DMagic.DMCollectScience";
-		private const string DMAnomaly = "DMagic.DMAnomalyParameter";
-
-		private static bool DMC, DMA = false;
-
-		delegate string DMCollectSci(ContractParameter cP);
-		delegate string DMAnomalySci(ContractParameter cP);
-
-		private static MethodInfo DMcollectMethod;
-		private static MethodInfo DManomalyMethod;
-
-		private static DMCollectSci _DMCollect;
-		private static DMAnomalySci _DMAnomaly;
-
-		internal static string DMagicSciencePartName(ContractParameter cParam)
-		{
-			return _DMCollect(cParam);
-		}
-
-		internal static string DMagicAnomalySciencePartName(ContractParameter cParam)
-		{
-			return _DMAnomaly(cParam);
-		}
-
-		internal static bool DMScienceAvailable()
-		{
-			if (DMcollectMethod != null && _DMCollect != null)
-				return true;
-
-			if (DMC)
-				return false;
-
-			DMC = true;
-
-			try
-			{
-				Type DMType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-					.SingleOrDefault(t => t.FullName == DMCollect);
-
-				if (DMType == null)
-				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Type Not Found");
-					return false;
-				}
-
-				DMcollectMethod = DMType.GetMethod("PartName", new Type[] { typeof(ContractParameter) });
-
-				if (DMcollectMethod == null)
-				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic String Method Not Found");
-					return false;
-				}
-				else
-				{
-					_DMCollect = (DMCollectSci)Delegate.CreateDelegate(typeof(DMCollectSci), DMcollectMethod);
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
-				}
-
-				return _DMCollect != null;
-			}
-			catch (Exception e)
-			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Accessor: {0}", e);
-			}
-
-			return false;
-		}
-
-		internal static bool DMAnomalyAvailable()
-		{
-			if (DManomalyMethod != null && _DMAnomaly!= null)
-				return true;
-
-			if (DMA)
-				return false;
-
-			DMA = true;
-
-			try
-			{
-				Type DMAType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-					.SingleOrDefault(t => t.FullName == DMAnomaly);
-
-				if (DMAType == null)
-				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Anomaly Type Not Found");
-					return false;
-				}
-
-				DManomalyMethod = DMAType.GetMethod("PartName");
-
-				if (DManomalyMethod == null)
-				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Anomaly String Method Not Found");
-					return false;
-				}
-				else
-				{
-					_DMAnomaly = (DMAnomalySci)Delegate.CreateDelegate(typeof(DMAnomalySci), DManomalyMethod);
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
-				}
-
-				return _DMAnomaly != null;
-			}
-			catch (Exception e)
-			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Anomaly Accessor: {0}", e);
-			}
-
-			return false;
-		}
-
-	}
-
 }
