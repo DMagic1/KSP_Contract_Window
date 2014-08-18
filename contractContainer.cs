@@ -67,47 +67,34 @@ namespace ContractsWindow
 			//Generate four layers of parameters, check if each is an altitude parameter
 			for (int i = 0; i < contract.ParameterCount; i++)
 			{
-				altElement = false;
-				partTest = "";
 				ContractParameter param = contract.GetParameter(i);
-				altElement = altParamCheck(param);
-				partTest = paramTypeCheck(param);
-				paramList.Add(new parameterContainer(param, 0, altElement, partTest));
-				totalReward += param.FundsCompletion;
-
+				addContractParam(param, 0);
 				for (int j = 0; j < param.ParameterCount; j++)
 				{
-					altElement = false;
-					partTest = "";
 					ContractParameter subParam1 = param.GetParameter(j);
-					altElement = altParamCheck(subParam1);
-					partTest = paramTypeCheck(subParam1);
-					paramList.Add(new parameterContainer(subParam1, 1, altElement, partTest));
-					totalReward += subParam1.FundsCompletion;
-
+					addContractParam(subParam1, 1);
 					for (int k = 0; k < subParam1.ParameterCount; k++)
 					{
-						altElement = false;
-						partTest = "";
 						ContractParameter subParam2 = param.GetParameter(k);
-						altElement = altParamCheck(subParam2);
-						partTest = paramTypeCheck(subParam2);
-						paramList.Add(new parameterContainer(subParam2, 2, altElement, partTest));
-						totalReward += subParam2.FundsCompletion;
-
+						addContractParam(subParam2, 2);
 						for (int l = 0; l < subParam2.ParameterCount; l++)
 						{
-							altElement = false;
-							partTest = "";
 							ContractParameter subParam3 = param.GetParameter(k);
-							altElement = altParamCheck(subParam3);
-							partTest = paramTypeCheck(subParam3);
-							paramList.Add(new parameterContainer(subParam3, 3, altElement, partTest));
-							totalReward += subParam3.FundsCompletion;
+							addContractParam(subParam3, 3);
 						}
 					}
 				}
 			}
+		}
+
+		private void addContractParam(ContractParameter param, int Level)
+		{
+			altElement = false;
+			partTest = "";
+			altElement = altParamCheck(param);
+			partTest = paramTypeCheck(param);
+			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
+			totalReward += param.FundsCompletion;
 		}
 
 		private bool altParamCheck(ContractParameter param)
