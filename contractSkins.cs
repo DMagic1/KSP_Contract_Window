@@ -51,11 +51,11 @@ namespace ContractsWindow
 		internal static GUIStyle contractFailedBehind;
 
 		internal static GUIStyle paramText;
+		internal static GUIStyle paramSub;
 		internal static GUIStyle paramCompleted;
 		internal static GUIStyle paramFailed;
 
 		internal static GUIStyle noteText;
-		internal static GUIStyle noteButton;
 
 		internal static GUIStyle dropDown;
 		internal static GUIStyle sortMenu;
@@ -66,7 +66,6 @@ namespace ContractsWindow
 		internal static GUIStyle timerFinished;
 
 		internal static GUIStyle reward;
-		internal static GUIStyle advance;
 		internal static GUIStyle penalty;
 		internal static GUIStyle scienceReward;
 		internal static GUIStyle texLabel;
@@ -92,7 +91,6 @@ namespace ContractsWindow
 		internal static Texture2D orderDesc;
 		internal static Texture2D windowTex;
 		internal static Texture2D sortIcon;
-		//internal static Texture2D pinIcon;
 		internal static Texture2D hideIcon;
 		internal static Texture2D showIcon;
 		internal static Texture2D revealHideIcon;
@@ -102,6 +100,8 @@ namespace ContractsWindow
 		internal static Texture2D headerBar;
 		internal static Texture2D footerBar;
 		internal static Texture2D resetIcon;
+		internal static Texture2D partIcon;
+		internal static Texture2D noteIcon;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -122,7 +122,6 @@ namespace ContractsWindow
 			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
 			dropDownTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DropDownTex", false);
 			sortIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SortIcon", false);
-			//pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
 			hideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HideIcon", false);
 			showIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ShowIcon", false);
 			revealHideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealHideIcon", false);
@@ -132,6 +131,8 @@ namespace ContractsWindow
 			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
 			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
 			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
+			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
+			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -185,9 +186,13 @@ namespace ContractsWindow
 			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			paramText.name = "ParameterText";
 			paramText.fontSize = 11;
-			paramText.normal.textColor = new Color(220, 220, 220);
+			paramText.normal.textColor = XKCDColors.PaleGrey;
 			paramText.wordWrap = true;
 			paramText.alignment = TextAnchor.UpperLeft;
+
+			paramSub = new GUIStyle(paramText);
+			paramSub.name = "ParamSubText";
+			paramSub.normal.textColor = XKCDColors.LightGrey;
 
 			paramCompleted = new GUIStyle(paramText);
 			paramCompleted.name = "ParameterCompleteText";
@@ -204,13 +209,6 @@ namespace ContractsWindow
 			noteText.wordWrap = true;
 			noteText.alignment = TextAnchor.UpperLeft;
 			noteText.normal.textColor = XKCDColors.AquaBlue;
-
-			noteButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
-			noteButton.name = "ContractNoteButton";
-			noteButton.fontSize = 10;
-			noteButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
-			noteButton.alignment = TextAnchor.MiddleLeft;
-			noteButton.normal.textColor = XKCDColors.AquaBlue;
 
 			//Expanded Style
 			timerGood = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
@@ -234,10 +232,6 @@ namespace ContractsWindow
 			reward.normal.textColor = XKCDColors.FreshGreen;
 			reward.wordWrap = false;
 			reward.alignment = TextAnchor.MiddleLeft;
-
-			advance = new GUIStyle(reward);
-			advance.name = "FundsAdvance";
-			advance.normal.textColor = XKCDColors.SunYellow;
 
 			penalty = new GUIStyle(reward);
 			penalty.name = "FundsPenalty";
