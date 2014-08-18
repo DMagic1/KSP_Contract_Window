@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="contractAssembly.cs" />
     <Compile Include="contractContainer.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
