@@ -59,7 +59,6 @@ namespace ContractsWindow
 
 		internal static GUIStyle dropDown;
 		internal static GUIStyle sortMenu;
-		internal static GUIStyle sortOrder;
 
 		internal static GUIStyle timerGood;
 		internal static GUIStyle timerBad;
@@ -261,9 +260,6 @@ namespace ContractsWindow
 			sortBackground.Apply();
 			sortMenu.hover.background = sortBackground;
 			sortMenu.alignment = TextAnchor.MiddleLeft;
-
-			sortOrder = new GUIStyle(sortMenu);
-			sortOrder.name = "SortOrder";
 
 			texButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			texButton.name = "TexButton";
