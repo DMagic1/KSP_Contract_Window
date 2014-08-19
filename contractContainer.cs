@@ -27,9 +27,12 @@ THE SOFTWARE.
 #endregion
 
 using System.Collections.Generic;
-
+using System;
+using System.Linq;
 using Contracts;
+using Contracts.Parameters;
 using UnityEngine;
+using System.Reflection;
 
 namespace ContractsWindow
 {
@@ -37,8 +40,8 @@ namespace ContractsWindow
 	{
 		internal Contract contract;
 		internal double totalReward, duration;
-		internal bool showParams;
-		internal string daysToExpire;
+		internal bool showParams, altElement;
+		internal string daysToExpire, partTest;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
@@ -61,31 +64,73 @@ namespace ContractsWindow
 			totalReward = contract.FundsCompletion;
 			showParams = true;
 
-			//Generate four layers of parameters
+			//Generate four layers of parameters, check if each is an altitude parameter
 			for (int i = 0; i < contract.ParameterCount; i++)
 			{
 				ContractParameter param = contract.GetParameter(i);
-				paramList.Add(new parameterContainer(param, 0));
-				totalReward += param.FundsCompletion;
+				addContractParam(param, 0);
 				for (int j = 0; j < param.ParameterCount; j++)
 				{
 					ContractParameter subParam1 = param.GetParameter(j);
-					paramList.Add(new parameterContainer(subParam1, 1));
-					totalReward += subParam1.FundsCompletion;
+					addContractParam(subParam1, 1);
 					for (int k = 0; k < subParam1.ParameterCount; k++)
 					{
 						ContractParameter subParam2 = param.GetParameter(k);
-						paramList.Add(new parameterContainer(subParam2, 2));
-						totalReward += subParam2.FundsCompletion;
+						addContractParam(subParam2, 2);
 						for (int l = 0; l < subParam2.ParameterCount; l++)
 						{
 							ContractParameter subParam3 = param.GetParameter(k);
-							paramList.Add(new parameterContainer(subParam3, 3));
-							totalReward += subParam3.FundsCompletion;
+							addContractParam(subParam3, 3);
 						}
 					}
 				}
 			}
+		}
+
+		private void addContractParam(ContractParameter param, int Level)
+		{
+			altElement = false;
+			partTest = "";
+			altElement = altParamCheck(param);
+			partTest = paramTypeCheck(param);
+			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
+			totalReward += param.FundsCompletion;
+		}
+
+		private bool altParamCheck(ContractParameter param)
+		{
+			if (param.GetType() == typeof(ReachAltitudeEnvelope))
+				return true;
+			else
+				return false;
+		}
+
+		private string paramTypeCheck(ContractParameter param)
+		{
+			if (param.GetType() == typeof(PartTest))
+				return "partTest";
+
+			//if (contractAssembly.FPLoaded)
+			//{
+			//    if (param.GetType() == contractAssembly._FPType)
+			//        return "FinePrint";
+			//}
+
+			if (contractAssembly.DMLoaded)
+			{
+				if (param.GetType() == contractAssembly._DMCType)
+					return "DMcollectScience";
+			}
+
+			if (contractAssembly.DMALoaded)
+			{
+				if (param.GetType() == contractAssembly._DMAType)
+					return "DManomalyScience";
+				else
+					return "";
+			}
+
+			return "";
 		}
 
 		internal static string timeInDays(double D)
@@ -121,25 +166,61 @@ namespace ContractsWindow
 	internal class parameterContainer
 	{
 		internal ContractParameter cParam;
-		internal bool showNote;
+		internal bool showNote, altElement;
 		internal int level;
+		internal string partTestName;
+		internal AvailablePart part;
 
-		internal parameterContainer(ContractParameter cP, int Level)
+
+		internal parameterContainer(ContractParameter cP, int Level, bool AltElement, string PartTestName)
 		{
 			cParam = cP;
 			showNote = false;
 			level = Level;
+			altElement = AltElement;
+			partTestName = PartTestName;
+			
+			if (!string.IsNullOrEmpty(partTestName))
+			{
+				if (partTestName == "partTest")
+				{
+					part = ((PartTest)cParam).tgtPartInfo;
+					MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
+				}
+				else if (partTestName == "DMcollectScience")
+				{
+					if (contractAssembly.DMLoaded)
+					{
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicSciencePartName(cParam));
+						if (part != null)
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Contract");
+						else
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+					}
+				}
+				else if (partTestName == "DManomalyScience")
+				{
+					if (contractAssembly.DMALoaded)
+					{
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAnomalySciencePartName(cParam));
+						if (part != null)
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Anomaly Contract");
+						else
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+					}
+				}
+				//else if (partTestName == "FinePrint")
+				//{
+				//    part = PartLoader.getPartInfoByName(cParam.ID);
+				//    if (part != null)
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
+				//    else
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+				//}
+				else
+					part = null;
+			}
 		}
-	}
 
-	enum sortClass
-	{
-		Default = 1,
-		Expiration = 2,
-		Acceptance = 3,
-		Difficulty = 4,
-		Reward = 5,
-		Type = 6,
 	}
-
 }
