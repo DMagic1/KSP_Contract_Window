@@ -110,11 +110,11 @@ namespace ContractsWindow
 			if (param.GetType() == typeof(PartTest))
 				return "partTest";
 
-			if (contractAssembly.FPLoaded)
-			{
-				if (param.GetType() == contractAssembly._FPType)
-					return "FinePrint";
-			}
+			//if (contractAssembly.FPLoaded)
+			//{
+			//    if (param.GetType() == contractAssembly._FPType)
+			//        return "FinePrint";
+			//}
 
 			if (contractAssembly.DMLoaded)
 			{
@@ -209,14 +209,14 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (partTestName == "FinePrint")
-				{
-					part = PartLoader.getPartInfoByName(cParam.ID);
-					if (part != null)
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
-					else
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
-				}
+				//else if (partTestName == "FinePrint")
+				//{
+				//    part = PartLoader.getPartInfoByName(cParam.ID);
+				//    if (part != null)
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
+				//    else
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+				//}
 				else
 					part = null;
 			}
