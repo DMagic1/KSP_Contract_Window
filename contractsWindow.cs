@@ -459,6 +459,7 @@ namespace ContractsWindow
 				{
 					LogFormatted_DebugOnly("Activating Part Icon Window");
 					EditorLogic.fetch.Unlock(lockID);
+					editorLocked = false;
 					EditorPartList.Instance.RevealPart(cP.part, true);
 				}
 			}
