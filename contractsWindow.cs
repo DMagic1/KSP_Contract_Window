@@ -546,7 +546,7 @@ namespace ContractsWindow
 
 			if (level < 4)
 			{
-				foreach (parameterContainer sP in c.paramList)
+				foreach (parameterContainer sP in cP.paramList)
 				{
 					if (sP.level == level + 1)
 						buildParameterLabel(sP, c, level + 1, id);
@@ -900,7 +900,7 @@ namespace ContractsWindow
 				{
 					cC.duration = cC.contract.DateDeadline - Planetarium.GetUniversalTime();
 					//Calculate time in day values using Kerbin or Earth days
-					cC.daysToExpire = contractContainer.timeInDays(cC.duration);
+					cC.daysToExpire = contractScenario.timeInDays(cC.duration);
 				}
 			}
 			cL = sortList(cL, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
