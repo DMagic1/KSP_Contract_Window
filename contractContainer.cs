@@ -41,7 +41,7 @@ namespace ContractsWindow
 		internal Contract contract;
 		internal double totalReward, duration;
 		internal bool showParams, altElement;
-		internal string daysToExpire, partTest;
+		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
@@ -58,107 +58,29 @@ namespace ContractsWindow
 			{
 				duration = contract.DateDeadline - Planetarium.GetUniversalTime();
 				//Calculate time in day values using Kerbin or Earth days
-				daysToExpire = timeInDays(duration);
+				daysToExpire = contractScenario.timeInDays(duration);
 			}
 
 			totalReward = contract.FundsCompletion;
-			showParams = true;
+			foreach (ContractParameter param in contract.AllParameters)
+				totalReward += param.FundsCompletion;
 
 			//Generate four layers of parameters, check if each is an altitude parameter
 			for (int i = 0; i < contract.ParameterCount; i++)
 			{
 				ContractParameter param = contract.GetParameter(i);
 				addContractParam(param, 0);
-				for (int j = 0; j < param.ParameterCount; j++)
-				{
-					ContractParameter subParam1 = param.GetParameter(j);
-					addContractParam(subParam1, 1);
-					for (int k = 0; k < subParam1.ParameterCount; k++)
-					{
-						ContractParameter subParam2 = param.GetParameter(k);
-						addContractParam(subParam2, 2);
-						for (int l = 0; l < subParam2.ParameterCount; l++)
-						{
-							ContractParameter subParam3 = param.GetParameter(k);
-							addContractParam(subParam3, 3);
-						}
-					}
-				}
 			}
+
+			showParams = true;
 		}
 
 		private void addContractParam(ContractParameter param, int Level)
 		{
 			altElement = false;
-			partTest = "";
-			altElement = altParamCheck(param);
-			partTest = paramTypeCheck(param);
+			altElement = contractScenario.altParamCheck(param);
+			string partTest = contractScenario.paramTypeCheck(param);
 			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
-			totalReward += param.FundsCompletion;
-		}
-
-		private bool altParamCheck(ContractParameter param)
-		{
-			if (param.GetType() == typeof(ReachAltitudeEnvelope))
-				return true;
-			else
-				return false;
-		}
-
-		private string paramTypeCheck(ContractParameter param)
-		{
-			if (param.GetType() == typeof(PartTest))
-				return "partTest";
-
-			//if (contractAssembly.FPLoaded)
-			//{
-			//    if (param.GetType() == contractAssembly._FPType)
-			//        return "FinePrint";
-			//}
-
-			if (contractAssembly.DMLoaded)
-			{
-				if (param.GetType() == contractAssembly._DMCType)
-					return "DMcollectScience";
-			}
-
-			if (contractAssembly.DMALoaded)
-			{
-				if (param.GetType() == contractAssembly._DMAType)
-					return "DManomalyScience";
-				else
-					return "";
-			}
-
-			return "";
-		}
-
-		internal static string timeInDays(double D)
-		{
-			if (D <= 0)
-				return "----";
-
-			int[] time = KSPUtil.GetDateFromUT((int)D);
-			string s = "";
-
-			if (time[4] > 0)
-				s = string.Format("{0}y", time[4]);
-			if (time[3] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}d", time[3]);
-			}
-			if (time[4] <= 0 && time[2] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}h", time[2]);
-			}
-			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
-				s = string.Format("{0}m", time[1]);
-
-			return s;
 		}
 	}
 
@@ -170,7 +92,7 @@ namespace ContractsWindow
 		internal int level;
 		internal string partTestName;
 		internal AvailablePart part;
-
+		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		internal parameterContainer(ContractParameter cP, int Level, bool AltElement, string PartTestName)
 		{
@@ -179,7 +101,16 @@ namespace ContractsWindow
 			level = Level;
 			altElement = AltElement;
 			partTestName = PartTestName;
-			
+
+			if (level < 4)
+			{
+				for (int i = 0; i < cParam.ParameterCount; i++)
+				{
+					ContractParameter param = cParam.GetParameter(i);
+					addSubParam(param, level + 1);
+				}
+			}
+
 			if (!string.IsNullOrEmpty(partTestName))
 			{
 				if (partTestName == "partTest")
@@ -220,6 +151,14 @@ namespace ContractsWindow
 				else
 					part = null;
 			}
+		}
+
+		private void addSubParam(ContractParameter param, int Level)
+		{
+			altElement = false;
+			altElement = contractScenario.altParamCheck(param);
+			string partTest = contractScenario.paramTypeCheck(param);
+			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
 		}
 
 	}
