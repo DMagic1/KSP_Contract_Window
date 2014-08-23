@@ -33,9 +33,12 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Contracts;
+using Contracts.Parameters;
 
 namespace ContractsWindow
 {
+
+	#region Scenario Setup
 
 	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)] 
 	class contractScenario: ScenarioModule
@@ -137,6 +140,8 @@ namespace ContractsWindow
 			MonoBehaviourExtended.LogFormatted_DebugOnly("Destroying Contract Window");
 			Destroy(cWin);
 		}
+
+	#endregion
 
 		#region utilities
 
@@ -246,6 +251,10 @@ namespace ContractsWindow
 			return id;
 		}
 
+		#endregion
+
+		#region internal methods
+
 		//Populate the contract lists based on contract Guid values
 		internal void addToList(List<Guid> IDList, List<contractContainer> cL)
 		{
@@ -266,6 +275,70 @@ namespace ContractsWindow
 			}
 			foreach (Guid id in removeList)
 				IDList.Remove(id);
+		}
+
+		internal static bool altParamCheck(ContractParameter param)
+		{
+			if (param.GetType() == typeof(ReachAltitudeEnvelope))
+				return true;
+			else
+				return false;
+		}
+
+		internal static string paramTypeCheck(ContractParameter param)
+		{
+			if (param.GetType() == typeof(PartTest))
+				return "partTest";
+
+			//if (contractAssembly.FPLoaded)
+			//{
+			//    if (param.GetType() == contractAssembly._FPType)
+			//        return "FinePrint";
+			//}
+
+			if (contractAssembly.DMLoaded)
+			{
+				if (param.GetType() == contractAssembly._DMCType)
+					return "DMcollectScience";
+			}
+
+			if (contractAssembly.DMALoaded)
+			{
+				if (param.GetType() == contractAssembly._DMAType)
+					return "DManomalyScience";
+				else
+					return "";
+			}
+
+			return "";
+		}
+
+		internal static string timeInDays(double D)
+		{
+			if (D <= 0)
+				return "----";
+
+			int[] time = KSPUtil.GetDateFromUT((int)D);
+			string s = "";
+
+			if (time[4] > 0)
+				s = string.Format("{0}y", time[4]);
+			if (time[3] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}d", time[3]);
+			}
+			if (time[4] <= 0 && time[2] > 0)
+			{
+				if (!string.IsNullOrEmpty(s))
+					s += " ";
+				s += string.Format("{0}h", time[2]);
+			}
+			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
+				s = string.Format("{0}m", time[1]);
+
+			return s;
 		}
 
 		#endregion
