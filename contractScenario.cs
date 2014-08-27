@@ -296,6 +296,12 @@ namespace ContractsWindow
 			//        return "FinePrint";
 			//}
 
+			if (contractAssembly.MCELoaded)
+			{
+				if (param.GetType() == contractAssembly._MCEType)
+					return "MCEScience";
+			}
+
 			if (contractAssembly.DMLoaded)
 			{
 				if (param.GetType() == contractAssembly._DMCType)
