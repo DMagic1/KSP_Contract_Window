@@ -90,6 +90,7 @@ namespace ContractsWindow
 		internal ContractParameter cParam;
 		internal bool showNote, altElement;
 		internal int level;
+		internal string partTestName;
 		internal AvailablePart part;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
@@ -99,6 +100,7 @@ namespace ContractsWindow
 			showNote = false;
 			level = Level;
 			altElement = AltElement;
+			partTestName = PartTestName;
 
 			if (level < 4)
 			{
@@ -109,25 +111,14 @@ namespace ContractsWindow
 				}
 			}
 
-			if (!string.IsNullOrEmpty(PartTestName))
+			if (!string.IsNullOrEmpty(partTestName))
 			{
-				if (PartTestName == "partTest")
+				if (partTestName == "partTest")
 				{
 					part = ((PartTest)cParam).tgtPartInfo;
 					MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
 				}
-				else if (PartTestName == "MCEScience")
-				{
-					if (contractAssembly.MCELoaded)
-					{
-						part = PartLoader.getPartInfoByName(contractAssembly.MCEPartName(cParam));
-						if (part != null)
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Mission Controller Contract");
-						else
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
-					}
-				}
-				else if (PartTestName == "DMcollectScience")
+				else if (partTestName == "DMcollectScience")
 				{
 					if (contractAssembly.DMLoaded)
 					{
@@ -138,7 +129,7 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (PartTestName == "DManomalyScience")
+				else if (partTestName == "DManomalyScience")
 				{
 					if (contractAssembly.DMALoaded)
 					{
@@ -149,7 +140,7 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (PartTestName == "DMasteroidScience")
+				else if (partTestName == "DMasteroidScience")
 				{
 					if (contractAssembly.DMAstLoaded)
 					{
@@ -160,14 +151,14 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (PartTestName == "FinePrint")
-				{
-					part = PartLoader.getPartInfoByName(contractAssembly.FPPartName(cParam));
-					if (part != null)
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
-					else
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
-				}
+				//else if (partTestName == "FinePrint")
+				//{
+				//    part = PartLoader.getPartInfoByName(cParam.ID);
+				//    if (part != null)
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
+				//    else
+				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+				//}
 				else
 					part = null;
 			}
