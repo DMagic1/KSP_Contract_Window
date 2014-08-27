@@ -48,12 +48,14 @@ namespace ContractsWindow
 		private List<contractContainer> nextRemoveList = new List<contractContainer>();
 		private string version;
 		private Vector2 scroll;
-		private bool resizing, showSort, rebuild, editorLocked, contractsLoading, loaded;
+		private bool resizing, showSort, rebuild, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded;
 		private float dragStart, windowHeight;
 		private int timer;
 		private Rect dropDownSort, resetRect;
 		private int sceneInt;
 		private const string lockID = "ContractsWindow_LockID";
+		private const string centerLockID = "ContractsWindow_SC_LockID";
+		private const string trackingLockID = "ContractsWindow_TS_LockID";
 
 		private contractScenario contract = contractScenario.Instance;
 
@@ -92,6 +94,10 @@ namespace ContractsWindow
 			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
 			if (InputLockManager.lockStack.ContainsKey(lockID))
 				EditorLogic.fetch.Unlock(lockID);
+			if (InputLockManager.lockStack.ContainsKey(centerLockID))
+				InputLockManager.RemoveControlLock(centerLockID);
+			if (InputLockManager.lockStack.ContainsKey(trackingLockID))
+				InputLockManager.RemoveControlLock(trackingLockID);
 		}
 
 		internal override void Update()
@@ -157,6 +163,40 @@ namespace ContractsWindow
 						window.enabled = false;
 						window.displayDirty = true;
 					}
+				}
+			}
+
+			//Lock space center click through
+			if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+			{
+				Vector2 mousePos = Input.mousePosition;
+				mousePos.y = Screen.height - mousePos.y;
+				if (WindowRect.Contains(mousePos) && !spacecenterLocked)
+				{
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS | ControlTypes.KSC_FACILITIES | ControlTypes.KSC_UI, centerLockID);
+					spacecenterLocked = true;
+				}
+				else if (!WindowRect.Contains(mousePos) && spacecenterLocked)
+				{
+					InputLockManager.RemoveControlLock(centerLockID);
+					spacecenterLocked = false;
+				}
+			}
+
+			//Lock tracking scene click through
+			if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+			{
+				Vector2 mousePos = Input.mousePosition;
+				mousePos.y = Screen.height - mousePos.y;
+				if (WindowRect.Contains(mousePos) && !trackingLocked)
+				{
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS | ControlTypes.TRACKINGSTATION_ALL, trackingLockID);
+					trackingLocked = true;
+				}
+				else if (!WindowRect.Contains(mousePos) && trackingLocked)
+				{
+					InputLockManager.RemoveControlLock(trackingLockID);
+					trackingLocked = false;
 				}
 			}
 
