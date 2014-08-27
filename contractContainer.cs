@@ -140,6 +140,17 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
+				else if (partTestName == "DMasteroidScience")
+				{
+					if (contractAssembly.DMAstLoaded)
+					{
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAsteroidSciencePartName(cParam));
+						if (part != null)
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Asteroid Contract");
+						else
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+					}
+				}
 				//else if (partTestName == "FinePrint")
 				//{
 				//    part = PartLoader.getPartInfoByName(cParam.ID);

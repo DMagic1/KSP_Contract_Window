@@ -310,6 +310,14 @@ namespace ContractsWindow
 					return "";
 			}
 
+			if (contractAssembly.DMAstLoaded)
+			{
+				if (param.GetType() == contractAssembly._DMAstType)
+					return "DMasteroidScience";
+				else
+					return "";
+			}
+
 			return "";
 		}
 

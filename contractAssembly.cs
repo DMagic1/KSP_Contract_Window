@@ -44,28 +44,34 @@ namespace ContractsWindow
 		{
 			DMLoaded = DMScienceAvailable();
 			DMALoaded = DMAnomalyAvailable();
+			DMAstLoaded = DMAsteroidAvailable();
 			//FPLoaded = FPAssemblyLoaded();
 		}
 
-		internal static bool DMLoaded, DMALoaded; //, FPLoaded;
+		internal static bool DMLoaded, DMALoaded, DMAstLoaded; //, FPLoaded;
 
 		private const string DMCollectType = "DMagic.DMCollectScience";
 		private const string DMAnomalyType = "DMagic.DMAnomalyParameter";
+		private const string DMAsteroidType = "DMagic.DMAsteroidParameter";
 		//private const string FPContractType = "FinePrint.Contracts.Parameters.PartNameParameter";
 
-		private static bool DMCRun, DMARun = false; //, FPRun = false;
+		private static bool DMCRun, DMARun, DMAstRun = false; //, FPRun = false;
 
 		private delegate string DMCollectSci(ContractParameter cP);
 		private delegate string DMAnomalySci(ContractParameter cP);
+		private delegate string DMAstSci(ContractParameter cP);
 
 		private static DMCollectSci _DMCollect;
 		private static DMAnomalySci _DMAnomaly;
+		private static DMAstSci _DMAst;
 
 		private static MethodInfo DMcollectMethod;
 		private static MethodInfo DManomalyMethod;
+		private static MethodInfo DMastMethod;
 
 		internal static Type _DMCType;
 		internal static Type _DMAType;
+		internal static Type _DMAstType;
 		//internal static Type _FPType;
 
 		internal static string DMagicSciencePartName(ContractParameter cParam)
@@ -76,6 +82,11 @@ namespace ContractsWindow
 		internal static string DMagicAnomalySciencePartName(ContractParameter cParam)
 		{
 			return _DMAnomaly(cParam);
+		}
+
+		internal static string DMagicAsteroidSciencePartName(ContractParameter cParam)
+		{
+			return _DMAst(cParam);
 		}
 
 		//private static bool FPAssemblyLoaded()
@@ -184,6 +195,52 @@ namespace ContractsWindow
 			catch (Exception e)
 			{
 				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Anomaly Accessor: {0}", e);
+			}
+
+			return false;
+		}
+
+		private static bool DMAsteroidAvailable()
+		{
+			if (DMastMethod != null && _DMAst != null)
+				return true;
+
+			if (DMAstRun)
+				return false;
+
+			DMAstRun = true;
+
+			try
+			{
+				Type DMAstType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
+					.SingleOrDefault(t => t.FullName == DMAsteroidType);
+
+				if (DMAstType == null)
+				{
+					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Asteroid Type Not Found");
+					return false;
+				}
+
+				_DMAstType = DMAstType;
+
+				DMastMethod = DMAstType.GetMethod("PartName");
+
+				if (DMastMethod == null)
+				{
+					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Asteroid String Method Not Found");
+					return false;
+				}
+				else
+				{
+					_DMAst = (DMAstSci)Delegate.CreateDelegate(typeof(DMAstSci), DMastMethod);
+					MonoBehaviourExtended.LogFormatted_DebugOnly("Asteroid Reflection Method Assigned");
+				}
+
+				return _DMAst != null;
+			}
+			catch (Exception e)
+			{
+				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Asteroid Accessor: {0}", e);
 			}
 
 			return false;
