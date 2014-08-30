@@ -101,6 +101,7 @@ namespace ContractsWindow
 		internal static Texture2D resetIcon;
 		internal static Texture2D partIcon;
 		internal static Texture2D noteIcon;
+		internal static Texture2D noteIconOff;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -132,6 +133,7 @@ namespace ContractsWindow
 			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
 			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
 			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
+			noteIconOff = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIconOff", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);

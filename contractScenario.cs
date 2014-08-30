@@ -277,24 +277,22 @@ namespace ContractsWindow
 				IDList.Remove(id);
 		}
 
-		internal static bool altParamCheck(ContractParameter param)
-		{
-			if (param.GetType() == typeof(ReachAltitudeEnvelope))
-				return true;
-			else
-				return false;
-		}
-
 		internal static string paramTypeCheck(ContractParameter param)
 		{
 			if (param.GetType() == typeof(PartTest))
 				return "partTest";
 
-			//if (contractAssembly.FPLoaded)
-			//{
-			//    if (param.GetType() == contractAssembly._FPType)
-			//        return "FinePrint";
-			//}
+			if (contractAssembly.FPLoaded)
+			{
+				if (param.GetType() == contractAssembly._FPType)
+					return "FinePrint";
+			}
+
+			if (contractAssembly.MCELoaded)
+			{
+				if (param.GetType() == contractAssembly._MCEType)
+					return "MCEScience";
+			}
 
 			if (contractAssembly.DMLoaded)
 			{
@@ -306,6 +304,14 @@ namespace ContractsWindow
 			{
 				if (param.GetType() == contractAssembly._DMAType)
 					return "DManomalyScience";
+				else
+					return "";
+			}
+
+			if (contractAssembly.DMAstLoaded)
+			{
+				if (param.GetType() == contractAssembly._DMAstType)
+					return "DMasteroidScience";
 				else
 					return "";
 			}

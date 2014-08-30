@@ -40,7 +40,7 @@ namespace ContractsWindow
 	{
 		internal Contract contract;
 		internal double totalReward, duration;
-		internal bool showParams, altElement;
+		internal bool showParams, showNote;
 		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
@@ -77,10 +77,8 @@ namespace ContractsWindow
 
 		private void addContractParam(ContractParameter param, int Level)
 		{
-			altElement = false;
-			altElement = contractScenario.altParamCheck(param);
 			string partTest = contractScenario.paramTypeCheck(param);
-			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
+			paramList.Add(new parameterContainer(param, Level, partTest));
 		}
 	}
 
@@ -88,19 +86,24 @@ namespace ContractsWindow
 	internal class parameterContainer
 	{
 		internal ContractParameter cParam;
-		internal bool showNote, altElement;
+		internal bool showNote;
 		internal int level;
-		internal string partTestName;
+		internal double fundsReward, fundsPenalty;
+		internal float repReward, repPenalty, scienceReward;
 		internal AvailablePart part;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
-		internal parameterContainer(ContractParameter cP, int Level, bool AltElement, string PartTestName)
+		internal parameterContainer(ContractParameter cP, int Level, string PartTestName)
 		{
 			cParam = cP;
 			showNote = false;
 			level = Level;
-			altElement = AltElement;
-			partTestName = PartTestName;
+			//For some reason parameter rewards/penalties reset to zero upon completion/failure
+			fundsReward = cP.FundsCompletion;
+			fundsPenalty = cP.FundsFailure;
+			repReward = cP.ReputationCompletion;
+			repPenalty = cP.ReputationFailure;
+			scienceReward = cP.ScienceCompletion;
 
 			if (level < 4)
 			{
@@ -111,14 +114,25 @@ namespace ContractsWindow
 				}
 			}
 
-			if (!string.IsNullOrEmpty(partTestName))
+			if (!string.IsNullOrEmpty(PartTestName))
 			{
-				if (partTestName == "partTest")
+				if (PartTestName == "partTest")
 				{
 					part = ((PartTest)cParam).tgtPartInfo;
 					MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
 				}
-				else if (partTestName == "DMcollectScience")
+				else if (PartTestName == "MCEScience")
+				{
+					if (contractAssembly.MCELoaded)
+					{
+						part = PartLoader.getPartInfoByName(contractAssembly.MCEPartName(cParam));
+						if (part != null)
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Mission Controller Contract");
+						else
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+					}
+				}
+				else if (PartTestName == "DMcollectScience")
 				{
 					if (contractAssembly.DMLoaded)
 					{
@@ -129,7 +143,7 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (partTestName == "DManomalyScience")
+				else if (PartTestName == "DManomalyScience")
 				{
 					if (contractAssembly.DMALoaded)
 					{
@@ -140,14 +154,25 @@ namespace ContractsWindow
 							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				//else if (partTestName == "FinePrint")
-				//{
-				//    part = PartLoader.getPartInfoByName(cParam.ID);
-				//    if (part != null)
-				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
-				//    else
-				//        MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
-				//}
+				else if (PartTestName == "DMasteroidScience")
+				{
+					if (contractAssembly.DMAstLoaded)
+					{
+						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAsteroidSciencePartName(cParam));
+						if (part != null)
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Asteroid Contract");
+						else
+							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+					}
+				}
+				else if (PartTestName == "FinePrint")
+				{
+					part = PartLoader.getPartInfoByName(contractAssembly.FPPartName(cParam));
+					if (part != null)
+						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
+					else
+						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+				}
 				else
 					part = null;
 			}
@@ -155,10 +180,8 @@ namespace ContractsWindow
 
 		private void addSubParam(ContractParameter param, int Level)
 		{
-			altElement = false;
-			altElement = contractScenario.altParamCheck(param);
 			string partTest = contractScenario.paramTypeCheck(param);
-			paramList.Add(new parameterContainer(param, Level, altElement, partTest));
+			paramList.Add(new parameterContainer(param, Level, partTest));
 		}
 
 	}
