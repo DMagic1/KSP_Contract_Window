@@ -44,7 +44,7 @@ namespace ContractsWindow
 
 		#region Initialization
 
-		private List<contractContainer> cList = new List<contractContainer>();
+		private List<Guid> cList = new List<Guid>();
 		private List<contractContainer> nextRemoveList = new List<contractContainer>();
 		private string version;
 		private Vector2 scroll;
@@ -116,10 +116,8 @@ namespace ContractsWindow
 				{
 					contractsLoading = false;
 					loaded = true;
-					if (contractScenario.Instance.showIDList.Count > 0)
-						contractScenario.Instance.addToList(contractScenario.Instance.showIDList, contractScenario.Instance.showList);
-					if (contractScenario.Instance.hiddenIDList.Count > 0)
-						contractScenario.Instance.addToList(contractScenario.Instance.hiddenIDList, contractScenario.Instance.hiddenList);
+
+					generateList();
 
 					if (contractScenario.Instance.showHideMode[sceneInt] == 0)
 					{
@@ -228,10 +226,12 @@ namespace ContractsWindow
 			scroll = GUILayout.BeginScrollView(scroll);
 
 			//Contract List Begins
-			foreach (contractContainer c in cList)
+			foreach (Guid gID in cList)
 			{
-
+				contractContainer c = contractScenario.Instance.getContract(gID);
 				//Contracts
+				buildContractTitleBar(c, id);
+
 				buildContractTitle(c, id);
 
 				//Parameters
@@ -350,39 +350,35 @@ namespace ContractsWindow
 
 		#endregion
 
-		#region Contract Titles
+		#region Contract Title Bar
 
-		private void buildContractTitle(contractContainer c, int id)
+		private void buildContractTitleBar(contractContainer c, int id)
 		{
-			//Contract title buttons
 			GUILayout.BeginHorizontal();
-			if (!showSort && !rebuild)
-			{
-				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(210)))
-					c.showParams = !c.showParams;
-			}
-			else
-				GUILayout.Box(c.contract.Title, hoverTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
+			//Difficulty icons
+			GUILayout.Label(contractDifficulty(c.contract), GUILayout.MaxHeight(16));
 
 			//Show and hide icons
-			GUILayout.Space(-2);
-			GUILayout.BeginVertical();
-			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+			if (c.contract.ContractState == Contract.State.Active)
 			{
-				if (GUILayout.Button(new GUIContent(contractSkins.hideIcon, "Hide Contract"), GUILayout.MaxWidth(16), GUILayout.MaxHeight(16)))
-					nextRemoveList.Add(c);
+				if (contractScenario.Instance.showHideMode[sceneInt] == 0)
+				{
+					if (GUILayout.Button(new GUIContent(contractSkins.hideIcon, "Hide Contract"), GUILayout.MaxWidth(16), GUILayout.MaxHeight(16)))
+						nextRemoveList.Add(c);
+				}
+				else
+				{
+					if (GUILayout.Button(new GUIContent(contractSkins.showIcon, "Un-Hide Contract"), GUILayout.MaxWidth(15), GUILayout.MaxHeight(15)))
+						nextRemoveList.Add(c);
+				}
 			}
 			else
-			{
-				if (GUILayout.Button(new GUIContent(contractSkins.showIcon, "Un-Hide Contract"), GUILayout.MaxWidth(15), GUILayout.MaxHeight(15)))
+				if (GUILayout.Button(new GUIContent(contractSkins.hideIcon, "Remove Contract"), GUILayout.MaxWidth(16), GUILayout.MaxHeight(16)))
 					nextRemoveList.Add(c);
-			}
+
 			//Note icon button
 			if (c.contract.ContractState == Contract.State.Active && !string.IsNullOrEmpty(c.contract.Notes))
 			{
-				GUILayout.Space(-4);
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(5);
 				if (!c.showNote)
 				{
 					if (GUILayout.Button(new GUIContent(contractSkins.noteIcon, "Show Note"), GUILayout.MaxWidth(14), GUILayout.MaxHeight(14)))
@@ -393,9 +389,7 @@ namespace ContractsWindow
 					if (GUILayout.Button(new GUIContent(contractSkins.noteIconOff, "Hide Note"), GUILayout.MaxWidth(14), GUILayout.MaxHeight(14)))
 						c.showNote = !c.showNote;
 				}
-				GUILayout.EndHorizontal();
 			}
-			GUILayout.EndVertical();
 
 			//Expiration date
 			if (contractScenario.Instance.windowMode[sceneInt] == 1)
@@ -410,17 +404,27 @@ namespace ContractsWindow
 					GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
 			}
 
-			else if (contractScenario.Instance.windowMode[sceneInt] == 2)
-			{
-				if (c.duration >= 2160000)
-					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
-				else if (c.duration > 0)
-					GUILayout.Label(c.daysToExpire, contractSkins.timerBad, GUILayout.Width(45));
-				else if (c.contract.ContractState == Contract.State.Completed)
-					GUILayout.Label(c.daysToExpire, contractSkins.timerGood, GUILayout.Width(45));
-				else
-					GUILayout.Label(c.daysToExpire, contractSkins.timerFinished, GUILayout.Width(45));
+			GUILayout.EndHorizontal();
+		}
 
+		#endregion
+
+		#region Contract Titles
+
+		private void buildContractTitle(contractContainer c, int id)
+		{
+			//Contract title buttons
+			GUILayout.BeginHorizontal();
+			if (!showSort && !rebuild)
+			{
+				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(230)))
+					c.showParams = !c.showParams;
+			}
+			else
+				GUILayout.Box(c.contract.Title, hoverTitleState(c.contract.ContractState), GUILayout.MaxWidth(210));
+
+			if (contractScenario.Instance.windowMode[sceneInt] == 2)
+			{
 				//Reward and penalty amounts
 				if (c.contract.FundsCompletion > 0 || c.contract.FundsFailure > 0)
 				{
@@ -701,6 +705,7 @@ namespace ContractsWindow
 			if (GUI.Button(new Rect(resetRect.x + 20, resetRect.y + 110, resetRect.width - 40, 25), "Reset Display", contractSkins.resetButton))
 			{
 				LogFormatted("Rebuilding Contract Window List");
+				generateList();
 				rebuildList();
 				rebuild = false;
 			}
@@ -781,32 +786,53 @@ namespace ContractsWindow
 
 		#region Methods
 
+		private Texture2D contractDifficulty(Contract c)
+		{
+			if (c.Prestige == Contract.ContractPrestige.Trivial)
+				return contractSkins.headerBar;
+			else if (c.Prestige == Contract.ContractPrestige.Significant)
+				return contractSkins.headerBar;
+			else
+				return contractSkins.headerBar;
+		}
+
 		private void rebuildList()
 		{
 			contractScenario.Instance.showHideMode[sceneInt] = 0;
-			LogFormatted_DebugOnly("Generating Contract List");
 			contractScenario.Instance.showList.Clear();
 			contractScenario.Instance.hiddenList.Clear();
-			contractScenario.Instance.showIDList.Clear();
-			contractScenario.Instance.hiddenIDList.Clear();
-			cList = contractScenario.Instance.showList;
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
-				if (c.ContractState == Contract.State.Active)
-				{
-					cList.Add(new contractContainer(c));
-				}
+				if (contractScenario.Instance.getContract(c.ContractGuid) != null)
+					contractScenario.Instance.showList.Add(c.ContractGuid);
 			}
+			cList = contractScenario.Instance.showList;
 			cList = sortList(cList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
 		}
 
-		//Function to sort the list based on several criteria
-		private List<contractContainer> sortList(List<contractContainer> cL, sortClass s, int i)
+		private void generateList()
 		{
-			List<contractContainer> sortedList = new List<contractContainer>();
+			contractScenario.Instance.resetList();
+			foreach (Contract c in ContractSystem.Instance.Contracts)
+			{
+				if (c.ContractState == Contract.State.Active)
+					contractScenario.Instance.addContract(c.ContractGuid, new contractContainer(c));
+			}
+		}
+
+		//Function to sort the list based on several criteria
+		private List<Guid> sortList(List<Guid> gID, sortClass s, int i)
+		{
+			List<contractContainer> cL = new List<contractContainer>();
+			foreach (Guid id in gID)
+			{
+				contractContainer cC = contractScenario.Instance.getContract(id);
+				if (cC != null)
+					cL.Add(cC);
+			}
 			bool Order = i < 1;
 			if (s == sortClass.Default)
-				return cL;
+				return gID;
 			else if (s == sortClass.Expiration)
 				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.duration.CompareTo(b.duration), a.contract.Title.CompareTo(b.contract.Title)));
 			else if (s == sortClass.Acceptance)
@@ -820,7 +846,10 @@ namespace ContractsWindow
 				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Order, a.contract.GetType().Name.CompareTo(b.contract.GetType().Name), a.contract.Title.CompareTo(b.contract.Title)));
 				cL = typeSort(cL, Order);
 			}
-			return cL;
+			gID.Clear();
+			foreach (contractContainer cC in cL)
+				gID.Add(cC.contract.ContractGuid);
+			return gID;
 		}
 
 		//Special method for handling altitude based parameters; only ReachAltitudeEnvelope seems to be relevant
@@ -933,7 +962,8 @@ namespace ContractsWindow
 		private void contractAccepted(Contract c)
 		{
 			LogFormatted_DebugOnly("Adding New Contract To List");
-			contractScenario.Instance.showList.Add(new contractContainer(c));
+			contractScenario.Instance.addContract(c.ContractGuid, new contractContainer(c));
+			contractScenario.Instance.showList.Add(c.ContractGuid);
 			contractScenario.Instance.showList = sortList(contractScenario.Instance.showList, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
 			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
 				cList = contractScenario.Instance.showList;
@@ -950,34 +980,46 @@ namespace ContractsWindow
 		}
 
 		//Update contract values
-		private void refreshContracts(List<contractContainer> cL)
+		private void refreshContracts(List<Guid> gID)
 		{
-			foreach (contractContainer cC in cL)
+			List<Guid> removeList = new List<Guid>();
+			foreach (Guid id in gID)
 			{
-				if (cC.contract.ContractState != Contract.State.Active)
+				contractContainer cC = contractScenario.Instance.getContract(id);
+				if (cC == null)
 				{
-					cC.duration = 0;
-					cC.daysToExpire = "----";
+					removeList.Add(id);
 					continue;
-				}
-				//Update contract timers
-				if (cC.contract.DateDeadline <= 0)
-				{
-					cC.duration = double.MaxValue;
-					cC.daysToExpire = "----";
 				}
 				else
 				{
-					cC.duration = cC.contract.DateDeadline - Planetarium.GetUniversalTime();
-					//Calculate time in day values using Kerbin or Earth days
-					cC.daysToExpire = contractScenario.timeInDays(cC.duration);
+					if (cC.contract.ContractState != Contract.State.Active)
+					{
+						cC.duration = 0;
+						cC.daysToExpire = "----";
+						continue;
+					}
+					//Update contract timers
+					if (cC.contract.DateDeadline <= 0)
+					{
+						cC.duration = double.MaxValue;
+						cC.daysToExpire = "----";
+					}
+					else
+					{
+						cC.duration = cC.contract.DateDeadline - Planetarium.GetUniversalTime();
+						//Calculate time in day values using Kerbin or Earth days
+						cC.daysToExpire = contractScenario.timeInDays(cC.duration);
+					}
 				}
 			}
-			cL = sortList(cL, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
+			foreach (Guid removeID in removeList)
+				gID.Remove(removeID);
+			gID = sortList(gID, contractScenario.Instance.sortMode[sceneInt], contractScenario.Instance.orderMode[sceneInt]);
 			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
-				contractScenario.Instance.showList = cList;
+				contractScenario.Instance.showList = gID;
 			else
-				contractScenario.Instance.hiddenList = cList;
+				contractScenario.Instance.hiddenList = gID;
 		}
 
 		//Remove contract from current list and update
@@ -985,17 +1027,20 @@ namespace ContractsWindow
 		{
 			if (contractScenario.Instance.showHideMode[sceneInt] == 0)
 			{
-				if (!contractScenario.Instance.hiddenList.Any(i => i.contract.ContractGuid == c.contract.ContractGuid))
-					contractScenario.Instance.hiddenList.Add(c);
-				contractScenario.Instance.showList.Remove(c);
+				if (!contractScenario.Instance.hiddenList.Contains(c.contract.ContractGuid) && c.contract.ContractState == Contract.State.Active)
+				{
+					contractScenario.Instance.hiddenList.Add(c.contract.ContractGuid);
+					c.showParams = false;
+				}
+				contractScenario.Instance.showList.Remove(c.contract.ContractGuid);
 				cList = contractScenario.Instance.showList;
 				refreshContracts(cList);
 			}
 			else
 			{
-				if (!contractScenario.Instance.showList.Any(i => i.contract.ContractGuid == c.contract.ContractGuid))
-					contractScenario.Instance.showList.Add(c);
-				contractScenario.Instance.hiddenList.Remove(c);
+				if (!contractScenario.Instance.showList.Contains(c.contract.ContractGuid) && c.contract.ContractState == Contract.State.Active)
+					contractScenario.Instance.showList.Add(c.contract.ContractGuid);
+				contractScenario.Instance.hiddenList.Remove(c.contract.ContractGuid);
 				cList = contractScenario.Instance.hiddenList;
 				refreshContracts(cList);
 			}
@@ -1019,7 +1064,7 @@ namespace ContractsWindow
 		//Load window position and size settings
 		private void PersistenceLoad()
 		{
-			if (contractScenario.Instance.loaded)
+			if (contractScenario.Instance != null)
 			{
 				cList.Clear();
 				WindowRect = contractScenario.Instance.windowRects[sceneInt];
