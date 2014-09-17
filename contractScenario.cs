@@ -40,7 +40,7 @@ namespace ContractsWindow
 
 	#region Scenario Setup
 
-	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)] 
+	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.SPH)] 
 	class contractScenario: ScenarioModule
 	{
 
@@ -70,15 +70,15 @@ namespace ContractsWindow
 		[KSPField(isPersistant = true)]
 		public bool loaded = false;
 
-		internal List<contractContainer> showList = new List<contractContainer>();
-		internal List<contractContainer> hiddenList = new List<contractContainer>();
+		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
+
+		internal List<Guid> showList = new List<Guid>();
+		internal List<Guid> hiddenList = new List<Guid>();
 
 		//initialize data for each gamescene
 		internal int[] orderMode = new int[4];
 		internal int[] windowMode = new int[4];
 		internal int[] showHideMode = new int[4];
-		internal List<Guid> showIDList = new List<Guid>();
-		internal List<Guid> hiddenIDList = new List<Guid>();
 		internal bool[] windowVisible = new bool[4];
 		internal bool[] toolTips = new bool[4] { true, true, true, true };
 		internal sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
@@ -95,8 +95,8 @@ namespace ContractsWindow
 			ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 			if (scenes != null)
 			{
-				showIDList = stringSplitGuid(scenes.GetValue("DefaultListID"));
-				hiddenIDList = stringSplitGuid(scenes.GetValue("HiddenListID"));
+				showList = stringSplitGuid(scenes.GetValue("DefaultListID"));
+				hiddenList = stringSplitGuid(scenes.GetValue("HiddenListID"));
 				showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
 				windowMode = stringSplit(scenes.GetValue("WindowMode"));
 				orderMode = stringSplit(scenes.GetValue("SortOrder"));
@@ -115,14 +115,11 @@ namespace ContractsWindow
 
 		public override void OnSave(ConfigNode node)
 		{
-			//Convert the contract lists into Guid for storage
-			Guid[] showListID = contractID(showList);
-			Guid[] hiddenListID = contractID(hiddenList);
 			saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
-			scenes.AddValue("DefaultListID", stringConcat(showListID, showListID.Length));
-			scenes.AddValue("HiddenListID", stringConcat(hiddenListID, hiddenListID.Length));
+			scenes.AddValue("DefaultListID", stringConcat(showList, showList.Count));
+			scenes.AddValue("HiddenListID", stringConcat(hiddenList, hiddenList.Count));
 			scenes.AddValue("ShowListMode", stringConcat(showHideMode, showHideMode.Length));
 			scenes.AddValue("WindowMode", stringConcat(windowMode, windowMode.Length));
 			scenes.AddValue("SortOrder", stringConcat(orderMode, orderMode.Length));
@@ -152,6 +149,7 @@ namespace ContractsWindow
 				case GameScenes.FLIGHT:
 					return 0;
 				case GameScenes.EDITOR:
+				case GameScenes.SPH:
 					return 1;
 				case GameScenes.SPACECENTER:
 					return 2;
@@ -175,7 +173,7 @@ namespace ContractsWindow
 			return string.Concat(s).TrimEnd(',');
 		}
 
-		private string stringConcat(Guid[] source, int i)
+		private string stringConcat(List<Guid> source, int i)
 		{
 			if (i == 0)
 				return "";
@@ -243,38 +241,30 @@ namespace ContractsWindow
 			return b;
 		}
 
-		private Guid[] contractID(List<contractContainer> c)
-		{
-			Guid[] id = new Guid[c.Count];
-			for (int j = 0; j < c.Count; j++)
-				id[j] = c[j].contract.ContractGuid;
-			return id;
-		}
-
 		#endregion
 
 		#region internal methods
 
 		//Populate the contract lists based on contract Guid values
-		internal void addToList(List<Guid> IDList, List<contractContainer> cL)
+		internal contractContainer getContract(Guid id)
 		{
-			List<Guid> removeList = new List<Guid>();
-			foreach (Guid ID in IDList)
-			{
-				try
-				{
-					Contract c = ContractSystem.Instance.Contracts.FirstOrDefault(n => n.ContractGuid == ID);
-					if (c.ContractState == Contract.State.Active)
-						cL.Add(new contractContainer(c));
-				}
-				catch
-				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Contract: {0} Not Found In Loaded Contract List; Removing From Database", ID);
-					removeList.Add(ID);
-				}
-			}
-			foreach (Guid id in removeList)
-				IDList.Remove(id);
+			if (masterList.ContainsKey(id))
+				return masterList[id];
+			else
+				return null;
+		}
+
+		internal void addContract(Guid id, contractContainer c)
+		{
+			if (!masterList.ContainsKey(id))
+				masterList.Add(id, c);
+			else
+				MonoBehaviourExtended.LogFormatted_DebugOnly("Contract Already Present In List");
+		}
+
+		internal void resetList()
+		{
+			masterList.Clear();
 		}
 
 		internal static string paramTypeCheck(ContractParameter param)
