@@ -70,6 +70,7 @@ namespace ContractsWindow
 		internal static GUIStyle texLabel;
 
 		internal static GUIStyle texButton;
+		internal static GUIStyle texButtonSmall;
 		internal static GUIStyle dragButton;
 
 		internal static GUIStyle resetBox;
@@ -83,15 +84,14 @@ namespace ContractsWindow
 		internal static Texture2D expandIcon;
 		internal static Texture2D dropDownTex;
 		internal static Texture2D expandRight;
-		internal static Texture2D expandRightStop;
 		internal static Texture2D collapseLeft;
-		internal static Texture2D collapseLeftStop;
 		internal static Texture2D orderAsc;
 		internal static Texture2D orderDesc;
 		internal static Texture2D windowTex;
 		internal static Texture2D sortIcon;
 		internal static Texture2D hideIcon;
 		internal static Texture2D showIcon;
+		internal static Texture2D closeIcon;
 		internal static Texture2D revealHideIcon;
 		internal static Texture2D revealShowIcon;
 		internal static Texture2D tooltipIcon;
@@ -102,6 +102,11 @@ namespace ContractsWindow
 		internal static Texture2D partIcon;
 		internal static Texture2D noteIcon;
 		internal static Texture2D noteIconOff;
+		internal static Texture2D goldStar;
+		internal static Texture2D pinIcon;
+		internal static Texture2D pinDownIcon;
+		internal static Texture2D fontSize;
+		internal static Texture2D windowSize;
 
 		internal override void OnGUIOnceOnly()
 		{
@@ -114,9 +119,7 @@ namespace ContractsWindow
 			science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
 			expandIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResizeIcon", false);
 			expandRight = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ExpandRight", false);
-			expandRightStop = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ExpandRightStop", false);
 			collapseLeft = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CollapseLeft", false);
-			collapseLeftStop = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CollapseLeftStop", false);
 			orderAsc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderAsc", false);
 			orderDesc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderDesc", false);
 			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
@@ -134,6 +137,12 @@ namespace ContractsWindow
 			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
 			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
 			noteIconOff = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIconOff", false);
+			goldStar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStar", false);
+			pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
+			pinDownIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinDownIcon", false);
+			closeIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CloseIcon", false);
+			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
+			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
@@ -217,7 +226,8 @@ namespace ContractsWindow
 			timerGood.fontSize = 11;
 			timerGood.normal.textColor = XKCDColors.FreshGreen;
 			timerGood.wordWrap = false;
-			timerGood.alignment = TextAnchor.LowerCenter;
+			timerGood.alignment = TextAnchor.UpperCenter;
+			timerGood.padding = new RectOffset(1, 1, 1, 2);
 
 			timerBad = new GUIStyle(timerGood);
 			timerBad.name = "TimerBad";
@@ -245,6 +255,7 @@ namespace ContractsWindow
 			scienceReward = new GUIStyle(reward);
 			scienceReward.name = "ScienceReward";
 			scienceReward.normal.textColor = XKCDColors.AquaBlue;
+			scienceReward.padding = new RectOffset(1, 1, 1, 3);
 
 			//Other Styles
 			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
@@ -268,6 +279,10 @@ namespace ContractsWindow
 			texButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
 			texButton.hover.background = buttonHover;
 			texButton.padding = new RectOffset(1, 1, 2, 2);
+
+			texButtonSmall = new GUIStyle(texButton);
+			texButtonSmall.name = "TexButtonSmall";
+			texButtonSmall.padding = new RectOffset(1, 1, 1, 1);
 
 			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
