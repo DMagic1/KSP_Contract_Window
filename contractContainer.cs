@@ -40,7 +40,7 @@ namespace ContractsWindow
 	{
 		internal Contract contract;
 		internal double totalReward, duration;
-		internal bool showParams, showNote;
+		internal bool showParams, showNote, pinned;
 		internal string daysToExpire;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
