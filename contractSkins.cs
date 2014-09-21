@@ -108,9 +108,11 @@ namespace ContractsWindow
 		internal static Texture2D fontSize;
 		internal static Texture2D windowSize;
 
+		internal static int normalFontSize = 0;
+		internal static int windowFontSize = 0;
+
 		internal override void OnGUIOnceOnly()
 		{
-
 			//Fetch icon textures
 			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);
 			fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
@@ -144,6 +146,11 @@ namespace ContractsWindow
 			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 
+			initializeSkins();
+		}
+
+		internal static void initializeSkins()
+		{
 			//Initialize Skins
 			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
 			contractKSPSkin.button = SkinsLibrary.DefKSPSkin.button;
@@ -155,6 +162,7 @@ namespace ContractsWindow
 			//Main Window Style
 			newWindowStyle = new GUIStyle(SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
+			newWindowStyle.fontSize = 14 + normalFontSize + windowFontSize;
 			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
 			newWindowStyle.normal.background = windowTex;
 			newWindowStyle.focused.background = newWindowStyle.normal.background;
@@ -163,7 +171,7 @@ namespace ContractsWindow
 			//Contract Title Style
 			contractActive = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
 			contractActive.name = "ContractActiveText";
-			contractActive.fontSize = 12;
+			contractActive.fontSize = 12 + normalFontSize + windowFontSize;
 			contractActive.alignment = TextAnchor.UpperLeft;
 			contractActive.normal.textColor = XKCDColors.DustyOrange;
 			contractActive.wordWrap = true;
@@ -195,7 +203,7 @@ namespace ContractsWindow
 			//Parameter Style
 			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			paramText.name = "ParameterText";
-			paramText.fontSize = 11;
+			paramText.fontSize = 11 + normalFontSize + windowFontSize;
 			paramText.normal.textColor = XKCDColors.PaleGrey;
 			paramText.wordWrap = true;
 			paramText.alignment = TextAnchor.UpperLeft;
@@ -215,7 +223,7 @@ namespace ContractsWindow
 			//Note Style
 			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			noteText.name = "ContractNoteText";
-			noteText.fontSize = 11;
+			noteText.fontSize = 11 + normalFontSize + windowFontSize;
 			noteText.wordWrap = true;
 			noteText.alignment = TextAnchor.UpperLeft;
 			noteText.normal.textColor = XKCDColors.AquaBlue;
@@ -223,7 +231,7 @@ namespace ContractsWindow
 			//Expanded Style
 			timerGood = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			timerGood.name = "TimerGood";
-			timerGood.fontSize = 11;
+			timerGood.fontSize = 11 + normalFontSize + windowFontSize;
 			timerGood.normal.textColor = XKCDColors.FreshGreen;
 			timerGood.wordWrap = false;
 			timerGood.alignment = TextAnchor.UpperCenter;
@@ -239,7 +247,7 @@ namespace ContractsWindow
 
 			reward = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			reward.name = "FundsReward";
-			reward.fontSize = 10;
+			reward.fontSize = 10 + normalFontSize + windowFontSize;
 			reward.normal.textColor = XKCDColors.FreshGreen;
 			reward.wordWrap = false;
 			reward.alignment = TextAnchor.MiddleLeft;
@@ -264,7 +272,7 @@ namespace ContractsWindow
 
 			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
 			sortMenu.name = "SortMenu";
-			sortMenu.fontSize = 12;
+			sortMenu.fontSize = 12 + normalFontSize + windowFontSize;
 			sortMenu.padding = new RectOffset(2, 2, 2, 2);
 			sortMenu.normal.textColor = XKCDColors.White;
 			sortMenu.hover.textColor = XKCDColors.AlmostBlack;
@@ -310,9 +318,6 @@ namespace ContractsWindow
 			SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
 			SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
 			SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
-
-			
-
 		}
 	}
 }
