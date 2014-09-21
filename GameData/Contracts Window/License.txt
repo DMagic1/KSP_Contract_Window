@@ -32,10 +32,6 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public L
 
 ---------------
 
-Reward and Penalty icons are modified versions of Squad icons from the Unity Assets
-
----------------
-
 The show/hide icons and reset icons are from the Font Awesome icon library:
 
 http://fortawesome.github.io/Font-Awesome/
@@ -45,3 +41,12 @@ Licensed under the SIL Open Font License:
 http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
 
 and the MIT license (see above)
+
+---------------
+
+The pin icons are from the IonIcons library:
+
+http://ionicons.com/
+
+Licensed under the MIT license (see above)
+
