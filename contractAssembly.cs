@@ -47,7 +47,10 @@ namespace ContractsWindow
 			DMAstLoaded = DMAsteroidAvailable();
 			MCELoaded = MCEAvailable();
 			FPLoaded = FPAssemblyLoaded();
+			Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		}
+
+		internal static string Version;
 
 		internal static bool DMLoaded, DMALoaded, DMAstLoaded, MCELoaded, FPLoaded;
 
