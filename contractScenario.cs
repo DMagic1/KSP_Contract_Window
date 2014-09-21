@@ -64,9 +64,9 @@ namespace ContractsWindow
 			private set { }
 		}
 
-		//Make the first load smoother
+		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public bool loaded = false;
+		public string version = "1.0.1.2";
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -96,31 +96,34 @@ namespace ContractsWindow
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
-			ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
-			if (scenes != null)
+			if (version == contractAssembly.Version)
 			{
-				//Contract lists
-				showString = scenes.GetValue("DefaultListID");
-				hiddenString = scenes.GetValue("HiddenListID");
+				ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
+				if (scenes != null)
+				{
+					//Contract lists
+					showString = scenes.GetValue("DefaultListID");
+					hiddenString = scenes.GetValue("HiddenListID");
 
-				//Scene settings
-				showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
-				windowMode = stringSplit(scenes.GetValue("WindowMode"));
-				orderMode = stringSplit(scenes.GetValue("SortOrder"));
-				int[] sort = stringSplit(scenes.GetValue("SortMode"));
-				sortMode = new sortClass[4] { (sortClass)sort[0], (sortClass)sort[1], (sortClass)sort[2], (sortClass)sort[3] };
-				windowPos = stringSplit(scenes.GetValue("WindowPosition"));
-				windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
-				int[] winPos = new int[4] {windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3]};
-				loadWindow(winPos);
+					//Scene settings
+					showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
+					windowMode = stringSplit(scenes.GetValue("WindowMode"));
+					orderMode = stringSplit(scenes.GetValue("SortOrder"));
+					int[] sort = stringSplit(scenes.GetValue("SortMode"));
+					sortMode = new sortClass[4] { (sortClass)sort[0], (sortClass)sort[1], (sortClass)sort[2], (sortClass)sort[3] };
+					windowPos = stringSplit(scenes.GetValue("WindowPosition"));
+					windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
+					int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
+					loadWindow(winPos);
 
-				//Global Settings
-				toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
-				fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
-				windowSize = stringintParse(scenes.GetValue("WindowSize"));
-
-				loaded = true;
+					//Global Settings
+					toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
+					fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
+					windowSize = stringintParse(scenes.GetValue("WindowSize"));
+				}
 			}
+			version = contractAssembly.Version;
+
 			//Start the window object
 			cWin = gameObject.AddComponent<contractsWindow>();
 		}
@@ -448,7 +451,10 @@ namespace ContractsWindow
 			int i = currentScene(HighLogic.LoadedScene);
 			windowPos[i * 4] = (int)source.x;
 			windowPos[(i * 4) + 1] = (int)source.y;
-			windowPos[(i * 4) + 2] = (int)source.width;
+			if (windowMode[i] == 0)
+				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 30;
+			else
+				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 60;
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
