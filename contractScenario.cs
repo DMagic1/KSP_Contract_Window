@@ -28,9 +28,7 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
@@ -70,33 +68,42 @@ namespace ContractsWindow
 		[KSPField(isPersistant = true)]
 		public bool loaded = false;
 
+		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
 
+		//Contract lists; for saving/loading and ordering
 		internal List<Guid> showList = new List<Guid>();
 		internal List<Guid> hiddenList = new List<Guid>();
+		internal string showString;
+		internal string hiddenString;
 
 		//initialize data for each gamescene
 		internal int[] orderMode = new int[4];
 		internal int[] windowMode = new int[4];
 		internal int[] showHideMode = new int[4];
 		internal bool[] windowVisible = new bool[4];
-		internal bool[] toolTips = new bool[4] { true, true, true, true };
 		internal sortClass[] sortMode = new sortClass[4] { sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty, sortClass.Difficulty };
 		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
+
+		//Global settings
+		internal bool toolTips = true;
+		internal bool fontSmall = true;
+		internal int windowSize = 0;
 
 		internal contractsWindow cWin;
 
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
-			showList.Clear();
-			hiddenList.Clear();
 			ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 			if (scenes != null)
 			{
-				showList = stringSplitGuid(scenes.GetValue("DefaultListID"));
-				hiddenList = stringSplitGuid(scenes.GetValue("HiddenListID"));
+				//Contract lists
+				showString = scenes.GetValue("DefaultListID");
+				hiddenString = scenes.GetValue("HiddenListID");
+
+				//Scene settings
 				showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
 				windowMode = stringSplit(scenes.GetValue("WindowMode"));
 				orderMode = stringSplit(scenes.GetValue("SortOrder"));
@@ -104,9 +111,14 @@ namespace ContractsWindow
 				sortMode = new sortClass[4] { (sortClass)sort[0], (sortClass)sort[1], (sortClass)sort[2], (sortClass)sort[3] };
 				windowPos = stringSplit(scenes.GetValue("WindowPosition"));
 				windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
-				toolTips = stringSplitBool(scenes.GetValue("ToolTips"));
 				int[] winPos = new int[4] {windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3]};
 				loadWindow(winPos);
+
+				//Global Settings
+				toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
+				fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
+				windowSize = stringintParse(scenes.GetValue("WindowSize"));
+
 				loaded = true;
 			}
 			//Start the window object
@@ -118,8 +130,12 @@ namespace ContractsWindow
 			saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
 			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
-			scenes.AddValue("DefaultListID", stringConcat(showList, showList.Count));
-			scenes.AddValue("HiddenListID", stringConcat(hiddenList, hiddenList.Count));
+			
+			//Contract lists
+			scenes.AddValue("DefaultListID", stringConcat(showList));
+			scenes.AddValue("HiddenListID", stringConcat(hiddenList));
+
+			//Scene settings
 			scenes.AddValue("ShowListMode", stringConcat(showHideMode, showHideMode.Length));
 			scenes.AddValue("WindowMode", stringConcat(windowMode, windowMode.Length));
 			scenes.AddValue("SortOrder", stringConcat(orderMode, orderMode.Length));
@@ -127,14 +143,18 @@ namespace ContractsWindow
 			scenes.AddValue("SortMode", stringConcat(sort, sort.Length));
 			scenes.AddValue("WindowPosition", stringConcat(windowPos, windowPos.Length));
 			scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
-			scenes.AddValue("ToolTips", stringConcat(toolTips, toolTips.Length));
+
+			//Global settings
+			scenes.AddValue("ToolTips", toolTips);
+			scenes.AddValue("FontSize", fontSmall);
+			scenes.AddValue("WindowSize", windowSize);
+
 			node.AddNode(scenes);
 		}
 
 		//Remove our contract window object
 		private void OnDestroy()
 		{
-			MonoBehaviourExtended.LogFormatted_DebugOnly("Destroying Contract Window");
 			Destroy(cWin);
 		}
 
@@ -156,7 +176,7 @@ namespace ContractsWindow
 				case GameScenes.TRACKSTATION:
 					return 3;
 				default:
-					return 3;
+					return 0;
 			}
 		}
 
@@ -168,21 +188,32 @@ namespace ContractsWindow
 			string[] s = new string[i];
 			for (int j = 0; j < i; j++)
 			{
-				s[j] = source[j].ToString() + ",";
+				s[j] = source[j].ToString();
 			}
-			return string.Concat(s).TrimEnd(',');
+			return string.Join(",", s);
 		}
 
-		private string stringConcat(List<Guid> source, int i)
+		private string stringConcat(List<Guid> source)
 		{
-			if (i == 0)
+			if (source.Count == 0)
 				return "";
-			string[] s = new string[i];
-			for (int j = 0; j < i; j++)
+			List<string> s = new List<string>();
+			for (int j = 0; j < source.Count; j++)
 			{
-				s[j] = source[j].ToString() + ",";
+				contractContainer c = getContract(source[j]);
+				if (c == null)
+					continue;
+				string i;
+				if (c.listOrder == null)
+					i = "N";
+				else
+					i = c.listOrder.ToString();
+				bool show = c.showParams;
+				string id = string.Format("{0}|{1}|{2}", source[j], i, show);
+				s.Add(id);
 			}
-			return string.Concat(s).TrimEnd(',');
+
+			return string.Join(",", s.ToArray());
 		}
 
 		private string stringConcat(bool[] source, int i)
@@ -192,9 +223,9 @@ namespace ContractsWindow
 			string[] s = new string[i];
 			for (int j = 0; j < i; j++)
 			{
-				s[j] = source[j].ToString() + ",";
+				s[j] = source[j].ToString();
 			}
-			return string.Concat(s).TrimEnd(',');
+			return string.Join(",", s);
 		}
 
 		//Convert strings into the appropriate arrays
@@ -209,27 +240,6 @@ namespace ContractsWindow
 			return i;
 		}
 
-		private List<Guid> stringSplitGuid(string source)
-		{
-			if (source == "")
-				return new List<Guid>();
-			string[] s = source.Split(',');
-			List<Guid> i = new List<Guid>();
-			for (int j = 0; j < s.Length; j++)
-			{
-				try
-				{
-					Guid g = new Guid(s[j]);
-					i.Add(g);
-				}
-				catch (Exception e)
-				{
-					MonoBehaviourWindow.LogFormatted("Guid invalid: {0}", e);
-				}
-			}
-			return i;
-		}
-
 		private bool[] stringSplitBool(string source)
 		{
 			string[] s = source.Split(',');
@@ -239,6 +249,28 @@ namespace ContractsWindow
 				b[j] = bool.Parse(s[j]);
 			}
 			return b;
+		}
+
+		private bool stringBoolParse(string source)
+		{
+			bool b;
+			if (bool.TryParse(source, out b))
+				return b;
+			return true;
+		}
+
+		private int? stringIntParse(string s)
+		{
+			int i;
+			if (int.TryParse(s, out i)) return i;
+			return null;
+		}
+
+		private int stringintParse(string s)
+		{
+			int i;
+			if (int.TryParse(s, out i)) return i;
+			return 0;
 		}
 
 		#endregion
@@ -265,6 +297,75 @@ namespace ContractsWindow
 		internal void resetList()
 		{
 			masterList.Clear();
+		}
+
+		internal void loadContractLists(string s, int l)
+		{
+			if (string.IsNullOrEmpty(s))
+			{
+				if (l == 0)
+					showList = new List<Guid>();
+				else
+					hiddenList = new List<Guid>();
+			}
+			else
+			{
+				string[] sA = s.Split(',');
+				List<Guid> gID = new List<Guid>();
+				for (int i = 0; i < sA.Length; i++)
+				{
+					contractContainer c = null;
+					string[] sB = sA[i].Split('|');
+					try
+					{
+						Guid g = new Guid(sB[0]);
+						c = getContract(g);
+						if (c != null)
+							gID.Add(g);
+						else
+							continue;
+					}
+					catch (Exception e)
+					{
+						MonoBehaviourWindow.LogFormatted("Guid invalid: {0}", e);
+						continue;
+					}
+
+					c.listOrder = stringIntParse(sB[1]);
+					c.showParams = stringBoolParse(sB[2]);
+				}
+				if (l == 0)
+					showList = gID;
+				else
+					hiddenList = gID;
+			}
+		}
+
+		internal List<Guid> loadPinnedContracts(List<Guid> gID)
+		{
+			List<contractContainer> temp = new List<contractContainer>();
+			List<Guid> idTemp = new List<Guid>();
+			foreach (Guid id in gID)
+			{
+				contractContainer c = getContract(id);
+				if (c != null)
+				{
+					if (c.listOrder != null)
+						temp.Add(c);
+				}
+			}
+			if (temp.Count > 0)
+			{
+				temp.Sort((a, b) =>
+					{
+						return Comparer<int?>.Default.Compare(a.listOrder, b.listOrder);
+					});
+				foreach (contractContainer c in temp)
+				{
+					idTemp.Add(c.contract.ContractGuid);
+				}
+			}
+			return idTemp;
 		}
 
 		internal static string paramTypeCheck(ContractParameter param)
