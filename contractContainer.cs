@@ -40,14 +40,17 @@ namespace ContractsWindow
 	{
 		internal Contract contract;
 		internal double totalReward, duration;
-		internal bool showParams, showNote, pinned;
+		internal bool showParams, showNote;
 		internal string daysToExpire;
+		internal int? listOrder;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
+			showParams = true;
+			listOrder = null;
 
 			if (contract.DateDeadline <= 0)
 			{
@@ -71,8 +74,6 @@ namespace ContractsWindow
 				ContractParameter param = contract.GetParameter(i);
 				addContractParam(param, 0);
 			}
-
-			showParams = true;
 		}
 
 		private void addContractParam(ContractParameter param, int Level)
