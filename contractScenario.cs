@@ -454,7 +454,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 30;
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 60;
+				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 40;
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
