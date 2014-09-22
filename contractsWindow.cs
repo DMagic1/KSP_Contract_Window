@@ -68,7 +68,7 @@ namespace ContractsWindow
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 
 			//Set up the various GUI options to their default values here
-			WindowCaption = "Contracts +";
+			WindowCaption = "    Contracts +";
 			WindowRect = new Rect(40, 80, 250, 300);
 			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 			WindowStyle = contractSkins.newWindowStyle;
@@ -742,6 +742,7 @@ namespace ContractsWindow
 				else
 					contractSkins.normalFontSize = 0;
 				contractSkins.initializeSkins();
+				WindowStyle = contractSkins.newWindowStyle;
 				SkinsLibrary.SetCurrent("ContractUnitySkin");
 				contractScenario.Instance.fontSmall = !contractScenario.Instance.fontSmall;
 			}
@@ -770,6 +771,7 @@ namespace ContractsWindow
 					DragRect.width = WindowRect.width - 19;
 				}
 				contractSkins.initializeSkins();
+				WindowStyle = contractSkins.newWindowStyle;
 				SkinsLibrary.SetCurrent("ContractUnitySkin");
 
 			}
@@ -1202,6 +1204,7 @@ namespace ContractsWindow
 				else
 					contractSkins.windowFontSize = 2;
 				contractSkins.initializeSkins();
+				WindowStyle = contractSkins.newWindowStyle;
 				DragRect = new Rect(0, 0, WindowRect.width - 19, WindowRect.height - 24 - contractScenario.Instance.windowSize * 8);
 				Visible = contractScenario.Instance.windowVisible[sceneInt];
 				TooltipsEnabled = contractScenario.Instance.toolTips;
