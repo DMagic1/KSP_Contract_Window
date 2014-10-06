@@ -294,7 +294,7 @@ namespace ContractsWindow
 			if (!masterList.ContainsKey(id))
 				masterList.Add(id, c);
 			else
-				MonoBehaviourExtended.LogFormatted_DebugOnly("Contract Already Present In List");
+				DMC_MBE.LogFormatted_DebugOnly("Contract Already Present In List");
 		}
 
 		internal void resetList()
@@ -330,7 +330,7 @@ namespace ContractsWindow
 					}
 					catch (Exception e)
 					{
-						MonoBehaviourWindow.LogFormatted("Guid invalid: {0}", e);
+						DMC_MBW.LogFormatted("Guid invalid: {0}", e);
 						continue;
 					}
 
@@ -454,7 +454,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 30;
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 40;
+				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 60;
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 

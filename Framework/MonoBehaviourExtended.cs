@@ -38,7 +38,7 @@ namespace ContractsWindow
     /// DONT DO THIS ONE!!!
     /// MonobehaviourExtended mbTemp = new MonobehaviourExtended();
     /// </example>
-    public abstract class MonoBehaviourExtended : MonoBehaviour
+    public abstract class DMC_MBE : MonoBehaviour
     {
         #region Constructor
         ///// <summary>
@@ -55,7 +55,7 @@ namespace ContractsWindow
         //    monoReturn = AttachTo.AddComponent<MonoBehaviourExtended>();
         //    return monoReturn;
         //}
-        static MonoBehaviourExtended()
+        static DMC_MBE()
         {
             UnityEngine.Random.seed = (int)(DateTime.Now - DateTime.Now.Date).TotalSeconds;
         }
@@ -338,8 +338,8 @@ namespace ContractsWindow
                 //set theflag so this only runs once
                 _OnGUIOnceOnlyHasRun = true;
                 //set up the skins library
-                if (!SkinsLibrary._Initialized)
-                    SkinsLibrary.InitSkinList();
+                if (!DMC_SkinsLibrary._Initialized)
+                    DMC_SkinsLibrary.InitSkinList();
 
                 //then pass it on to the downstream derivatives
                 OnGUIOnceOnly();

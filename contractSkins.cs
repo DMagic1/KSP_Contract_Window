@@ -35,7 +35,7 @@ using UnityEngine;
 namespace ContractsWindow
 {
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
-	class contractSkins: MonoBehaviourExtended
+	class contractSkins: DMC_MBE
 	{
 		internal static GUISkin contractUnitySkin;
 		internal static GUISkin contractKSPSkin;
@@ -152,15 +152,15 @@ namespace ContractsWindow
 		internal static void initializeSkins()
 		{
 			//Initialize Skins
-			contractKSPSkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.KSP);
-			contractKSPSkin.button = SkinsLibrary.DefKSPSkin.button;
-			SkinsLibrary.AddSkin("ContractKSPSkin", contractKSPSkin);
+			contractKSPSkin = DMC_SkinsLibrary.CopySkin(DMC_SkinsLibrary.DefSkinType.KSP);
+			contractKSPSkin.button = DMC_SkinsLibrary.DefKSPSkin.button;
+			DMC_SkinsLibrary.AddSkin("ContractKSPSkin", contractKSPSkin);
 
-			contractUnitySkin = SkinsLibrary.CopySkin(SkinsLibrary.DefSkinType.Unity);
-			SkinsLibrary.AddSkin("ContractUnitySkin", contractUnitySkin);
+			contractUnitySkin = DMC_SkinsLibrary.CopySkin(DMC_SkinsLibrary.DefSkinType.Unity);
+			DMC_SkinsLibrary.AddSkin("ContractUnitySkin", contractUnitySkin);
 
 			//Main Window Style
-			newWindowStyle = new GUIStyle(SkinsLibrary.DefUnitySkin.window);
+			newWindowStyle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
 			newWindowStyle.fontSize = 14 + normalFontSize + windowFontSize;
 			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
@@ -169,7 +169,7 @@ namespace ContractsWindow
 			newWindowStyle.onNormal.background = newWindowStyle.normal.background;
 
 			//Contract Title Style
-			contractActive = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			contractActive = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			contractActive.name = "ContractActiveText";
 			contractActive.fontSize = 12 + normalFontSize + windowFontSize;
 			contractActive.alignment = TextAnchor.UpperLeft;
@@ -201,7 +201,7 @@ namespace ContractsWindow
 			contractFailedBehind.hover.textColor = contractFailedBehind.normal.textColor;
 
 			//Parameter Style
-			paramText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			paramText = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			paramText.name = "ParameterText";
 			paramText.fontSize = 11 + normalFontSize + windowFontSize;
 			paramText.normal.textColor = XKCDColors.PaleGrey;
@@ -221,7 +221,7 @@ namespace ContractsWindow
 			paramFailed.normal.textColor = XKCDColors.Red;
 
 			//Note Style
-			noteText = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			noteText = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			noteText.name = "ContractNoteText";
 			noteText.fontSize = 11 + normalFontSize + windowFontSize;
 			noteText.wordWrap = true;
@@ -229,7 +229,7 @@ namespace ContractsWindow
 			noteText.normal.textColor = XKCDColors.AquaBlue;
 
 			//Expanded Style
-			timerGood = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			timerGood = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			timerGood.name = "TimerGood";
 			timerGood.fontSize = 11 + normalFontSize + windowFontSize;
 			timerGood.normal.textColor = XKCDColors.FreshGreen;
@@ -245,7 +245,7 @@ namespace ContractsWindow
 			timerFinished.name = "TimerFinished";
 			timerFinished.normal.textColor = XKCDColors.Red;
 
-			reward = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			reward = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			reward.name = "FundsReward";
 			reward.fontSize = 10 + normalFontSize + windowFontSize;
 			reward.normal.textColor = XKCDColors.FreshGreen;
@@ -256,7 +256,7 @@ namespace ContractsWindow
 			penalty.name = "FundsPenalty";
 			penalty.normal.textColor = XKCDColors.OrangeyRed;
 
-			texLabel = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			texLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			texLabel.name = "TexLabel";
 			texLabel.padding = new RectOffset(0, 0, 0, 0);
 
@@ -266,11 +266,11 @@ namespace ContractsWindow
 			scienceReward.padding = new RectOffset(1, 1, 1, 3);
 
 			//Other Styles
-			dropDown = new GUIStyle(SkinsLibrary.DefUnitySkin.box);
+			dropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.box);
 			dropDown.name = "DropDown";
 			dropDown.normal.background = dropDownTex;
 
-			sortMenu = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			sortMenu = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			sortMenu.name = "SortMenu";
 			sortMenu.fontSize = 12 + normalFontSize + windowFontSize;
 			sortMenu.padding = new RectOffset(2, 2, 2, 2);
@@ -282,9 +282,9 @@ namespace ContractsWindow
 			sortMenu.hover.background = sortBackground;
 			sortMenu.alignment = TextAnchor.MiddleLeft;
 
-			texButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			texButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			texButton.name = "TexButton";
-			texButton.normal.background = SkinsLibrary.DefUnitySkin.label.normal.background;
+			texButton.normal.background = DMC_SkinsLibrary.DefUnitySkin.label.normal.background;
 			texButton.hover.background = buttonHover;
 			texButton.padding = new RectOffset(1, 1, 2, 2);
 
@@ -292,32 +292,32 @@ namespace ContractsWindow
 			texButtonSmall.name = "TexButtonSmall";
 			texButtonSmall.padding = new RectOffset(1, 1, 1, 1);
 
-			dragButton = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			dragButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
 			dragButton.padding = new RectOffset(1, 2, 0, 0);
 
-			resetBox = new GUIStyle(SkinsLibrary.DefUnitySkin.label);
+			resetBox = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			resetBox.name = "ResetBox";
 			resetBox.fontSize = 16;
 			resetBox.normal.textColor = XKCDColors.VomitYellow;
 			resetBox.wordWrap = true;
 			resetBox.alignment = TextAnchor.UpperCenter;
 
-			resetButton = new GUIStyle(SkinsLibrary.DefUnitySkin.button);
+			resetButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			resetButton.name = "ResetButton";
 			resetButton.fontSize = 15;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
-			SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
-			SkinsLibrary.List["ContractUnitySkin"].button = new GUIStyle(texButton);
-			SkinsLibrary.List["ContractUnitySkin"].box = new GUIStyle(noteText);
-			SkinsLibrary.List["ContractUnitySkin"].label = new GUIStyle(texLabel);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].button = new GUIStyle(texButton);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].box = new GUIStyle(noteText);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].label = new GUIStyle(texLabel);
 
-			SkinsLibrary.AddStyle("ContractUnitySkin", newWindowStyle);
-			SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
-			SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
-			SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", newWindowStyle);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
 		}
 	}
 }

@@ -39,7 +39,7 @@ using UnityEngine;
 namespace ContractsWindow
 {
 
-	class contractsWindow: MonoBehaviourWindow
+	class contractsWindow: DMC_MBW
 	{
 
 		#region Initialization
@@ -64,7 +64,13 @@ namespace ContractsWindow
 		internal override void Awake()
 		{
 			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
-			version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
+			switch (ainfoV == null)
+			{
+				case true: version = ""; break;
+				default: version = ainfoV.InformationalVersion; break;
+			}
+
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 
 			//Set up the various GUI options to their default values here
@@ -80,7 +86,7 @@ namespace ContractsWindow
 			//Make sure our click-through control locks are disabled
 			InputLockManager.RemoveControlLock(lockID);
 
-			SkinsLibrary.SetCurrent("ContractUnitySkin");
+			DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 		}
 
 		internal override void Start()
@@ -327,7 +333,7 @@ namespace ContractsWindow
 				if (GUI.Button(new Rect(WindowRect.width - 20 - contractScenario.Instance.windowSize * 4, 2, 16 + contractScenario.Instance.windowSize * 4, 18 + contractScenario.Instance.windowSize * 6), contractSkins.expandRight))
 				{
 					contractScenario.Instance.windowMode[sceneInt] = 1;
-					WindowRect.width = 450 + contractScenario.Instance.windowSize * 40;
+					WindowRect.width = 480 + contractScenario.Instance.windowSize * 60;
 					DragRect.width = WindowRect.width - 19;
 				}
 			}
@@ -494,7 +500,7 @@ namespace ContractsWindow
 					GUILayout.EndVertical();
 				}
 				else
-					GUILayout.Space(70 + contractScenario.Instance.windowSize * 18);
+					GUILayout.Space(75 + contractScenario.Instance.windowSize * 18);
 				
 				//Rep rewards and penalty amounts
 				if (c.contract.ReputationCompletion > 0 || c.contract.ReputationFailure > 0)
@@ -521,7 +527,7 @@ namespace ContractsWindow
 					GUILayout.EndVertical();
 				}
 				else
-					GUILayout.Space(50 + contractScenario.Instance.windowSize * 14);
+					GUILayout.Space(55 + contractScenario.Instance.windowSize * 14);
 
 				//Science reward
 				if (c.contract.ScienceCompletion > 0)
@@ -533,7 +539,7 @@ namespace ContractsWindow
 					}
 				}
 				else
-					GUILayout.Space(54 + contractScenario.Instance.windowSize * 14);
+					GUILayout.Space(58 + contractScenario.Instance.windowSize * 14);
 
 			}
 			GUILayout.EndHorizontal();
@@ -614,7 +620,7 @@ namespace ContractsWindow
 					GUILayout.EndVertical();
 				}
 				else
-					GUILayout.Space(70 + contractScenario.Instance.windowSize * 18);
+					GUILayout.Space(75 + contractScenario.Instance.windowSize * 18);
 
 				if (cP.repReward > 0 || cP.repPenalty > 0)
 				{
@@ -640,7 +646,7 @@ namespace ContractsWindow
 					GUILayout.EndVertical();
 				}
 				else
-					GUILayout.Space(50 + contractScenario.Instance.windowSize * 14);
+					GUILayout.Space(55 + contractScenario.Instance.windowSize * 14);
 
 				if (cP.scienceReward > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
 				{
@@ -648,7 +654,7 @@ namespace ContractsWindow
 					GUILayout.Label("+ " + cP.scienceReward.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37 + contractScenario.Instance.windowSize * 8));
 				}
 				else
-					GUILayout.Space(54 + contractScenario.Instance.windowSize * 14);
+					GUILayout.Space(58 + contractScenario.Instance.windowSize * 14);
 
 			}
 			GUILayout.EndHorizontal();
@@ -743,7 +749,7 @@ namespace ContractsWindow
 					contractSkins.normalFontSize = 0;
 				contractSkins.initializeSkins();
 				WindowStyle = contractSkins.newWindowStyle;
-				SkinsLibrary.SetCurrent("ContractUnitySkin");
+				DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 				contractScenario.Instance.fontSmall = !contractScenario.Instance.fontSmall;
 			}
 
@@ -757,7 +763,7 @@ namespace ContractsWindow
 					if (contractScenario.Instance.windowMode[sceneInt] == 0)
 						WindowRect.width += 30;
 					else
-						WindowRect.width += 40;
+						WindowRect.width += 60;
 					DragRect.width = WindowRect.width - 19;
 				}
 				else
@@ -767,12 +773,12 @@ namespace ContractsWindow
 					if (contractScenario.Instance.windowMode[sceneInt] == 0)
 						WindowRect.width -= 30;
 					else
-						WindowRect.width -= 40;
+						WindowRect.width -= 60;
 					DragRect.width = WindowRect.width - 19;
 				}
 				contractSkins.initializeSkins();
 				WindowStyle = contractSkins.newWindowStyle;
-				SkinsLibrary.SetCurrent("ContractUnitySkin");
+				DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 
 			}
 		}
@@ -1194,7 +1200,7 @@ namespace ContractsWindow
 				if (contractScenario.Instance.windowMode[sceneInt] == 0)
 					WindowRect.width += contractScenario.Instance.windowSize * 30;
 				else
-					WindowRect.width += contractScenario.Instance.windowSize * 40;
+					WindowRect.width += contractScenario.Instance.windowSize * 60;
 				if (contractScenario.Instance.fontSmall)
 					contractSkins.normalFontSize = 0;
 				else

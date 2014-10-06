@@ -15,10 +15,10 @@ using UnityEngine;
 
 namespace ContractsWindow
 {
-    internal static class SkinsLibrary
+    internal static class DMC_SkinsLibrary
     {
         #region Constructor
-        static SkinsLibrary()
+        static DMC_SkinsLibrary()
         {
             _Initialized = false;
             List = new Dictionary<string, GUISkin>();
@@ -89,7 +89,7 @@ namespace ContractsWindow
         /// <param name="DefaultSkin">Which predefined skin to use</param>
         internal static void SetCurrent(DefSkinType DefaultSkin)
         {
-            MonoBehaviourExtended.LogFormatted_DebugOnly("Setting GUISkin to {0}", DefaultSkin);
+            DMC_MBE.LogFormatted_DebugOnly("Setting GUISkin to {0}", DefaultSkin);
             GUISkin OldSkin = _CurrentSkin;
             switch (DefaultSkin)
             {
@@ -114,14 +114,14 @@ namespace ContractsWindow
         /// <param name="SkinID">The string ID of the custom skin</param>
         internal static void SetCurrent(String SkinID)
         {
-            MonoBehaviourExtended.LogFormatted_DebugOnly("Setting GUISkin to {0}", SkinID);
+            DMC_MBE.LogFormatted_DebugOnly("Setting GUISkin to {0}", SkinID);
             GUISkin OldSkin = _CurrentSkin;
 
             //check the skin exists, and throw a log line if it doesnt
             if (List.ContainsKey(SkinID))
                 _CurrentSkin = List[SkinID];
             else
-                MonoBehaviourExtended.LogFormatted("Unable to change GUISkin to {0}, GUISkin not found", SkinID);
+                DMC_MBE.LogFormatted("Unable to change GUISkin to {0}, GUISkin not found", SkinID);
 
             //Now set the tooltip style as well
             SetCurrentTooltip();
@@ -181,10 +181,10 @@ namespace ContractsWindow
         {
             switch (DefaultSkin)
             {
-                case DefSkinType.Unity: return (GUISkin)MonoBehaviourExtended.Instantiate(DefUnitySkin);
-                case DefSkinType.KSP: return (GUISkin)MonoBehaviourExtended.Instantiate(DefKSPSkin);
+                case DefSkinType.Unity: return (GUISkin)DMC_MBE.Instantiate(DefUnitySkin);
+                case DefSkinType.KSP: return (GUISkin)DMC_MBE.Instantiate(DefKSPSkin);
                 //case DefSkinType.None: return new GUISkin();
-                default: return (GUISkin)MonoBehaviourExtended.Instantiate(DefKSPSkin);
+                default: return (GUISkin)DMC_MBE.Instantiate(DefKSPSkin);
             }
         }
         /// <summary>
@@ -195,10 +195,10 @@ namespace ContractsWindow
         internal static GUISkin CopySkin(String SkinID)
         {
             if (List.ContainsKey(SkinID))
-                return (GUISkin)MonoBehaviourExtended.Instantiate(List[SkinID]);
+                return (GUISkin)DMC_MBE.Instantiate(List[SkinID]);
             else
             {
-                MonoBehaviourExtended.LogFormatted("Unable to copy GUISkin to {0}, GUISkin not found", SkinID);
+                DMC_MBE.LogFormatted("Unable to copy GUISkin to {0}, GUISkin not found", SkinID);
                 throw new SystemException(String.Format("Unable to copy GUISkin to {0}, GUISkin not found", SkinID));
             }
         }
@@ -371,7 +371,7 @@ namespace ContractsWindow
         {
             if (NewStyle.name == null || NewStyle.name == "")
             {
-                MonoBehaviourExtended.LogFormatted("No Name Provided in the Style to add to {0}. Cannot add this.", SkinToAction.name);
+                DMC_MBE.LogFormatted("No Name Provided in the Style to add to {0}. Cannot add this.", SkinToAction.name);
                 return;
             }
 
