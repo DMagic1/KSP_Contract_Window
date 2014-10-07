@@ -30,10 +30,10 @@ namespace ContractsWindow
     /// An Extended version of the UnityEngine.MonoBehaviour Class
     /// Basically a template for a Window, has the MonoBehaviourExtended properties and extra bits to make drawing a window easier
     /// </summary>
-    public abstract class MonoBehaviourWindow : MonoBehaviourExtended
+    public abstract class DMC_MBW : DMC_MBE
     {
         #region "Constructors"
-        internal MonoBehaviourWindow()
+        internal DMC_MBW()
             : base()
         {
             //do the assembly name add so we get different windowIDs for multiple plugins
@@ -157,7 +157,7 @@ namespace ContractsWindow
 		internal void DrawGUI()
 		{
 			//this sets the skin on each draw loop
-			GUI.skin = SkinsLibrary.CurrentSkin;
+			GUI.skin = DMC_SkinsLibrary.CurrentSkin;
 
 			//keep the window locked to the screen if its supposed to be
 			if (ClampToScreen)
@@ -289,7 +289,7 @@ namespace ContractsWindow
             if (TooltipsEnabled && Visible && (strToolTipText != "") && ((TooltipDisplayForSecs == 0) || (fltTooltipTime < (Single)TooltipDisplayForSecs)))
             {
                 GUIContent contTooltip = new GUIContent(strToolTipText);
-                GUIStyle styleTooltip = SkinsLibrary.CurrentTooltip;
+                GUIStyle styleTooltip = DMC_SkinsLibrary.CurrentTooltip;
 
                 //if the content of the tooltip changes then reset the counter
                 if (!TooltipShown || (strToolTipText != strLastTooltipText))
@@ -304,14 +304,14 @@ namespace ContractsWindow
                 {
                     //calc the new width and height
                     float minwidth, maxwidth;
-                    SkinsLibrary.CurrentTooltip.CalcMinMaxWidth(contTooltip, out minwidth, out maxwidth); // figure out how wide one line would be
-                    _TooltipPosition.width = Math.Min(TooltipMaxWidth - SkinsLibrary.CurrentTooltip.padding.horizontal, maxwidth); //then work out the height with a max width
-                    _TooltipPosition.height = SkinsLibrary.CurrentTooltip.CalcHeight(contTooltip, TooltipPosition.width); // heres the result
+                    DMC_SkinsLibrary.CurrentTooltip.CalcMinMaxWidth(contTooltip, out minwidth, out maxwidth); // figure out how wide one line would be
+                    _TooltipPosition.width = Math.Min(TooltipMaxWidth - DMC_SkinsLibrary.CurrentTooltip.padding.horizontal, maxwidth); //then work out the height with a max width
+                    _TooltipPosition.height = DMC_SkinsLibrary.CurrentTooltip.CalcHeight(contTooltip, TooltipPosition.width); // heres the result
                 }
                 else
                 {
                     //calc the new width and height
-                    Vector2 Size = SkinsLibrary.CurrentTooltip.CalcSize(contTooltip);
+                    Vector2 Size = DMC_SkinsLibrary.CurrentTooltip.CalcSize(contTooltip);
                     _TooltipPosition.width = Size.x;
                     _TooltipPosition.height = Size.y;
 

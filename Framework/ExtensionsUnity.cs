@@ -18,7 +18,7 @@ namespace ContractsWindow
     /// <summary>
     /// CLass containing some extension methods for Unity Objects
     /// </summary>
-    public static class UnityExtensions
+    public static class DMC_UnityExtensions
     {
         /// <summary>
         /// Ensure that the Rect remains within the screen bounds

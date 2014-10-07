@@ -17,7 +17,7 @@ namespace ContractsWindow
 {
 
 	[AttributeUsage(AttributeTargets.Class)]
-	internal class KSPAddonImproved : Attribute
+	internal class DMC_KSPAddonImproved : Attribute
 	{
 		[Flags]
 		public enum Startup
@@ -58,7 +58,7 @@ namespace ContractsWindow
 		public bool runOnce;
 		public Startup scenes;
 
-		public KSPAddonImproved(Startup mask, bool once = false)
+		public DMC_KSPAddonImproved(Startup mask, bool once = false)
 		{
 			runOnce = once;
 			scenes = mask;
@@ -82,10 +82,10 @@ namespace ContractsWindow
 		class AddonInfo
 		{
 			public readonly Type type;
-			public readonly KSPAddonImproved addon;
+			public readonly DMC_KSPAddonImproved addon;
 			public bool created;
 
-			internal AddonInfo(Type t, KSPAddonImproved add)
+			internal AddonInfo(Type t, DMC_KSPAddonImproved add)
 			{
 				type = t;
 				created = false;
@@ -101,7 +101,7 @@ namespace ContractsWindow
 				}
 			}
 
-			internal KSPAddonImproved.Startup Scenes
+			internal DMC_KSPAddonImproved.Startup Scenes
 			{
 				get
 				{
@@ -124,7 +124,7 @@ namespace ContractsWindow
 			// examine our assembly for loaded types
 			foreach (var ourType in System.Reflection.Assembly.GetExecutingAssembly().GetTypes())
 			{
-				var attr = ((KSPAddonImproved[])ourType.GetCustomAttributes(typeof(KSPAddonImproved), true)).SingleOrDefault();
+				var attr = ((DMC_KSPAddonImproved[])ourType.GetCustomAttributes(typeof(DMC_KSPAddonImproved), true)).SingleOrDefault();
 				if (attr != null)
 				{
 					Debug.Log(string.Format("Found KSPAddonImproved in {0}", ourType.FullName));
@@ -143,7 +143,7 @@ namespace ContractsWindow
 		void OnLevelWasLoaded(int level)
 		{
 			GameScenes scene = (GameScenes)level;
-			KSPAddonImproved.Startup mask = 0;
+			DMC_KSPAddonImproved.Startup mask = 0;
 
 			if (scene == GameScenes.LOADINGBUFFER)
 				return;
@@ -154,43 +154,43 @@ namespace ContractsWindow
 			switch (scene)
 			{
 				case GameScenes.EDITOR:
-					mask = KSPAddonImproved.Startup.EditorVAB;
+					mask = DMC_KSPAddonImproved.Startup.EditorVAB;
 					break;
 
 				case GameScenes.SPH:
-					mask = KSPAddonImproved.Startup.EditorSPH;
+					mask = DMC_KSPAddonImproved.Startup.EditorSPH;
 					break;
 
 				case GameScenes.CREDITS:
-					mask = KSPAddonImproved.Startup.Credits;
+					mask = DMC_KSPAddonImproved.Startup.Credits;
 					break;
 
 				case GameScenes.FLIGHT:
-					mask = KSPAddonImproved.Startup.Flight;
+					mask = DMC_KSPAddonImproved.Startup.Flight;
 					break;
 
 				case GameScenes.LOADING:
-					mask = KSPAddonImproved.Startup.Instantly;
+					mask = DMC_KSPAddonImproved.Startup.Instantly;
 					break;
 
 				case GameScenes.MAINMENU:
-					mask = KSPAddonImproved.Startup.MainMenu;
+					mask = DMC_KSPAddonImproved.Startup.MainMenu;
 					break;
 
 				case GameScenes.SETTINGS:
-					mask = KSPAddonImproved.Startup.Settings;
+					mask = DMC_KSPAddonImproved.Startup.Settings;
 					break;
 
 				case GameScenes.SPACECENTER:
-					mask = KSPAddonImproved.Startup.SpaceCenter;
+					mask = DMC_KSPAddonImproved.Startup.SpaceCenter;
 					break;
 
 				case GameScenes.TRACKSTATION:
-					mask = KSPAddonImproved.Startup.TrackingStation;
+					mask = DMC_KSPAddonImproved.Startup.TrackingStation;
 					break;
 
 				case GameScenes.PSYSTEM:
-					mask = KSPAddonImproved.Startup.PSystemSpawn;
+					mask = DMC_KSPAddonImproved.Startup.PSystemSpawn;
 					break;
 
 				case GameScenes.LOADINGBUFFER:

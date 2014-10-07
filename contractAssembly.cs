@@ -47,7 +47,10 @@ namespace ContractsWindow
 			DMAstLoaded = DMAsteroidAvailable();
 			MCELoaded = MCEAvailable();
 			FPLoaded = FPAssemblyLoaded();
+			Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		}
+
+		internal static string Version;
 
 		internal static bool DMLoaded, DMALoaded, DMAstLoaded, MCELoaded, FPLoaded;
 
@@ -119,7 +122,7 @@ namespace ContractsWindow
 
 				if (FPType == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Fine Print Type Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("Fine Print Type Not Found");
 					return false;
 				}
 
@@ -129,18 +132,18 @@ namespace ContractsWindow
 
 				if (FPMethod == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Fine Print String Method Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("Fine Print String Method Not Found");
 					return false;
 				}
 
 				_FP = (FPSci)Delegate.CreateDelegate(typeof(FPSci), FPMethod);
-				MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
+				DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
 
 				return _FP != null;
 			}
 			catch (Exception e)
 			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading Fine Print Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Exception While Loading Fine Print Accessor: {0}", e);
 			}
 
 			return false;
@@ -163,7 +166,7 @@ namespace ContractsWindow
 
 				if (MCEType == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Mision Controller Type Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("Mision Controller Type Not Found");
 					return false;
 				}
 
@@ -173,18 +176,18 @@ namespace ContractsWindow
 
 				if (MCEMethod == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Mission Controller String Method Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("Mission Controller String Method Not Found");
 					return false;
 				}
 
 				_MCE = (MCESci)Delegate.CreateDelegate(typeof(MCESci), MCEMethod);
-				MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
+				DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
 
 				return _MCE != null;
 			}
 			catch (Exception e)
 			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading Mission Controller Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Exception While Loading Mission Controller Accessor: {0}", e);
 			}
 
 			return false;
@@ -207,7 +210,7 @@ namespace ContractsWindow
 
 				if (DMType == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Type Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic Type Not Found");
 					return false;
 				}
 
@@ -217,20 +220,20 @@ namespace ContractsWindow
 
 				if (DMcollectMethod == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic String Method Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic String Method Not Found");
 					return false;
 				}
 				else
 				{
 					_DMCollect = (DMCollectSci)Delegate.CreateDelegate(typeof(DMCollectSci), DMcollectMethod);
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
+					DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
 				}
 
 				return _DMCollect != null;
 			}
 			catch (Exception e)
 			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Exception While Loading DMagic Accessor: {0}", e);
 			}
 
 			return false;
@@ -253,7 +256,7 @@ namespace ContractsWindow
 
 				if (DMAType == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Anomaly Type Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic Anomaly Type Not Found");
 					return false;
 				}
 
@@ -263,20 +266,20 @@ namespace ContractsWindow
 
 				if (DManomalyMethod == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Anomaly String Method Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic Anomaly String Method Not Found");
 					return false;
 				}
 				else
 				{
 					_DMAnomaly = (DMAnomalySci)Delegate.CreateDelegate(typeof(DMAnomalySci), DManomalyMethod);
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Reflection Method Assigned");
+					DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
 				}
 
 				return _DMAnomaly != null;
 			}
 			catch (Exception e)
 			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Anomaly Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Exception While Loading DMagic Anomaly Accessor: {0}", e);
 			}
 
 			return false;
@@ -299,7 +302,7 @@ namespace ContractsWindow
 
 				if (DMAstType == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Asteroid Type Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic Asteroid Type Not Found");
 					return false;
 				}
 
@@ -309,20 +312,20 @@ namespace ContractsWindow
 
 				if (DMastMethod == null)
 				{
-					MonoBehaviourExtended.LogFormatted_DebugOnly("DMagic Asteroid String Method Not Found");
+					DMC_MBE.LogFormatted_DebugOnly("DMagic Asteroid String Method Not Found");
 					return false;
 				}
 				else
 				{
 					_DMAst = (DMAstSci)Delegate.CreateDelegate(typeof(DMAstSci), DMastMethod);
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Asteroid Reflection Method Assigned");
+					DMC_MBE.LogFormatted_DebugOnly("Asteroid Reflection Method Assigned");
 				}
 
 				return _DMAst != null;
 			}
 			catch (Exception e)
 			{
-				MonoBehaviourExtended.LogFormatted("Exception While Loading DMagic Asteroid Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Exception While Loading DMagic Asteroid Accessor: {0}", e);
 			}
 
 			return false;

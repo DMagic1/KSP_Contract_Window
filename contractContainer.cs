@@ -42,12 +42,15 @@ namespace ContractsWindow
 		internal double totalReward, duration;
 		internal bool showParams, showNote;
 		internal string daysToExpire;
+		internal int? listOrder;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
 		internal contractContainer(Contract Contract)
 		{
 			contract = Contract;
+			showParams = true;
+			listOrder = null;
 
 			if (contract.DateDeadline <= 0)
 			{
@@ -71,8 +74,6 @@ namespace ContractsWindow
 				ContractParameter param = contract.GetParameter(i);
 				addContractParam(param, 0);
 			}
-
-			showParams = true;
 		}
 
 		private void addContractParam(ContractParameter param, int Level)
@@ -119,7 +120,7 @@ namespace ContractsWindow
 				if (PartTestName == "partTest")
 				{
 					part = ((PartTest)cParam).tgtPartInfo;
-					MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
+					DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
 				}
 				else if (PartTestName == "MCEScience")
 				{
@@ -127,9 +128,9 @@ namespace ContractsWindow
 					{
 						part = PartLoader.getPartInfoByName(contractAssembly.MCEPartName(cParam));
 						if (part != null)
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Mission Controller Contract");
+							DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Mission Controller Contract");
 						else
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+							DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
 				else if (PartTestName == "DMcollectScience")
@@ -138,9 +139,9 @@ namespace ContractsWindow
 					{
 						part = PartLoader.getPartInfoByName(contractAssembly.DMagicSciencePartName(cParam));
 						if (part != null)
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Contract");
+							DMC_MBE.LogFormatted_DebugOnly("Part Assigned For DMagic Contract");
 						else
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+							DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
 				else if (PartTestName == "DManomalyScience")
@@ -149,9 +150,9 @@ namespace ContractsWindow
 					{
 						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAnomalySciencePartName(cParam));
 						if (part != null)
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Anomaly Contract");
+							DMC_MBE.LogFormatted_DebugOnly("Part Assigned For DMagic Anomaly Contract");
 						else
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+							DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
 				else if (PartTestName == "DMasteroidScience")
@@ -160,18 +161,18 @@ namespace ContractsWindow
 					{
 						part = PartLoader.getPartInfoByName(contractAssembly.DMagicAsteroidSciencePartName(cParam));
 						if (part != null)
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For DMagic Asteroid Contract");
+							DMC_MBE.LogFormatted_DebugOnly("Part Assigned For DMagic Asteroid Contract");
 						else
-							MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+							DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
 				else if (PartTestName == "FinePrint")
 				{
 					part = PartLoader.getPartInfoByName(contractAssembly.FPPartName(cParam));
 					if (part != null)
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
+						DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
 					else
-						MonoBehaviourExtended.LogFormatted_DebugOnly("Part Not Found");
+						DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 				}
 				else
 					part = null;
