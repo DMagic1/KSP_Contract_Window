@@ -904,7 +904,7 @@ namespace ContractsWindow
 		//Reset contract list from the "refresh" button
 		private void rebuildList()
 		{
-			contractScenario.Instance.showHideMode[sceneInt] = 0;
+			resetWindow();
 			contractScenario.Instance.showList.Clear();
 			contractScenario.Instance.hiddenList.Clear();
 			cList.Clear();
@@ -916,6 +916,32 @@ namespace ContractsWindow
 			}
 			cList = contractScenario.Instance.showList;
 			refreshContracts(cList);
+		}
+
+		//Reset all parameters
+		private void resetWindow()
+		{
+			//Reset window settings
+			WindowRect = new Rect(40, 80, 250, 300);
+			TooltipsEnabled = true;
+			Visible = true;
+			DragRect.width = WindowRect.width - 19;
+			contractScenario.Instance.showHideMode[sceneInt] = 0;
+			contractScenario.Instance.orderMode[sceneInt] = 0;
+			contractScenario.Instance.windowMode[sceneInt] = 0;
+			contractScenario.Instance.sortMode[sceneInt] = sortClass.Difficulty;
+			contractScenario.Instance.windowRects[sceneInt] = WindowRect;
+			contractScenario.Instance.fontSmall = true;
+			contractScenario.Instance.windowSize = 0;
+			contractScenario.Instance.windowVisible[sceneInt] = Visible;
+			contractScenario.Instance.toolTips = TooltipsEnabled;
+
+			//Reset GUI settings
+			contractSkins.normalFontSize = 0;
+			contractSkins.windowFontSize = 0;
+			contractSkins.initializeSkins();
+			WindowStyle = contractSkins.newWindowStyle;
+			DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 		}
 
 		//Initial contract load
@@ -1197,10 +1223,6 @@ namespace ContractsWindow
 			{
 				cList.Clear();
 				WindowRect = contractScenario.Instance.windowRects[sceneInt];
-				if (contractScenario.Instance.windowMode[sceneInt] == 0)
-					WindowRect.width += contractScenario.Instance.windowSize * 30;
-				else
-					WindowRect.width += contractScenario.Instance.windowSize * 60;
 				if (contractScenario.Instance.fontSmall)
 					contractSkins.normalFontSize = 0;
 				else
@@ -1216,6 +1238,8 @@ namespace ContractsWindow
 				TooltipsEnabled = contractScenario.Instance.toolTips;
 				if (Visible)
 					StartRepeatingWorker(5);
+				if (WindowRect.width < 250)
+					resetWindow();
 			}
 		}
 
