@@ -172,7 +172,7 @@ namespace ContractsWindow
 
 				_MCEType = MCEType;
 
-				MethodInfo MCEMethod = MCEType.GetMethod("PartName", new Type[] { typeof(ContractParameter) });
+				MethodInfo MCEMethod = MCEType.GetMethod("iPartName", new Type[] { typeof(ContractParameter) });
 
 				if (MCEMethod == null)
 				{
