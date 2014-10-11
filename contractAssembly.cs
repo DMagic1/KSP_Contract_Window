@@ -137,7 +137,7 @@ namespace ContractsWindow
 				}
 
 				_FP = (FPSci)Delegate.CreateDelegate(typeof(FPSci), FPMethod);
-				DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
+				DMC_MBE.LogFormatted("Fine Print Reflection Method Assigned");
 
 				return _FP != null;
 			}
@@ -181,7 +181,7 @@ namespace ContractsWindow
 				}
 
 				_MCE = (MCESci)Delegate.CreateDelegate(typeof(MCESci), MCEMethod);
-				DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
+				DMC_MBE.LogFormatted("Mission Control Reflection Method Assigned");
 
 				return _MCE != null;
 			}
@@ -226,7 +226,7 @@ namespace ContractsWindow
 				else
 				{
 					_DMCollect = (DMCollectSci)Delegate.CreateDelegate(typeof(DMCollectSci), DMcollectMethod);
-					DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
+					DMC_MBE.LogFormatted("DMagic Standard Reflection Method Assigned");
 				}
 
 				return _DMCollect != null;
@@ -272,7 +272,7 @@ namespace ContractsWindow
 				else
 				{
 					_DMAnomaly = (DMAnomalySci)Delegate.CreateDelegate(typeof(DMAnomalySci), DManomalyMethod);
-					DMC_MBE.LogFormatted_DebugOnly("Reflection Method Assigned");
+					DMC_MBE.LogFormatted("DMagic Anomaly Reflection Method Assigned");
 				}
 
 				return _DMAnomaly != null;
@@ -318,7 +318,7 @@ namespace ContractsWindow
 				else
 				{
 					_DMAst = (DMAstSci)Delegate.CreateDelegate(typeof(DMAstSci), DMastMethod);
-					DMC_MBE.LogFormatted_DebugOnly("Asteroid Reflection Method Assigned");
+					DMC_MBE.LogFormatted("DMagic Asteroid Reflection Method Assigned");
 				}
 
 				return _DMAst != null;
