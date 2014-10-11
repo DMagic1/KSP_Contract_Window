@@ -126,7 +126,7 @@ namespace ContractsWindow
 				{
 					if (contractAssembly.MCELoaded)
 					{
-						part = PartLoader.getPartInfoByName(contractAssembly.MCEPartName(cParam));
+						part = PartLoader.Instance.parts.FirstOrDefault(p => p.partPrefab.partInfo.title == contractAssembly.MCEPartName(cParam));
 						if (part != null)
 							DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Mission Controller Contract");
 						else
