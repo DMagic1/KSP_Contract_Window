@@ -27,6 +27,7 @@ THE SOFTWARE.
 #endregion
 
 using System.IO;
+using System;
 using UnityEngine;
 using Toolbar;
 
@@ -36,33 +37,52 @@ namespace ContractsWindow
 	class contractToolbar : MonoBehaviour
 	{
 		private IButton contractButton;
+		private Game.Modes mode;
 
 		internal contractToolbar()
 		{
 			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
-			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+
+			try
 			{
-				contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractManager");
+				mode = HighLogic.CurrentGame.Mode;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Looks Like Something Went Wrong Here; Current Game Mode Cannot Be Detected: {0}", e);
+				mode = Game.Modes.CAREER;
+			}
+
+			if (mode == Game.Modes.CAREER)
+			{
+				contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractWindowPlus");
 
 				if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/Contracts Window/Textures/ContractsIcon.png").Replace("\\", "/")))
 					contractButton.TexturePath = "Contracts Window/Textures/ContractsIcon";
 				else
 					contractButton.TexturePath = "000_Toolbar/resize-cursor";
 
-				contractButton.ToolTip = "Contract Manager";
+				contractButton.ToolTip = "Contract Window";
 				contractButton.OnClick += (e) =>
 					{
-						if (contractScenario.Instance.cWin.Visible)
-						{
-							contractScenario.Instance.cWin.Visible = false;
-							contractScenario.Instance.cWin.StopRepeatingWorker();
-							contractScenario.Instance.windowVisible[sceneInt] = false;
-						}
+						if (contractScenario.Instance == null)
+							DMC_MBE.LogFormatted("Contract Scenario Not Loaded...");
+						else if (contractScenario.Instance.cWin == null)
+							DMC_MBE.LogFormatted("Contract Window Not Loaded...");
 						else
 						{
-							contractScenario.Instance.cWin.Visible = true;
-							contractScenario.Instance.cWin.StartRepeatingWorker(5);
-							contractScenario.Instance.windowVisible[sceneInt] = true;
+							if (contractScenario.Instance.cWin.Visible)
+							{
+								contractScenario.Instance.cWin.Visible = false;
+								contractScenario.Instance.cWin.StopRepeatingWorker();
+								contractScenario.Instance.windowVisible[sceneInt] = false;
+							}
+							else
+							{
+								contractScenario.Instance.cWin.Visible = true;
+								contractScenario.Instance.cWin.StartRepeatingWorker(5);
+								contractScenario.Instance.windowVisible[sceneInt] = true;
+							}
 						}
 					};
 			}
