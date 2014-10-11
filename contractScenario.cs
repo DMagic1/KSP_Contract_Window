@@ -38,8 +38,8 @@ namespace ContractsWindow
 
 	#region Scenario Setup
 
-	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.SPH)] 
-	class contractScenario: ScenarioModule
+	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.SPH)]
+	class contractScenario : ScenarioModule
 	{
 
 		internal static contractScenario Instance
@@ -66,7 +66,7 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "1.0.1.2";
+		public string version = "1.0.2.0";
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -105,6 +105,11 @@ namespace ContractsWindow
 					showString = scenes.GetValue("DefaultListID");
 					hiddenString = scenes.GetValue("HiddenListID");
 
+					//Global Settings
+					toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
+					fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
+					windowSize = stringintParse(scenes.GetValue("WindowSize"));
+
 					//Scene settings
 					showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
 					windowMode = stringSplit(scenes.GetValue("WindowMode"));
@@ -115,11 +120,6 @@ namespace ContractsWindow
 					windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
 					int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
 					loadWindow(winPos);
-
-					//Global Settings
-					toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
-					fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
-					windowSize = stringintParse(scenes.GetValue("WindowSize"));
 				}
 			}
 			version = contractAssembly.Version;
@@ -452,15 +452,20 @@ namespace ContractsWindow
 			windowPos[i * 4] = (int)source.x;
 			windowPos[(i * 4) + 1] = (int)source.y;
 			if (windowMode[i] == 0)
-				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 30;
+				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - windowSize * 60;
+				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 60);
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
 		private void loadWindow(int[] window)
 		{
-			windowRects[currentScene(HighLogic.LoadedScene)] = new Rect(window[0], window[1], window[2], window[3]);
+			int i = currentScene(HighLogic.LoadedScene);
+			windowRects[i] = new Rect(window[0], window[1], window[2], window[3]);
+			if (windowMode[i] == 0)
+				windowRects[i].width += (windowSize * 30);
+			else
+				windowRects[i].width += (windowSize * 60);
 		}
 
 		#endregion
