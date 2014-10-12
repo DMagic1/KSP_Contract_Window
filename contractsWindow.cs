@@ -118,7 +118,7 @@ namespace ContractsWindow
 			//Start a timer after contracts begin loading to ensure that all contracts are loaded before we populate the lists
 			else if (contractsLoading && !loaded)
 			{
-				if (timer < 15)
+				if (timer < 30)
 					timer++;
 				else
 				{
@@ -797,6 +797,7 @@ namespace ContractsWindow
 				LogFormatted("Rebuilding Contract Window List");
 				generateList();
 				rebuildList();
+				resetWindow();
 				rebuild = false;
 			}
 		}
@@ -904,7 +905,6 @@ namespace ContractsWindow
 		//Reset contract list from the "refresh" button
 		private void rebuildList()
 		{
-			resetWindow();
 			contractScenario.Instance.showList.Clear();
 			contractScenario.Instance.hiddenList.Clear();
 			cList.Clear();
@@ -1238,7 +1238,7 @@ namespace ContractsWindow
 				TooltipsEnabled = contractScenario.Instance.toolTips;
 				if (Visible)
 					StartRepeatingWorker(5);
-				if (WindowRect.width < 250)
+				if (WindowRect.width < 100)
 					resetWindow();
 			}
 		}
