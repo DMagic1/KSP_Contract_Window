@@ -76,6 +76,8 @@ namespace ContractsWindow
 		internal static GUIStyle resetBox;
 		internal static GUIStyle resetButton;
 
+		internal static GUIStyle smallLabel;
+
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
 		internal static Texture2D repGreen;
