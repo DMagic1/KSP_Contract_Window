@@ -724,24 +724,34 @@ namespace ContractsWindow
 
 		private void buildBottomBar(int id)
 		{
-			GUI.DrawTexture(new Rect(2, WindowRect.height - 30 - contractScenario.Instance.windowSize * 4, WindowRect.width - 4, 4), contractSkins.footerBar);
+			Rect r = new Rect(2, WindowRect.height - 30 - contractScenario.Instance.windowSize * 4, WindowRect.width - 4, 4);
+			GUI.DrawTexture(r, contractSkins.footerBar);
 
 			//Version label
-			GUI.Label(new Rect(8, WindowRect.height - 23 + contractScenario.Instance.windowSize * -4, 30 + contractScenario.Instance.windowSize * 4, 20 + contractScenario.Instance.windowSize * 4), version, contractSkins.paramText);
+			r.x = 8;
+			r.y = WindowRect.height - 23 + contractScenario.Instance.windowSize * -4;
+			r.width = 30 + contractScenario.Instance.windowSize * 4;
+			r.height = 20 + contractScenario.Instance.windowSize * 4;
+			GUI.Label(r, version, contractSkins.paramText);
 
 			//Tooltip toggle icon
-			if (GUI.Button(new Rect(36 + contractScenario.Instance.windowSize * 4, WindowRect.height - 25 - contractScenario.Instance.windowSize * 4, 30 + contractScenario.Instance.windowSize * 4, 22 + contractScenario.Instance.windowSize * 4), new GUIContent(contractSkins.tooltipIcon, "Toggle Tooltips")))
+			r.x = 36 + contractScenario.Instance.windowSize * 4;
+			r.y -= 2;
+			r.height += 2;
+			if (GUI.Button(r, new GUIContent(contractSkins.tooltipIcon, "Toggle Tooltips")))
 			{
 				TooltipsEnabled = !TooltipsEnabled;
 				contractScenario.Instance.toolTips = TooltipsEnabled;
 			}
 
 			//Clear list button
-			if (GUI.Button(new Rect(74 + contractScenario.Instance.windowSize * 10, WindowRect.height - 25 - contractScenario.Instance.windowSize * 4, 30 + contractScenario.Instance.windowSize * 4, 22 + contractScenario.Instance.windowSize * 4), new GUIContent(contractSkins.resetIcon, "Reset Contracts Window Display")))
+			r.x = 74 + contractScenario.Instance.windowSize * 10;
+			if (GUI.Button(r, new GUIContent(contractSkins.resetIcon, "Reset Contracts Window Display")))
 				rebuild = !rebuild;
 
 			//Font size button
-			if (GUI.Button(new Rect(112 + contractScenario.Instance.windowSize * 16, WindowRect.height - 25 - contractScenario.Instance.windowSize * 4, 30 + contractScenario.Instance.windowSize * 4, 22 + contractScenario.Instance.windowSize * 4), new GUIContent(contractSkins.fontSize, "Toggle Font Size")))
+			r.x = 112 + contractScenario.Instance.windowSize * 16;
+			if (GUI.Button(r, new GUIContent(contractSkins.fontSize, "Toggle Font Size")))
 			{
 				if (contractSkins.normalFontSize == 0)
 					contractSkins.normalFontSize = 1;
@@ -754,7 +764,8 @@ namespace ContractsWindow
 			}
 
 			//Window size button
-			if (GUI.Button(new Rect(150 + contractScenario.Instance.windowSize * 22, WindowRect.height - 25 - contractScenario.Instance.windowSize * 4, 30 + contractScenario.Instance.windowSize * 4, 22 + contractScenario.Instance.windowSize * 4), new GUIContent(contractSkins.windowSize, "Change Window Size")))
+			r.x = 150 + contractScenario.Instance.windowSize * 22;
+			if (GUI.Button(r, new GUIContent(contractSkins.windowSize, "Change Window Size")))
 			{
 				if (contractScenario.Instance.windowSize == 0)
 				{
@@ -779,7 +790,13 @@ namespace ContractsWindow
 				contractSkins.initializeSkins();
 				WindowStyle = contractSkins.newWindowStyle;
 				DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
+			}
 
+			//Contract config window button
+			r.x = 188 + contractScenario.Instance.windowSize * 28;
+			if (GUI.Button(new Rect(), new GUIContent("Config", "Contract Configuration")))
+			{
+				contractScenario.Instance.cConfig.Visible = !contractScenario.Instance.cConfig.Visible;
 			}
 		}
 
