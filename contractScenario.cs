@@ -91,7 +91,12 @@ namespace ContractsWindow
 		internal bool fontSmall = true;
 		internal int windowSize = 0;
 
+		//Contract Config storage
+		internal static Dictionary<string, contractTypeContainer> cTypeList;
+		internal static Dictionary<string, paramTypeContainer> pTypeList;
+
 		internal contractsWindow cWin;
+		internal contractConfig cConfig;
 
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
@@ -126,6 +131,26 @@ namespace ContractsWindow
 
 			//Start the window object
 			cWin = gameObject.AddComponent<contractsWindow>();
+			cConfig = gameObject.AddComponent<contractConfig>();
+
+			//Load the contract and parameter types
+			if (cTypeList == null)
+			{
+				foreach (Type t in ContractSystem.ContractTypes)
+				{
+					if (!cTypeList.ContainsKey(t.Name))
+						cTypeList.Add(t.Name, new contractTypeContainer(t));
+				}
+			}
+
+			if (pTypeList == null)
+			{
+				foreach (Type t in ContractSystem.ParameterTypes)
+				{
+					if (!pTypeList.ContainsKey(t.Name))
+						pTypeList.Add(t.Name, new paramTypeContainer(t));
+				}
+			}
 		}
 
 		public override void OnSave(ConfigNode node)
@@ -159,6 +184,7 @@ namespace ContractsWindow
 		private void OnDestroy()
 		{
 			Destroy(cWin);
+			Destroy(cConfig);
 		}
 
 	#endregion
