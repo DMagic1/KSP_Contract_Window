@@ -409,7 +409,7 @@ namespace ContractsWindow
 				r.x += 105;
 				r.width = 120;
 
-				contractType.MaxOffer = logSlider(ref cOffer, 0, 20, r, 0);
+				contractType.MaxOffer = linearSlider(ref cOffer, 0, 20, r);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -421,7 +421,7 @@ namespace ContractsWindow
 				r.x += 100;
 				r.width = 120;
 
-				contractType.MaxActive = logSlider(ref cActive, 0, 20, r, 0);
+				contractType.MaxActive = linearSlider(ref cActive, 0, 20, r);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -537,7 +537,10 @@ namespace ContractsWindow
 		//Semi log scale slider for percentage adjustments
 		private float logSlider (ref float f, float min, float max, Rect r, int round)
 		{
-			f = GUI.HorizontalSlider(r, f, min, max).Mathf_Round(round);
+			if (!dropDown)
+				f = GUI.HorizontalSlider(r, f, min, max).Mathf_Round(round);
+			else
+				GUI.HorizontalSlider(r, f, min, max);
 
 			if (f >= -1 && f < 0)
 			{
@@ -545,6 +548,17 @@ namespace ContractsWindow
 			}
 			else
 				return (float)Math.Pow(10, f);
+		}
+
+		//Simple linear scale slider for integer values
+		private float linearSlider (ref float f, float min, float max, Rect r)
+		{
+			if (!dropDown)
+				f = Mathf.RoundToInt(GUI.HorizontalSlider(r, f, min, max));
+			else
+				GUI.HorizontalSlider(r, f, min, max);
+
+			return f;
 		}
 
 	}
