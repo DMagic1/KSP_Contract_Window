@@ -310,6 +310,12 @@ namespace ContractsWindow
 			resetButton.fontSize = 15;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
+			//Config styles
+			smallLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			smallLabel.name = "SmallLabel";
+			smallLabel.fontSize = 10;
+			smallLabel.normal.textColor = Color.white;
+
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].button = new GUIStyle(texButton);
