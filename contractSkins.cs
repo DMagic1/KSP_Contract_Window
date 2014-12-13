@@ -77,6 +77,8 @@ namespace ContractsWindow
 		internal static GUIStyle resetButton;
 
 		internal static GUIStyle smallLabel;
+		internal static GUIStyle configDropDown;
+		internal static GUIStyle configHeader;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -315,6 +317,18 @@ namespace ContractsWindow
 			smallLabel.name = "SmallLabel";
 			smallLabel.fontSize = 10;
 			smallLabel.normal.textColor = Color.white;
+
+			configDropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
+			configDropDown.name = "ConfigDropDown";
+			configDropDown.fontSize = 16 + normalFontSize;
+			configDropDown.normal.textColor = XKCDColors.DustyOrange;
+			configDropDown.alignment = TextAnchor.MiddleCenter;
+
+			configHeader = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			configHeader.name = "ConfigHeader";
+			configHeader.fontSize = 16 + normalFontSize;
+			configHeader.normal.textColor = XKCDColors.DustyOrange;
+			configHeader.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);

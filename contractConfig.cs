@@ -50,7 +50,7 @@ namespace ContractsWindow
 		internal override void Awake()
 		{
 			WindowCaption = "Contract Configuration";
-			WindowRect = new Rect(40, 80, 780, 360);
+			WindowRect = new Rect(40, 80, 780, 320);
 			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 			WindowStyle = contractSkins.newWindowStyle;
 			Visible = false;
@@ -159,6 +159,7 @@ namespace ContractsWindow
 			closeButton(id);						/* Draw the close button */
 
 			GUILayout.BeginVertical();
+				GUILayout.Space(10);
 				//headerRegion(id);					/* Window header label */
 				GUILayout.BeginHorizontal();
 					GUILayout.Space(8);
@@ -200,7 +201,7 @@ namespace ContractsWindow
 		{
 			GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-				if(GUILayout.Button("Contract Type:"))
+				if(GUILayout.Button("Contract Type:", contractSkins.configDropDown, GUILayout.MaxWidth(130)))
 				{
 					dropDown = true;
 					cDropDown = true;
@@ -209,9 +210,9 @@ namespace ContractsWindow
 				GUILayout.Space(8);
 
 				if (contractType != null)
-					GUILayout.Label(contractType.Name);
+					GUILayout.Label(contractType.Name, contractSkins.configHeader, GUILayout.MaxWidth(150));
 				else
-					GUILayout.Label("Unknown:");
+					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(150));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		}
@@ -308,7 +309,7 @@ namespace ContractsWindow
 		{
 			GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-				if (GUILayout.Button("Parameter Type:"))
+				if (GUILayout.Button("Parameter Type:", contractSkins.configDropDown, GUILayout.MaxWidth(140)))
 				{
 					dropDown = true;
 					pDropDown = true;
@@ -317,9 +318,9 @@ namespace ContractsWindow
 				GUILayout.Space(8);
 
 				if (paramType != null)
-					GUILayout.Label(paramType.Name);
+					GUILayout.Label(paramType.Name, contractSkins.configHeader, GUILayout.MaxWidth(160));
 				else
-					GUILayout.Label("Unknown:");
+					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(160));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		}
@@ -410,7 +411,7 @@ namespace ContractsWindow
 
 				contractType.MaxOffer = logSlider(ref cOffer, 0, 20, r, 0);
 
-				drawSliderLabel(r, "0", "∞", "10");
+				drawSliderLabel(r, "0", "   ∞", "10");
 
 				GUILayout.Space(145);
 
@@ -422,7 +423,7 @@ namespace ContractsWindow
 
 				contractType.MaxActive = logSlider(ref cActive, 0, 20, r, 0);
 
-				drawSliderLabel(r, "0", "∞", "10");
+				drawSliderLabel(r, "0", "   ∞", "10");
 
 				GUILayout.Space(145);
 
@@ -480,7 +481,6 @@ namespace ContractsWindow
 						GUI.EndScrollView();
 					}
 
-
 				}
 
 				else
@@ -534,6 +534,7 @@ namespace ContractsWindow
 				GUI.Label(r, txt, contractSkins.smallLabel);
 		}
 
+		//Semi log scale slider for percentage adjustments
 		private float logSlider (ref float f, float min, float max, Rect r, int round)
 		{
 			f = GUI.HorizontalSlider(r, f, min, max).Mathf_Round(round);
