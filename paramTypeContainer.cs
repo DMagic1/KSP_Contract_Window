@@ -13,7 +13,7 @@ namespace ContractsWindow
 		private Type paramType;
 		private ContractParameter param;
 		private string name;
-		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience;
+		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience = 1f;
 
 		internal paramTypeContainer (Type PType)
 		{

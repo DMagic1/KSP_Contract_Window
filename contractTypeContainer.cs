@@ -12,10 +12,10 @@ namespace ContractsWindow
 	class contractTypeContainer
 	{
 		private Type contractType;
-		private string name;
+		private string name = "";
 		private Contract contractC;
-		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience;
-		private float durationTime, expirationTime, maxOffer, maxActive;
+		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience, durationTime, expirationTime = 1f;
+		private float maxOffer, maxActive = 20f;
 
 		internal contractTypeContainer (Type CType)
 		{
