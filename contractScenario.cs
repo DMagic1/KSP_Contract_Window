@@ -136,6 +136,7 @@ namespace ContractsWindow
 			//Load the contract and parameter types
 			if (cTypeList == null)
 			{
+				cTypeList = new Dictionary<string, contractTypeContainer>();
 				foreach (Type t in ContractSystem.ContractTypes)
 				{
 					if (!cTypeList.ContainsKey(t.Name))
@@ -145,6 +146,7 @@ namespace ContractsWindow
 
 			if (pTypeList == null)
 			{
+				pTypeList = new Dictionary<string, paramTypeContainer>();
 				foreach (Type t in ContractSystem.ParameterTypes)
 				{
 					if (!pTypeList.ContainsKey(t.Name))
