@@ -794,7 +794,7 @@ namespace ContractsWindow
 
 			//Contract config window button
 			r.x = 188 + contractScenario.Instance.windowSize * 28;
-			if (GUI.Button(new Rect(), new GUIContent("Config", "Contract Configuration")))
+			if (GUI.Button(r, new GUIContent("Config", "Contract Configuration")))
 			{
 				contractScenario.Instance.cConfig.Visible = !contractScenario.Instance.cConfig.Visible;
 			}
