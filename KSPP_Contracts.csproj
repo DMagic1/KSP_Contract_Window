@@ -50,15 +50,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="contractAssembly.cs" />
+    <Compile Include="contractConfig.cs" />
     <Compile Include="contractContainer.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
     <Compile Include="contractsWindow.cs" />
     <Compile Include="contractToolbar.cs" />
+    <Compile Include="contractTypeContainer.cs" />
     <Compile Include="Framework\ExtensionsUnity.cs" />
     <Compile Include="Framework\KSPAddonImproved.cs" />
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
     <Compile Include="Framework\MonoBehaviourWindow.cs" />
+    <Compile Include="paramTypeContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\SkinsLibrary.cs" />
   </ItemGroup>
