@@ -113,6 +113,7 @@ namespace ContractsWindow
 		internal static Texture2D fontSize;
 		internal static Texture2D windowSize;
 		internal static Texture2D settingsIcon;
+		internal static Texture2D agencyIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -152,6 +153,7 @@ namespace ContractsWindow
 			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
+			//agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgencyIcon", false);
 
 			initializeSkins();
 		}
