@@ -43,6 +43,8 @@ namespace ContractsWindow
 		private bool spacecenterLocked, trackingLocked, editorLocked;
 		private Rect ddRect;
 		private Vector2 cScroll, pScroll;
+		private List<contractTypeContainer> cList;
+		private List<paramTypeContainer> pList;
 		private paramTypeContainer paramType;
 		private contractTypeContainer contractType;
 		private float cFRew, cFAdv, cFPen, cRRew, cRPen, cSRew, cOffer, cActive, cDur, pFRew, pFPen, pRRew, pRPen, pSRew = 0f;
@@ -50,13 +52,11 @@ namespace ContractsWindow
 		internal override void Awake()
 		{
 			WindowCaption = "Contract Configuration";
-			WindowRect = new Rect(40, 80, 780, 320);
-			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
+			WindowRect = new Rect(40, 80, 780, 340);
 			WindowStyle = contractSkins.newWindowStyle;
 			Visible = false;
 			DragEnabled = true;
 			TooltipMouseOffset = new Vector2d(-10, -25);
-			RepeatingWorkerInitialWait = 10;
 
 			//Make sure our click-through control locks are disabled
 			InputLockManager.RemoveControlLock(lockID);
@@ -66,10 +66,12 @@ namespace ContractsWindow
 
 		internal override void Start()
 		{
-			if (contractScenario.cTypeList.Count > 0 && contractScenario.pTypeList.Count > 0)
+			cList = contractScenario.Instance.setContractTypes(cList);
+			pList = contractScenario.Instance.setParamTypes(pList);
+			if (cList.Count > 0 && pList.Count > 0)
 			{
-				contractType = contractScenario.cTypeList.ElementAt(0).Value;
-				paramType = contractScenario.pTypeList.ElementAt(0).Value;
+				setContractType(cList[0]);
+				setParameterType(pList[0]);
 			}
 		}
 
@@ -160,7 +162,6 @@ namespace ContractsWindow
 
 			GUILayout.BeginVertical();
 				GUILayout.Space(10);
-				//headerRegion(id);					/* Window header label */
 				GUILayout.BeginHorizontal();
 					GUILayout.Space(8);
 					GUILayout.BeginVertical();
@@ -186,14 +187,18 @@ namespace ContractsWindow
 				dropDown = false;
 		}
 
+		//Draw the close button in the upper right corner
 		private void closeButton(int id)
 		{
-
-		}
-
-		private void headerRegion(int id)
-		{
-			GUILayout.Label("Contract Configuration");
+			Rect r = new Rect(WindowRect.width - 20, 0, 18, 18);
+			if (GUI.Button(r, "✖", contractSkins.configClose))
+			{
+				InputLockManager.RemoveControlLock(lockID);
+				spacecenterLocked = false;
+				trackingLocked = false;
+				editorLocked = false;
+				Visible = false;
+			}
 		}
 
 		//Contract type selector
@@ -203,16 +208,14 @@ namespace ContractsWindow
 				GUILayout.FlexibleSpace();
 				if(GUILayout.Button("Contract Type:", contractSkins.configDropDown, GUILayout.MaxWidth(130)))
 				{
-					dropDown = true;
-					cDropDown = true;
+					dropDown = !dropDown;
+					cDropDown = !cDropDown;
 				}
 
-				GUILayout.Space(8);
-
 				if (contractType != null)
-					GUILayout.Label(contractType.Name, contractSkins.configHeader, GUILayout.MaxWidth(150));
+					GUILayout.Label(contractType.Name, contractSkins.configHeader, GUILayout.MaxWidth(160));
 				else
-					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(150));
+					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(160));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		}
@@ -311,16 +314,14 @@ namespace ContractsWindow
 				GUILayout.FlexibleSpace();
 				if (GUILayout.Button("Parameter Type:", contractSkins.configDropDown, GUILayout.MaxWidth(140)))
 				{
-					dropDown = true;
-					pDropDown = true;
+					dropDown = !dropDown;
+					pDropDown = !pDropDown;
 				}
 
-				GUILayout.Space(8);
-
 				if (paramType != null)
-					GUILayout.Label(paramType.Name, contractSkins.configHeader, GUILayout.MaxWidth(160));
+					GUILayout.Label(paramType.Name, contractSkins.configHeader, GUILayout.MaxWidth(190));
 				else
-					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(160));
+					GUILayout.Label("Unknown", contractSkins.configHeader, GUILayout.MaxWidth(190));
 				GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		}
@@ -445,42 +446,40 @@ namespace ContractsWindow
 			{
 				if (cDropDown)
 				{
-					ddRect = new Rect(75, 40, 190, 160);
+					ddRect = new Rect(40, 55, 200, 160);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 
-					for (int i = 0; i < contractScenario.cTypeList.Count; i++)
+					for (int i = 0; i < cList.Count; i++)
 					{
-						cScroll = GUI.BeginScrollView(ddRect, cScroll, new Rect(0, 0, 170, 20 * contractScenario.cTypeList.Count));
-						Rect r = new Rect(2, 20 * i, 160, 20);
-						if (GUI.Button(r, contractScenario.cTypeList.ElementAt(i).Value.Name, contractSkins.sortMenu))
+						cScroll = GUI.BeginScrollView(ddRect, cScroll, new Rect(0, 0, 180, 20 * cList.Count));
+						Rect r = new Rect(2, 20 * i, 170, 20);
+						if (GUI.Button(r, cList[i].Name, contractSkins.sortMenu))
 						{
-							contractType = contractScenario.cTypeList.ElementAt(i).Value;
+							setContractType(cList[i]);
 							cDropDown = false;
 							dropDown = false;
 						}
 					GUI.EndScrollView();
 					}
-
 				}
 
 				else if (pDropDown)
 				{
-					ddRect = new Rect(WindowRect.width - 250, 40, 200, 160);
+					ddRect = new Rect(WindowRect.width - 365, 55, 200, 160);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 
-					for (int i = 0; i < contractScenario.pTypeList.Count; i++)
+					for (int i = 0; i < pList.Count; i++)
 					{
-						pScroll = GUI.BeginScrollView(ddRect, pScroll, new Rect(0, 0, 180, 20 * contractScenario.pTypeList.Count));
+						pScroll = GUI.BeginScrollView(ddRect, pScroll, new Rect(0, 0, 180, 20 * pList.Count));
 						Rect r = new Rect(2, 20 * i, 170, 20);
-						if (GUI.Button(r, contractScenario.pTypeList.ElementAt(i).Value.Name, contractSkins.sortMenu))
+						if (GUI.Button(r, pList[i].Name, contractSkins.sortMenu))
 						{
-							paramType = contractScenario.pTypeList.ElementAt(i).Value;
+							setParameterType(pList[i]);
 							pDropDown = false;
 							dropDown = false;
 						}
 						GUI.EndScrollView();
 					}
-
 				}
 
 				else
@@ -559,6 +558,30 @@ namespace ContractsWindow
 				GUI.HorizontalSlider(r, f, min, max);
 
 			return f;
+		}
+
+		private void setContractType(contractTypeContainer c)
+		{
+			contractType = c;
+			cFRew = c.RewardFund.reverseLog();
+			cFAdv = c.AdvanceFund.reverseLog();
+			cFPen = c.PenaltyFund.reverseLog();
+			cRRew = c.RewardRep.reverseLog();
+			cRPen = c.PenaltyRep.reverseLog();
+			cSRew = c.RewardScience.reverseLog();
+			cDur = c.DurationTime.reverseLog();
+			cOffer = c.MaxOffer;
+			cActive = c.MaxActive;
+		}
+
+		private void setParameterType(paramTypeContainer p)
+		{
+			paramType = p;
+			pFRew = p.RewardFund.reverseLog();
+			pFPen = p.PenaltyFund.reverseLog();
+			pRRew = p.RewardRep.reverseLog();
+			pRPen = p.PenaltyRep.reverseLog();
+			pSRew = p.RewardScience.reverseLog();
 		}
 
 	}
