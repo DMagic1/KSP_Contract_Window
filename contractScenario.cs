@@ -66,7 +66,7 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "1.0.2.0";
+		public string version = "2.0.2.0";
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -92,8 +92,8 @@ namespace ContractsWindow
 		internal int windowSize = 0;
 
 		//Contract Config storage
-		internal static Dictionary<string, contractTypeContainer> cTypeList;
-		internal static Dictionary<string, paramTypeContainer> pTypeList;
+		private static Dictionary<string, contractTypeContainer> cTypeList;
+		private static Dictionary<string, paramTypeContainer> pTypeList;
 
 		internal contractsWindow cWin;
 		internal contractConfig cConfig;
@@ -137,20 +137,76 @@ namespace ContractsWindow
 			if (cTypeList == null)
 			{
 				cTypeList = new Dictionary<string, contractTypeContainer>();
-				foreach (Type t in ContractSystem.ContractTypes)
+				foreach(AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
 				{
-					if (!cTypeList.ContainsKey(t.Name))
-						cTypeList.Add(t.Name, new contractTypeContainer(t));
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach (Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(Contract)))
+						{
+							if (t != typeof(Contract))
+							{
+								if (!cTypeList.ContainsKey(t.Name))
+									cTypeList.Add(t.Name, new contractTypeContainer(t));
+								if (cTypeList[t.Name].ContractC == null)
+									cTypeList.Remove(t.Name);
+							}
+						}
+					}
+				}
+			}
+
+			ConfigNode contractTypes = node.GetNode("Contracts_Window_Contract_Types");
+
+			if (contractTypes != null)
+			{
+				foreach (ConfigNode contractType in contractTypes.GetNodes("Contract_Type"))
+				{
+					if (contractType != null)
+					{
+						string contractTypeName = contractType.GetValue("TypeName");
+						string valuesString = contractType.GetValue("ContractValues");
+						stringContractParse(valuesString, contractTypeName);
+					}
 				}
 			}
 
 			if (pTypeList == null)
 			{
 				pTypeList = new Dictionary<string, paramTypeContainer>();
-				foreach (Type t in ContractSystem.ParameterTypes)
+				foreach(AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
 				{
-					if (!pTypeList.ContainsKey(t.Name))
-						pTypeList.Add(t.Name, new paramTypeContainer(t));
+					Type[] assemblyTypes = assembly.assembly.GetTypes();
+					foreach(Type t in assemblyTypes)
+					{
+						if (t.IsSubclassOf(typeof(ContractParameter)))
+						{
+							if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
+								continue;
+							if (t != typeof(ContractParameter))
+							{
+								if (!pTypeList.ContainsKey(t.Name))
+									pTypeList.Add(t.Name, new paramTypeContainer(t));
+								if (pTypeList[t.Name].Param == null)
+									pTypeList.Remove(t.Name);
+							}
+						}
+					}
+				}
+			}
+
+			ConfigNode paramTypes = node.GetNode("Contracts_Window_Parameter_Types");
+
+			if (paramTypes != null)
+			{
+				foreach (ConfigNode paramType in paramTypes.GetNodes("Parameter_Type"))
+				{
+					if (paramType != null)
+					{
+						string paramTypeName = paramType.GetValue("TypeName");
+						string valuesString = paramType.GetValue("ParameterValues");
+						stringParamParse(valuesString, paramTypeName);
+					}
 				}
 			}
 		}
@@ -180,6 +236,36 @@ namespace ContractsWindow
 			scenes.AddValue("WindowSize", windowSize);
 
 			node.AddNode(scenes);
+
+			//Save values for each contract type
+			ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
+
+			foreach (contractTypeContainer c in cTypeList.Values)
+			{
+				ConfigNode contractType = new ConfigNode("Contract_Type");
+
+				contractType.AddValue("TypeName", c.ContractC.GetType().Name);
+				contractType.AddValue("ContractValues", stringConcat(c));
+
+				contractTypes.AddNode(contractType);
+			}
+
+			node.AddNode(contractTypes);
+
+			//Save values for each parameter type
+			ConfigNode paramTypes = new ConfigNode("Contracts_Window_Parameter_Types");
+
+			foreach (paramTypeContainer p in pTypeList.Values)
+			{
+				ConfigNode paramType = new ConfigNode("Parameter_Type");
+
+				paramType.AddValue("TypeName", p.Param.GetType().Name);
+				paramType.AddValue("ParameterValues", stringConcat(p));
+
+				paramTypes.AddNode(paramType);
+			}
+
+			node.AddNode(paramTypes);
 		}
 
 		//Remove our contract window object
@@ -259,6 +345,32 @@ namespace ContractsWindow
 			return string.Join(",", s);
 		}
 
+		private string stringConcat(contractTypeContainer c)
+		{
+			string[] s = new string[9];
+			s[0] = c.RewardFund.ToString("N2");
+			s[1] = c.AdvanceFund.ToString("N2");
+			s[2] = c.PenaltyFund.ToString("N2");
+			s[3] = c.RewardRep.ToString("N2");
+			s[4] = c.PenaltyRep.ToString("N2");
+			s[5] = c.RewardScience.ToString("N2");
+			s[6] = c.DurationTime.ToString("N2");
+			s[7] = c.MaxOffer.ToString("N0");
+			s[8] = c.MaxActive.ToString("N0");
+			return string.Join(",", s);
+		}
+
+		private string stringConcat(paramTypeContainer p)
+		{
+			string[] s = new string[5];
+			s[0] = p.RewardFund.ToString("N2");
+			s[1] = p.PenaltyFund.ToString("N2");
+			s[2] = p.RewardRep.ToString("N2");
+			s[3] = p.PenaltyRep.ToString("N2");
+			s[4] = p.RewardScience.ToString("N2");
+			return string.Join(",", s);
+		}
+
 		//Convert strings into the appropriate arrays
 		private int[] stringSplit(string source)
 		{
@@ -302,6 +414,56 @@ namespace ContractsWindow
 			int i;
 			if (int.TryParse(s, out i)) return i;
 			return 0;
+		}
+
+		private float stringFloatParse(string s, bool b)
+		{
+			float f;
+			if (float.TryParse(s, out f)) return f;
+			if (b)
+				return 1;
+			else
+				return 10;
+		}
+
+		private void stringContractParse(string s, string type)
+		{
+			contractTypeContainer c;
+			string[] a = s.Split(',');
+			if (cTypeList.ContainsKey(type))
+				c = cTypeList[type];
+			else
+			{
+				DMC_MBE.LogFormatted("Contract Type Not Found; Removing Type From List");
+				return;
+			}
+			c.RewardFund = stringFloatParse(a[0], true);
+			c.AdvanceFund = stringFloatParse(a[1], true);
+			c.PenaltyFund = stringFloatParse(a[2], true);
+			c.RewardRep = stringFloatParse(a[3], true);
+			c.PenaltyRep = stringFloatParse(a[4], true);
+			c.RewardScience = stringFloatParse(a[5], true);
+			c.DurationTime = stringFloatParse(a[6], true);
+			c.MaxOffer = stringFloatParse(a[7], false);
+			c.MaxActive = stringFloatParse(a[8], false);
+		}
+
+		private void stringParamParse(string s, string type)
+		{
+			paramTypeContainer p;
+			string[] a = s.Split(',');
+			if (pTypeList.ContainsKey(type))
+				p = pTypeList[type];
+			else
+			{
+				DMC_MBE.LogFormatted("Parameter Type Not Found; Removing Type From List");
+				return;
+			}
+			p.RewardFund = stringFloatParse(a[0], true);
+			p.PenaltyFund = stringFloatParse(a[1], true);
+			p.RewardRep = stringFloatParse(a[2], true);
+			p.PenaltyRep = stringFloatParse(a[3], true);
+			p.RewardScience = stringFloatParse(a[4], true);
 		}
 
 		#endregion
@@ -397,6 +559,26 @@ namespace ContractsWindow
 				}
 			}
 			return idTemp;
+		}
+
+		internal List<contractTypeContainer> setContractTypes(List<contractTypeContainer> cC)
+		{
+			cC = new List<contractTypeContainer>();
+			foreach (contractTypeContainer c in cTypeList.Values)
+				cC.Add(c);
+			if (cC.Count > 0)
+				cC.Sort((a,b) => string.Compare(a.Name, b.Name));
+			return cC;
+		}
+
+		internal List<paramTypeContainer> setParamTypes(List<paramTypeContainer> pC)
+		{
+			pC = new List<paramTypeContainer>();
+			foreach (paramTypeContainer p in pTypeList.Values)
+				pC.Add(p);
+			if (pC.Count > 0)
+				pC.Sort((a, b) => string.Compare(a.Name, b.Name));
+			return pC;
 		}
 
 		internal static string paramTypeCheck(ContractParameter param)
