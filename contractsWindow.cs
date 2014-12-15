@@ -50,7 +50,7 @@ namespace ContractsWindow
 		private List<contractContainer> nextPinnedList = new List<contractContainer>();
 		private string version;
 		private Vector2 scroll;
-		private bool resizing, showSort, rebuild, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded;
+		private bool resizing, showSort, rebuild, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, agencyPopup;
 		private float dragStart, windowHeight;
 		private int timer;
 		private Rect dropDownSort, resetRect;
@@ -394,6 +394,12 @@ namespace ContractsWindow
 
 			GUILayout.Space(4 + contractScenario.Instance.windowSize * 2);
 
+			//Agency Icon
+			if (GUILayout.Button(new GUIContent(contractSkins.agencyIcon, "Agency"), contractSkins.texButtonSmall, GUILayout.MaxWidth(16 + contractScenario.Instance.windowSize * 4), GUILayout.MaxHeight(14 + contractScenario.Instance.windowSize * 4)))
+			{
+				agencyPopup = !agencyPopup;
+			}
+
 			//Show and hide icons
 			if (c.contract.ContractState == Contract.State.Active)
 			{
@@ -465,7 +471,7 @@ namespace ContractsWindow
 		{
 			//Contract title buttons
 			GUILayout.BeginHorizontal();
-			if (!showSort && !rebuild)
+			if (!showSort && !rebuild && !agencyPopup)
 			{
 				if (GUILayout.Button(c.contract.Title, titleState(c.contract.ContractState), GUILayout.MaxWidth(225 + contractScenario.Instance.windowSize * 30)))
 					c.showParams = !c.showParams;
