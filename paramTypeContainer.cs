@@ -38,6 +38,11 @@ namespace ContractsWindow
 			get { return param; }
 		}
 
+		public Type ParamType
+		{
+			get { return paramType; }
+		}
+
 		public string Name
 		{
 			get { return name; }

@@ -41,6 +41,11 @@ namespace ContractsWindow
 			get { return contractC; }
 		}
 
+		public Type ContractType
+		{
+			get { return contractType; }
+		}
+
 		public string Name
 		{
 			get { return name; }
