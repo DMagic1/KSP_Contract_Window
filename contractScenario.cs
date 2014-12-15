@@ -29,6 +29,7 @@ THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
@@ -41,7 +42,6 @@ namespace ContractsWindow
 	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.SPH)]
 	class contractScenario : ScenarioModule
 	{
-
 		internal static contractScenario Instance
 		{
 			get
@@ -94,6 +94,10 @@ namespace ContractsWindow
 		//Contract Config storage
 		private static Dictionary<string, contractTypeContainer> cTypeList;
 		private static Dictionary<string, paramTypeContainer> pTypeList;
+
+		//Contract config event
+		internal static EventData<Type, contractTypeContainer> onContractChange;
+		internal static EventData<Type, paramTypeContainer> onParamChange;
 
 		internal contractsWindow cWin;
 		internal contractConfig cConfig;
@@ -268,11 +272,25 @@ namespace ContractsWindow
 			node.AddNode(paramTypes);
 		}
 
+		private void Start()
+		{
+			if (onContractChange == null)
+				onContractChange = new EventData<Type, contractTypeContainer>("onContractChange");
+			if (onParamChange == null)
+				onParamChange = new EventData<Type, paramTypeContainer>("onParamChange");
+			onContractChange.Add(contractChanged);
+			onParamChange.Add(paramChanged);
+			GameEvents.Contract.onOffered.Add(contractOffered);
+		}
+
 		//Remove our contract window object
 		private void OnDestroy()
 		{
 			Destroy(cWin);
 			Destroy(cConfig);
+			onContractChange.Remove(contractChanged);
+			onParamChange.Remove(paramChanged);
+			GameEvents.Contract.onOffered.Remove(contractOffered);
 		}
 
 	#endregion
@@ -464,6 +482,136 @@ namespace ContractsWindow
 			p.RewardRep = stringFloatParse(a[2], true);
 			p.PenaltyRep = stringFloatParse(a[3], true);
 			p.RewardScience = stringFloatParse(a[4], true);
+		}
+
+		#endregion
+
+		#region contract Events
+		private void contractOffered(Contract c)
+		{
+			Type contractT = c.GetType();
+			contractTypeContainer cC;
+			if (cTypeList.ContainsKey(contractT.Name))
+				cC = cTypeList[contractT.Name];
+			else
+			{
+				DMC_MBE.LogFormatted("Contract Type: {0} Not Present; Allowing All Offers", contractT.Name);
+				return;
+			}
+
+			var cList = ContractSystem.Instance.Contracts;
+			int active = 0;
+			int offered = 0;
+			for (int i = 0; i < cList.Count; i++)
+			{
+				if (cList[i].GetType() == contractT)
+				{
+					if (cList[i].ContractState == Contract.State.Active)
+						active++;
+					else if (cList[i].ContractState == Contract.State.Offered)
+						offered++;
+				}
+			}
+			int remainingSlots = (int)cC.MaxActive - (active + offered);
+			if ((offered - 1) >= cC.MaxOffer)
+			{
+				ContractSystem.Instance.Contracts.Remove(c);
+				DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
+			}
+			else if ((offered - 1) >= remainingSlots)
+			{
+				ContractSystem.Instance.Contracts.Remove(c);
+				DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
+			}
+			else
+			{
+				updateContractValues(cC, c);
+				updateParameterValues(c);
+				DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
+			}
+		}
+
+		private void paramChanged(Type t, paramTypeContainer p)
+		{
+
+		}
+
+		private void contractChanged(Type t, contractTypeContainer c)
+		{
+
+		}
+
+		private void updateContractValues(contractTypeContainer cC, Contract c)
+		{
+			if (ContractSystem.Instance.Contracts.Contains(c))
+			{
+				if (c.GetType() == cC.ContractType)
+				{
+					c.FundsCompletion *= cC.RewardFund;
+					c.FundsAdvance *= cC.AdvanceFund;
+					c.FundsFailure *= cC.PenaltyFund;
+					c.ReputationCompletion *= cC.RewardRep;
+					c.ReputationFailure *= cC.PenaltyRep;
+					c.ScienceCompletion *= cC.RewardScience;
+					c.TimeDeadline *= cC.DurationTime;
+				}
+			}
+		}
+
+		private void updateParameterValues(paramTypeContainer pC, ContractParameter p)
+		{
+			if (p.GetType() == pC.ParamType)
+			{
+				p.FundsCompletion *= pC.RewardFund;
+				p.FundsFailure *= pC.PenaltyFund;
+				p.ReputationCompletion *= pC.RewardRep;
+				p.ReputationFailure *= pC.PenaltyRep;
+				p.ScienceCompletion *= pC.RewardScience;
+			}
+		}
+
+		private void updateParameterValues(paramTypeContainer pC, Contract c)
+		{
+			if (ContractSystem.Instance.Contracts.Contains(c))
+			{
+				List<ContractParameter> modifyList = new List<ContractParameter>();
+				var cParams = c.AllParameters;
+				for (int i = 0; i < cParams.Count(); i++)
+				{
+					if (cParams.ElementAt(i).GetType() == pC.ty)
+					{
+
+					}
+				}
+			}
+		}
+
+		private void updateParameterValues(Contract c)
+		{
+			if (ContractSystem.Instance.Contracts.Contains(c))
+			{
+				List<ContractParameter> modifyList = new List<ContractParameter>();
+				var pTypes = ContractSystem.ParameterTypes;
+				var cParams = c.AllParameters;
+				for (int i = 0; i < pTypes.Count; i++)
+				{
+					for (int j = 0; j < cParams.Count(); j++)
+					{
+						if (cParams.ElementAt(j).GetType() == pTypes[i])
+							modifyList.Add(cParams.ElementAt(j));
+					}
+				}
+				if (modifyList.Count > 0)
+				{
+					for (int k = 0; k < modifyList.Count; k++)
+					{
+						if (pTypeList.ContainsKey(modifyList[k].GetType().Name))
+						{
+							updateParameterValues(pTypeList[modifyList[k].GetType().Name], modifyList[k]);
+						}
+					}
+				}
+			}
 		}
 
 		#endregion
