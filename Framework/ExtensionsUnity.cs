@@ -68,5 +68,15 @@ namespace ContractsWindow
 				return (float)Math.Round(f - (f % precision), 0);
 			}
 		}
+
+		public static float reverseLog(this float f)
+		{
+			if (f >= 0 && f < 1)
+			{
+				return f - 1;
+			}
+			else
+				return (float)Math.Log10(f);
+		}
     }
 }
