@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using Contracts;
 using Contracts.Parameters;
@@ -11,15 +12,25 @@ namespace ContractsWindow
 	class paramTypeContainer
 	{
 		private Type paramType;
-		private ContractParameter param;
+		private ContractParameter param = null;
 		private string name;
-		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience = 1f;
+		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience;
 
 		internal paramTypeContainer (Type PType)
 		{
 			paramType = PType;
-			param = (ContractParameter)Activator.CreateInstance(PType);
+			try
+			{
+				param = (ContractParameter)Activator.CreateInstance(PType);
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("This Parameter Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1]", PType.Name, e);
+				return;
+			}
 			name = PType.Name;
+			name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+			rewardFund = penaltyFund = rewardRep = penaltyRep = rewardScience = 1f;
 		}
 
 		public ContractParameter Param

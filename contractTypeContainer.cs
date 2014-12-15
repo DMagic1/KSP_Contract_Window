@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using Contracts;
 using Contracts.Parameters;
@@ -13,15 +14,26 @@ namespace ContractsWindow
 	{
 		private Type contractType;
 		private string name = "";
-		private Contract contractC;
-		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience, durationTime, expirationTime = 1f;
-		private float maxOffer, maxActive = 20f;
+		private Contract contractC = null;
+		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience, durationTime, expirationTime;
+		private float maxOffer, maxActive;
 
 		internal contractTypeContainer (Type CType)
 		{
 			contractType = CType;
+			try
+			{
 			contractC = (Contract)Activator.CreateInstance(CType);
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("This Contract Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1]", CType.Name, e);
+				
+			}
 			name = CType.Name;
+			name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+			rewardFund = penaltyFund = advanceFund = rewardRep = penaltyRep = rewardScience = durationTime = expirationTime = 1f;
+			maxOffer = maxActive = 20;
 		}
 
 		public Contract ContractC
