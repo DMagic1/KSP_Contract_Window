@@ -15,6 +15,7 @@ namespace ContractsWindow
 		private ContractParameter param = null;
 		private string name;
 		private float rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience;
+		private float[] paramValues;
 
 		internal paramTypeContainer (Type PType)
 		{
@@ -95,6 +96,15 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value < 1000)
 					rewardScience = value;
+			}
+		}
+
+		public float[] ParamValues
+		{
+			get
+			{
+				paramValues = new float[5] { rewardFund, penaltyFund, rewardRep, penaltyRep, rewardScience };
+				return paramValues;
 			}
 		}
 	}
