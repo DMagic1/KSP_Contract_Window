@@ -39,7 +39,7 @@ namespace ContractsWindow
 
 	#region Scenario Setup
 
-	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER, GameScenes.SPH)]
+	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	class contractScenario : ScenarioModule
 	{
 		internal static contractScenario Instance
@@ -96,8 +96,8 @@ namespace ContractsWindow
 		private static Dictionary<string, paramTypeContainer> pTypeList;
 
 		//Contract config event
-		internal static EventData<Type, contractTypeContainer> onContractChange;
-		internal static EventData<Type, paramTypeContainer> onParamChange;
+		internal static EventData<float[], contractTypeContainer> onContractChange;
+		internal static EventData<float[], paramTypeContainer> onParamChange;
 
 		internal contractsWindow cWin;
 		internal contractConfig cConfig;
@@ -275,9 +275,9 @@ namespace ContractsWindow
 		private void Start()
 		{
 			if (onContractChange == null)
-				onContractChange = new EventData<Type, contractTypeContainer>("onContractChange");
+				onContractChange = new EventData<float[], contractTypeContainer>("onContractChange");
 			if (onParamChange == null)
-				onParamChange = new EventData<Type, paramTypeContainer>("onParamChange");
+				onParamChange = new EventData<float[], paramTypeContainer>("onParamChange");
 			onContractChange.Add(contractChanged);
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
@@ -304,7 +304,6 @@ namespace ContractsWindow
 				case GameScenes.FLIGHT:
 					return 0;
 				case GameScenes.EDITOR:
-				case GameScenes.SPH:
 					return 1;
 				case GameScenes.SPACECENTER:
 					return 2;
@@ -525,52 +524,77 @@ namespace ContractsWindow
 			}
 			else
 			{
-				updateContractValues(cC, c);
+				updateContractValues(cC, c, new float[9] {1,1,1,1,1,1,1,1,1});
 				updateParameterValues(c);
 				DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
 			}
 		}
 
-		private void paramChanged(Type t, paramTypeContainer p)
+		private void paramChanged(float[] originals, paramTypeContainer p)
 		{
-
-		}
-
-		private void contractChanged(Type t, contractTypeContainer c)
-		{
-
-		}
-
-		private void updateContractValues(contractTypeContainer cC, Contract c)
-		{
-			if (ContractSystem.Instance.Contracts.Contains(c))
+			DMC_MBE.LogFormatted_DebugOnly("Parameter Value Updated");
+			var cList = ContractSystem.Instance.Contracts;
+			for (int i = 0; i < cList.Count; i++)
 			{
-				if (c.GetType() == cC.ContractType)
+				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
 				{
-					c.FundsCompletion *= cC.RewardFund;
-					c.FundsAdvance *= cC.AdvanceFund;
-					c.FundsFailure *= cC.PenaltyFund;
-					c.ReputationCompletion *= cC.RewardRep;
-					c.ReputationFailure *= cC.PenaltyRep;
-					c.ScienceCompletion *= cC.RewardScience;
-					c.TimeDeadline *= cC.DurationTime;
+					updateParameterValues(p, cList[i], originals);
 				}
 			}
 		}
 
-		private void updateParameterValues(paramTypeContainer pC, ContractParameter p)
+		private void contractChanged(float[] originals, contractTypeContainer c)
 		{
-			if (p.GetType() == pC.ParamType)
+			DMC_MBE.LogFormatted_DebugOnly("Contract Value Updated");
+			var cList = ContractSystem.Instance.Contracts;
+			for(int i = 0; i < cList.Count; i++)
 			{
-				p.FundsCompletion *= pC.RewardFund;
-				p.FundsFailure *= pC.PenaltyFund;
-				p.ReputationCompletion *= pC.RewardRep;
-				p.ReputationFailure *= pC.PenaltyRep;
-				p.ScienceCompletion *= pC.RewardScience;
+				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
+				{
+					updateContractValues(c, cList[i], originals);
+				}
 			}
 		}
 
-		private void updateParameterValues(paramTypeContainer pC, Contract c)
+		private void updateContractValues(contractTypeContainer cC, Contract c, float[] O)
+		{
+			if (ContractSystem.Instance.Contracts.Contains(c))
+			{
+				if (cTypeList.ContainsValue(cC))
+				{
+					if (c.GetType() == cC.ContractType)
+					{
+						c.FundsCompletion = (c.FundsCompletion / O[0] ) * cC.RewardFund;
+						c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
+						c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
+						c.ReputationCompletion = (c.ReputationCompletion / O[3] ) * cC.RewardRep;
+						c.ReputationFailure = (c.ReputationFailure / O[4] ) * cC.PenaltyRep;
+						c.ScienceCompletion = (c.ScienceCompletion / O[5] ) * cC.RewardScience;
+						c.TimeDeadline = (c.TimeDeadline / O[6] ) * cC.DurationTime;
+					}
+				}
+			}
+		}
+
+		private void updateParameterValues(paramTypeContainer pC, List<ContractParameter> pL, float[] O)
+		{
+			foreach (ContractParameter p in pL)
+			{
+				if (pTypeList.ContainsValue(pC))
+				{
+					if (p.GetType() == pC.ParamType)
+					{
+						p.FundsCompletion = (p.FundsCompletion / O[0] ) * pC.RewardFund;
+						p.FundsFailure = (p.FundsFailure / O[1] ) * pC.PenaltyFund;
+						p.ReputationCompletion = (p.ReputationCompletion / O[2]) * pC.RewardRep;
+						p.ReputationFailure = (p.ReputationFailure / O[3] ) * pC.PenaltyRep;
+						p.ScienceCompletion = (p.ScienceCompletion / O[4] ) * pC.RewardScience;
+					}
+				}
+			}
+		}
+
+		private void updateParameterValues(paramTypeContainer pC, Contract c, float[] originals)
 		{
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
@@ -578,10 +602,14 @@ namespace ContractsWindow
 				var cParams = c.AllParameters;
 				for (int i = 0; i < cParams.Count(); i++)
 				{
-					if (cParams.ElementAt(i).GetType() == pC.ty)
+					if (cParams.ElementAt(i).GetType() == pC.ParamType)
 					{
-
+						modifyList.Add(cParams.ElementAt(i));
 					}
+				}
+				if (modifyList.Count > 0)
+				{
+					updateParameterValues(pC, modifyList, originals);
 				}
 			}
 		}
@@ -593,12 +621,15 @@ namespace ContractsWindow
 				List<ContractParameter> modifyList = new List<ContractParameter>();
 				var pTypes = ContractSystem.ParameterTypes;
 				var cParams = c.AllParameters;
-				for (int i = 0; i < pTypes.Count; i++)
+				for (int i = 0; i < cParams.Count(); i++)
 				{
-					for (int j = 0; j < cParams.Count(); j++)
+					for (int j = 0; j < pTypes.Count; j++)
 					{
-						if (cParams.ElementAt(j).GetType() == pTypes[i])
-							modifyList.Add(cParams.ElementAt(j));
+						if (cParams.ElementAt(i).GetType() == pTypes[j])
+						{
+							modifyList.Add(cParams.ElementAt(i));
+							break;
+						}
 					}
 				}
 				if (modifyList.Count > 0)
@@ -607,7 +638,7 @@ namespace ContractsWindow
 					{
 						if (pTypeList.ContainsKey(modifyList[k].GetType().Name))
 						{
-							updateParameterValues(pTypeList[modifyList[k].GetType().Name], modifyList[k]);
+							updateParameterValues(pTypeList[modifyList[k].GetType().Name], new List<ContractParameter>() { modifyList[k] }, new float[5] { 1, 1, 1, 1, 1 });
 						}
 					}
 				}
