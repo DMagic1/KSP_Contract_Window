@@ -231,7 +231,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardFund = logSlider(ref cFRew, -1, 1, r, 2);
+				contractType.RewardFund = logSlider(ref cFRew, -1, 1, r, 2, 0, contractType.RewardFund);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -245,7 +245,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.AdvanceFund = logSlider(ref cFAdv, -1, 1, r, 2);
+				contractType.AdvanceFund = logSlider(ref cFAdv, -1, 1, r, 2, 0, contractType.AdvanceFund);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -259,7 +259,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.PenaltyFund = logSlider(ref cFPen, -1, 1, r, 2);
+				contractType.PenaltyFund = logSlider(ref cFPen, -1, 1, r, 2, 0, contractType.PenaltyFund);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -273,7 +273,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardRep = logSlider(ref cRRew, -1, 1, r, 2);
+				contractType.RewardRep = logSlider(ref cRRew, -1, 1, r, 2, 0, contractType.RewardRep);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -287,7 +287,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.PenaltyRep = logSlider(ref cRPen, -1, 1, r, 2);
+				contractType.PenaltyRep = logSlider(ref cRPen, -1, 1, r, 2, 0, contractType.PenaltyRep);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -301,7 +301,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardScience = logSlider(ref cSRew, -1, 1, r, 2);
+				contractType.RewardScience = logSlider(ref cSRew, -1, 1, r, 2, 0, contractType.RewardScience);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -337,7 +337,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardFund = logSlider(ref pFRew, -1, 1, r, 2);
+				paramType.RewardFund = logSlider(ref pFRew, -1, 1, r, 2, 1, paramType.RewardFund);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -351,7 +351,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.PenaltyFund = logSlider(ref pFPen, -1, 1, r, 2);
+				paramType.PenaltyFund = logSlider(ref pFPen, -1, 1, r, 2, 1, paramType.PenaltyFund);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -365,7 +365,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardRep = logSlider(ref pRRew, -1, 1, r, 2);
+				paramType.RewardRep = logSlider(ref pRRew, -1, 1, r, 2, 1, paramType.RewardRep);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -379,7 +379,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.PenaltyRep = logSlider(ref pRPen, -1, 1, r, 2);
+				paramType.PenaltyRep = logSlider(ref pRPen, -1, 1, r, 2, 1, paramType.PenaltyRep);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -393,7 +393,7 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardScience = logSlider(ref pSRew, -1, 1, r, 2);
+				paramType.RewardScience = logSlider(ref pSRew, -1, 1, r, 2, 1, paramType.RewardScience);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -410,7 +410,7 @@ namespace ContractsWindow
 				r.x += 105;
 				r.width = 120;
 
-				contractType.MaxOffer = linearSlider(ref cOffer, 0, 20, r);
+				//contractType.MaxOffer = 10 * logSlider(ref cOffer, -1, 1, r, 2, 0, contractType.MaxOffer / 10);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -422,7 +422,7 @@ namespace ContractsWindow
 				r.x += 100;
 				r.width = 120;
 
-				contractType.MaxActive = linearSlider(ref cActive, 0, 20, r);
+				//contractType.MaxActive = 10 * logSlider(ref cActive, -1, 1, r, 2, 0, contractType.MaxActive / 10);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -434,7 +434,7 @@ namespace ContractsWindow
 				r.x += 110;
 				r.width = 160;
 
-				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2);
+				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2, 0, contractType.DurationTime);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -446,14 +446,14 @@ namespace ContractsWindow
 			{
 				if (cDropDown)
 				{
-					ddRect = new Rect(40, 55, 200, 160);
+					ddRect = new Rect(40, 55, 280, 160);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 
 					for (int i = 0; i < cList.Count; i++)
 					{
-						cScroll = GUI.BeginScrollView(ddRect, cScroll, new Rect(0, 0, 180, 20 * cList.Count));
-						Rect r = new Rect(2, 20 * i, 170, 20);
-						if (GUI.Button(r, cList[i].Name, contractSkins.sortMenu))
+						cScroll = GUI.BeginScrollView(ddRect, cScroll, new Rect(0, 0, 260, 25 * cList.Count));
+						Rect r = new Rect(2, (25 * i) + 2, 250, 25);
+						if (GUI.Button(r, cList[i].Name, contractSkins.configDropMenu))
 						{
 							setContractType(cList[i]);
 							cDropDown = false;
@@ -465,14 +465,14 @@ namespace ContractsWindow
 
 				else if (pDropDown)
 				{
-					ddRect = new Rect(WindowRect.width - 365, 55, 200, 160);
+					ddRect = new Rect(WindowRect.width - 365, 55, 280, 160);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 
 					for (int i = 0; i < pList.Count; i++)
 					{
-						pScroll = GUI.BeginScrollView(ddRect, pScroll, new Rect(0, 0, 180, 20 * pList.Count));
-						Rect r = new Rect(2, 20 * i, 170, 20);
-						if (GUI.Button(r, pList[i].Name, contractSkins.sortMenu))
+						pScroll = GUI.BeginScrollView(ddRect, pScroll, new Rect(0, 0, 260, 25 * pList.Count));
+						Rect r = new Rect(2, (25 * i) + 2, 250, 25);
+						if (GUI.Button(r, pList[i].Name, contractSkins.configDropMenu))
 						{
 							setParameterType(pList[i]);
 							pDropDown = false;
@@ -534,19 +534,32 @@ namespace ContractsWindow
 		}
 
 		//Semi log scale slider for percentage adjustments
-		private float logSlider (ref float f, float min, float max, Rect r, int round)
+		private float logSlider (ref float f, float min, float max, Rect r, int round, int type, float original)
 		{
+			float newVal = f;
 			if (!dropDown)
 				f = GUI.HorizontalSlider(r, f, min, max).Mathf_Round(round);
 			else
 				GUI.HorizontalSlider(r, f, min, max);
 
 			if (f >= -1 && f < 0)
-			{
-				return f + 1;
-			}
+				newVal = f + 1;
 			else
-				return (float)Math.Pow(10, f);
+				newVal = (float)Math.Pow(10, f);
+
+			if (Mathf.RoundToInt(original * 100) != Mathf.RoundToInt(newVal * 100))
+			{
+				if (type == 0)
+				{
+					contractScenario.onContractChange.Fire(contractType.ContractValues, contractType);
+				}
+				else if (type == 1)
+				{
+					contractScenario.onParamChange.Fire(paramType.ParamValues, paramType);
+				}
+			}
+
+			return newVal;
 		}
 
 		//Simple linear scale slider for integer values
