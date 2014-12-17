@@ -33,7 +33,7 @@ using Toolbar;
 
 namespace ContractsWindow
 {
-	[DMC_KSPAddonImproved(DMC_KSPAddonImproved.Startup.EditorAny | DMC_KSPAddonImproved.Startup.TimeElapses, false)]
+	[DMC_KSPAddonImproved(DMC_KSPAddonImproved.Startup.EditorVAB | DMC_KSPAddonImproved.Startup.TimeElapses, false)]
 	class contractToolbar : MonoBehaviour
 	{
 		private IButton contractButton;
