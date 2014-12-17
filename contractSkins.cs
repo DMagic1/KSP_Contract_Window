@@ -76,10 +76,13 @@ namespace ContractsWindow
 		internal static GUIStyle resetBox;
 		internal static GUIStyle resetButton;
 
+		internal static GUIStyle agentName;
+
 		internal static GUIStyle smallLabel;
 		internal static GUIStyle configDropDown;
 		internal static GUIStyle configHeader;
 		internal static GUIStyle configClose;
+		internal static GUIStyle configDropMenu;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -153,7 +156,7 @@ namespace ContractsWindow
 			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
-			//agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgencyIcon", false);
+			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
 
 			initializeSkins();
 		}
@@ -317,11 +320,24 @@ namespace ContractsWindow
 			resetButton.fontSize = 15;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
+			agentName = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			agentName.name = "AgentName";
+			agentName.normal.textColor = XKCDColors.White;
+			agentName.fontSize = 13 + normalFontSize;
+			agentName.fontStyle = FontStyle.Bold;
+			agentName.wordWrap = true;
+			agentName.alignment = TextAnchor.MiddleLeft;
+
 			//Config styles
 			smallLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			smallLabel.name = "SmallLabel";
 			smallLabel.fontSize = 10;
 			smallLabel.normal.textColor = Color.white;
+
+			configDropMenu = new GUIStyle(sortMenu);
+			configDropMenu.name = "ConfigDropMenu";
+			configDropMenu.fontSize = 12 + normalFontSize;
+			configDropMenu.wordWrap = false;
 
 			configDropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			configDropDown.name = "ConfigDropDown";
