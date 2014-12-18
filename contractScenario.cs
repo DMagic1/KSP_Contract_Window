@@ -365,26 +365,26 @@ namespace ContractsWindow
 		private string stringConcat(contractTypeContainer c)
 		{
 			string[] s = new string[9];
-			s[0] = c.RewardFund.ToString("N2");
-			s[1] = c.AdvanceFund.ToString("N2");
-			s[2] = c.PenaltyFund.ToString("N2");
-			s[3] = c.RewardRep.ToString("N2");
-			s[4] = c.PenaltyRep.ToString("N2");
-			s[5] = c.RewardScience.ToString("N2");
-			s[6] = c.DurationTime.ToString("N2");
-			s[7] = c.MaxOffer.ToString("N0");
-			s[8] = c.MaxActive.ToString("N0");
+			s[0] = c.RewardFund.ToString("N3");
+			s[1] = c.AdvanceFund.ToString("N3");
+			s[2] = c.PenaltyFund.ToString("N3");
+			s[3] = c.RewardRep.ToString("N3");
+			s[4] = c.PenaltyRep.ToString("N3");
+			s[5] = c.RewardScience.ToString("N3");
+			s[6] = c.DurationTime.ToString("N3");
+			s[7] = c.MaxOffer.ToString("N1");
+			s[8] = c.MaxActive.ToString("N1");
 			return string.Join(",", s);
 		}
 
 		private string stringConcat(paramTypeContainer p)
 		{
 			string[] s = new string[5];
-			s[0] = p.RewardFund.ToString("N2");
-			s[1] = p.PenaltyFund.ToString("N2");
-			s[2] = p.RewardRep.ToString("N2");
-			s[3] = p.PenaltyRep.ToString("N2");
-			s[4] = p.RewardScience.ToString("N2");
+			s[0] = p.RewardFund.ToString("N3");
+			s[1] = p.PenaltyFund.ToString("N3");
+			s[2] = p.RewardRep.ToString("N3");
+			s[3] = p.PenaltyRep.ToString("N3");
+			s[4] = p.RewardScience.ToString("N3");
 			return string.Join(",", s);
 		}
 
@@ -498,33 +498,42 @@ namespace ContractsWindow
 				return;
 			}
 
-			var cList = ContractSystem.Instance.Contracts;
-			int active = 0;
-			int offered = 0;
-			for (int i = 0; i < cList.Count; i++)
+			if (cC.MaxActive < 10f || cC.MaxOffer < 10f)
 			{
-				if (cList[i].GetType() == contractT)
+				var cList = ContractSystem.Instance.Contracts;
+				int active = 0;
+				int offered = 0;
+				for (int i = 0; i < cList.Count; i++)
 				{
-					if (cList[i].ContractState == Contract.State.Active)
-						active++;
-					else if (cList[i].ContractState == Contract.State.Offered)
-						offered++;
+					if (cList[i].GetType() == contractT)
+					{
+						if (cList[i].ContractState == Contract.State.Active)
+							active++;
+						else if (cList[i].ContractState == Contract.State.Offered)
+							offered++;
+					}
 				}
-			}
-			int remainingSlots = (int)cC.MaxActive - (active + offered);
-			if ((offered - 1) >= cC.MaxOffer)
-			{
-				ContractSystem.Instance.Contracts.Remove(c);
-				DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
-			}
-			else if ((offered - 1) >= remainingSlots)
-			{
-				ContractSystem.Instance.Contracts.Remove(c);
-				DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
+				int remainingSlots = (int)(cC.MaxActive * 10) - (active + offered - 1);
+				if ((offered - 1) >= (int)(cC.MaxOffer * 10))
+				{
+					ContractSystem.Instance.Contracts.Remove(c);
+					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
+				}
+				else if ((offered - 1) >= remainingSlots)
+				{
+					ContractSystem.Instance.Contracts.Remove(c);
+					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
+				}
+				else
+				{
+					updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+					updateParameterValues(c);
+					DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
+				}
 			}
 			else
 			{
-				updateContractValues(cC, c, new float[9] {1,1,1,1,1,1,1,1,1});
+				updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
 				updateParameterValues(c);
 				DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
 			}
@@ -547,23 +556,26 @@ namespace ContractsWindow
 		{
 			DMC_MBE.LogFormatted_DebugOnly("Contract Value Updated");
 			var cList = ContractSystem.Instance.Contracts;
-			for(int i = 0; i < cList.Count; i++)
+			for (int i = 0; i < cList.Count; i++)
 			{
 				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
 				{
-					updateContractValues(c, cList[i], originals);
+					if (cList[i].GetType() == c.ContractType)
+						updateContractValues(c, cList[i], originals);
 				}
 			}
 		}
 
 		private void updateContractValues(contractTypeContainer cC, Contract c, float[] O)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Updating Contract: {0}", c.GetType().Name);
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
 				if (cTypeList.ContainsValue(cC))
 				{
 					if (c.GetType() == cC.ContractType)
 					{
+						DMC_MBE.LogFormatted_DebugOnly("Contract Values Updating");
 						c.FundsCompletion = (c.FundsCompletion / O[0] ) * cC.RewardFund;
 						c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
 						c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
@@ -578,12 +590,14 @@ namespace ContractsWindow
 
 		private void updateParameterValues(paramTypeContainer pC, List<ContractParameter> pL, float[] O)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Updating Param Type: {0}", pC.ParamType.Name);
 			foreach (ContractParameter p in pL)
 			{
 				if (pTypeList.ContainsValue(pC))
 				{
 					if (p.GetType() == pC.ParamType)
 					{
+						DMC_MBE.LogFormatted_DebugOnly("Updating Param Values");
 						p.FundsCompletion = (p.FundsCompletion / O[0] ) * pC.RewardFund;
 						p.FundsFailure = (p.FundsFailure / O[1] ) * pC.PenaltyFund;
 						p.ReputationCompletion = (p.ReputationCompletion / O[2]) * pC.RewardRep;
