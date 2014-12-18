@@ -54,7 +54,7 @@ namespace ContractsWindow
 			get { return rewardFund; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardFund = value;
 			}
 		}
@@ -64,7 +64,7 @@ namespace ContractsWindow
 			get { return penaltyFund; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					penaltyFund = value;
 			}
 		}
@@ -74,7 +74,7 @@ namespace ContractsWindow
 			get { return rewardRep; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardRep = value;
 			}
 		}
@@ -84,7 +84,7 @@ namespace ContractsWindow
 			get { return penaltyRep; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					penaltyRep = value;
 			}
 		}
@@ -94,7 +94,7 @@ namespace ContractsWindow
 			get { return rewardScience; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardScience = value;
 			}
 		}

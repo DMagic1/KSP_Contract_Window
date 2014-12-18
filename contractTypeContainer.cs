@@ -34,7 +34,7 @@ namespace ContractsWindow
 			name = CType.Name;
 			name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
 			rewardFund = penaltyFund = advanceFund = rewardRep = penaltyRep = rewardScience = durationTime = expirationTime = 1f;
-			maxOffer = maxActive = 20;
+			maxOffer = maxActive = 10f;
 		}
 
 		public Contract ContractC
@@ -57,7 +57,7 @@ namespace ContractsWindow
 			get { return rewardFund; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardFund = value;
 			}
 		}
@@ -67,7 +67,7 @@ namespace ContractsWindow
 			get { return penaltyFund; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					penaltyFund = value;
 			}
 		}
@@ -77,7 +77,7 @@ namespace ContractsWindow
 			get { return advanceFund; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					advanceFund = value;
 			}
 		}
@@ -87,7 +87,7 @@ namespace ContractsWindow
 			get { return rewardRep; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardRep = value;
 			}
 		}
@@ -97,7 +97,7 @@ namespace ContractsWindow
 			get { return penaltyRep; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					penaltyRep = value;
 			}
 		}
@@ -107,7 +107,7 @@ namespace ContractsWindow
 			get { return rewardScience; }
 			set
 			{
-				if (value >= 0 && value < 1000)
+				if (value >= 0 && value <= 10)
 					rewardScience = value;
 			}
 		}
@@ -117,7 +117,7 @@ namespace ContractsWindow
 			get { return durationTime; }
 			set
 			{
-				if (value > 0 && value < 1000)
+				if (value > 0 && value <= 10)
 					durationTime = value;
 			}
 		}
@@ -127,7 +127,7 @@ namespace ContractsWindow
 			get { return expirationTime; }
 			set
 			{
-				if (value > 0 && value < 1000)
+				if (value > 0 && value <= 10)
 					expirationTime = value;
 			}
 		}
@@ -137,7 +137,7 @@ namespace ContractsWindow
 			get { return maxOffer; }
 			set
 			{
-				if (value >= 0 && value < 50)
+				if (value >= 0 && value <= 10)
 					maxOffer = value;
 			}
 		}
@@ -147,7 +147,7 @@ namespace ContractsWindow
 			get { return maxActive; }
 			set
 			{
-				if (value >= 0 && value < 50)
+				if (value >= 0 && value <= 10)
 					maxActive = value;
 			}
 		}
