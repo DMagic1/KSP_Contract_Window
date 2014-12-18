@@ -404,35 +404,45 @@ namespace ContractsWindow
 		{
 			GUILayout.Space(30);
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Max Offered: {0:N0}", contractType.MaxOffer));
+				string offers = "";
+				if (contractType.MaxOffer < 10)
+					offers = string.Format("Max Offered: {0}", contractType.MaxOffer * 10);
+				else
+					offers = ("Max Offered: ∞");
+				GUILayout.Label(offers, GUILayout.Width(110));
 
 				Rect r = GUILayoutUtility.GetLastRect();
-				r.x += 105;
-				r.width = 120;
+				r.x += 110;
+				r.width = 135;
 
-				//contractType.MaxOffer = 10 * logSlider(ref cOffer, -1, 1, r, 2, 0, contractType.MaxOffer / 10);
+				contractType.MaxOffer = logSlider(ref cOffer, -1, 1, r, 2, 0, contractType.MaxOffer);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
-				GUILayout.Space(145);
+				GUILayout.Space(150);
 
-				GUILayout.Label(string.Format("Max Active: {0:N0}", contractType.MaxActive));
+				string actives = "";
+				if (contractType.MaxActive < 10)
+					actives = string.Format("Max Active: {0}", contractType.MaxActive * 10);
+				else
+					actives = "Max Active: ∞";
+				GUILayout.Label(actives, GUILayout.Width(100));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 100;
-				r.width = 120;
+				r.width = 135;
 
-				//contractType.MaxActive = 10 * logSlider(ref cActive, -1, 1, r, 2, 0, contractType.MaxActive / 10);
+				contractType.MaxActive = logSlider(ref cActive, -1, 1, r, 2, 0, contractType.MaxActive);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
-				GUILayout.Space(145);
+				GUILayout.Space(150);
 
-				GUILayout.Label(string.Format("Duration: {0:P0}", contractType.DurationTime));
+				GUILayout.Label(string.Format("Duration: {0:P0}", contractType.DurationTime), GUILayout.Width(110));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 110;
-				r.width = 160;
+				r.width = 135;
 
 				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2, 0, contractType.DurationTime);
 
@@ -544,8 +554,10 @@ namespace ContractsWindow
 
 			if (f >= -1 && f < 0)
 				newVal = f + 1;
-			else
+			else if (f >= 0 && f < 1)
 				newVal = (float)Math.Pow(10, f);
+			else
+				newVal = 10f;
 
 			if (Mathf.RoundToInt(original * 100) != Mathf.RoundToInt(newVal * 100))
 			{
