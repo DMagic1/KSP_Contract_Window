@@ -766,13 +766,18 @@ namespace ContractsWindow
 
 				else if (agencyPopup)
 				{
-					agentPopupRect = new Rect(40, 40, 240, 80);
+					agentPopupRect = new Rect(40, 40, 260, 80);
 					GUI.Box(agentPopupRect, "", contractSkins.dropDown);
-					Rect r = new Rect(agentPopupRect.x + 5, agentPopupRect.y + 20, 64, 40);
+					Rect r = new Rect(agentPopupRect.x + 5, agentPopupRect.y + 10, 84, 60);
+					GUI.Box(r, "", contractSkins.agentBackground);
+					r.x += 10;
+					r.y += 10;
+					r.width = 64;
+					r.height = 40;
 					GUI.Label(r, currentAgent.LogoScaled);
 					r.x += 80;
 					r.y -= 10;
-					r.width = 180;
+					r.width = 150;
 					r.height = 60;
 					GUI.Label(r, currentAgent.Name, contractSkins.agentName);
 				}
