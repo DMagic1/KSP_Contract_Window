@@ -77,6 +77,7 @@ namespace ContractsWindow
 		internal static GUIStyle resetButton;
 
 		internal static GUIStyle agentName;
+		internal static GUIStyle agentBackground;
 
 		internal static GUIStyle smallLabel;
 		internal static GUIStyle configDropDown;
@@ -326,7 +327,14 @@ namespace ContractsWindow
 			agentName.fontSize = 13 + normalFontSize;
 			agentName.fontStyle = FontStyle.Bold;
 			agentName.wordWrap = true;
-			agentName.alignment = TextAnchor.MiddleLeft;
+			agentName.alignment = TextAnchor.MiddleCenter;
+
+			agentBackground = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.box);
+			agentBackground.name = "AgentBackground";
+			Texture2D agentBackDrop = new Texture2D(1, 1);
+			agentBackDrop.SetPixel(1, 1, XKCDColors.White);
+			agentBackDrop.Apply();
+			agentBackground.normal.background = agentBackDrop;
 
 			//Config styles
 			smallLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
