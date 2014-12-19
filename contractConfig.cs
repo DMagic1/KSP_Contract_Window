@@ -406,7 +406,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				string offers = "";
 				if (contractType.MaxOffer < 10)
-					offers = string.Format("Max Offered: {0}", contractType.MaxOffer * 10);
+					offers = string.Format("Max Offered: {0:N0}", contractType.MaxOffer * 10);
 				else
 					offers = ("Max Offered: ∞");
 				GUILayout.Label(offers, GUILayout.Width(110));
@@ -423,7 +423,7 @@ namespace ContractsWindow
 
 				string actives = "";
 				if (contractType.MaxActive < 10)
-					actives = string.Format("Max Active: {0}", contractType.MaxActive * 10);
+					actives = string.Format("Max Active: {0:N0}", contractType.MaxActive * 10);
 				else
 					actives = "Max Active: ∞";
 				GUILayout.Label(actives, GUILayout.Width(100));
@@ -552,9 +552,14 @@ namespace ContractsWindow
 			else
 				GUI.HorizontalSlider(r, f, min, max);
 
-			if (f >= -1 && f < 0)
+			if (f >= -1 && f < -0.05)
 				newVal = f + 1;
-			else if (f >= 0 && f < 1)
+			else if (f >= -0.05 && f < 0.05)
+			{
+				f = 0;
+				newVal = 1;
+			}
+			else if (f >= 0.05 && f < 1)
 				newVal = (float)Math.Pow(10, f);
 			else
 				newVal = 10f;
@@ -572,17 +577,6 @@ namespace ContractsWindow
 			}
 
 			return newVal;
-		}
-
-		//Simple linear scale slider for integer values
-		private float linearSlider (ref float f, float min, float max, Rect r)
-		{
-			if (!dropDown)
-				f = Mathf.RoundToInt(GUI.HorizontalSlider(r, f, min, max));
-			else
-				GUI.HorizontalSlider(r, f, min, max);
-
-			return f;
 		}
 
 		private void setContractType(contractTypeContainer c)
