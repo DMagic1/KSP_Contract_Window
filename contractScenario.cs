@@ -514,12 +514,12 @@ namespace ContractsWindow
 					}
 				}
 				int remainingSlots = (int)(cC.MaxActive * 10) - (active + offered - 1);
-				if ((offered - 1) >= (int)(cC.MaxOffer * 10))
+				if ((offered - 1) >= (int)(cC.MaxOffer * 10) && cC.MaxOffer < 10f)
 				{
 					ContractSystem.Instance.Contracts.Remove(c);
 					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
 				}
-				else if ((offered - 1) >= remainingSlots)
+				else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
 				{
 					ContractSystem.Instance.Contracts.Remove(c);
 					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
@@ -541,7 +541,7 @@ namespace ContractsWindow
 
 		private void paramChanged(float[] originals, paramTypeContainer p)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Parameter Value Updated");
+			DMC_MBE.LogFormatted_DebugOnly("Parameter Value Event Fired; Type: {0}", p.Name);
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
@@ -554,50 +554,56 @@ namespace ContractsWindow
 
 		private void contractChanged(float[] originals, contractTypeContainer c)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Contract Value Updated");
+			DMC_MBE.LogFormatted_DebugOnly("Contract Value Event Fired; Type: {0}", c.Name);
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
 				if (cList[i].ContractState == Contract.State.Active || cList[i].ContractState == Contract.State.Offered)
 				{
-					if (cList[i].GetType() == c.ContractType)
-						updateContractValues(c, cList[i], originals);
+					updateContractValues(c, cList[i], originals);
 				}
 			}
 		}
 
 		private void updateContractValues(contractTypeContainer cC, Contract c, float[] O)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Updating Contract: {0}", c.GetType().Name);
-			if (ContractSystem.Instance.Contracts.Contains(c))
+			if (cTypeList.ContainsValue(cC))
 			{
-				if (cTypeList.ContainsValue(cC))
+				if (c.GetType() == cC.ContractType)
 				{
-					if (c.GetType() == cC.ContractType)
-					{
-						DMC_MBE.LogFormatted_DebugOnly("Contract Values Updating");
-						c.FundsCompletion = (c.FundsCompletion / O[0] ) * cC.RewardFund;
-						c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
-						c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
-						c.ReputationCompletion = (c.ReputationCompletion / O[3] ) * cC.RewardRep;
-						c.ReputationFailure = (c.ReputationFailure / O[4] ) * cC.PenaltyRep;
-						c.ScienceCompletion = (c.ScienceCompletion / O[5] ) * cC.RewardScience;
-						c.TimeDeadline = (c.TimeDeadline / O[6] ) * cC.DurationTime;
-					}
+					DMC_MBE.LogFormatted_DebugOnly("Contract Values Updating; Type: {0}", cC.Name);
+					DMC_MBE.LogFormatted_DebugOnly("Original Contract Values: {0}; New Values: {1}", printArray(O), printArray(cC.ContractValues));
+					c.FundsCompletion = (c.FundsCompletion / O[0]) * cC.RewardFund;
+					c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
+					c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
+					c.ReputationCompletion = (c.ReputationCompletion / O[3]) * cC.RewardRep;
+					c.ReputationFailure = (c.ReputationFailure / O[4]) * cC.PenaltyRep;
+					c.ScienceCompletion = (c.ScienceCompletion / O[5]) * cC.RewardScience;
+					c.TimeDeadline = (c.TimeDeadline / O[6]) * cC.DurationTime;
 				}
 			}
 		}
 
+		private string printArray(float[] fA)
+		{
+			string[] s = new string[fA.Length];
+			for(int i = 0; i < fA.Length; i++)
+			{
+				s[i] = fA[i].ToString("F2");
+			}
+			return string.Join(",", s);
+		}
+
 		private void updateParameterValues(paramTypeContainer pC, List<ContractParameter> pL, float[] O)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Updating Param Type: {0}", pC.ParamType.Name);
 			foreach (ContractParameter p in pL)
 			{
 				if (pTypeList.ContainsValue(pC))
 				{
 					if (p.GetType() == pC.ParamType)
 					{
-						DMC_MBE.LogFormatted_DebugOnly("Updating Param Values");
+						DMC_MBE.LogFormatted_DebugOnly("Updating Param Values; Type: {0}", pC.Name);
+						DMC_MBE.LogFormatted_DebugOnly("Original Param Values: {0}; New Values: {1}", printArray(O), printArray(pC.ParamValues));
 						p.FundsCompletion = (p.FundsCompletion / O[0] ) * pC.RewardFund;
 						p.FundsFailure = (p.FundsFailure / O[1] ) * pC.PenaltyFund;
 						p.ReputationCompletion = (p.ReputationCompletion / O[2]) * pC.RewardRep;
@@ -610,21 +616,20 @@ namespace ContractsWindow
 
 		private void updateParameterValues(paramTypeContainer pC, Contract c, float[] originals)
 		{
-			if (ContractSystem.Instance.Contracts.Contains(c))
+			List<ContractParameter> modifyList = new List<ContractParameter>();
+			var cParams = c.AllParameters;
+			for (int i = 0; i < cParams.Count(); i++)
 			{
-				List<ContractParameter> modifyList = new List<ContractParameter>();
-				var cParams = c.AllParameters;
-				for (int i = 0; i < cParams.Count(); i++)
+				if (cParams.ElementAt(i).GetType() == pC.ParamType)
 				{
-					if (cParams.ElementAt(i).GetType() == pC.ParamType)
-					{
-						modifyList.Add(cParams.ElementAt(i));
-					}
+					DMC_MBE.LogFormatted_DebugOnly("Found Parameter Of Type: {0}; Updating Values", pC.Name);
+					modifyList.Add(cParams.ElementAt(i));
 				}
-				if (modifyList.Count > 0)
-				{
-					updateParameterValues(pC, modifyList, originals);
-				}
+			}
+			if (modifyList.Count > 0)
+			{
+				DMC_MBE.LogFormatted_DebugOnly("Found {0} Parameters Of Type: {1}", modifyList.Count, pC.Name);
+				updateParameterValues(pC, modifyList, originals);
 			}
 		}
 
@@ -632,27 +637,39 @@ namespace ContractsWindow
 		{
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
-				List<ContractParameter> modifyList = new List<ContractParameter>();
-				var pTypes = ContractSystem.ParameterTypes;
+				DMC_MBE.LogFormatted_DebugOnly("Updating Parameters For Newly Offered Contract");
+				//List<ContractParameter> modifyList = new List<ContractParameter>();
+				//var pTypes = ContractSystem.ParameterTypes;
 				var cParams = c.AllParameters;
-				for (int i = 0; i < cParams.Count(); i++)
+				//for (int i = 0; i < cParams.Count(); i++)
+				//{
+				//	for (int j = 0; j < pTypes.Count; j++)
+				//	{
+				//		if (cParams.ElementAt(i).GetType() == pTypes[j])
+				//		{
+				//			modifyList.Add(cParams.ElementAt(i));
+				//			break;
+				//		}
+				//	}
+				//}
+				//if (modifyList.Count > 0)
+				//{
+				//	for (int k = 0; k < modifyList.Count; k++)
+				//	{
+				//		if (pTypeList.ContainsKey(modifyList[k].GetType().Name))
+				//		{
+				//			updateParameterValues(pTypeList[modifyList[k].GetType().Name], new List<ContractParameter>() { modifyList[k] }, new float[5] { 1, 1, 1, 1, 1 });
+				//		}
+				//	}
+				//}
+
+				if (cParams.Count() > 0)
 				{
-					for (int j = 0; j < pTypes.Count; j++)
+					for (int i = 0; i < cParams.Count(); i++)
 					{
-						if (cParams.ElementAt(i).GetType() == pTypes[j])
+						if (pTypeList.ContainsKey(cParams.ElementAt(i).GetType().Name))
 						{
-							modifyList.Add(cParams.ElementAt(i));
-							break;
-						}
-					}
-				}
-				if (modifyList.Count > 0)
-				{
-					for (int k = 0; k < modifyList.Count; k++)
-					{
-						if (pTypeList.ContainsKey(modifyList[k].GetType().Name))
-						{
-							updateParameterValues(pTypeList[modifyList[k].GetType().Name], new List<ContractParameter>() { modifyList[k] }, new float[5] { 1, 1, 1, 1, 1 });
+							updateParameterValues(pTypeList[cParams.ElementAt(i).GetType().Name], new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
 						}
 					}
 				}
