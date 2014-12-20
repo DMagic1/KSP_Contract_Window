@@ -89,8 +89,8 @@ namespace ContractsWindow
 		internal ContractParameter cParam;
 		internal bool showNote;
 		internal int level;
-		internal double fundsReward, fundsPenalty;
-		internal float repReward, repPenalty, scienceReward;
+		//internal double fundsReward, fundsPenalty;
+		//internal float repReward, repPenalty, scienceReward;
 		internal AvailablePart part;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
@@ -100,11 +100,11 @@ namespace ContractsWindow
 			showNote = false;
 			level = Level;
 			//For some reason parameter rewards/penalties reset to zero upon completion/failure
-			fundsReward = cP.FundsCompletion;
-			fundsPenalty = cP.FundsFailure;
-			repReward = cP.ReputationCompletion;
-			repPenalty = cP.ReputationFailure;
-			scienceReward = cP.ScienceCompletion;
+			//fundsReward = cP.FundsCompletion;
+			//fundsPenalty = cP.FundsFailure;
+			//repReward = cP.ReputationCompletion;
+			//repPenalty = cP.ReputationFailure;
+			//scienceReward = cP.ScienceCompletion;
 
 			if (level < 4)
 			{
