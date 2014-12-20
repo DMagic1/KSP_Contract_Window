@@ -48,6 +48,8 @@ namespace ContractsWindow
 		private paramTypeContainer paramType;
 		private contractTypeContainer contractType;
 		private float cFRew, cFAdv, cFPen, cRRew, cRPen, cSRew, cOffer, cActive, cDur, pFRew, pFPen, pRRew, pRPen, pSRew = 0f;
+		private float[] oldCValues;
+		private float[] oldPValues;
 
 		internal override void Awake()
 		{
@@ -231,7 +233,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardFund = logSlider(ref cFRew, -1, 1, r, 2, 0, contractType.RewardFund);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.RewardFund = logSlider(ref cFRew, -1, 1, r, 2);
+
+				eventCheck(contractType.RewardFund, 0, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -245,7 +251,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.AdvanceFund = logSlider(ref cFAdv, -1, 1, r, 2, 0, contractType.AdvanceFund);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.AdvanceFund = logSlider(ref cFAdv, -1, 1, r, 2);
+
+				eventCheck(contractType.AdvanceFund, 1, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -259,7 +269,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.PenaltyFund = logSlider(ref cFPen, -1, 1, r, 2, 0, contractType.PenaltyFund);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.PenaltyFund = logSlider(ref cFPen, -1, 1, r, 2);
+
+				eventCheck(contractType.PenaltyFund, 2, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -273,7 +287,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardRep = logSlider(ref cRRew, -1, 1, r, 2, 0, contractType.RewardRep);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.RewardRep = logSlider(ref cRRew, -1, 1, r, 2);
+
+				eventCheck(contractType.RewardRep, 3, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -287,7 +305,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.PenaltyRep = logSlider(ref cRPen, -1, 1, r, 2, 0, contractType.PenaltyRep);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.PenaltyRep = logSlider(ref cRPen, -1, 1, r, 2);
+
+				eventCheck(contractType.PenaltyRep, 4, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -301,7 +323,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				contractType.RewardScience = logSlider(ref cSRew, -1, 1, r, 2, 0, contractType.RewardScience);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.RewardScience = logSlider(ref cSRew, -1, 1, r, 2);
+
+				eventCheck(contractType.RewardScience, 5, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -337,7 +363,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardFund = logSlider(ref pFRew, -1, 1, r, 2, 1, paramType.RewardFund);
+				oldPValues = (float[])paramType.ParamValues.Clone();
+
+				paramType.RewardFund = logSlider(ref pFRew, -1, 1, r, 2);
+
+				eventCheck(paramType.RewardFund, 0, oldPValues, 1);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -351,7 +381,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.PenaltyFund = logSlider(ref pFPen, -1, 1, r, 2, 1, paramType.PenaltyFund);
+				oldPValues = (float[])paramType.ParamValues.Clone();
+
+				paramType.PenaltyFund = logSlider(ref pFPen, -1, 1, r, 2);
+
+				eventCheck(paramType.PenaltyFund, 1, oldPValues, 1);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -365,7 +399,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardRep = logSlider(ref pRRew, -1, 1, r, 2, 1, paramType.RewardRep);
+				oldPValues = (float[])paramType.ParamValues.Clone();
+
+				paramType.RewardRep = logSlider(ref pRRew, -1, 1, r, 2);
+
+				eventCheck(paramType.RewardRep, 2, oldPValues, 1);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -379,7 +417,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.PenaltyRep = logSlider(ref pRPen, -1, 1, r, 2, 1, paramType.PenaltyRep);
+				oldPValues = (float[])paramType.ParamValues.Clone();
+
+				paramType.PenaltyRep = logSlider(ref pRPen, -1, 1, r, 2);
+
+				eventCheck(paramType.PenaltyRep, 3, oldPValues, 1);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -393,7 +435,11 @@ namespace ContractsWindow
 				r.x += 150;
 				r.width = 200;
 
-				paramType.RewardScience = logSlider(ref pSRew, -1, 1, r, 2, 1, paramType.RewardScience);
+				oldPValues = (float[])paramType.ParamValues.Clone();
+
+				paramType.RewardScience = logSlider(ref pSRew, -1, 1, r, 2);
+
+				eventCheck(paramType.RewardScience, 4, oldPValues, 1);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -415,7 +461,11 @@ namespace ContractsWindow
 				r.x += 110;
 				r.width = 135;
 
-				contractType.MaxOffer = logSlider(ref cOffer, -1, 1, r, 2, 0, contractType.MaxOffer);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.MaxOffer = logSlider(ref cOffer, -1, 1, r, 2);
+
+				eventCheck(contractType.MaxOffer, 7, oldCValues, 0);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -432,7 +482,11 @@ namespace ContractsWindow
 				r.x += 100;
 				r.width = 135;
 
-				contractType.MaxActive = logSlider(ref cActive, -1, 1, r, 2, 0, contractType.MaxActive);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.MaxActive = logSlider(ref cActive, -1, 1, r, 2);
+
+				eventCheck(contractType.MaxActive, 8, oldCValues, 0);
 
 				drawSliderLabel(r, "0", "   ∞", "10");
 
@@ -444,7 +498,11 @@ namespace ContractsWindow
 				r.x += 110;
 				r.width = 135;
 
-				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2, 0, contractType.DurationTime);
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2);
+
+				eventCheck(contractType.DurationTime, 6, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
@@ -544,7 +602,7 @@ namespace ContractsWindow
 		}
 
 		//Semi log scale slider for percentage adjustments
-		private float logSlider (ref float f, float min, float max, Rect r, int round, int type, float original)
+		private float logSlider (ref float f, float min, float max, Rect r, int round)
 		{
 			float newVal = f;
 			if (!dropDown)
@@ -564,19 +622,22 @@ namespace ContractsWindow
 			else
 				newVal = 10f;
 
-			if (Mathf.RoundToInt(original * 100) != Mathf.RoundToInt(newVal * 100))
+			return newVal;
+		}
+
+		private void eventCheck(float newF, int pos, float[] originals, int type)
+		{
+			if (Mathf.RoundToInt(originals[pos] * 100) != Mathf.RoundToInt(newF * 100))
 			{
 				if (type == 0)
 				{
-					contractScenario.onContractChange.Fire(contractType.ContractValues, contractType);
+					contractScenario.onContractChange.Fire(originals, contractType);
 				}
 				else if (type == 1)
 				{
-					contractScenario.onParamChange.Fire(paramType.ParamValues, paramType);
+					contractScenario.onParamChange.Fire(originals, paramType);
 				}
 			}
-
-			return newVal;
 		}
 
 		private void setContractType(contractTypeContainer c)
@@ -589,8 +650,8 @@ namespace ContractsWindow
 			cRPen = c.PenaltyRep.reverseLog();
 			cSRew = c.RewardScience.reverseLog();
 			cDur = c.DurationTime.reverseLog();
-			cOffer = c.MaxOffer;
-			cActive = c.MaxActive;
+			cOffer = c.MaxOffer.reverseLog();
+			cActive = c.MaxActive.reverseLog();
 		}
 
 		private void setParameterType(paramTypeContainer p)
