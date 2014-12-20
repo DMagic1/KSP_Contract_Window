@@ -17,7 +17,7 @@ namespace ContractsWindow
 		private Contract contractC = null;
 		private float rewardFund, penaltyFund, advanceFund, rewardRep, penaltyRep, rewardScience, durationTime, expirationTime;
 		private float maxOffer, maxActive;
-		private float[] contractValues;
+		private float[] contractValues = new float[9];
 
 		internal contractTypeContainer (Type CType)
 		{
@@ -156,7 +156,15 @@ namespace ContractsWindow
 		{
 			get
 			{
-				contractValues = new float[9] { rewardFund, advanceFund, penaltyFund, rewardRep, penaltyRep, rewardScience, durationTime, maxOffer, maxActive };
+				contractValues[0] = rewardFund;
+				contractValues[1] = advanceFund;
+				contractValues[2] = penaltyFund;
+				contractValues[3] = rewardRep;
+				contractValues[4] = penaltyRep;
+				contractValues[5] = rewardScience;
+				contractValues[6] = durationTime;
+				contractValues[7] = maxOffer;
+				contractValues[8] = maxActive;
 				return contractValues;
 			}
 		}
