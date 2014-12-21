@@ -84,6 +84,8 @@ namespace ContractsWindow
 		internal static GUIStyle configHeader;
 		internal static GUIStyle configClose;
 		internal static GUIStyle configDropMenu;
+		internal static GUIStyle configLabel;
+		internal static GUIStyle configCenterLabel;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -107,6 +109,7 @@ namespace ContractsWindow
 		internal static Texture2D buttonHover;
 		internal static Texture2D headerBar;
 		internal static Texture2D footerBar;
+		internal static Texture2D verticalBar;
 		internal static Texture2D resetIcon;
 		internal static Texture2D partIcon;
 		internal static Texture2D noteIcon;
@@ -146,6 +149,7 @@ namespace ContractsWindow
 			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
 			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
 			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
+			verticalBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/VerticalBar", false);
 			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
 			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
 			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
@@ -362,6 +366,15 @@ namespace ContractsWindow
 			configClose = new GUIStyle(texButton);
 			configClose.name = "ConfigClose";
 			configClose.normal.textColor = XKCDColors.DustyOrange;
+
+			configLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			configLabel.name = "ConfigLabel";
+			configLabel.alignment = TextAnchor.MiddleRight;
+			configLabel.fontSize = 12 + normalFontSize;
+
+			configCenterLabel = new GUIStyle(configLabel);
+			configCenterLabel.name = "ConfigCenterLabel";
+			configCenterLabel.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
