@@ -177,9 +177,10 @@ namespace ContractsWindow
 					GUILayout.EndVertical();
 					GUILayout.Space(8);
 				GUILayout.EndHorizontal();
-				secondaryContractOptions(id);		/* Sliders for contract amounts and duration */
+				//secondaryContractOptions(id);		/* Sliders for contract amounts and duration */
 			GUILayout.EndVertical();
 
+			windowFrame(id);
 			dropDownMenu(id);						/* Draw the drop down menus when open */
 		}
 
@@ -227,10 +228,12 @@ namespace ContractsWindow
 		{
 			GUILayout.Space(12);
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Funds Reward: {0:P0}", contractType.RewardFund));
+				GUILayout.Label("Funds Reward: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.RewardFund.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				Rect r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -242,13 +245,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Funds Advance: {0:P0}", contractType.AdvanceFund));
+				GUILayout.Label("Funds Advance: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.AdvanceFund.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -260,13 +265,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Funds Penalty: {0:P0}", contractType.PenaltyFund));
+				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.PenaltyFund.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -278,13 +285,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Rep Reward: {0:P0}", contractType.RewardRep));
+				GUILayout.Label("Rep Reward: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.RewardRep.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -296,13 +305,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Rep Penalty: {0:P0}", contractType.PenaltyRep));
+				GUILayout.Label("Rep Penalty: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.PenaltyRep.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -314,13 +325,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Science Reward: {0:P0}", contractType.RewardScience));
+				GUILayout.Label("Science Reward: ", contractSkins.configLabel, GUILayout.Width(95));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.RewardScience.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
@@ -330,6 +343,74 @@ namespace ContractsWindow
 				eventCheck(contractType.RewardScience, 5, oldCValues, 0);
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(14);
+
+			GUILayout.BeginHorizontal();
+				GUILayout.Label("Duration: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(contractType.DurationTime.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
+
+				r = GUILayoutUtility.GetLastRect();
+				r.x += 50;
+				r.width = 200;
+
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2);
+
+				eventCheck(contractType.DurationTime, 6, oldCValues, 0);
+
+				drawSliderLabel(r, "0%", "1000%", "100%");
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(14);
+
+			GUILayout.BeginHorizontal();
+				string offers = "";
+				if (contractType.MaxOffer < 10)
+					offers = (contractType.MaxOffer * 10).ToString("N0");
+				else
+					offers = ("∞");
+				GUILayout.Label("Max Offered: ", contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Space(-15);
+				GUILayout.Label(offers, contractSkins.configCenterLabel, GUILayout.Width(30));
+
+				r = GUILayoutUtility.GetLastRect();
+				r.x += 35;
+				r.width = 115;
+
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.MaxOffer = logSlider(ref cOffer, -1, 1, r, 2);
+
+				eventCheck(contractType.MaxOffer, 7, oldCValues, 0);
+
+				drawSliderLabel(r, "0", "   ∞", "10");
+
+				GUILayout.Space(120);
+
+				string actives = "";
+				if (contractType.MaxActive < 10)
+					actives = (contractType.MaxActive * 10).ToString("N0");
+				else
+					actives = "∞";
+				GUILayout.Label("Max Active: ", contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Space(-15);
+				GUILayout.Label(actives, contractSkins.configCenterLabel, GUILayout.Width(30));
+
+				r = GUILayoutUtility.GetLastRect();
+				r.x += 35;
+				r.width = 115;
+
+				oldCValues = (float[])contractType.ContractValues.Clone();
+
+				contractType.MaxActive = logSlider(ref cActive, -1, 1, r, 2);
+
+				eventCheck(contractType.MaxActive, 8, oldCValues, 0);
+
+				drawSliderLabel(r, "0", "   ∞", "10");
 			GUILayout.EndHorizontal();
 		}
 
@@ -357,10 +438,12 @@ namespace ContractsWindow
 		{
 			GUILayout.Space(12);
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Funds Reward: {0:P0}", paramType.RewardFund));
+				GUILayout.Label("Funds Reward: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(paramType.RewardFund.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				Rect r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
@@ -372,13 +455,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Funds Penalty: {0:P0}", paramType.PenaltyFund));
+				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(paramType.PenaltyFund.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
@@ -390,13 +475,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Rep Reward: {0:P0}", paramType.RewardRep));
+				GUILayout.Label("Rep Reward: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(paramType.RewardRep.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
@@ -408,13 +495,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Rep Penalty: {0:P0}", paramType.PenaltyRep));
+				GUILayout.Label("Rep Penalty: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Space(-4);
+				GUILayout.Label(paramType.PenaltyRep.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
@@ -426,13 +515,15 @@ namespace ContractsWindow
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(16);
+			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label(string.Format("Science Reward: {0:P0}", paramType.RewardScience));
+				GUILayout.Label("Science Reward: ", contractSkins.configLabel, GUILayout.Width(95));
+				GUILayout.Space(-4);
+				GUILayout.Label(paramType.RewardScience.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
-				r.x += 150;
+				r.x += 50;
 				r.width = 200;
 
 				oldPValues = (float[])paramType.ParamValues.Clone();
@@ -443,6 +534,8 @@ namespace ContractsWindow
 
 				drawSliderLabel(r, "0%", "1000%", "100%");
 			GUILayout.EndHorizontal();
+
+
 		}
 
 		//Options for contract max amount and duration
@@ -508,6 +601,18 @@ namespace ContractsWindow
 			GUILayout.EndHorizontal();
 		}
 
+		private void windowFrame(int id)
+		{
+			Rect r = new Rect(WindowRect.width - (WindowRect.width / 2) - 4, 260, (WindowRect.width / 2) + 2 , 4);
+			GUI.DrawTexture(r, contractSkins.footerBar);
+
+			r.x -= 2;
+			r.y = WindowRect.height - (WindowRect.height - 64);
+			r.width = 4;
+			r.height = WindowRect.height - 60;
+			GUI.DrawTexture(r, contractSkins.verticalBar);
+		}
+
 		private void dropDownMenu(int id)
 		{
 			if (dropDown)
@@ -564,10 +669,10 @@ namespace ContractsWindow
 			{
 				sr.x += (r.width / 2);
 				drawLabel(sr, "|", true, false);
-				sr.x += ((r.width / 2) - 2);
+				sr.x += ((r.width / 2) - 1);
 			}
 			else
-				sr.x += (r.width - 8);
+				sr.x += (r.width - 7);
 			drawLabel(sr, "|", true, false);
 			sr.width = 40;
 			sr.x -= r.width;
