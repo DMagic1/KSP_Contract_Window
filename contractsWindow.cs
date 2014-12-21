@@ -281,18 +281,6 @@ namespace ContractsWindow
 			//Draw various popup and dropdown windows
 			buildPopup(id);
 
-			////If the sort menu is open
-			//if (showSort)
-			//	buildSortMenu(id);
-
-			////Reset warning menu
-			//if (rebuild)
-			//	resetMenu(id);
-
-			////Agency pop up window
-			//if (agencyPopup)
-			//	buildAgentWindow(id);
-
 			//Resize window when the resizer is grabbed by the mouse
 			buildResizer(id);
 		}
