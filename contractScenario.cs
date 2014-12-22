@@ -66,7 +66,13 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "2.0.2.0";
+		public string version = "3.0.0.0";
+		[KSPField(isPersistant = true)]
+		public bool allowZero = false;
+		[KSPField(isPersistant = true)]
+		public bool warnedZero = false;
+		[KSPField(isPersistant = true)]
+		public bool alterActive = false;
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
