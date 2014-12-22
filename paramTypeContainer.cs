@@ -55,7 +55,11 @@ namespace ContractsWindow
 			set
 			{
 				if (value >= 0 && value <= 10)
+				{
+					if (contractScenario.Instance.allowZero && value == 0.00)
+						value = 0.001f;
 					rewardFund = value;
+				}
 			}
 		}
 
@@ -65,7 +69,11 @@ namespace ContractsWindow
 			set
 			{
 				if (value >= 0 && value <= 10)
+				{
+					if (contractScenario.Instance.allowZero && value == 0.00)
+						value = 0.001f;
 					penaltyFund = value;
+				}
 			}
 		}
 
@@ -75,7 +83,11 @@ namespace ContractsWindow
 			set
 			{
 				if (value >= 0 && value <= 10)
+				{
+					if (contractScenario.Instance.allowZero && value == 0.00)
+						value = 0.001f;
 					rewardRep = value;
+				}
 			}
 		}
 
@@ -85,7 +97,11 @@ namespace ContractsWindow
 			set
 			{
 				if (value >= 0 && value <= 10)
+				{
+					if (contractScenario.Instance.allowZero && value == 0.00)
+						value = 0.001f;
 					penaltyRep = value;
+				}
 			}
 		}
 
@@ -95,7 +111,11 @@ namespace ContractsWindow
 			set
 			{
 				if (value >= 0 && value <= 10)
+				{
+					if (contractScenario.Instance.allowZero && value == 0.00)
+						value = 0.001f;
 					rewardScience = value;
+				}
 			}
 		}
 

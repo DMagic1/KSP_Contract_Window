@@ -71,7 +71,9 @@ namespace ContractsWindow
 
 		public static float reverseLog(this float f)
 		{
-			if (f >= 0 && f < 0.95)
+			if (f == 0.001 && contractScenario.Instance.allowZero)
+				return -1;
+			else if (f >= 0.000 && f < 0.95)
 				return f - 1;
 			else if (f >= 0.95 && f < 1.05)
 				return 0;
