@@ -86,6 +86,8 @@ namespace ContractsWindow
 		internal static GUIStyle configDropMenu;
 		internal static GUIStyle configLabel;
 		internal static GUIStyle configCenterLabel;
+		internal static GUIStyle configButton;
+		internal static GUIStyle configToggle;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -121,6 +123,7 @@ namespace ContractsWindow
 		internal static Texture2D windowSize;
 		internal static Texture2D settingsIcon;
 		internal static Texture2D agencyIcon;
+		internal static Texture2D toolbarIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -162,6 +165,7 @@ namespace ContractsWindow
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
 			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIcon", false);
 
 			initializeSkins();
 		}
@@ -371,6 +375,14 @@ namespace ContractsWindow
 			configLabel.name = "ConfigLabel";
 			configLabel.alignment = TextAnchor.MiddleRight;
 			configLabel.fontSize = 12 + normalFontSize;
+
+			configButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
+			configButton.name = "ConfigButton";
+			configButton.fontSize = 12 + normalFontSize;
+
+			configToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
+			configToggle.name = "ConfigToggle";
+			configToggle.fontSize = 12 + normalFontSize;
 
 			configCenterLabel = new GUIStyle(configLabel);
 			configCenterLabel.name = "ConfigCenterLabel";
