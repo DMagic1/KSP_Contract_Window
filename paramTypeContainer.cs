@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 using Contracts;
@@ -56,8 +54,11 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value <= 10)
 				{
-					if (contractScenario.Instance.allowZero && value == 0.00)
-						value = 0.001f;
+					if (contractScenario.Instance != null)
+					{
+						if (!contractScenario.Instance.allowZero && value == 0.00)
+							value = 0.001f;
+					}
 					rewardFund = value;
 				}
 			}
@@ -70,8 +71,11 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value <= 10)
 				{
-					if (contractScenario.Instance.allowZero && value == 0.00)
-						value = 0.001f;
+					if (contractScenario.Instance != null)
+					{
+						if (!contractScenario.Instance.allowZero && value == 0.00)
+							value = 0.001f;
+					}
 					penaltyFund = value;
 				}
 			}
@@ -84,8 +88,11 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value <= 10)
 				{
-					if (contractScenario.Instance.allowZero && value == 0.00)
-						value = 0.001f;
+					if (contractScenario.Instance != null)
+					{
+						if (!contractScenario.Instance.allowZero && value == 0.00)
+							value = 0.001f;
+					}
 					rewardRep = value;
 				}
 			}
@@ -98,8 +105,11 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value <= 10)
 				{
-					if (contractScenario.Instance.allowZero && value == 0.00)
-						value = 0.001f;
+					if (contractScenario.Instance != null)
+					{
+						if (!contractScenario.Instance.allowZero && value == 0.00)
+							value = 0.001f;
+					}
 					penaltyRep = value;
 				}
 			}
@@ -112,8 +122,11 @@ namespace ContractsWindow
 			{
 				if (value >= 0 && value <= 10)
 				{
-					if (contractScenario.Instance.allowZero && value == 0.00)
-						value = 0.001f;
+					if (contractScenario.Instance != null)
+					{
+						if (!contractScenario.Instance.allowZero && value == 0.00)
+							value = 0.001f;
+					}
 					rewardScience = value;
 				}
 			}
