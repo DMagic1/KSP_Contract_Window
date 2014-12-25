@@ -33,6 +33,7 @@ using System.Diagnostics;
 using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
+using ContractsWindow.Toolbar;
 
 namespace ContractsWindow
 {
@@ -73,6 +74,8 @@ namespace ContractsWindow
 		public bool warnedZero = false;
 		[KSPField(isPersistant = true)]
 		public bool alterActive = false;
+		[KSPField(isPersistant = true)]
+		public bool stockToolbar = true;
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -104,6 +107,9 @@ namespace ContractsWindow
 		//Contract config event
 		internal static EventData<float[], contractTypeContainer> onContractChange;
 		internal static EventData<float[], paramTypeContainer> onParamChange;
+
+		internal contractStockToolbar appLauncherButton = null;
+		internal contractToolbar blizzyToolbarButton = null;
 
 		internal contractsWindow cWin;
 		internal contractConfig cConfig;
@@ -287,6 +293,19 @@ namespace ContractsWindow
 			onContractChange.Add(contractChanged);
 			onParamChange.Add(paramChanged);
 			GameEvents.Contract.onOffered.Add(contractOffered);
+
+			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
+			{
+				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
+				if (blizzyToolbarButton != null)
+					Destroy(blizzyToolbarButton);
+			}
+			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
+			{
+				blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
+				if (appLauncherButton != null)
+					Destroy(appLauncherButton);
+			}
 		}
 
 		//Remove our contract window object
@@ -297,7 +316,12 @@ namespace ContractsWindow
 			onContractChange.Remove(contractChanged);
 			onParamChange.Remove(paramChanged);
 			GameEvents.Contract.onOffered.Remove(contractOffered);
-		}
+
+			if (appLauncherButton != null)
+				Destroy(appLauncherButton);
+			if (blizzyToolbarButton != null)
+				Destroy(blizzyToolbarButton);
+			}
 
 	#endregion
 
