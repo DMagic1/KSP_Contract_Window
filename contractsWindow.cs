@@ -410,6 +410,8 @@ namespace ContractsWindow
 				agencyPopup = !agencyPopup;
 			}
 
+			GUILayout.Space(4 + contractScenario.Instance.windowSize * 2);
+
 			//Show and hide icons
 			if (c.contract.ContractState == Contract.State.Active)
 			{
@@ -594,17 +596,18 @@ namespace ContractsWindow
 				GUILayout.Space(-3);
 			}
 
+			/* FIXME - Disabled For Now; Need to Figure Out Changes Made In 0.90 */
 			//Editor part icon button
-			if (cP.part != null && HighLogic.LoadedSceneIsEditor)
-			{
-				if (GUILayout.Button(new GUIContent(contractSkins.partIcon, "Preview Part"), contractSkins.texButtonSmall, GUILayout.MaxWidth(18 + contractScenario.Instance.windowSize * 4), GUILayout.MaxHeight(18 + contractScenario.Instance.windowSize * 4)))
-				{
-					EditorLogic.fetch.Unlock(lockID);
-					editorLocked = false;
-					EditorPartList.Instance.RevealPart(cP.part, true);
-				}
-				GUILayout.Space(-3);
-			}
+			//if (cP.part != null && HighLogic.LoadedSceneIsEditor)
+			//{
+			//	if (GUILayout.Button(new GUIContent(contractSkins.partIcon, "Preview Part"), contractSkins.texButtonSmall, GUILayout.MaxWidth(18 + contractScenario.Instance.windowSize * 4), GUILayout.MaxHeight(18 + contractScenario.Instance.windowSize * 4)))
+			//	{
+			//		EditorLogic.fetch.Unlock(lockID);
+			//		editorLocked = false;
+			//		EditorPartList.Instance.RevealPart(cP.part, true);
+			//	}
+			//	GUILayout.Space(-3);
+			//}
 
 			//Contract parameter title
 			GUILayout.Box(cP.cParam.Title, paramState(cP), GUILayout.MaxWidth(220 - (level * 5) + contractScenario.Instance.windowSize * 30));
@@ -754,7 +757,7 @@ namespace ContractsWindow
 
 				else if (agencyPopup)
 				{
-					agentPopupRect = new Rect(5, 40, 250, 80);
+					agentPopupRect = new Rect(10, 40, 230 + contractScenario.Instance.windowSize * 20, 80);
 					GUI.Box(agentPopupRect, "", contractSkins.dropDown);
 					Rect r = new Rect(agentPopupRect.x + 5, agentPopupRect.y + 10, 84, 60);
 					GUI.Box(r, "", contractSkins.agentBackground);
@@ -763,9 +766,9 @@ namespace ContractsWindow
 					r.width = 64;
 					r.height = 40;
 					GUI.Label(r, currentAgent.LogoScaled);
-					r.x += 80;
+					r.x += 85;
 					r.y -= 10;
-					r.width = 140;
+					r.width = 120 + contractScenario.Instance.windowSize * 20;
 					r.height = 60;
 					GUI.Label(r, currentAgent.Name, contractSkins.agentName);
 				}
