@@ -40,9 +40,10 @@ namespace ContractsWindow
 	class contractConfig : DMC_MBW
 	{
 		private const string lockID = "ContractConfigLockID";
-		private bool dropDown, cDropDown, pDropDown, rCPopup, rPPopup, wPopup, zPopup;
+		private bool dropDown, cDropDown, pDropDown, rCPopup, rPPopup, wPopup, zPopup, stockPopup;
 		private bool spacecenterLocked, trackingLocked, editorLocked;
 		private bool stockToolbar = true;
+		private bool replaceStockAppLauncher = false;
 		private Rect ddRect;
 		private Vector2 cScroll, pScroll;
 		private List<contractTypeContainer> cList;
@@ -78,6 +79,7 @@ namespace ContractsWindow
 				setParameterType(pList[0]);
 			}
 			stockToolbar = contractScenario.Instance.stockToolbar;
+			replaceStockAppLauncher = contractScenario.Instance.replaceStockToolbar;
 		}
 
 		internal override void OnDestroy()
@@ -197,6 +199,8 @@ namespace ContractsWindow
 			{
 				dropDown = true;
 				zPopup = true;
+				if (!contractScenario.Instance.warnedZero)
+					contractScenario.Instance.allowZero = !contractScenario.Instance.allowZero;
 			}
 
 			if (stockToolbar != contractScenario.Instance.stockToolbar)
@@ -217,6 +221,18 @@ namespace ContractsWindow
 					{
 						Destroy(contractScenario.Instance.appLauncherButton);
 					}
+				}
+			}
+
+			if (replaceStockAppLauncher != contractScenario.Instance.replaceStockToolbar)
+			{
+				replaceStockAppLauncher = contractScenario.Instance.replaceStockToolbar;
+				if (replaceStockAppLauncher)
+				{
+					dropDown = !dropDown;
+					stockPopup = !stockPopup;
+					replaceStockAppLauncher = false;
+					contractScenario.Instance.replaceStockToolbar = false;
 				}
 			}
 
@@ -633,6 +649,9 @@ namespace ContractsWindow
 
 					if (ToolbarManager.ToolbarAvailable)
 						contractScenario.Instance.stockToolbar = GUILayout.Toggle(contractScenario.Instance.stockToolbar, "Use Stock Toolbar", contractSkins.configToggle);
+
+					if (stockToolbar)
+						contractScenario.Instance.replaceStockToolbar = GUILayout.Toggle(contractScenario.Instance.replaceStockToolbar, "Replace Stock Toolbar", contractSkins.configToggle);
 				GUILayout.EndVertical();
 
 				GUILayout.FlexibleSpace();
@@ -719,7 +738,7 @@ namespace ContractsWindow
 
 				else if (zPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 110, 200, 120);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 200, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 180, 40);
 					GUI.Label(r, "Warning:\nAny value set to 0.0% will no longer be adjustable", contractSkins.resetBox);
@@ -732,6 +751,7 @@ namespace ContractsWindow
 						dropDown = false;
 						zPopup = false;
 						contractScenario.Instance.warnedZero = true;
+						contractScenario.Instance.allowZero = true;
 					}
 				}
 
@@ -786,6 +806,25 @@ namespace ContractsWindow
 						dropDown = false;
 						wPopup = false;
 						resetParameToDefault();
+					}
+				}
+
+				else if (stockPopup)
+				{
+					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 120);
+					GUI.Box(ddRect, "", contractSkins.dropDown);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 80, 60);
+					GUI.Label(r, "Warning:\nStock Contracts Toolbar Can Only Be Reloaded After A Scene Change/Reload", contractSkins.resetBox);
+					r.x += 60;
+					r.y += 65;
+					r.width = 40;
+					r.height = 30;
+					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
+					{
+						if (contractScenario.Instance.appLauncherButton != null)
+							contractScenario.Instance.appLauncherButton.replaceStockApp();
+						replaceStockAppLauncher = true;
+						contractScenario.Instance.replaceStockToolbar = true;
 					}
 				}
 
