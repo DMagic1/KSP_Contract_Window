@@ -36,7 +36,6 @@ namespace ContractsWindow.Toolbar
 	class contractToolbar : DMC_MBE
 	{
 		private IButton contractButton;
-		private Game.Modes mode;
 
 		internal override void Start()
 		{
