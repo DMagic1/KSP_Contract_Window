@@ -332,7 +332,7 @@ namespace ContractsWindow
 			agentName = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			agentName.name = "AgentName";
 			agentName.normal.textColor = XKCDColors.White;
-			agentName.fontSize = 13 + normalFontSize;
+			agentName.fontSize = 13 + normalFontSize + windowFontSize;
 			agentName.fontStyle = FontStyle.Bold;
 			agentName.wordWrap = true;
 			agentName.alignment = TextAnchor.MiddleCenter;
