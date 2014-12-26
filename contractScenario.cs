@@ -76,6 +76,8 @@ namespace ContractsWindow
 		public bool alterActive = false;
 		[KSPField(isPersistant = true)]
 		public bool stockToolbar = true;
+		[KSPField(isPersistant = true)]
+		public bool replaceStockToolbar = false;
 
 		//Master contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -299,6 +301,8 @@ namespace ContractsWindow
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
 					Destroy(blizzyToolbarButton);
+				if (replaceStockToolbar)
+					appLauncherButton.replaceStockApp();
 			}
 			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
 			{
