@@ -425,11 +425,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Duration: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.DurationTime <= 0.001)
-					percent = "0.1%";
-				else
-					percent = contractType.DurationTime.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(contractType.DurationTime.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -437,11 +433,11 @@ namespace ContractsWindow
 
 				oldCValues = (float[])contractType.ContractValues.Clone();
 
-				contractType.DurationTime = logSlider(ref cDur, -1, 1, r, 2);
+				contractType.DurationTime = logSlider(ref cDur, -0.9f, 1, r, 2);
 
 				eventCheck(contractType.DurationTime, 6, oldCValues, 0);
 
-				drawSliderLabel(r, "0%", "1000%", "100%");
+				drawSliderLabel(r, "10%", "1000%", "100%");
 			GUILayout.EndHorizontal();
 
 			GUILayout.Space(14);
