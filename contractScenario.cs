@@ -672,31 +672,7 @@ namespace ContractsWindow
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
 				DMC_MBE.LogFormatted_DebugOnly("Updating Parameters For Newly Offered Contract");
-				//List<ContractParameter> modifyList = new List<ContractParameter>();
-				//var pTypes = ContractSystem.ParameterTypes;
 				var cParams = c.AllParameters;
-				//for (int i = 0; i < cParams.Count(); i++)
-				//{
-				//	for (int j = 0; j < pTypes.Count; j++)
-				//	{
-				//		if (cParams.ElementAt(i).GetType() == pTypes[j])
-				//		{
-				//			modifyList.Add(cParams.ElementAt(i));
-				//			break;
-				//		}
-				//	}
-				//}
-				//if (modifyList.Count > 0)
-				//{
-				//	for (int k = 0; k < modifyList.Count; k++)
-				//	{
-				//		if (pTypeList.ContainsKey(modifyList[k].GetType().Name))
-				//		{
-				//			updateParameterValues(pTypeList[modifyList[k].GetType().Name], new List<ContractParameter>() { modifyList[k] }, new float[5] { 1, 1, 1, 1, 1 });
-				//		}
-				//	}
-				//}
-
 				if (cParams.Count() > 0)
 				{
 					for (int i = 0; i < cParams.Count(); i++)
