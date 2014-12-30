@@ -57,7 +57,7 @@ namespace ContractsWindow
 		internal override void Awake()
 		{
 			WindowCaption = "Contract Configuration";
-			WindowRect = new Rect(40, 80, 780, 340);
+			WindowRect = new Rect(40, 80, 780, 360);
 			WindowStyle = contractSkins.newWindowStyle;
 			Visible = false;
 			DragEnabled = true;
@@ -538,7 +538,7 @@ namespace ContractsWindow
 			GUILayout.Space(14);
 
 			GUILayout.BeginHorizontal();
-				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(90));
+				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
 				if (!contractScenario.Instance.allowZero && paramType.PenaltyFund <= 0.001)
 					percent = "0.1%";
@@ -734,13 +734,13 @@ namespace ContractsWindow
 
 				else if (zPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 200, 120);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 180, 40);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 40);
 					GUI.Label(r, "Warning:\nAny value set to 0.0% will no longer be adjustable", contractSkins.resetBox);
 					r.x += 65;
 					r.y += 45;
-					r.width = 80;
+					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
@@ -753,13 +753,13 @@ namespace ContractsWindow
 
 				else if (rCPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 220, WindowRect.height - 180, 200, 120);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 180, 240, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 80, 70);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 60);
 					GUI.Label(r, "Contract Type:\n<b>" + contractType.Name + "</b>\nWill Be Reset To Default Values", contractSkins.resetBox);
 					r.x += 60;
 					r.y += 70;
-					r.width = 40;
+					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
@@ -771,13 +771,13 @@ namespace ContractsWindow
 
 				else if (rPPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 220, WindowRect.height - 160, 200, 120);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 160, 240, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 80, 60);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 70);
 					GUI.Label(r, "Parameter Type:\n<b>" + paramType.Name + "</b>\nWill Be Reset To Default Values", contractSkins.resetBox);
 					r.x += 60;
 					r.y += 65;
-					r.width = 40;
+					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
@@ -789,13 +789,13 @@ namespace ContractsWindow
 
 				else if (wPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 220, WindowRect.height - 120, 200, 100);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 120, 240, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 80, 60);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 60);
 					GUI.Label(r, "Overwrite Default Config File With Current Values?", contractSkins.resetBox);
 					r.x += 60;
 					r.y += 65;
-					r.width = 40;
+					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
@@ -809,11 +809,11 @@ namespace ContractsWindow
 				{
 					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 80, 60);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 260, 60);
 					GUI.Label(r, "Warning:\nStock Contracts Toolbar Can Only Be Reloaded After A Scene Change/Reload", contractSkins.resetBox);
 					r.x += 60;
 					r.y += 65;
-					r.width = 40;
+					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
