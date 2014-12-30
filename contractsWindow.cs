@@ -494,25 +494,25 @@ namespace ContractsWindow
 			if (contractScenario.Instance.windowMode[sceneInt] == 1)
 			{
 				//Reward and penalty amounts
-				if (c.contract.FundsCompletion > 0 || c.contract.FundsFailure > 0)
+				if (c.fundsReward > 0 || c.fundsPenalty > 0)
 				{
 					GUILayout.BeginVertical();
-					if (c.contract.FundsCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+					if (c.fundsReward > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
 					{
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(8 + contractScenario.Instance.windowSize * 2));
 						GUILayout.Space(-4 );
-						GUILayout.Label("+ " + c.contract.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
+						GUILayout.Label("+ " + c.fundsReward.ToString("N0"), contractSkins.reward, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
 						GUILayout.EndHorizontal();
 					}
-					if (c.contract.FundsFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
+					if (c.fundsPenalty > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
 					{
 						if (c.contract.ContractState == Contract.State.Active)
 							GUILayout.Space(-4);
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(8 + contractScenario.Instance.windowSize * 2));
 						GUILayout.Space(-3);
-						GUILayout.Label("- " + c.contract.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
+						GUILayout.Label("- " + c.fundsPenalty.ToString("N0"), contractSkins.penalty, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
 						GUILayout.EndHorizontal();
 					}
 					GUILayout.EndVertical();
@@ -521,25 +521,25 @@ namespace ContractsWindow
 					GUILayout.Space(75 + contractScenario.Instance.windowSize * 18);
 				
 				//Rep rewards and penalty amounts
-				if (c.contract.ReputationCompletion > 0 || c.contract.ReputationFailure > 0)
+				if (c.repReward > 0 || c.repPenalty > 0)
 				{
 					GUILayout.BeginVertical();
-					if (c.contract.ReputationCompletion > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
+					if (c.repReward > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed))
 					{
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(12 + contractScenario.Instance.windowSize * 4), GUILayout.MaxWidth(12 + contractScenario.Instance.windowSize * 4));
 						GUILayout.Space(-5);
-						GUILayout.Label("+ " + c.contract.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
+						GUILayout.Label("+ " + c.repReward.ToString("F0"), contractSkins.reward, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
 						GUILayout.EndHorizontal();
 					}
-					if (c.contract.ReputationFailure > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
+					if (c.repPenalty > 0 && (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Cancelled || c.contract.ContractState == Contract.State.DeadlineExpired || c.contract.ContractState == Contract.State.Failed))
 					{
 						if (c.contract.ContractState == Contract.State.Active)
 							GUILayout.Space(-8);
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(12 + contractScenario.Instance.windowSize * 4), GUILayout.MaxWidth(12 + contractScenario.Instance.windowSize * 4));
 						GUILayout.Space(-4);
-						GUILayout.Label("- " + c.contract.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
+						GUILayout.Label("- " + c.repPenalty.ToString("F0"), contractSkins.penalty, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
 						GUILayout.EndHorizontal();
 					}
 					GUILayout.EndVertical();
@@ -548,12 +548,12 @@ namespace ContractsWindow
 					GUILayout.Space(55 + contractScenario.Instance.windowSize * 14);
 
 				//Science reward
-				if (c.contract.ScienceCompletion > 0)
+				if (c.scienceReward > 0)
 				{
 					if (c.contract.ContractState == Contract.State.Active || c.contract.ContractState == Contract.State.Completed)
 					{
 						GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(11 + contractScenario.Instance.windowSize * 5));
-						GUILayout.Label("+ " + c.contract.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37 + contractScenario.Instance.windowSize * 8));
+						GUILayout.Label("+ " + c.scienceReward.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37 + contractScenario.Instance.windowSize * 8));
 					}
 				}
 				else
@@ -615,25 +615,25 @@ namespace ContractsWindow
 			//Parameter reward info
 			if (contractScenario.Instance.windowMode[sceneInt] == 1 && cP.cParam.State == ParameterState.Incomplete)
 			{
-				if (cP.cParam.FundsCompletion> 0 || cP.cParam.FundsFailure > 0)
+				if (cP.fundsReward > 0 || cP.fundsPenalty > 0)
 				{
 					GUILayout.BeginVertical();
-					if (cP.cParam.FundsCompletion > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
+					if (cP.fundsReward > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
 					{
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.fundsGreen, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(8 + contractScenario.Instance.windowSize * 2));
 						GUILayout.Space(-4);
-						GUILayout.Label("+ " + cP.cParam.FundsCompletion.ToString("N0"), contractSkins.reward, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
+						GUILayout.Label("+ " + cP.fundsReward.ToString("N0"), contractSkins.reward, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
 						GUILayout.EndHorizontal();
 					}
-					if (cP.cParam.FundsFailure > 0 && (cP.cParam.State == ParameterState.Incomplete || cP.cParam.State == ParameterState.Failed))
+					if (cP.fundsPenalty > 0 && (cP.cParam.State == ParameterState.Incomplete || cP.cParam.State == ParameterState.Failed))
 					{
 						if (cP.cParam.State == ParameterState.Incomplete)
 							GUILayout.Space(-4);
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.fundsRed, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(8 + contractScenario.Instance.windowSize * 2));
 						GUILayout.Space(-3);
-						GUILayout.Label("- " + cP.cParam.FundsFailure.ToString("N0"), contractSkins.penalty, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
+						GUILayout.Label("- " + cP.fundsPenalty.ToString("N0"), contractSkins.penalty, GUILayout.Width(65 + contractScenario.Instance.windowSize * 15));
 						GUILayout.EndHorizontal();
 					}
 					GUILayout.EndVertical();
@@ -641,25 +641,25 @@ namespace ContractsWindow
 				else
 					GUILayout.Space(75 + contractScenario.Instance.windowSize * 18);
 
-				if (cP.cParam.ReputationCompletion > 0 || cP.cParam.ReputationFailure > 0)
+				if (cP.repReward > 0 || cP.repPenalty > 0)
 				{
 					GUILayout.BeginVertical();
-					if (cP.cParam.ReputationCompletion > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
+					if (cP.repReward > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
 					{
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.repGreen, GUILayout.MaxHeight(12 + contractScenario.Instance.windowSize * 4), GUILayout.MaxWidth(12 + contractScenario.Instance.windowSize * 4));
 						GUILayout.Space(-5);
-						GUILayout.Label("+ " + cP.cParam.ReputationCompletion.ToString("F0"), contractSkins.reward, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
+						GUILayout.Label("+ " + cP.repReward.ToString("F0"), contractSkins.reward, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
 						GUILayout.EndHorizontal();
 					}
-					if (cP.cParam.ReputationFailure > 0 && (cP.cParam.State == ParameterState.Incomplete || cP.cParam.State == ParameterState.Failed))
+					if (cP.repPenalty > 0 && (cP.cParam.State == ParameterState.Incomplete || cP.cParam.State == ParameterState.Failed))
 					{
 						if (cP.cParam.State == ParameterState.Incomplete)
 							GUILayout.Space(-8);
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(contractSkins.repRed, GUILayout.MaxHeight(12 + contractScenario.Instance.windowSize * 4), GUILayout.MaxWidth(12 + contractScenario.Instance.windowSize * 4));
 						GUILayout.Space(-4);
-						GUILayout.Label("- " + cP.cParam.ReputationFailure.ToString("F0"), contractSkins.penalty, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
+						GUILayout.Label("- " + cP.repPenalty.ToString("F0"), contractSkins.penalty, GUILayout.Width(38 + contractScenario.Instance.windowSize * 8));
 						GUILayout.EndHorizontal();
 					}
 					GUILayout.EndVertical();
@@ -667,10 +667,10 @@ namespace ContractsWindow
 				else
 					GUILayout.Space(55 + contractScenario.Instance.windowSize * 14);
 
-				if (cP.cParam.ScienceCompletion > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
+				if (cP.scienceReward > 0 && (cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Incomplete))
 				{
 					GUILayout.Label(contractSkins.science, GUILayout.MaxHeight(11 + contractScenario.Instance.windowSize * 5), GUILayout.MaxWidth(11 + contractScenario.Instance.windowSize * 5));
-					GUILayout.Label("+ " + cP.cParam.ScienceCompletion.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37 + contractScenario.Instance.windowSize * 8));
+					GUILayout.Label("+ " + cP.scienceReward.ToString("F0"), contractSkins.scienceReward, GUILayout.MaxWidth(37 + contractScenario.Instance.windowSize * 8));
 				}
 				else
 					GUILayout.Space(58 + contractScenario.Instance.windowSize * 14);
