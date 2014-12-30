@@ -179,7 +179,7 @@ namespace ContractsWindow
 						contractSelectionMenu(id);	/* Drop down menu and label for the current contract type */
 						contractOptions(id);		/* Contract reward/penalty sliders */
 					GUILayout.EndVertical();
-					GUILayout.FlexibleSpace();
+					GUILayout.Space(45);
 					GUILayout.BeginVertical();
 						parameterSelectionMenu(id);	/* Drop down menu and label for the current parameter */
 						parameterOptions(id);		/* Parameter reward/penalty sliders */
@@ -734,12 +734,12 @@ namespace ContractsWindow
 
 				else if (zPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 130, 240, 120);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 100, 240, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 40);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
 					GUI.Label(r, "Warning:\nAny value set to 0.0% will no longer be adjustable", contractSkins.resetBox);
-					r.x += 65;
-					r.y += 45;
+					r.x += 85;
+					r.y += 60;
 					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
@@ -753,12 +753,12 @@ namespace ContractsWindow
 
 				else if (rCPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 180, 240, 120);
+					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 60);
+					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 70);
 					GUI.Label(r, "Contract Type:\n<b>" + contractType.Name + "</b>\nWill Be Reset To Default Values", contractSkins.resetBox);
-					r.x += 60;
-					r.y += 70;
+					r.x += 110;
+					r.y += 60;
 					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
@@ -771,12 +771,12 @@ namespace ContractsWindow
 
 				else if (rPPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 160, 240, 120);
+					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 70);
+					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 80);
 					GUI.Label(r, "Parameter Type:\n<b>" + paramType.Name + "</b>\nWill Be Reset To Default Values", contractSkins.resetBox);
-					r.x += 60;
-					r.y += 65;
+					r.x += 110;
+					r.y += 60;
 					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
@@ -789,12 +789,12 @@ namespace ContractsWindow
 
 				else if (wPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 120, 240, 100);
+					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 80, 240, 80);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 60);
+					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 45);
 					GUI.Label(r, "Overwrite Default Config File With Current Values?", contractSkins.resetBox);
-					r.x += 60;
-					r.y += 65;
+					r.x += 85;
+					r.y += 40;
 					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
@@ -807,16 +807,18 @@ namespace ContractsWindow
 
 				else if (stockPopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 130, 280, 120);
+					ddRect = new Rect(WindowRect.width - 320, WindowRect.height - 120, 300, 120);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
-					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 260, 60);
-					GUI.Label(r, "Warning:\nStock Contracts Toolbar Can Only Be Reloaded After A Scene Change/Reload", contractSkins.resetBox);
-					r.x += 60;
-					r.y += 65;
+					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 290, 80);
+					GUI.Label(r, "Warning:\nStock Contracts Toolbar Can Only Be Reloaded After A\nScene Change/Reload", contractSkins.resetBox);
+					r.x += 120;
+					r.y += 80;
 					r.width = 70;
 					r.height = 30;
 					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
 					{
+						dropDown = false;
+						stockPopup = false;
 						if (contractScenario.Instance.appLauncherButton != null)
 							contractScenario.Instance.appLauncherButton.replaceStockApp();
 						replaceStockAppLauncher = true;
