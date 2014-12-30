@@ -584,6 +584,10 @@ namespace ContractsWindow
 					updateParameterValues(p, cList[i], originals);
 				}
 			}
+			for (int j = 0; j < masterList.Count; j++)
+			{
+				masterList.ElementAt(j).Value.updateContractInfo();
+			}
 		}
 
 		private void contractChanged(float[] originals, contractTypeContainer c)
@@ -596,6 +600,10 @@ namespace ContractsWindow
 				{
 					updateContractValues(c, cList[i], originals);
 				}
+			}
+			for (int j = 0; j < masterList.Count; j++)
+			{
+				masterList.ElementAt(j).Value.updateContractInfo();
 			}
 		}
 
