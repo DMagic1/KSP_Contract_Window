@@ -43,16 +43,18 @@ namespace ContractsWindow
 		internal bool showParams, showNote;
 		internal string daysToExpire;
 		internal int? listOrder;
+		internal double fundsReward, fundsPenalty;
+		internal float repReward, repPenalty, scienceReward, repRewardStrat, repPenaltyStrat, scienceRewardStrat, fundsRewardStrat, fundsPenaltyStrat;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
 		//Store info on contracts
-		internal contractContainer(Contract Contract)
+		internal contractContainer(Contract c)
 		{
-			contract = Contract;
+			contract = c;
 			showParams = true;
 			listOrder = null;
 
-			if (contract.DateDeadline <= 0)
+			if (c.DateDeadline <= 0)
 			{
 				duration = double.MaxValue;
 				daysToExpire = "----";
@@ -64,14 +66,17 @@ namespace ContractsWindow
 				daysToExpire = contractScenario.timeInDays(duration);
 			}
 
-			totalReward = contract.FundsCompletion;
-			foreach (ContractParameter param in contract.AllParameters)
+			contractRewards(c);
+			contractPenalties(c);
+
+			totalReward = c.FundsCompletion;
+			foreach (ContractParameter param in c.AllParameters)
 				totalReward += param.FundsCompletion;
 
 			//Generate four layers of parameters, check if each is an altitude parameter
-			for (int i = 0; i < contract.ParameterCount; i++)
+			for (int i = 0; i < c.ParameterCount; i++)
 			{
-				ContractParameter param = contract.GetParameter(i);
+				ContractParameter param = c.GetParameter(i);
 				addContractParam(param, 0);
 			}
 		}
@@ -80,6 +85,57 @@ namespace ContractsWindow
 		{
 			string partTest = contractScenario.paramTypeCheck(param);
 			paramList.Add(new parameterContainer(param, Level, partTest));
+		}
+
+		private void contractRewards(Contract c)
+		{
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)c.FundsCompletion, c.ReputationCompletion, c.ScienceCompletion);
+			fundsReward = c.FundsCompletion;
+			if (currencyQuery.GetEffectDelta(Currency.Funds) != 0f)
+			{
+				fundsRewardStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+				fundsReward += fundsRewardStrat;
+			}
+			repReward = c.ReputationCompletion;
+			if (currencyQuery.GetEffectDelta(Currency.Reputation) != 0f)
+			{
+				repRewardStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+				repReward += repRewardStrat;
+			}
+			scienceReward = c.ScienceCompletion;
+			if (currencyQuery.GetEffectDelta(Currency.Science) != 0f)
+			{
+				scienceRewardStrat = currencyQuery.GetEffectDelta(Currency.Science);
+				scienceReward += scienceRewardStrat;
+			}
+		}
+
+		private void contractPenalties(Contract c)
+		{
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)c.FundsFailure, c.ReputationFailure, 0f);
+			fundsPenalty = c.FundsFailure;
+			if (currencyQuery.GetEffectDelta(Currency.Funds) != 0f)
+			{
+				fundsPenaltyStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+				fundsPenalty += fundsPenaltyStrat;
+			}
+			repPenalty = c.ReputationFailure;
+			if (currencyQuery.GetEffectDelta(Currency.Reputation) != 0f)
+			{
+				repPenaltyStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+				repPenalty += repPenaltyStrat;
+			}
+		}
+
+		internal void updateContractInfo()
+		{
+			contractRewards(contract);
+			contractPenalties(contract);
+			foreach (parameterContainer pC in paramList)
+			{
+				pC.paramRewards(pC.cParam);
+				pC.paramPenalties(pC.cParam);
+			}
 		}
 	}
 
@@ -90,7 +146,7 @@ namespace ContractsWindow
 		internal bool showNote;
 		internal int level;
 		internal double fundsReward, fundsPenalty;
-		internal float repReward, repPenalty, scienceReward;
+		internal float repReward, repPenalty, scienceReward, repRewardStrat, repPenaltyStrat, scienceRewardStrat, fundsRewardStrat, fundsPenaltyStrat;
 		internal AvailablePart part;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
@@ -102,11 +158,6 @@ namespace ContractsWindow
 			//For some reason parameter rewards/penalties reset to zero upon completion/failure
 			paramRewards(cP);
 			paramPenalties(cP);
-			//fundsReward = cP.FundsCompletion;
-			//fundsPenalty = cP.FundsFailure;
-			//repReward = cP.ReputationCompletion;
-			//repPenalty = cP.ReputationFailure;
-			//scienceReward = cP.ScienceCompletion;
 
 			if (level < 4)
 			{
@@ -181,14 +232,44 @@ namespace ContractsWindow
 			}
 		}
 
-		private void paramRewards(ContractParameter cP)
+		internal void paramRewards(ContractParameter cP)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)cP.FundsCompletion, cP.ReputationCompletion, cP.ScienceCompletion);
+			fundsReward = cP.FundsCompletion;
+			if(currencyQuery.GetEffectDelta(Currency.Funds) != 0f)
+			{
+				fundsRewardStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+				fundsReward += fundsRewardStrat;
+			}
+			repReward = cP.ReputationCompletion;
+			if(currencyQuery.GetEffectDelta(Currency.Reputation) != 0f)
+			{
+				repRewardStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+				repReward += repRewardStrat;
+			}
+			scienceReward = cP.ScienceCompletion;
+			if (currencyQuery.GetEffectDelta(Currency.Science) != 0f)
+			{
+				scienceRewardStrat = currencyQuery.GetEffectDelta(Currency.Science);
+				scienceReward += scienceRewardStrat;
+			}
 		}
 
-		private void paramPenalties(ContractParameter cP)
+		internal void paramPenalties(ContractParameter cP)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)cP.FundsFailure, cP.ReputationFailure, 0f);
+			fundsPenalty = cP.FundsFailure;
+			if(currencyQuery.GetEffectDelta(Currency.Funds) != 0f)
+			{
+				fundsPenaltyStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+				fundsPenalty += fundsPenaltyStrat;
+			}
+			repPenalty = cP.ReputationFailure;
+			if (currencyQuery.GetEffectDelta(Currency.Reputation) != 0f)
+			{
+				repPenaltyStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+				repPenalty += repPenaltyStrat;
+			}
 		}
 
 		private void addSubParam(ContractParameter param, int Level)
