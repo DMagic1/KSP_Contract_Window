@@ -101,7 +101,7 @@ namespace ContractsWindow.Toolbar
 				stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
 				stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
 				stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
-				stockContracts.SetTexture(contractSkins.toolbarIcon);
+				stockContracts.SetTexture(contractSkins.toolbarIcon); //Needs to be replaced with sprite
 
 				LogFormatted_DebugOnly("Stock Contracts App Replaced With Contracts Window +");
 
