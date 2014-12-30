@@ -89,8 +89,8 @@ namespace ContractsWindow
 		internal ContractParameter cParam;
 		internal bool showNote;
 		internal int level;
-		//internal double fundsReward, fundsPenalty;
-		//internal float repReward, repPenalty, scienceReward;
+		internal double fundsReward, fundsPenalty;
+		internal float repReward, repPenalty, scienceReward;
 		internal AvailablePart part;
 		internal List<parameterContainer> paramList = new List<parameterContainer>();
 
@@ -100,6 +100,8 @@ namespace ContractsWindow
 			showNote = false;
 			level = Level;
 			//For some reason parameter rewards/penalties reset to zero upon completion/failure
+			paramRewards(cP);
+			paramPenalties(cP);
 			//fundsReward = cP.FundsCompletion;
 			//fundsPenalty = cP.FundsFailure;
 			//repReward = cP.ReputationCompletion;
@@ -177,6 +179,16 @@ namespace ContractsWindow
 				else
 					part = null;
 			}
+		}
+
+		private void paramRewards(ContractParameter cP)
+		{
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)cP.FundsCompletion, cP.ReputationCompletion, cP.ScienceCompletion);
+		}
+
+		private void paramPenalties(ContractParameter cP)
+		{
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)cP.FundsFailure, cP.ReputationFailure, 0f);
 		}
 
 		private void addSubParam(ContractParameter param, int Level)
