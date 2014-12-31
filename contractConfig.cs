@@ -166,6 +166,8 @@ namespace ContractsWindow
 				rPPopup = false;
 				zPopup = false;
 				wPopup = false;
+				stockPopup = false;
+				activePopup = false;
 			}
 		}
 
@@ -840,7 +842,7 @@ namespace ContractsWindow
 
 				else if (activePopup)
 				{
-					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 120, 280, 100);
+					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 100, 280, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 80);
 					GUI.Label(r, "Contract Duration Can Only Be Adjusted For Newly Offered Contracts", contractSkins.resetBox);
