@@ -124,7 +124,6 @@ namespace ContractsWindow
 		internal static Texture2D settingsIcon;
 		internal static Texture2D agencyIcon;
 		internal static Texture2D toolbarIcon;
-		internal static PackedSprite toolbarSprite;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -167,8 +166,6 @@ namespace ContractsWindow
 			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
 			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
 			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIcon", false);
-			//toolbarSprite = new PackedSprite();
-			//toolbarSprite.SetTexture(toolbarIcon);
 		}
 
 		internal static void initializeSkins()
