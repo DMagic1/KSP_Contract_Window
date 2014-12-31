@@ -165,7 +165,7 @@ namespace ContractsWindow
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
 			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
 			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
-			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIcon", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIconApp", false);
 		}
 
 		internal static void initializeSkins()
