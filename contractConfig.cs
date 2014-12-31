@@ -40,10 +40,11 @@ namespace ContractsWindow
 	class contractConfig : DMC_MBW
 	{
 		private const string lockID = "ContractConfigLockID";
-		private bool dropDown, cDropDown, pDropDown, rCPopup, rPPopup, wPopup, zPopup, stockPopup;
+		private bool dropDown, cDropDown, pDropDown, rCPopup, rPPopup, wPopup, zPopup, stockPopup, activePopup;
 		private bool spacecenterLocked, trackingLocked, editorLocked;
 		private bool stockToolbar = true;
 		private bool replaceStockAppLauncher = false;
+		private bool alterActive = false;
 		private Rect ddRect;
 		private Vector2 cScroll, pScroll;
 		private List<contractTypeContainer> cList;
@@ -79,6 +80,7 @@ namespace ContractsWindow
 				setParameterType(pList[0]);
 			}
 			stockToolbar = contractScenario.Instance.stockToolbar;
+			alterActive = contractScenario.Instance.alterActive;
 			replaceStockAppLauncher = contractScenario.Instance.replaceStockToolbar;
 		}
 
@@ -224,6 +226,16 @@ namespace ContractsWindow
 				}
 			}
 
+			if (alterActive != contractScenario.Instance.alterActive)
+			{
+				alterActive = contractScenario.Instance.alterActive;
+				if (alterActive)
+				{
+					dropDown = true;
+					activePopup = true;
+				}
+			}
+
 			if (replaceStockAppLauncher != contractScenario.Instance.replaceStockToolbar)
 			{
 				replaceStockAppLauncher = contractScenario.Instance.replaceStockToolbar;
@@ -281,7 +293,7 @@ namespace ContractsWindow
 				GUILayout.Label("Funds Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
 				string percent = "";
-				if (!contractScenario.Instance.allowZero && contractType.RewardFund <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.RewardFund <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.RewardFund.ToString("P0");
@@ -305,7 +317,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Funds Advance: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.AdvanceFund <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.AdvanceFund <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.AdvanceFund.ToString("P0");
@@ -329,7 +341,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.PenaltyFund <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.PenaltyFund <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.PenaltyFund.ToString("P0");
@@ -353,7 +365,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Rep Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.RewardRep <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.RewardRep <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.RewardRep.ToString("P0");
@@ -377,7 +389,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Rep Penalty: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.PenaltyRep <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.PenaltyRep <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.PenaltyRep.ToString("P0");
@@ -401,7 +413,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Science Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && contractType.RewardScience <= 0.001)
+				if (!contractScenario.Instance.allowZero && contractType.RewardScience <= 0.009)
 					percent = "0.1%";
 				else
 					percent = contractType.RewardScience.ToString("P0");
@@ -516,7 +528,7 @@ namespace ContractsWindow
 				GUILayout.Label("Funds Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
 				string percent = "";
-				if (!contractScenario.Instance.allowZero && paramType.RewardFund <= 0.001)
+				if (!contractScenario.Instance.allowZero && paramType.RewardFund <= 0.009)
 					percent = "0.1%";
 				else
 					percent = paramType.RewardFund.ToString("P0");
@@ -540,7 +552,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Funds Penalty: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && paramType.PenaltyFund <= 0.001)
+				if (!contractScenario.Instance.allowZero && paramType.PenaltyFund <= 0.009)
 					percent = "0.1%";
 				else
 					percent = paramType.PenaltyFund.ToString("P0");
@@ -564,7 +576,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Rep Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && paramType.RewardRep <= 0.001)
+				if (!contractScenario.Instance.allowZero && paramType.RewardRep <= 0.009)
 					percent = "0.1%";
 				else
 					percent = paramType.RewardRep.ToString("P0");
@@ -588,7 +600,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Rep Penalty: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && paramType.PenaltyRep <= 0.001)
+				if (!contractScenario.Instance.allowZero && paramType.PenaltyRep <= 0.009)
 					percent = "0.1%";
 				else
 					percent = paramType.PenaltyRep.ToString("P0");
@@ -612,7 +624,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Science Reward: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				if (!contractScenario.Instance.allowZero && paramType.RewardScience <= 0.001)
+				if (!contractScenario.Instance.allowZero && paramType.RewardScience <= 0.009)
 					percent = "0.1%";
 				else
 					percent = paramType.RewardScience.ToString("P0");
@@ -823,6 +835,23 @@ namespace ContractsWindow
 							contractScenario.Instance.appLauncherButton.replaceStockApp();
 						replaceStockAppLauncher = true;
 						contractScenario.Instance.replaceStockToolbar = true;
+					}
+				}
+
+				else if (activePopup)
+				{
+					ddRect = new Rect(WindowRect.width - 300, WindowRect.height - 120, 280, 100);
+					GUI.Box(ddRect, "", contractSkins.dropDown);
+					Rect r = new Rect(ddRect.x + 5, ddRect.y + 5, 270, 80);
+					GUI.Label(r, "Contract Duration Can Only Be Adjusted For Newly Offered Contracts", contractSkins.resetBox);
+					r.x += 120;
+					r.y += 60;
+					r.width = 50;
+					r.height = 30;
+					if (GUI.Button(r, "OK", contractSkins.resetButton))
+					{
+						dropDown = false;
+						activePopup = false;
 					}
 				}
 
