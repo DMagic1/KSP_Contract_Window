@@ -300,9 +300,7 @@ namespace ContractsWindow
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
-					Destroy(blizzyToolbarButton);
-				if (replaceStockToolbar)
-					appLauncherButton.replaceStockApp();
+						Destroy(blizzyToolbarButton);
 			}
 			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
 			{
@@ -892,7 +890,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 60);
+				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 100);
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
@@ -903,7 +901,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowRects[i].width += (windowSize * 30);
 			else
-				windowRects[i].width += (windowSize * 60);
+				windowRects[i].width += (windowSize * 100);
 		}
 
 		#endregion
