@@ -45,7 +45,10 @@ namespace ContractsWindow.Toolbar
 		private void setupToolbar()
 		{
 			LogFormatted_DebugOnly("Starting App Launcher Manager");
-			StartCoroutine(addButton());
+			if (!contractScenario.Instance.replaceStockToolbar)
+				StartCoroutine(addButton());
+			else
+				StartCoroutine(replaceStockContractApp());
 		}
 
 		internal override void OnDestroy()
@@ -84,38 +87,39 @@ namespace ContractsWindow.Toolbar
 
 		IEnumerator replaceStockContractApp()
 		{
-			while (ContractsApp.Instance.appLauncherButton == null)
+			while (ContractsApp.Instance.appLauncherButton == null && !ApplicationLauncher.Ready)
 				yield return null;
 
-			if (stockToolbarButton != null)
+			if (stockToolbarButton == null)
 			{
-				LogFormatted_DebugOnly("Replacing Stock Contracts App With Contracts +");
-
-				ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
-
-				stockContracts.toggleButton.onDisable();
-
-				stockContracts.toggleButton.onTrue = stockToolbarButton.toggleButton.onTrue;
-				stockContracts.toggleButton.onFalse = stockToolbarButton.toggleButton.onFalse;
-				stockContracts.toggleButton.onHover = stockToolbarButton.toggleButton.onHover;
-				stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
-				stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
-				stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
-
-				LogFormatted_DebugOnly("Stock Contracts App Replaced With Contracts Window +");
-
-				try
-				{
-					ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-					LogFormatted_DebugOnly("Contracts Window + Toolbar Removed");
-				}
-				catch (Exception e)
-				{
-					LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
-				}
+				LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
+				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggleOn, toggleOff, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 			}
-			else
-				LogFormatted("Contracts Window + App Launcher Button Not Initialized; Retaining Stock Contracts App");
+
+			LogFormatted_DebugOnly("Replacing Stock Contracts App With Contracts +");
+
+			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
+
+			stockContracts.toggleButton.onDisable();
+
+			stockContracts.toggleButton.onTrue = stockToolbarButton.toggleButton.onTrue;
+			stockContracts.toggleButton.onFalse = stockToolbarButton.toggleButton.onFalse;
+			stockContracts.toggleButton.onHover = stockToolbarButton.toggleButton.onHover;
+			stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
+			stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
+			stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
+
+			LogFormatted_DebugOnly("Stock Contracts App Replaced With Contracts Window +");
+
+			try
+			{
+				ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
+				LogFormatted_DebugOnly("Contracts Window + Toolbar Removed");
+			}
+			catch (Exception e)
+			{
+				LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+			}
 		}
 
 		private void toggleOn()
