@@ -120,7 +120,7 @@ namespace ContractsWindow
 			fundsPenalty = c.FundsFailure;
 			fundsPen = "- " + fundsPenalty.ToString("N0");
 			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
-			if (fundsRewStrat != 0f)
+			if (fundsPenStrat != 0f)
 			{
 				fundsPen = string.Format("- {0:N0} ({1:N0})", fundsPenalty + fundsPenStrat, fundsPenStrat);
 			}
