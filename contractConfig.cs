@@ -299,7 +299,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.RewardFund.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				Rect r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -323,7 +323,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.AdvanceFund.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -347,7 +347,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.PenaltyFund.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -371,7 +371,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.RewardRep.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -395,7 +395,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.PenaltyRep.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -419,7 +419,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = contractType.RewardScience.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -439,7 +439,7 @@ namespace ContractsWindow
 			GUILayout.BeginHorizontal();
 				GUILayout.Label("Duration: ", contractSkins.configLabel, GUILayout.Width(100));
 				GUILayout.Space(-4);
-				GUILayout.Label(contractType.DurationTime.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(contractType.DurationTime.ToString("P0"), contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -462,7 +462,7 @@ namespace ContractsWindow
 					offers = (contractType.MaxOffer * 10).ToString("N0");
 				else
 					offers = ("∞");
-				GUILayout.Label("Max Offered: ", contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label("Max Offered: ", contractSkins.configCenterLabel, GUILayout.Width(48));
 				GUILayout.Space(-15);
 				GUILayout.Label(offers, contractSkins.configCenterLabel, GUILayout.Width(30));
 
@@ -485,7 +485,7 @@ namespace ContractsWindow
 					actives = (contractType.MaxActive * 10).ToString("N0");
 				else
 					actives = "∞";
-				GUILayout.Label("Max Active: ", contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label("Max Active: ", contractSkins.configCenterLabel, GUILayout.Width(47));
 				GUILayout.Space(-15);
 				GUILayout.Label(actives, contractSkins.configCenterLabel, GUILayout.Width(30));
 
@@ -534,7 +534,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = paramType.RewardFund.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				Rect r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -558,7 +558,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = paramType.PenaltyFund.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -582,7 +582,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = paramType.RewardRep.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -606,7 +606,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = paramType.PenaltyRep.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -630,7 +630,7 @@ namespace ContractsWindow
 					percent = "0.1%";
 				else
 					percent = paramType.RewardScience.ToString("P0");
-				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(45));
+				GUILayout.Label(percent, contractSkins.configCenterLabel, GUILayout.Width(48));
 
 				r = GUILayoutUtility.GetLastRect();
 				r.x += 50;
@@ -692,7 +692,7 @@ namespace ContractsWindow
 		//Draw some line textures to break up the window into sections
 		private void windowFrame(int id)
 		{
-			Rect r = new Rect(WindowRect.width - (WindowRect.width / 2) - 4, 260, (WindowRect.width / 2) + 2 , 4);
+			Rect r = new Rect(WindowRect.width - (WindowRect.width / 2) - 4, 265, (WindowRect.width / 2) + 2 , 4);
 			GUI.DrawTexture(r, contractSkins.footerBar);
 
 			r.x -= 2;
