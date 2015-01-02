@@ -84,9 +84,11 @@ namespace ContractsWindow
 				{
 					if (contractScenario.Instance != null)
 					{
-						if (!contractScenario.Instance.allowZero && value == 0.00)
+						if (!contractScenario.Instance.allowZero && value == 0.00f)
 							value = 0.001f;
 					}
+					if (value == 0.00f)
+						value = 0.0000000001f;
 					rewardFund = value;
 				}
 			}
@@ -101,9 +103,11 @@ namespace ContractsWindow
 				{
 					if (contractScenario.Instance != null)
 					{
-						if (!contractScenario.Instance.allowZero && value == 0.00)
+						if (!contractScenario.Instance.allowZero && value == 0.00f)
 							value = 0.001f;
 					}
+					if (value == 0.00f)
+						value = 0.0000000001f;
 					penaltyFund = value;
 				}
 			}
@@ -118,9 +122,11 @@ namespace ContractsWindow
 				{
 					if (contractScenario.Instance != null)
 					{
-						if (!contractScenario.Instance.allowZero && value == 0.00)
+						if (!contractScenario.Instance.allowZero && value == 0.00f)
 							value = 0.001f;
 					}
+					if (value == 0.00f)
+						value = 0.0000000001f;
 					rewardRep = value;
 				}
 			}
@@ -135,9 +141,11 @@ namespace ContractsWindow
 				{
 					if (contractScenario.Instance != null)
 					{
-						if (!contractScenario.Instance.allowZero && value == 0.00)
+						if (!contractScenario.Instance.allowZero && value == 0.00f)
 							value = 0.001f;
 					}
+					if (value == 0.00f)
+						value = 0.0000000001f;
 					penaltyRep = value;
 				}
 			}
@@ -152,9 +160,11 @@ namespace ContractsWindow
 				{
 					if (contractScenario.Instance != null)
 					{
-						if (!contractScenario.Instance.allowZero && value == 0.00)
+						if (!contractScenario.Instance.allowZero && value == 0.00f)
 							value = 0.001f;
 					}
+					if (value == 0.00f)
+						value = 0.0000000001f;
 					rewardScience = value;
 				}
 			}
