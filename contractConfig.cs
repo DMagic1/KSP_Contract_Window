@@ -183,7 +183,7 @@ namespace ContractsWindow
 						contractSelectionMenu(id);	/* Drop down menu and label for the current contract type */
 						contractOptions(id);		/* Contract reward/penalty sliders */
 					GUILayout.EndVertical();
-					GUILayout.Space(45);
+					GUILayout.Space(50);
 					GUILayout.BeginVertical();
 						parameterSelectionMenu(id);	/* Drop down menu and label for the current parameter */
 						parameterOptions(id);		/* Parameter reward/penalty sliders */
@@ -664,7 +664,7 @@ namespace ContractsWindow
 						contractScenario.Instance.replaceStockToolbar = GUILayout.Toggle(contractScenario.Instance.replaceStockToolbar, "Replace Stock Toolbar", contractSkins.configToggle);
 				GUILayout.EndVertical();
 
-				GUILayout.FlexibleSpace();
+				GUILayout.Space(20);
 
 				GUILayout.BeginVertical();
 					if (GUILayout.Button("Reset Contract Values", contractSkins.configButton))
@@ -685,7 +685,7 @@ namespace ContractsWindow
 					//	wPopup = !wPopup;
 					//}
 				GUILayout.EndVertical();
-				GUILayout.Space(50);
+				GUILayout.Space(20);
 			GUILayout.EndHorizontal();
 		}
 
