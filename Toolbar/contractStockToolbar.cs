@@ -55,7 +55,9 @@ namespace ContractsWindow.Toolbar
 		{
 			LogFormatted_DebugOnly("Destroying App Launcher Manager");
 			GameEvents.onGUIApplicationLauncherUnreadifying.Remove(removeButton);
-			removeButton(HighLogic.LoadedScene);
+
+			if (stockToolbarButton != null)
+				removeButton(HighLogic.LoadedScene);
 		}
 
 		IEnumerator addButton()
@@ -77,6 +79,7 @@ namespace ContractsWindow.Toolbar
 		{
 			LogFormatted_DebugOnly("Removing App Launcher Button");
 			ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
+			stockToolbarButton = null;
 			LogFormatted_DebugOnly("App Launcher Button Removed");
 		}
 
@@ -114,6 +117,7 @@ namespace ContractsWindow.Toolbar
 			try
 			{
 				ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
+				stockToolbarButton = null;
 				LogFormatted_DebugOnly("Contracts Window + Toolbar Removed");
 			}
 			catch (Exception e)
