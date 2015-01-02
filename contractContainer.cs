@@ -96,21 +96,21 @@ namespace ContractsWindow
 			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if (fundsRewStrat != 0f)
 			{
-				fundsRew = string.Format("+ {0:N0} ({1:N0})", fundsReward, fundsRewStrat);
+				fundsRew = string.Format("+ {0:N0} ({1:N0})", fundsReward + fundsRewStrat, fundsRewStrat);
 			}
 			repReward = c.ReputationCompletion;
 			repRew = "+ " + repReward.ToString("N0");
 			repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repRewStrat != 0f)
 			{
-				repRew = string.Format("+ {0:N0} ({1:N0})", repReward, repRewStrat);
+				repRew = string.Format("+ {0:N0} ({1:N0})", repReward + repRewStrat, repRewStrat);
 			}
 			scienceReward = c.ScienceCompletion;
 			sciRew = "+ " + scienceReward.ToString("N0");
 			sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
 			if (sciRewStrat != 0f)
 			{
-				sciRew = string.Format("+ {0:N0} ({1:N0})", scienceReward, sciRewStrat);
+				sciRew = string.Format("+ {0:N0} ({1:N0})", scienceReward + sciRewStrat, sciRewStrat);
 			}
 		}
 
@@ -122,14 +122,14 @@ namespace ContractsWindow
 			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if (fundsPenStrat != 0f)
 			{
-				fundsPen = string.Format("- {0:N0} ({1:N0})", fundsPenalty, fundsPenStrat);
+				fundsPen = string.Format("- {0:N0} ({1:N0})", fundsPenalty + fundsPenStrat, fundsPenStrat);
 			}
 			repPenalty = c.ReputationFailure;
 			repPen = "- " + repPenalty.ToString("N0");
 			repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repPenStrat != 0f)
 			{
-				repPen = string.Format("- {0:N0} ({1:N0})", repPenalty, repPenStrat);
+				repPen = string.Format("- {0:N0} ({1:N0})", repPenalty + repPenStrat, repPenStrat);
 			}
 		}
 
@@ -247,21 +247,21 @@ namespace ContractsWindow
 			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if(fundsRewStrat != 0f)
 			{
-				fundsRew = string.Format("+ {0:N0} ({1:N0})", fundsReward, fundsRewStrat);
+				fundsRew = string.Format("+ {0:N0} ({1:N0})", fundsReward + fundsRewStrat, fundsRewStrat);
 			}
 			repReward = cP.ReputationCompletion;
 			repRew = "+ " + repReward.ToString("N0");
 			repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if(repRewStrat != 0f)
 			{
-				repRew = string.Format("+ {0:N0} ({1:N0})", repReward, repRewStrat);
+				repRew = string.Format("+ {0:N0} ({1:N0})", repReward + repRewStrat, repRewStrat);
 			}
 			scienceReward = cP.ScienceCompletion;
 			sciRew = "+ " + scienceReward.ToString("N0");
 			sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
 			if (sciRewStrat != 0f)
 			{
-				sciRew = string.Format("+ {0:N0} ({1:N0})", scienceReward, sciRewStrat);
+				sciRew = string.Format("+ {0:N0} ({1:N0})", scienceReward + sciRewStrat, sciRewStrat);
 			}
 		}
 
@@ -273,14 +273,14 @@ namespace ContractsWindow
 			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if(fundsPenStrat != 0f)
 			{
-				fundsPen = string.Format("- {0:N0} ({1:N0})", fundsPenalty, fundsPenStrat);
+				fundsPen = string.Format("- {0:N0} ({1:N0})", fundsPenalty + fundsPenStrat, fundsPenStrat);
 			}
 			repPenalty = cP.ReputationFailure;
 			repPen = "- " + repPenalty.ToString("N0");
 			repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repPenStrat != 0f)
 			{
-				repPen = string.Format("- {0:N0} ({1:N0})", repPenalty, repPenStrat);
+				repPen = string.Format("- {0:N0} ({1:N0})", repPenalty + repPenStrat, repPenStrat);
 			}
 		}
 
