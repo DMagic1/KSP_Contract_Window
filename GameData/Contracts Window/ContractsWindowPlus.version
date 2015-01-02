@@ -1,0 +1,31 @@
+{
+     "NAME":"Contracts Window Plus",
+	 "URL":"https://github.com/DMagic1/KSP_Contract_Window/blob/master/GameData/Contracts%20Window/ContractsWindowPlus.version",
+     "DOWNLOAD":"https://kerbalstuff.com/mod/99/Contract%20Window%20+/download/3.0",
+     "GITHUB":{
+         "USERNAME":"DMagic1",
+         "REPOSITORY":"KSP_Contract_Window",
+         "ALLOW_PRE_RELEASE":false,
+     },
+     "VERSION":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":3,
+         "BUILD":0
+     },
+     "KSP_VERSION":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     },
+     "KSP_VERSION_MIN":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     },
+     "KSP_VERSION_MAX":{
+         "MAJOR":0,
+         "MINOR":90,
+         "PATCH":0
+     }
+ } 

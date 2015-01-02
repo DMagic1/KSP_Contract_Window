@@ -11,4 +11,4 @@ Kerbal Space Programe/GameData/
 Contracts Window will not function properly if not placed in the correct location.
 
 
-*Blizzy78's Toolbar is required
+*Blizzy78's Toolbar is supported

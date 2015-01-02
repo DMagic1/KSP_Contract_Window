@@ -76,6 +76,19 @@ namespace ContractsWindow
 		internal static GUIStyle resetBox;
 		internal static GUIStyle resetButton;
 
+		internal static GUIStyle agentName;
+		internal static GUIStyle agentBackground;
+
+		internal static GUIStyle smallLabel;
+		internal static GUIStyle configDropDown;
+		internal static GUIStyle configHeader;
+		internal static GUIStyle configClose;
+		internal static GUIStyle configDropMenu;
+		internal static GUIStyle configLabel;
+		internal static GUIStyle configCenterLabel;
+		internal static GUIStyle configButton;
+		internal static GUIStyle configToggle;
+
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
 		internal static Texture2D repGreen;
@@ -98,6 +111,7 @@ namespace ContractsWindow
 		internal static Texture2D buttonHover;
 		internal static Texture2D headerBar;
 		internal static Texture2D footerBar;
+		internal static Texture2D verticalBar;
 		internal static Texture2D resetIcon;
 		internal static Texture2D partIcon;
 		internal static Texture2D noteIcon;
@@ -107,6 +121,9 @@ namespace ContractsWindow
 		internal static Texture2D pinDownIcon;
 		internal static Texture2D fontSize;
 		internal static Texture2D windowSize;
+		internal static Texture2D settingsIcon;
+		internal static Texture2D agencyIcon;
+		internal static Texture2D toolbarIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -135,6 +152,7 @@ namespace ContractsWindow
 			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
 			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
 			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
+			verticalBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/VerticalBar", false);
 			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
 			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
 			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
@@ -145,6 +163,9 @@ namespace ContractsWindow
 			closeIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CloseIcon", false);
 			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
 			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
+			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
+			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIconApp", false);
 
 			initializeSkins();
 		}
@@ -307,6 +328,65 @@ namespace ContractsWindow
 			resetButton.name = "ResetButton";
 			resetButton.fontSize = 15;
 			resetButton.alignment = TextAnchor.MiddleCenter;
+
+			agentName = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			agentName.name = "AgentName";
+			agentName.normal.textColor = XKCDColors.White;
+			agentName.fontSize = 13 + normalFontSize + windowFontSize;
+			agentName.fontStyle = FontStyle.Bold;
+			agentName.wordWrap = true;
+			agentName.alignment = TextAnchor.MiddleCenter;
+
+			agentBackground = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.box);
+			agentBackground.name = "AgentBackground";
+			Texture2D agentBackDrop = new Texture2D(1, 1);
+			agentBackDrop.SetPixel(1, 1, XKCDColors.White);
+			agentBackDrop.Apply();
+			agentBackground.normal.background = agentBackDrop;
+
+			//Config styles
+			smallLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			smallLabel.name = "SmallLabel";
+			smallLabel.fontSize = 10;
+			smallLabel.normal.textColor = Color.white;
+
+			configDropMenu = new GUIStyle(sortMenu);
+			configDropMenu.name = "ConfigDropMenu";
+			configDropMenu.fontSize = 12 + normalFontSize;
+			configDropMenu.wordWrap = false;
+
+			configDropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
+			configDropDown.name = "ConfigDropDown";
+			configDropDown.fontSize = 16 + normalFontSize;
+			configDropDown.normal.textColor = XKCDColors.DustyOrange;
+			configDropDown.alignment = TextAnchor.MiddleCenter;
+
+			configHeader = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			configHeader.name = "ConfigHeader";
+			configHeader.fontSize = 16 + normalFontSize;
+			configHeader.normal.textColor = XKCDColors.DustyOrange;
+			configHeader.alignment = TextAnchor.MiddleLeft;
+
+			configClose = new GUIStyle(texButton);
+			configClose.name = "ConfigClose";
+			configClose.normal.textColor = XKCDColors.DustyOrange;
+
+			configLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			configLabel.name = "ConfigLabel";
+			configLabel.alignment = TextAnchor.MiddleRight;
+			configLabel.fontSize = 12 + normalFontSize;
+
+			configButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
+			configButton.name = "ConfigButton";
+			configButton.fontSize = 12 + normalFontSize;
+
+			configToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
+			configToggle.name = "ConfigToggle";
+			configToggle.fontSize = 12 + normalFontSize;
+
+			configCenterLabel = new GUIStyle(configLabel);
+			configCenterLabel.name = "ConfigCenterLabel";
+			configCenterLabel.alignment = TextAnchor.MiddleCenter;
 
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);

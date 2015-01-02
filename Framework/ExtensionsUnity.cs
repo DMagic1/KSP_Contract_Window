@@ -51,5 +51,36 @@ namespace ContractsWindow
             gReturn.padding.bottom = PaddingValue;
             return gReturn;
         }
+		public static float Mathf_Round(this float f, int precision)
+		{
+			if (precision < -4 || precision > 4)
+				throw new ArgumentOutOfRangeException("[Contracts +] Precision Must Be Between -4 And 4 For Rounding Operation");
+
+			if (precision >= 0)
+				return (float)Math.Round(f, precision);
+			else
+			{
+				precision = (int)Math.Pow(10, Math.Abs(precision));
+				if (f >= 0)
+					f += (5 * precision / 10);
+				else
+					f -= (5 * precision / 10);
+				return (float)Math.Round(f - (f % precision), 0);
+			}
+		}
+
+		public static float reverseLog(this float f)
+		{
+			if (f <= 0.009 && !contractScenario.Instance.allowZero)
+				return -1;
+			else if (f >= 0.000 && f < 0.95)
+				return f - 1;
+			else if (f >= 0.95 && f < 1.05)
+				return 0;
+			else if (f > 1.05 && f < 10)
+				return (float)Math.Log10(f);
+			else
+				return 10;
+		}
     }
 }

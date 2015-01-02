@@ -31,7 +31,6 @@ namespace ContractsWindow
 				SpaceCentre = 5,
 				Credits = 4,
 				EditorVAB = 6,
-				EditorSPH = 9,
 				Flight = 7,
 				TrackingStation,
 				PSystemSpawn = 10
@@ -43,13 +42,11 @@ namespace ContractsWindow
 			SpaceCenter = 1 << 2,
 			Credits = 1 << 3,
 			EditorVAB = 1 << 4,
-			EditorSPH = 1 << 5,
-			Flight = 1 << 6,
-			TrackingStation = 1 << 7,
-			PSystemSpawn = 1 << 8,
-			Instantly = 1 << 9,
+			Flight = 1 << 5,
+			TrackingStation = 1 << 6,
+			PSystemSpawn = 1 << 7,
+			Instantly = 1 << 8,
 
-			EditorAny = EditorVAB | EditorSPH,
 			TimeElapses = Flight | TrackingStation | SpaceCenter,
 			RealTime = TimeElapses,
 			EveryScene = ~0
@@ -155,10 +152,6 @@ namespace ContractsWindow
 			{
 				case GameScenes.EDITOR:
 					mask = DMC_KSPAddonImproved.Startup.EditorVAB;
-					break;
-
-				case GameScenes.SPH:
-					mask = DMC_KSPAddonImproved.Startup.EditorSPH;
 					break;
 
 				case GameScenes.CREDITS:

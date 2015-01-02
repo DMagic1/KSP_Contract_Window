@@ -42,11 +42,12 @@ namespace ContractsWindow
 
 		private void Start()
 		{
-			DMLoaded = DMScienceAvailable();
-			DMALoaded = DMAnomalyAvailable();
-			DMAstLoaded = DMAsteroidAvailable();
-			MCELoaded = MCEAvailable();
-			FPLoaded = FPAssemblyLoaded();
+			//DMLoaded = DMScienceAvailable();
+			//DMALoaded = DMAnomalyAvailable();
+			//DMAstLoaded = DMAsteroidAvailable();
+			//MCELoaded = MCEAvailable();
+			//FPLoaded = FPAssemblyLoaded();
+			DMLoaded = DMALoaded = DMAstLoaded = MCELoaded = FPLoaded = false;
 			Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		}
 
