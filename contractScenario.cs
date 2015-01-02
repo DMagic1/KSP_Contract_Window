@@ -890,7 +890,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 100);
+				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 180);
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
@@ -901,7 +901,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowRects[i].width += (windowSize * 30);
 			else
-				windowRects[i].width += (windowSize * 100);
+				windowRects[i].width += (windowSize * 180);
 		}
 
 		#endregion
