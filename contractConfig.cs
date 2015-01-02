@@ -679,13 +679,13 @@ namespace ContractsWindow
 						rPPopup = !rPPopup;
 					}
 
-					if (GUILayout.Button("Save To Config", contractSkins.configButton))
-					{
-						dropDown = !dropDown;
-						wPopup = !wPopup;
-					}
+					//if (GUILayout.Button("Save To Config", contractSkins.configButton))
+					//{
+					//	dropDown = !dropDown;
+					//	wPopup = !wPopup;
+					//}
 				GUILayout.EndVertical();
-				GUILayout.Space(20);
+				GUILayout.Space(50);
 			GUILayout.EndHorizontal();
 		}
 
@@ -751,7 +751,7 @@ namespace ContractsWindow
 					ddRect = new Rect(WindowRect.width - 260, WindowRect.height - 100, 240, 100);
 					GUI.Box(ddRect, "", contractSkins.dropDown);
 					Rect r = new Rect(ddRect.x + 10, ddRect.y + 5, 220, 80);
-					GUI.Label(r, "Warning:\nAny value set to 0.0% will no longer be adjustable", contractSkins.resetBox);
+					GUI.Label(r, "Warning:\nContract values set to 0.0% may no longer be adjustable", contractSkins.resetBox);
 					r.x += 85;
 					r.y += 60;
 					r.width = 70;
