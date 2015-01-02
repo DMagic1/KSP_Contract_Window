@@ -54,7 +54,7 @@ namespace ContractsWindow
 		public static float Mathf_Round(this float f, int precision)
 		{
 			if (precision < -4 || precision > 4)
-				throw new ArgumentOutOfRangeException("[SCANsat] Precision Must Be Between -4 And 4 For Rounding Operation");
+				throw new ArgumentOutOfRangeException("[Contracts +] Precision Must Be Between -4 And 4 For Rounding Operation");
 
 			if (precision >= 0)
 				return (float)Math.Round(f, precision);
@@ -71,7 +71,7 @@ namespace ContractsWindow
 
 		public static float reverseLog(this float f)
 		{
-			if (f == 0.001 && contractScenario.Instance.allowZero)
+			if (f <= 0.009 && !contractScenario.Instance.allowZero)
 				return -1;
 			else if (f >= 0.000 && f < 0.95)
 				return f - 1;
