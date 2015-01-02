@@ -67,7 +67,8 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "3.0.0.0";
+		public string version = "1.0.2.2";
+
 		[KSPField(isPersistant = true)]
 		public bool allowZero = false;
 		[KSPField(isPersistant = true)]
@@ -119,171 +120,222 @@ namespace ContractsWindow
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
-			if (version == contractAssembly.Version)
+			try
 			{
-				ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
-				if (scenes != null)
+				if (version == contractAssembly.Version)
 				{
-					//Contract lists
-					showString = scenes.GetValue("DefaultListID");
-					hiddenString = scenes.GetValue("HiddenListID");
+					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
+					if (scenes != null)
+					{
+						//Contract lists
+						showString = scenes.GetValue("DefaultListID");
+						hiddenString = scenes.GetValue("HiddenListID");
 
-					//Global Settings
-					toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
-					fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
-					windowSize = stringintParse(scenes.GetValue("WindowSize"));
+						//Global Settings - Why do these not use KSPFields? Because your mom, that's why...
+						toolTips = stringBoolParse(scenes.GetValue("ToolTips"));
+						fontSmall = stringBoolParse(scenes.GetValue("FontSize"));
+						windowSize = stringintParse(scenes.GetValue("WindowSize"));
 
-					//Scene settings
-					showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
-					windowMode = stringSplit(scenes.GetValue("WindowMode"));
-					orderMode = stringSplit(scenes.GetValue("SortOrder"));
-					int[] sort = stringSplit(scenes.GetValue("SortMode"));
-					sortMode = new sortClass[4] { (sortClass)sort[0], (sortClass)sort[1], (sortClass)sort[2], (sortClass)sort[3] };
-					windowPos = stringSplit(scenes.GetValue("WindowPosition"));
-					windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
-					int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
-					loadWindow(winPos);
+						//Scene settings
+						showHideMode = stringSplit(scenes.GetValue("ShowListMode"));
+						windowMode = stringSplit(scenes.GetValue("WindowMode"));
+						orderMode = stringSplit(scenes.GetValue("SortOrder"));
+						int[] sort = stringSplit(scenes.GetValue("SortMode"));
+						sortMode = new sortClass[4] { (sortClass)sort[0], (sortClass)sort[1], (sortClass)sort[2], (sortClass)sort[3] };
+						windowPos = stringSplit(scenes.GetValue("WindowPosition"));
+						windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
+						int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
+						loadWindow(winPos);
+					}
 				}
+
+				version = contractAssembly.Version;
+
 			}
-			version = contractAssembly.Version;
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contracts Window Settings Cannot Be Loaded: {0}", e);
+			}
 
 			//Start the window object
-			cWin = gameObject.AddComponent<contractsWindow>();
-			cConfig = gameObject.AddComponent<contractConfig>();
-
-			//Load the contract and parameter types
-			if (cTypeList == null)
+			try
 			{
-				cTypeList = new Dictionary<string, contractTypeContainer>();
-				foreach(AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
+				cWin = gameObject.AddComponent<contractsWindow>();
+				cConfig = gameObject.AddComponent<contractConfig>();
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
+			}
+
+			try
+			{
+				//Load the contract and parameter types
+				if (cTypeList == null)
 				{
-					Type[] assemblyTypes = assembly.assembly.GetTypes();
-					foreach (Type t in assemblyTypes)
+					cTypeList = new Dictionary<string, contractTypeContainer>();
+					foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
 					{
-						if (t.IsSubclassOf(typeof(Contract)))
+						Type[] assemblyTypes = assembly.assembly.GetTypes();
+						foreach (Type t in assemblyTypes)
 						{
-							if (t != typeof(Contract))
+							if (t.IsSubclassOf(typeof(Contract)))
 							{
-								if (!cTypeList.ContainsKey(t.Name))
-									cTypeList.Add(t.Name, new contractTypeContainer(t));
-								if (cTypeList[t.Name].ContractC == null)
-									cTypeList.Remove(t.Name);
+								if (t != typeof(Contract))
+								{
+									if (!cTypeList.ContainsKey(t.Name))
+										cTypeList.Add(t.Name, new contractTypeContainer(t));
+									if (cTypeList[t.Name].ContractC == null)
+										cTypeList.Remove(t.Name);
+								}
 							}
 						}
 					}
 				}
-			}
 
-			ConfigNode contractTypes = node.GetNode("Contracts_Window_Contract_Types");
+				ConfigNode contractTypes = node.GetNode("Contracts_Window_Contract_Types");
 
-			if (contractTypes != null)
-			{
-				foreach (ConfigNode contractType in contractTypes.GetNodes("Contract_Type"))
+				if (contractTypes != null)
 				{
-					if (contractType != null)
+					foreach (ConfigNode contractType in contractTypes.GetNodes("Contract_Type"))
 					{
-						string contractTypeName = contractType.GetValue("TypeName");
-						string valuesString = contractType.GetValue("ContractValues");
-						stringContractParse(valuesString, contractTypeName);
-					}
-				}
-			}
-
-			if (pTypeList == null)
-			{
-				pTypeList = new Dictionary<string, paramTypeContainer>();
-				foreach(AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
-				{
-					Type[] assemblyTypes = assembly.assembly.GetTypes();
-					foreach(Type t in assemblyTypes)
-					{
-						if (t.IsSubclassOf(typeof(ContractParameter)))
+						if (contractType != null)
 						{
-							if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
-								continue;
-							if (t != typeof(ContractParameter))
-							{
-								if (!pTypeList.ContainsKey(t.Name))
-									pTypeList.Add(t.Name, new paramTypeContainer(t));
-								if (pTypeList[t.Name].Param == null)
-									pTypeList.Remove(t.Name);
-							}
+							string contractTypeName = contractType.GetValue("TypeName");
+							string valuesString = contractType.GetValue("ContractValues");
+							stringContractParse(valuesString, contractTypeName);
 						}
 					}
 				}
 			}
-
-			ConfigNode paramTypes = node.GetNode("Contracts_Window_Parameter_Types");
-
-			if (paramTypes != null)
+			catch (Exception e)
 			{
-				foreach (ConfigNode paramType in paramTypes.GetNodes("Parameter_Type"))
+				DMC_MBE.LogFormatted("Contract Type List Cannot Be Generated Or Loaded: {0}", e);
+			}
+
+			try
+			{
+				if (pTypeList == null)
 				{
-					if (paramType != null)
+					pTypeList = new Dictionary<string, paramTypeContainer>();
+					foreach (AssemblyLoader.LoadedAssembly assembly in AssemblyLoader.loadedAssemblies)
 					{
-						string paramTypeName = paramType.GetValue("TypeName");
-						string valuesString = paramType.GetValue("ParameterValues");
-						stringParamParse(valuesString, paramTypeName);
+						Type[] assemblyTypes = assembly.assembly.GetTypes();
+						foreach (Type t in assemblyTypes)
+						{
+							if (t.IsSubclassOf(typeof(ContractParameter)))
+							{
+								if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
+									continue;
+								if (t != typeof(ContractParameter))
+								{
+									if (!pTypeList.ContainsKey(t.Name))
+										pTypeList.Add(t.Name, new paramTypeContainer(t));
+									if (pTypeList[t.Name].Param == null)
+										pTypeList.Remove(t.Name);
+								}
+							}
+						}
 					}
 				}
+
+				ConfigNode paramTypes = node.GetNode("Contracts_Window_Parameter_Types");
+
+				if (paramTypes != null)
+				{
+					foreach (ConfigNode paramType in paramTypes.GetNodes("Parameter_Type"))
+					{
+						if (paramType != null)
+						{
+							string paramTypeName = paramType.GetValue("TypeName");
+							string valuesString = paramType.GetValue("ParameterValues");
+							stringParamParse(valuesString, paramTypeName);
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Parameter Type List Cannot Be Generated Or Loaded: {0}", e);
 			}
 		}
 
 		public override void OnSave(ConfigNode node)
 		{
-			saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
+			try
+			{
+				saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
-			ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
-			
-			//Contract lists
-			scenes.AddValue("DefaultListID", stringConcat(showList));
-			scenes.AddValue("HiddenListID", stringConcat(hiddenList));
+				ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 
-			//Scene settings
-			scenes.AddValue("ShowListMode", stringConcat(showHideMode, showHideMode.Length));
-			scenes.AddValue("WindowMode", stringConcat(windowMode, windowMode.Length));
-			scenes.AddValue("SortOrder", stringConcat(orderMode, orderMode.Length));
-			int[] sort = new int[4] { (int)sortMode[0], (int)sortMode[1], (int)sortMode[2], (int)sortMode[3] };
-			scenes.AddValue("SortMode", stringConcat(sort, sort.Length));
-			scenes.AddValue("WindowPosition", stringConcat(windowPos, windowPos.Length));
-			scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
+				//Contract lists
+				scenes.AddValue("DefaultListID", stringConcat(showList));
+				scenes.AddValue("HiddenListID", stringConcat(hiddenList));
 
-			//Global settings
-			scenes.AddValue("ToolTips", toolTips);
-			scenes.AddValue("FontSize", fontSmall);
-			scenes.AddValue("WindowSize", windowSize);
+				//Scene settings
+				scenes.AddValue("ShowListMode", stringConcat(showHideMode, showHideMode.Length));
+				scenes.AddValue("WindowMode", stringConcat(windowMode, windowMode.Length));
+				scenes.AddValue("SortOrder", stringConcat(orderMode, orderMode.Length));
+				int[] sort = new int[4] { (int)sortMode[0], (int)sortMode[1], (int)sortMode[2], (int)sortMode[3] };
+				scenes.AddValue("SortMode", stringConcat(sort, sort.Length));
+				scenes.AddValue("WindowPosition", stringConcat(windowPos, windowPos.Length));
+				scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 
-			node.AddNode(scenes);
+				//Global settings
+				scenes.AddValue("ToolTips", toolTips);
+				scenes.AddValue("FontSize", fontSmall);
+				scenes.AddValue("WindowSize", windowSize);
+
+				node.AddNode(scenes);
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contracts Window Settings Cannot Be Saved: {0}", e);
+			}
 
 			//Save values for each contract type
-			ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
-
-			foreach (contractTypeContainer c in cTypeList.Values)
+			try
 			{
-				ConfigNode contractType = new ConfigNode("Contract_Type");
+				ConfigNode contractTypes = new ConfigNode("Contracts_Window_Contract_Types");
 
-				contractType.AddValue("TypeName", c.ContractC.GetType().Name);
-				contractType.AddValue("ContractValues", stringConcat(c));
+				foreach (contractTypeContainer c in cTypeList.Values)
+				{
+					ConfigNode contractType = new ConfigNode("Contract_Type");
 
-				contractTypes.AddNode(contractType);
+					contractType.AddValue("TypeName", c.ContractC.GetType().Name);
+					contractType.AddValue("ContractValues", stringConcat(c));
+
+					contractTypes.AddNode(contractType);
+				}
+
+				node.AddNode(contractTypes);
 			}
-
-			node.AddNode(contractTypes);
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contract Types Cannot Be Saved: {0}", e);
+			}
 
 			//Save values for each parameter type
-			ConfigNode paramTypes = new ConfigNode("Contracts_Window_Parameter_Types");
-
-			foreach (paramTypeContainer p in pTypeList.Values)
+			try
 			{
-				ConfigNode paramType = new ConfigNode("Parameter_Type");
+				ConfigNode paramTypes = new ConfigNode("Contracts_Window_Parameter_Types");
 
-				paramType.AddValue("TypeName", p.Param.GetType().Name);
-				paramType.AddValue("ParameterValues", stringConcat(p));
+				foreach (paramTypeContainer p in pTypeList.Values)
+				{
+					ConfigNode paramType = new ConfigNode("Parameter_Type");
 
-				paramTypes.AddNode(paramType);
+					paramType.AddValue("TypeName", p.Param.GetType().Name);
+					paramType.AddValue("ParameterValues", stringConcat(p));
+
+					paramTypes.AddNode(paramType);
+				}
+
+				node.AddNode(paramTypes);
 			}
-
-			node.AddNode(paramTypes);
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Parameter Type List Cannot Be Saved: {0}", e);
+			}
 		}
 
 		private void Start()
@@ -300,7 +352,7 @@ namespace ContractsWindow
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
-						Destroy(blizzyToolbarButton);
+					Destroy(blizzyToolbarButton);
 			}
 			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
 			{
@@ -323,7 +375,7 @@ namespace ContractsWindow
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
 				Destroy(blizzyToolbarButton);
-			}
+		}
 
 	#endregion
 
@@ -479,11 +531,19 @@ namespace ContractsWindow
 		{
 			contractTypeContainer c;
 			string[] a = s.Split(',');
-			if (cTypeList.ContainsKey(type))
-				c = cTypeList[type];
-			else
+			try
 			{
-				DMC_MBE.LogFormatted("Contract Type Not Found; Removing Type From List");
+				if (cTypeList.ContainsKey(type))
+					c = cTypeList[type];
+				else
+				{
+					DMC_MBE.LogFormatted("Contract Type Not Found; Removing Type From List");
+					return;
+				}
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contract Type List Not Responding: {0}", e);
 				return;
 			}
 			c.RewardFund = stringFloatParse(a[0], true);
@@ -501,11 +561,19 @@ namespace ContractsWindow
 		{
 			paramTypeContainer p;
 			string[] a = s.Split(',');
-			if (pTypeList.ContainsKey(type))
-				p = pTypeList[type];
-			else
+			try
 			{
-				DMC_MBE.LogFormatted("Parameter Type Not Found; Removing Type From List");
+				if (pTypeList.ContainsKey(type))
+					p = pTypeList[type];
+				else
+				{
+					DMC_MBE.LogFormatted("Parameter Type Not Found; Removing Type From List");
+					return;
+				}
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Parameter Type List Not Responding: {0}", e);
 				return;
 			}
 			p.RewardFund = stringFloatParse(a[0], true);
@@ -545,14 +613,16 @@ namespace ContractsWindow
 							offered++;
 					}
 				}
-				int remainingSlots = (int)(cC.MaxActive * 10) - (active + offered - 1);
+				int remainingSlots = (int)(cC.MaxActive * 10) - active;
 				if ((offered - 1) >= (int)(cC.MaxOffer * 10) && cC.MaxOffer < 10f)
 				{
+					c.Unregister();
 					ContractSystem.Instance.Contracts.Remove(c);
 					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
 				}
 				else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
 				{
+					c.Unregister();
 					ContractSystem.Instance.Contracts.Remove(c);
 					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
 				}
@@ -683,9 +753,10 @@ namespace ContractsWindow
 				{
 					for (int i = 0; i < cParams.Count(); i++)
 					{
-						if (pTypeList.ContainsKey(cParams.ElementAt(i).GetType().Name))
+						string name = cParams.ElementAt(i).GetType().Name;
+						if (pTypeList.ContainsKey(name))
 						{
-							updateParameterValues(pTypeList[cParams.ElementAt(i).GetType().Name], new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
+							updateParameterValues(pTypeList[name], new List<ContractParameter>() { cParams.ElementAt(i) }, new float[5] { 1, 1, 1, 1, 1 });
 						}
 					}
 				}
@@ -890,7 +961,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
 			else
-				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 180);
+				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 150);
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
@@ -901,7 +972,7 @@ namespace ContractsWindow
 			if (windowMode[i] == 0)
 				windowRects[i].width += (windowSize * 30);
 			else
-				windowRects[i].width += (windowSize * 180);
+				windowRects[i].width += (windowSize * 150);
 		}
 
 		#endregion
