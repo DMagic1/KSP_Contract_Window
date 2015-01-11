@@ -44,7 +44,6 @@ namespace ContractsWindow.Toolbar
 
 		private void setupToolbar()
 		{
-			LogFormatted_DebugOnly("Starting App Launcher Manager");
 			if (!contractScenario.Instance.replaceStockToolbar)
 				StartCoroutine(addButton());
 			else
@@ -53,34 +52,29 @@ namespace ContractsWindow.Toolbar
 
 		internal override void OnDestroy()
 		{
-			LogFormatted_DebugOnly("Destroying App Launcher Manager");
 			GameEvents.onGUIApplicationLauncherUnreadifying.Remove(removeButton);
 
-			if (stockToolbarButton != null)
-				removeButton(HighLogic.LoadedScene);
+			removeButton(HighLogic.LoadedScene);
 		}
 
 		IEnumerator addButton()
 		{
-			LogFormatted_DebugOnly("Waiting For Application Launcher...");
 
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
-			LogFormatted_DebugOnly("Adding App Launcher Button");
 			stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggleOn, toggleOff, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
-
-			LogFormatted_DebugOnly("App Launcher Button Added");
 		}
 
 		private void removeButton(GameScenes scene)
 		{
-			LogFormatted_DebugOnly("Removing App Launcher Button");
-			ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-			stockToolbarButton = null;
-			LogFormatted_DebugOnly("App Launcher Button Removed");
+			if (stockToolbarButton != null)
+			{
+				ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
+				stockToolbarButton = null;
+			}
 		}
 
 		internal void replaceStockApp()
@@ -99,8 +93,6 @@ namespace ContractsWindow.Toolbar
 				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggleOn, toggleOff, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 			}
 
-			LogFormatted_DebugOnly("Replacing Stock Contracts App With Contracts +");
-
 			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
 
 			stockContracts.toggleButton.onDisable();
@@ -112,13 +104,11 @@ namespace ContractsWindow.Toolbar
 			stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
 			stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
 
-			LogFormatted_DebugOnly("Stock Contracts App Replaced With Contracts Window +");
+			LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 
 			try
 			{
-				ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-				stockToolbarButton = null;
-				LogFormatted_DebugOnly("Contracts Window + Toolbar Removed");
+				removeButton(HighLogic.LoadedScene);
 			}
 			catch (Exception e)
 			{

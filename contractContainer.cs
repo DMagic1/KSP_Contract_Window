@@ -90,7 +90,7 @@ namespace ContractsWindow
 
 		private void contractRewards(Contract c)
 		{
-			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)c.FundsCompletion, c.ReputationCompletion, c.ScienceCompletion);
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)c.FundsCompletion, c.ScienceCompletion, c.ReputationCompletion);
 			fundsReward = c.FundsCompletion;
 			fundsRew = "+ " + fundsReward.ToString("N0");
 			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
@@ -116,7 +116,7 @@ namespace ContractsWindow
 
 		private void contractPenalties(Contract c)
 		{
-			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)c.FundsFailure, c.ReputationFailure, 0f);
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)c.FundsFailure, 0f, c.ReputationFailure);
 			fundsPenalty = c.FundsFailure;
 			fundsPen = "- " + fundsPenalty.ToString("N0");
 			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
@@ -241,7 +241,7 @@ namespace ContractsWindow
 
 		internal void paramRewards(ContractParameter cP)
 		{
-			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)cP.FundsCompletion, cP.ReputationCompletion, cP.ScienceCompletion);
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)cP.FundsCompletion, cP.ScienceCompletion, cP.ReputationCompletion);
 			fundsReward = cP.FundsCompletion;
 			fundsRew = "+ " + fundsReward.ToString("N0");
 			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
@@ -267,7 +267,7 @@ namespace ContractsWindow
 
 		internal void paramPenalties(ContractParameter cP)
 		{
-			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)cP.FundsFailure, cP.ReputationFailure, 0f);
+			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)cP.FundsFailure, 0f, cP.ReputationFailure);
 			fundsPenalty = cP.FundsFailure;
 			fundsPen = "- " + fundsPenalty.ToString("N0");
 			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
