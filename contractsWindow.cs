@@ -689,9 +689,11 @@ namespace ContractsWindow
 			{
 				foreach (parameterContainer sP in cP.paramList)
 				{
-					if (sP.level == level + 1 && !string.IsNullOrEmpty(sP.cParam.Title))
+					if ((cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Failed) && cP.cParam.DisableOnStateChange)
+						return;
+					else
 					{
-						if (cP.cParam.State != ParameterState.Complete && cP.cParam.DisableOnStateChange)
+						if (sP.level == level + 1 && !string.IsNullOrEmpty(sP.cParam.Title))
 							buildParameterLabel(sP, c, level + 1, id);
 					}
 				}
