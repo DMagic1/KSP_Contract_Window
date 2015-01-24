@@ -63,7 +63,7 @@ namespace ContractsWindow.Toolbar
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
-			stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggleOn, toggleOff, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+			stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
 		}
@@ -90,7 +90,7 @@ namespace ContractsWindow.Toolbar
 			if (stockToolbarButton == null)
 			{
 				LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
-				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggleOn, toggleOff, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 			}
 
 			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
@@ -104,6 +104,8 @@ namespace ContractsWindow.Toolbar
 			stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
 			stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
 
+			ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
+
 			LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 
 			try
@@ -116,7 +118,7 @@ namespace ContractsWindow.Toolbar
 			}
 		}
 
-		private void toggleOn()
+		private void toggle()
 		{
 			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 			if (contractScenario.Instance == null)
@@ -125,24 +127,12 @@ namespace ContractsWindow.Toolbar
 				LogFormatted("Contract Window Not Loaded...");
 			else
 			{
-				contractScenario.Instance.cWin.Visible = true;
-				contractScenario.Instance.cWin.StartRepeatingWorker(5);
-				contractScenario.Instance.windowVisible[sceneInt] = true;
-			}
-		}
-
-		private void toggleOff()
-		{
-			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
-			if (contractScenario.Instance == null)
-				LogFormatted("Contract Scenario Not Loaded...");
-			else if (contractScenario.Instance.cWin == null)
-				LogFormatted("Contract Window Not Loaded...");
-			else
-			{
-				contractScenario.Instance.cWin.Visible = false;
-				contractScenario.Instance.cWin.StopRepeatingWorker();
-				contractScenario.Instance.windowVisible[sceneInt] = false;
+				if (!contractScenario.Instance.cWin.Visible)
+					contractScenario.Instance.cWin.StartRepeatingWorker(5);
+				else
+					contractScenario.Instance.cWin.StopRepeatingWorker();
+				contractScenario.Instance.cWin.Visible = !contractScenario.Instance.cWin.Visible;
+				contractScenario.Instance.windowVisible[sceneInt] = !contractScenario.Instance.windowVisible[sceneInt];
 			}
 		}
 
