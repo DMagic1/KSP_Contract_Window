@@ -689,7 +689,7 @@ namespace ContractsWindow
 			{
 				foreach (parameterContainer sP in cP.paramList)
 				{
-					if ((cP.cParam.State == ParameterState.Complete || cP.cParam.State == ParameterState.Failed) && cP.cParam.DisableOnStateChange)
+					if (cP.cParam.State != ParameterState.Incomplete)
 						return;
 					else
 					{
