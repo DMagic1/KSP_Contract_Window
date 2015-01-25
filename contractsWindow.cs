@@ -265,7 +265,7 @@ namespace ContractsWindow
 				{
 					foreach (parameterContainer cP in c.paramList)
 					{
-						if (cP.level == 0)
+						if (cP.level == 0 && !string.IsNullOrEmpty(cP.cParam.Title))
 							buildParameterLabel(cP, c, 0, id);
 					}
 				}
@@ -689,8 +689,13 @@ namespace ContractsWindow
 			{
 				foreach (parameterContainer sP in cP.paramList)
 				{
-					if (sP.level == level + 1)
-						buildParameterLabel(sP, c, level + 1, id);
+					if (cP.cParam.State != ParameterState.Incomplete)
+						return;
+					else
+					{
+						if (sP.level == level + 1 && !string.IsNullOrEmpty(sP.cParam.Title))
+							buildParameterLabel(sP, c, level + 1, id);
+					}
 				}
 			}
 
