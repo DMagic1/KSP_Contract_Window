@@ -163,8 +163,8 @@ namespace ContractsWindow
 			//Update the drag rectangle
 			DragRect.height = WindowRect.height - 24 - contractScenario.Instance.windowSize * 8;
 
-			scrollRect = new Rect(0, 20, WindowRect.width - 10, WindowRect.height - 20);
-			scrollViewRect = new Rect(0, 0, scrollRect.width, 1500);
+			scrollRect = new Rect(0, 25, WindowRect.width - 2, WindowRect.height - 55);
+			scrollViewRect = new Rect(0, 0, scrollRect.width - 20, 1500);
 
 			//Prevent click through from activating part options
 			if (HighLogic.LoadedSceneIsFlight)
