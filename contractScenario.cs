@@ -227,6 +227,10 @@ namespace ContractsWindow
 							{
 								if (t.Name == "OR" || t.Name == "XOR" || t.Name == "RecoverPart")
 									continue;
+								if (t.IsAbstract)
+									continue;
+								if (t.IsGenericType)
+									continue;
 								if (t != typeof(ContractParameter))
 								{
 									if (!pTypeList.ContainsKey(t.Name))
