@@ -58,7 +58,7 @@ namespace ContractsWindow
 		internal override void Awake()
 		{
 			WindowCaption = "Contract Configuration";
-			WindowRect = new Rect(40, 80, 780, 360);
+			WindowRect = new Rect(40, 80, 780, 380);
 			WindowStyle = contractSkins.newWindowStyle;
 			Visible = false;
 			DragEnabled = true;
