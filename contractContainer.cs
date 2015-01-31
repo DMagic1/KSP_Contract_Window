@@ -42,6 +42,8 @@ namespace ContractsWindow
 		internal double totalReward, duration;
 		internal bool showParams, showNote;
 		internal string daysToExpire;
+		internal string title;
+		internal string notes;
 		internal int? listOrder;
 		internal double fundsReward, fundsPenalty;
 		internal float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
@@ -54,6 +56,8 @@ namespace ContractsWindow
 			contract = c;
 			showParams = true;
 			listOrder = null;
+			title = c.Title;
+			notes = c.Notes;
 
 			if (c.DateDeadline <= 0)
 			{
@@ -78,7 +82,8 @@ namespace ContractsWindow
 			for (int i = 0; i < c.ParameterCount; i++)
 			{
 				ContractParameter param = c.GetParameter(i);
-				addContractParam(param, 0);
+				if (!string.IsNullOrEmpty(param.Title))
+					addContractParam(param, 0);
 			}
 		}
 
@@ -150,6 +155,8 @@ namespace ContractsWindow
 	{
 		internal ContractParameter cParam;
 		internal bool showNote;
+		internal string title;
+		internal string notes;
 		internal int level;
 		internal double fundsReward, fundsPenalty;
 		internal float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
@@ -165,13 +172,16 @@ namespace ContractsWindow
 			//For some reason parameter rewards/penalties reset to zero upon completion/failure
 			paramRewards(cP);
 			paramPenalties(cP);
+			title = cParam.Title;
+			notes = cParam.Notes;
 
 			if (level < 4)
 			{
 				for (int i = 0; i < cParam.ParameterCount; i++)
 				{
 					ContractParameter param = cParam.GetParameter(i);
-					addSubParam(param, level + 1);
+					if (!string.IsNullOrEmpty(param.Title))
+						addSubParam(param, level + 1);
 				}
 			}
 
