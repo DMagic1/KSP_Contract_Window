@@ -166,11 +166,11 @@ namespace ContractsWindow
 			//Are we using a custom style of the skin style for the window
 			if (WindowStyle == null)
 			{
-				WindowRect = GUI.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption);
+				WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowOptions);
 			}
 			else
 			{
-				WindowRect = GUI.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle);
+				WindowRect = GUILayout.Window(WindowID, WindowRect, DrawWindowInternal, WindowCaption, WindowStyle, WindowOptions);
 			}
 
 
