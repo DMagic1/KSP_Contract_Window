@@ -55,7 +55,7 @@ namespace ContractsWindow
 		private float[] oldCValues;
 		private float[] oldPValues;
 
-		internal override void Awake()
+		protected override void Awake()
 		{
 			WindowCaption = "Contract Configuration";
 			WindowRect = new Rect(40, 80, 780, 380);
@@ -70,7 +70,7 @@ namespace ContractsWindow
 			DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 		}
 
-		internal override void Start()
+		protected override void Start()
 		{
 			cList = contractScenario.Instance.setContractTypes(cList);
 			pList = contractScenario.Instance.setParamTypes(pList);
@@ -84,13 +84,13 @@ namespace ContractsWindow
 			replaceStockAppLauncher = contractScenario.Instance.replaceStockToolbar;
 		}
 
-		internal override void OnDestroy()
+		protected override void OnDestroy()
 		{
 			if (InputLockManager.lockStack.ContainsKey(lockID))
 				EditorLogic.fetch.Unlock(lockID);
 		}
 
-		internal override void DrawWindowPre(int id)
+		protected override void DrawWindowPre(int id)
 		{
 			//Prevent click through from activating part options
 			if (HighLogic.LoadedSceneIsFlight)
@@ -171,7 +171,7 @@ namespace ContractsWindow
 			}
 		}
 
-		internal override void DrawWindow(int id)
+		protected override void DrawWindow(int id)
 		{
 			closeButton(id);						/* Draw the close button */
 
@@ -197,7 +197,7 @@ namespace ContractsWindow
 			dropDownMenu(id);						/* Draw the drop down menus when open */
 		}
 
-		internal override void DrawWindowPost(int id)
+		protected override void DrawWindowPost(int id)
 		{
 			if (contractScenario.Instance.allowZero && !contractScenario.Instance.warnedZero)
 			{

@@ -37,7 +37,7 @@ namespace ContractsWindow.Toolbar
 	{
 		private IButton contractButton;
 
-		internal override void Start()
+		protected override void Start()
 		{
 			setupToolbar();
 		}
@@ -81,7 +81,7 @@ namespace ContractsWindow.Toolbar
 				};
 		}
 
-		internal override void OnDestroy()
+		protected override void OnDestroy()
 		{
 			LogFormatted_DebugOnly("Destroying Blizzy Toolbar");
 			if (!ToolbarManager.ToolbarAvailable) return;

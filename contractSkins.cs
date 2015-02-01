@@ -130,7 +130,7 @@ namespace ContractsWindow
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
 
-		internal override void OnGUIOnceOnly()
+		protected override void OnGUIOnceOnly()
 		{
 			//Fetch icon textures
 			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);

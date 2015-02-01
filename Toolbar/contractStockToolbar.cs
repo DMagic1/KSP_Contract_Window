@@ -37,7 +37,7 @@ namespace ContractsWindow.Toolbar
 	{
 		private ApplicationLauncherButton stockToolbarButton = null;
 
-		internal override void Start()
+		protected override void Start()
 		{
 			setupToolbar();
 		}
@@ -50,7 +50,7 @@ namespace ContractsWindow.Toolbar
 				StartCoroutine(replaceStockContractApp());
 		}
 
-		internal override void OnDestroy()
+		protected override void OnDestroy()
 		{
 			GameEvents.onGUIApplicationLauncherUnreadifying.Remove(removeButton);
 
