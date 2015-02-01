@@ -133,5 +133,49 @@ namespace ContractsWindow
 				Debug.LogWarning("[Contracts +] Something went wrong when attempting to assign a new Parameter Notes: " + e);
 			}
 		}
+
+		/// <summary>
+		/// A method for returning a contractContainer object. The contract in question must be loaded by Contracts
+		/// Window + and may return null. All fields within the object are publicly accessible through properties.
+		/// </summary>
+		/// <param name="contract">Instance of the contract in question</param>
+		/// <returns>contractContainer object</returns>
+		public static contractContainer getContractContainer(Contract contract)
+		{
+			try
+			{
+				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				return c;
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Something went wrong when attempting to get a Contract Container object: " + e);
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// A method for returning a parameterContainer object. The contract and parameter in question must be loaded by 
+		/// Contracts Window + and may return null. All fields within the object are publicly accessible through properties.
+		/// </summary>
+		/// <param name="contract">Instance of the root contract (contractParameter.Root)</param>
+		/// <param name="parameter">Instance of the contract parameter in question</param>
+		/// <returns>parameterContainer object</returns>
+		public static parameterContainer getParameterContainer(Contract contract, ContractParameter parameter)
+		{
+			try
+			{
+				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				parameterContainer pC = null;
+				if (c != null)
+					pC = c.ParamList.First(a => a.CParam == parameter);
+				return pC;
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Something went wrong when attempting to get a Parameter Container object: " + e);
+				return null;
+			}
+		}
 	}
 }
