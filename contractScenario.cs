@@ -597,10 +597,7 @@ namespace ContractsWindow
 			if (cTypeList.ContainsKey(contractT.Name))
 				cC = cTypeList[contractT.Name];
 			else
-			{
-				DMC_MBE.LogFormatted("Contract Type: {0} Not Present; Allowing All Offers", contractT.Name);
 				return;
-			}
 
 			if (cC.MaxActive < 10f || cC.MaxOffer < 10f)
 			{
@@ -622,32 +619,27 @@ namespace ContractsWindow
 				{
 					c.Unregister();
 					ContractSystem.Instance.Contracts.Remove(c);
-					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Offered Limit Exceeded", contractT.Name);
 				}
 				else if ((offered - 1) >= remainingSlots && cC.MaxActive < 10f)
 				{
 					c.Unregister();
 					ContractSystem.Instance.Contracts.Remove(c);
-					DMC_MBE.LogFormatted("Removing Contract Of Type: {0} From The Offered List; Active Limit Exceeded", contractT.Name);
 				}
 				else
 				{
 					updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
 					updateParameterValues(c);
-					DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
 				}
 			}
 			else
 			{
 				updateContractValues(cC, c, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
 				updateParameterValues(c);
-				DMC_MBE.LogFormatted_DebugOnly("Contract: {0} Added To Offered List", contractT.Name);
 			}
 		}
 
 		private void paramChanged(float[] originals, paramTypeContainer p)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Parameter Value Event Fired; Type: {0}", p.Name);
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
@@ -664,7 +656,6 @@ namespace ContractsWindow
 
 		private void contractChanged(float[] originals, contractTypeContainer c)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Contract Value Event Fired; Type: {0}", c.Name);
 			var cList = ContractSystem.Instance.Contracts;
 			for (int i = 0; i < cList.Count; i++)
 			{
@@ -685,8 +676,6 @@ namespace ContractsWindow
 			{
 				if (c.GetType() == cC.ContractType)
 				{
-					DMC_MBE.LogFormatted_DebugOnly("Contract Values Updating; Type: {0}", cC.Name);
-					DMC_MBE.LogFormatted_DebugOnly("Original Contract Values: {0}; New Values: {1}", printArray(O), printArray(cC.ContractValues));
 					c.FundsCompletion = (c.FundsCompletion / O[0]) * cC.RewardFund;
 					c.FundsAdvance = (c.FundsAdvance / O[1]) * cC.AdvanceFund;
 					c.FundsFailure = (c.FundsFailure / O[2]) * cC.PenaltyFund;
@@ -698,16 +687,6 @@ namespace ContractsWindow
 			}
 		}
 
-		private string printArray(float[] fA)
-		{
-			string[] s = new string[fA.Length];
-			for(int i = 0; i < fA.Length; i++)
-			{
-				s[i] = fA[i].ToString("F2");
-			}
-			return string.Join(",", s);
-		}
-
 		private void updateParameterValues(paramTypeContainer pC, List<ContractParameter> pL, float[] O)
 		{
 			foreach (ContractParameter p in pL)
@@ -716,8 +695,6 @@ namespace ContractsWindow
 				{
 					if (p.GetType() == pC.ParamType)
 					{
-						DMC_MBE.LogFormatted_DebugOnly("Updating Param Values; Type: {0}", pC.Name);
-						DMC_MBE.LogFormatted_DebugOnly("Original Param Values: {0}; New Values: {1}", printArray(O), printArray(pC.ParamValues));
 						p.FundsCompletion = (p.FundsCompletion / O[0] ) * pC.RewardFund;
 						p.FundsFailure = (p.FundsFailure / O[1] ) * pC.PenaltyFund;
 						p.ReputationCompletion = (p.ReputationCompletion / O[2]) * pC.RewardRep;
@@ -735,23 +712,16 @@ namespace ContractsWindow
 			for (int i = 0; i < cParams.Count(); i++)
 			{
 				if (cParams.ElementAt(i).GetType() == pC.ParamType)
-				{
-					DMC_MBE.LogFormatted_DebugOnly("Found Parameter Of Type: {0}; Updating Values", pC.Name);
 					modifyList.Add(cParams.ElementAt(i));
-				}
 			}
 			if (modifyList.Count > 0)
-			{
-				DMC_MBE.LogFormatted_DebugOnly("Found {0} Parameters Of Type: {1}", modifyList.Count, pC.Name);
 				updateParameterValues(pC, modifyList, originals);
-			}
 		}
 
 		private void updateParameterValues(Contract c)
 		{
 			if (ContractSystem.Instance.Contracts.Contains(c))
 			{
-				DMC_MBE.LogFormatted_DebugOnly("Updating Parameters For Newly Offered Contract");
 				var cParams = c.AllParameters;
 				if (cParams.Count() > 0)
 				{
@@ -785,7 +755,7 @@ namespace ContractsWindow
 			if (!masterList.ContainsKey(id))
 				masterList.Add(id, c);
 			else
-				DMC_MBE.LogFormatted_DebugOnly("Contract Already Present In List");
+				DMC_MBE.LogFormatted("Error Adding Contract; Already Present In Master List");
 		}
 
 		internal void resetList()

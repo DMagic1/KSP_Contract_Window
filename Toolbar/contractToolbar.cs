@@ -44,7 +44,6 @@ namespace ContractsWindow.Toolbar
 
 		private void setupToolbar()
 		{
-			LogFormatted_DebugOnly("Adding Blizzy Toolbar");
 			if (!ToolbarManager.ToolbarAvailable) return;
 
 			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
@@ -83,7 +82,6 @@ namespace ContractsWindow.Toolbar
 
 		protected override void OnDestroy()
 		{
-			LogFormatted_DebugOnly("Destroying Blizzy Toolbar");
 			if (!ToolbarManager.ToolbarAvailable) return;
 			if (contractButton != null)
 				contractButton.Destroy();
