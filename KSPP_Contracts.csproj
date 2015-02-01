@@ -56,6 +56,9 @@
     <Compile Include="contractSkins.cs" />
     <Compile Include="contractsWindow.cs" />
     <Compile Include="contractTypeContainer.cs" />
+    <Compile Include="contractUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Framework\ExtensionsUnity.cs" />
     <Compile Include="Framework\KSPAddonImproved.cs" />
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
