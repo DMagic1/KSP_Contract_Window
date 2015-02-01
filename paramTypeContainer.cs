@@ -52,7 +52,7 @@ namespace ContractsWindow
 			}
 			catch (Exception e)
 			{
-				DMC_MBE.LogFormatted("This Parameter Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1]", PType.Name, e);
+				DMC_MBE.LogFormatted("This Parameter Type: {0} Does Not Have An Empty Constructor And Will Be Skipped: {1}", PType.Name, e);
 				return;
 			}
 			name = PType.Name;

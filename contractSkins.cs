@@ -117,6 +117,8 @@ namespace ContractsWindow
 		internal static Texture2D noteIcon;
 		internal static Texture2D noteIconOff;
 		internal static Texture2D goldStar;
+		internal static Texture2D goldStarTwo;
+		internal static Texture2D goldStarThree;
 		internal static Texture2D pinIcon;
 		internal static Texture2D pinDownIcon;
 		internal static Texture2D fontSize;
@@ -128,7 +130,7 @@ namespace ContractsWindow
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
 
-		internal override void OnGUIOnceOnly()
+		protected override void OnGUIOnceOnly()
 		{
 			//Fetch icon textures
 			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);
@@ -158,6 +160,8 @@ namespace ContractsWindow
 			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
 			noteIconOff = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIconOff", false);
 			goldStar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStar", false);
+			goldStarTwo = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStarTwo", false);
+			goldStarThree = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStarThree", false);
 			pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
 			pinDownIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinDownIcon", false);
 			closeIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CloseIcon", false);

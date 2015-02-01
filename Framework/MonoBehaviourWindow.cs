@@ -76,7 +76,7 @@ namespace ContractsWindow
 
         #endregion
 
-        internal override void Awake()
+		protected override void Awake()
         {
             //just some debugging stuff here
             LogFormatted_DebugOnly("New MBWindow Awakened");
@@ -219,19 +219,19 @@ namespace ContractsWindow
         /// This is the optionally overridden function that runs before DrawWindow
         /// </summary>
         /// <param name="id">The ID of the Window being drawn</param>
-        internal virtual void DrawWindowPre(Int32 id) {}
+		protected virtual void DrawWindowPre(Int32 id) { }
 
         /// <summary>
         /// This is the must be overridden function that equates to the content of the window
         /// </summary>
         /// <param name="id">The ID of the Window being drawn</param>
-        internal abstract void DrawWindow(Int32 id);
+		protected abstract void DrawWindow(Int32 id);
 
         /// <summary>
         /// This is the optionally overridden function that runs after DrawWindow, but before tooltips, etc
         /// </summary>
         /// <param name="id">The ID of the Window being drawn</param>
-        internal virtual void DrawWindowPost(Int32 id) { }
+		protected virtual void DrawWindowPost(Int32 id) { }
 
         #region Tooltip Work
         /// <summary>

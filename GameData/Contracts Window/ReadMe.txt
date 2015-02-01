@@ -6,4 +6,3 @@ Contracts Window will not function properly if not placed in the correct locatio
 
 
 *Blizzy78's Toolbar is supported, but not required
-

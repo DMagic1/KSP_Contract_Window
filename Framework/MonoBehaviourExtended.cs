@@ -206,7 +206,7 @@ namespace ContractsWindow
         /// 
         /// No Need to run the base RepeatingWorker
         /// </summary>
-        internal virtual void RepeatingWorker()
+        protected virtual void RepeatingWorker()
         {
             //LogFormatted_DebugOnly("WorkerBase");
 
@@ -264,7 +264,7 @@ namespace ContractsWindow
         /// Trigger: Override this for initialization Code - this is before the Start Event
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void Awake()
+        protected virtual void Awake()
         {
             LogFormatted_DebugOnly("New MBExtended Awakened");
         }
@@ -275,7 +275,7 @@ namespace ContractsWindow
         /// Trigger: This is the last thing that happens before the scene starts doing stuff
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void Start()
+        protected virtual void Start()
         {
             LogFormatted_DebugOnly("New MBExtended Started");
         }
@@ -286,7 +286,7 @@ namespace ContractsWindow
         /// Trigger: This Update is called at a fixed rate and usually where you do all your physics stuff for consistent results
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void FixedUpdate()
+        protected virtual void FixedUpdate()
         { }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace ContractsWindow
         /// Trigger: This Update is called just before the rendering, and where you can adjust any graphical values/positions based on what has been updated in the physics, etc
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void LateUpdate()
+        protected virtual void LateUpdate()
         { }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace ContractsWindow
         /// Trigger: This is usually where you stick all your control inputs, keyboard handling, etc
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void Update()
+        protected virtual void Update()
         { }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace ContractsWindow
         /// Trigger: Override this for destruction and cleanup code
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        internal virtual void OnDestroy()
+        protected virtual void OnDestroy()
         {
             LogFormatted_DebugOnly("Destroying MBExtended");
         }
@@ -357,7 +357,7 @@ namespace ContractsWindow
         ///          Code here ignores the F2 key that disables user interface. So if you are making something to be user hidable then use the RenderingManager.PostDrawQueue functions in here
         ///          Alternatively you could use the MonoBehaviourWindow Type and its DrawWindow Function
         /// </summary>
-        internal virtual void OnGUIEvery()
+        protected virtual void OnGUIEvery()
         {
 
         }
@@ -367,7 +367,7 @@ namespace ContractsWindow
         /// 
         /// Added this so you can put your GUI initialisation code in here. Running GUI initialisation stuff in Awake/Start will throw an error
         /// </summary>
-        internal virtual void OnGUIOnceOnly()
+        protected virtual void OnGUIOnceOnly()
         {
             LogFormatted_DebugOnly("Running OnGUI OnceOnly Code");
 
