@@ -426,11 +426,11 @@ namespace ContractsWindow
 				if (c == null)
 					continue;
 				string i;
-				if (c.listOrder == null)
+				if (c.ListOrder == null)
 					i = "N";
 				else
-					i = c.listOrder.ToString();
-				bool show = c.showParams;
+					i = c.ListOrder.ToString();
+				bool show = c.ShowParams;
 				string id = string.Format("{0}|{1}|{2}", source[j], i, show);
 				s.Add(id);
 			}
@@ -825,8 +825,8 @@ namespace ContractsWindow
 						continue;
 					}
 
-					c.listOrder = stringIntParse(sB[1]);
-					c.showParams = stringBoolParse(sB[2]);
+					c.ListOrder = stringIntParse(sB[1]);
+					c.ShowParams = stringBoolParse(sB[2]);
 				}
 				if (l == 0)
 					showList = gID;
@@ -844,7 +844,7 @@ namespace ContractsWindow
 				contractContainer c = getContract(id);
 				if (c != null)
 				{
-					if (c.listOrder != null)
+					if (c.ListOrder != null)
 						temp.Add(c);
 				}
 			}
@@ -852,11 +852,11 @@ namespace ContractsWindow
 			{
 				temp.Sort((a, b) =>
 					{
-						return Comparer<int?>.Default.Compare(a.listOrder, b.listOrder);
+						return Comparer<int?>.Default.Compare(a.ListOrder, b.ListOrder);
 					});
 				foreach (contractContainer c in temp)
 				{
-					idTemp.Add(c.contract.ContractGuid);
+					idTemp.Add(c.Contract.ContractGuid);
 				}
 			}
 			return idTemp;
