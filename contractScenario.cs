@@ -67,7 +67,7 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "1.0.3.2";
+		public string version = "1.0.3.3";
 
 		[KSPField(isPersistant = true)]
 		public bool allowZero = false;
