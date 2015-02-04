@@ -95,7 +95,7 @@ namespace ContractsWindow
 				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
 				if (c != null)
 				{
-					parameterContainer pC = c.ParamList.First(a => a.CParam == parameter);
+					parameterContainer pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
 					if (pC != null)
 					{
 						pC.Title = name;
@@ -121,7 +121,7 @@ namespace ContractsWindow
 				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
 				if (c != null)
 				{
-					parameterContainer pC = c.ParamList.First(a => a.CParam == parameter);
+					parameterContainer pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
 					if (pC != null)
 					{
 						pC.Notes = notes;
@@ -168,7 +168,7 @@ namespace ContractsWindow
 				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
 				parameterContainer pC = null;
 				if (c != null)
-					pC = c.ParamList.First(a => a.CParam == parameter);
+					pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
 				return pC;
 			}
 			catch (Exception e)
