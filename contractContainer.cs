@@ -49,6 +49,7 @@ namespace ContractsWindow
 		private float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
 		private List<parameterContainer> paramList = new List<parameterContainer>();
+		private List<parameterContainer> allParamList = new List<parameterContainer>();
 
 		//Store info on contracts
 		internal contractContainer(Contract c)
@@ -90,7 +91,8 @@ namespace ContractsWindow
 		private void addContractParam(ContractParameter param, int Level)
 		{
 			string partTest = contractScenario.paramTypeCheck(param);
-			paramList.Add(new parameterContainer(param, Level, partTest));
+			paramList.Add(new parameterContainer(this, param, Level, partTest));
+			allParamList.Add(paramList.Last());
 		}
 
 		private void contractRewards(Contract c)
@@ -147,6 +149,11 @@ namespace ContractsWindow
 				pC.paramRewards(pC.CParam);
 				pC.paramPenalties(pC.CParam);
 			}
+		}
+
+		internal void addToParamList(parameterContainer pC)
+		{
+			allParamList.Add(pC);
 		}
 
 		#region Public Accessors
@@ -258,12 +265,18 @@ namespace ContractsWindow
 			get { return paramList; }
 		}
 
+		public List<parameterContainer> AllParamList
+		{
+			get { return allParamList; }
+		}
+
 		#endregion
 	}
 
 	//Store some info about contract parameters
 	public class parameterContainer
 	{
+		private contractContainer root;
 		private ContractParameter cParam;
 		private bool showNote;
 		private string title = "";
@@ -275,8 +288,9 @@ namespace ContractsWindow
 		private AvailablePart part;
 		private List<parameterContainer> paramList = new List<parameterContainer>();
 
-		internal parameterContainer(ContractParameter cP, int Level, string PartTestName)
+		internal parameterContainer(contractContainer Root, ContractParameter cP, int Level, string PartTestName)
 		{
+			root = Root;
 			cParam = cP;
 			showNote = false;
 			level = Level;
@@ -406,7 +420,8 @@ namespace ContractsWindow
 		private void addSubParam(ContractParameter param, int Level)
 		{
 			string partTest = contractScenario.paramTypeCheck(param);
-			paramList.Add(new parameterContainer(param, Level, partTest));
+			paramList.Add(new parameterContainer(root, param, Level, partTest));
+			root.addToParamList(paramList.Last());
 		}
 
 		#region Public Accessors
