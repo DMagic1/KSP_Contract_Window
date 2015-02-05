@@ -650,7 +650,7 @@ namespace ContractsWindow
 			}
 			for (int j = 0; j < masterList.Count; j++)
 			{
-				masterList.ElementAt(j).Value.updateContractInfo();
+				masterList.ElementAt(j).Value.updateParameterInfo();
 			}
 		}
 

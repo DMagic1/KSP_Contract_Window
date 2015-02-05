@@ -144,7 +144,11 @@ namespace ContractsWindow
 		{
 			contractRewards(contract);
 			contractPenalties(contract);
-			foreach (parameterContainer pC in paramList)
+		}
+
+		internal void updateParameterInfo()
+		{
+			foreach (parameterContainer pC in allParamList)
 			{
 				pC.paramRewards(pC.CParam);
 				pC.paramPenalties(pC.CParam);
