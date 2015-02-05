@@ -1166,7 +1166,7 @@ namespace ContractsWindow
 					}
 					cC.Title = cC.Contract.Title;
 					cC.Notes = cC.Contract.Notes;
-					foreach (parameterContainer pC in cC.ParamList)
+					foreach (parameterContainer pC in cC.AllParamList)
 					{
 						pC.Title = pC.CParam.Title;
 						pC.Notes = pC.CParam.Notes;
