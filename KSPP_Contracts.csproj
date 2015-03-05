@@ -52,6 +52,7 @@
     <Compile Include="contractAssembly.cs" />
     <Compile Include="contractConfig.cs" />
     <Compile Include="contractContainer.cs" />
+    <Compile Include="contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
     <Compile Include="contractsWindow.cs" />
