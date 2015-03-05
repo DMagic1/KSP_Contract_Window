@@ -41,7 +41,7 @@ namespace ContractsWindow
 	#region Scenario Setup
 
 	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
-	class contractScenario : ScenarioModule
+	public class contractScenario : ScenarioModule
 	{
 		internal static contractScenario Instance
 		{
@@ -94,8 +94,8 @@ namespace ContractsWindow
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
 		//Contract config event
-		internal static EventData<float[], contractTypeContainer> onContractChange;
-		internal static EventData<float[], paramTypeContainer> onParamChange;
+		internal static EventData<float[]> onContractChange;
+		internal static EventData<float[]> onParamChange;
 
 		internal contractStockToolbar appLauncherButton = null;
 		internal contractToolbar blizzyToolbarButton = null;
@@ -148,8 +148,8 @@ namespace ContractsWindow
 								if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
 									sortMode = 0;
 
-								contractMission mission = new contractMission(name, activeString, hiddenString);
-								mission.MasterMission = master;
+								contractMission mission = new contractMission(name, activeString, hiddenString, ascending, showActive, sortMode, master);
+								masterMission = mission;
 
 								if (!missionList.ContainsKey(name))
 									missionList.Add(name, mission);
@@ -196,8 +196,8 @@ namespace ContractsWindow
 					ConfigNode missionNode = new ConfigNode("Contracts_Window_Mission");
 
 					missionNode.AddValue("MissionName", m.Name);
-					missionNode.AddValue("ActiveListID", stringConcat(m.ActiveMissionList));
-					missionNode.AddValue("HiddenListID", stringConcat(m.HiddenMissionList));
+					missionNode.AddValue("ActiveListID", m.stringConcat(m.ActiveMissionList));
+					missionNode.AddValue("HiddenListID", m.stringConcat(m.HiddenMissionList));
 					missionNode.AddValue("AscendingSort", m.AscendingOrder);
 					missionNode.AddValue("ShowActiveList", m.ShowActiveMissions);
 					missionNode.AddValue("SortMode", (int)m.OrderMode);
@@ -216,9 +216,9 @@ namespace ContractsWindow
 		private void Start()
 		{
 			if (onContractChange == null)
-				onContractChange = new EventData<float[], contractTypeContainer>("onContractChange");
+				onContractChange = new EventData<float[]>("onContractChange");
 			if (onParamChange == null)
-				onParamChange = new EventData<float[], paramTypeContainer>("onParamChange");
+				onParamChange = new EventData<float[]>("onParamChange");
 			onContractChange.Add(contractChanged);
 			onParamChange.Add(paramChanged);
 
@@ -247,6 +247,11 @@ namespace ContractsWindow
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
 				Destroy(blizzyToolbarButton);
+		}
+
+		public Dictionary<string, contractMission> MissionList
+		{
+			get { return missionList; }
 		}
 
 	#endregion
@@ -283,29 +288,6 @@ namespace ContractsWindow
 			return string.Join(",", s);
 		}
 
-		private string stringConcat(List<Guid> source)
-		{
-			if (source.Count == 0)
-				return "";
-			List<string> s = new List<string>();
-			for (int j = 0; j < source.Count; j++)
-			{
-				contractContainer c = getContract(source[j]);
-				if (c == null)
-					continue;
-				string i;
-				if (c.ListOrder == null)
-					i = "N";
-				else
-					i = c.ListOrder.ToString();
-				bool show = c.ShowParams;
-				string id = string.Format("{0}|{1}|{2}", source[j], i, show);
-				s.Add(id);
-			}
-
-			return string.Join(",", s.ToArray());
-		}
-
 		private string stringConcat(bool[] source, int i)
 		{
 			if (i == 0)
@@ -315,32 +297,6 @@ namespace ContractsWindow
 			{
 				s[j] = source[j].ToString();
 			}
-			return string.Join(",", s);
-		}
-
-		private string stringConcat(contractTypeContainer c)
-		{
-			string[] s = new string[9];
-			s[0] = c.RewardFund.ToString("N3");
-			s[1] = c.AdvanceFund.ToString("N3");
-			s[2] = c.PenaltyFund.ToString("N3");
-			s[3] = c.RewardRep.ToString("N3");
-			s[4] = c.PenaltyRep.ToString("N3");
-			s[5] = c.RewardScience.ToString("N3");
-			s[6] = c.DurationTime.ToString("N3");
-			s[7] = c.MaxOffer.ToString("N1");
-			s[8] = c.MaxActive.ToString("N1");
-			return string.Join(",", s);
-		}
-
-		private string stringConcat(paramTypeContainer p)
-		{
-			string[] s = new string[5];
-			s[0] = p.RewardFund.ToString("N3");
-			s[1] = p.PenaltyFund.ToString("N3");
-			s[2] = p.RewardRep.ToString("N3");
-			s[3] = p.PenaltyRep.ToString("N3");
-			s[4] = p.RewardScience.ToString("N3");
 			return string.Join(",", s);
 		}
 
@@ -367,21 +323,6 @@ namespace ContractsWindow
 			return b;
 		}
 
-		private bool stringBoolParse(string source)
-		{
-			bool b;
-			if (bool.TryParse(source, out b))
-				return b;
-			return true;
-		}
-
-		private int? stringIntParse(string s)
-		{
-			int i;
-			if (int.TryParse(s, out i)) return i;
-			return null;
-		}
-
 		private int stringintParse(string s)
 		{
 			int i;
@@ -403,7 +344,7 @@ namespace ContractsWindow
 
 		#region contract Events
 
-		private void paramChanged(float[] originals, paramTypeContainer p)
+		private void paramChanged(float[] originals)
 		{
 			for (int j = 0; j < masterList.Count; j++)
 			{
@@ -411,7 +352,7 @@ namespace ContractsWindow
 			}
 		}
 
-		private void contractChanged(float[] originals, contractTypeContainer c)
+		private void contractChanged(float[] originals)
 		{
 			for (int j = 0; j < masterList.Count; j++)
 			{
@@ -423,15 +364,18 @@ namespace ContractsWindow
 
 		#region internal methods
 
-		internal void addMissionList(string name)
+		internal bool addMissionList(string name)
 		{
 			if (!missionList.ContainsKey(name))
 			{
 				contractMission mission = new contractMission(name);
 				missionList.Add(name, mission);
+				return true;
 			}
 			else
 				DMC_MBE.LogFormatted("Missions List Already Contains Mission Of Name: [{0}]; Please Rename", name);
+
+			return false;
 		}
 
 		internal void addFullMissionList()
@@ -487,68 +431,32 @@ namespace ContractsWindow
 			masterList.Clear();
 		}
 
-		internal void loadContractLists(string s, List<Guid> IDList)
+		internal void loadAllContracts()
 		{
-			if (string.IsNullOrEmpty(s))
+			resetList();
+			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
-				IDList = new List<Guid>();
-			}
-			else
-			{
-				string[] sA = s.Split(',');
-				List<Guid> gID = new List<Guid>();
-				for (int i = 0; i < sA.Length; i++)
-				{
-					contractContainer c = null;
-					string[] sB = sA[i].Split('|');
-					try
-					{
-						Guid g = new Guid(sB[0]);
-						c = getContract(g);
-						if (c != null)
-							gID.Add(g);
-						else
-							continue;
-					}
-					catch (Exception e)
-					{
-						DMC_MBW.LogFormatted("Guid invalid: {0}", e);
-						continue;
-					}
-
-					c.ListOrder = stringIntParse(sB[1]);
-					c.ShowParams = stringBoolParse(sB[2]);
-				}
-
-				IDList = gID;
+				if (c.ContractState == Contract.State.Active)
+					addContract(c.ContractGuid, new contractContainer(c));
 			}
 		}
 
-		internal List<Guid> loadPinnedContracts(List<Guid> gID)
+		internal void loadAllMissionLists()
 		{
-			List<contractContainer> temp = new List<contractContainer>();
-			List<Guid> idTemp = new List<Guid>();
-			foreach (Guid id in gID)
+			foreach (contractMission m in missionList.Values)
 			{
-				contractContainer c = getContract(id);
-				if (c != null)
+				if (m != null)
 				{
-					if (c.ListOrder != null)
-						temp.Add(c);
-				}
-			}
-			if (temp.Count > 0)
-			{
-				temp.Sort((a, b) =>
+					if (m.MasterMission)
 					{
-						return Comparer<int?>.Default.Compare(a.ListOrder, b.ListOrder);
-					});
-				foreach (contractContainer c in temp)
-				{
-					idTemp.Add(c.Contract.ContractGuid);
+						m.buildMissionList();
+						foreach (contractContainer c in masterList.Values)
+							m.addMission(c);
+					}
+					else
+						m.buildMissionList();
 				}
 			}
-			return idTemp;
 		}
 
 		internal static string paramTypeCheck(ContractParameter param)
