@@ -1103,10 +1103,7 @@ namespace ContractsWindow
 			TooltipsEnabled = true;
 			Visible = true;
 			DragRect.width = WindowRect.width - 19;
-			contractScenario.Instance.showHideMode[sceneInt] = 0;
-			contractScenario.Instance.orderMode[sceneInt] = 0;
 			contractScenario.Instance.windowMode[sceneInt] = 0;
-			contractScenario.Instance.sortMode[sceneInt] = sortClass.Difficulty;
 			contractScenario.Instance.windowRects[sceneInt] = WindowRect;
 			contractScenario.Instance.fontSmall = true;
 			contractScenario.Instance.windowSize = 0;
@@ -1125,11 +1122,13 @@ namespace ContractsWindow
 		private void generateList()
 		{
 			contractScenario.Instance.resetList();
+			contractScenario.Instance.resetMissionsList();
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
 				if (c.ContractState == Contract.State.Active)
 					contractScenario.Instance.addContract(c.ContractGuid, new contractContainer(c));
 			}
+			contractScenario.Instance.addFullMissionList();
 		}
 
 		//Update contract values
@@ -1433,7 +1432,7 @@ namespace ContractsWindow
 
 	#region SortClass
 
-	internal enum sortClass
+	public enum sortClass
 	{
 		Default = 1,
 		Expiration = 2,
