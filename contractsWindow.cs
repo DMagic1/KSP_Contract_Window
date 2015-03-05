@@ -35,6 +35,7 @@ using System.Reflection;
 using Contracts;
 using Contracts.Parameters;
 using Contracts.Agents;
+using ContractsWindow.Toolbar;
 using UnityEngine;
 
 namespace ContractsWindow
@@ -54,8 +55,8 @@ namespace ContractsWindow
 		private Agent currentAgent;
 		private string version;
 		private Vector2 scroll, missionScroll;
-		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded;
-		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector;
+		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar;
+		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar;
 		private float dragStart, windowHeight;
 		private int timer;
 		private Rect popupRect, scrollRect, scrollViewRect;
@@ -77,6 +78,7 @@ namespace ContractsWindow
 			}
 
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+			stockToolbar = contractScenario.Instance.stockToolbar;
 
 			//Set up the various GUI options to their default values here
 			WindowCaption = "    Contracts +";
@@ -996,6 +998,34 @@ namespace ContractsWindow
 					}
 				}
 
+				else if (toolbar)
+				{
+					popupRect = new Rect(10, WindowRect.height - 180, 230, 150);
+					GUI.Box(popupRect, "", contractSkins.dropDown);
+					Rect r = new Rect(popupRect.x + 7, popupRect.y + 10, popupRect.width - 14, 30);
+					GUI.Label(r, "Toolbar Options:", contractSkins.resetBox);
+
+					r.y += 35;
+
+					if (ToolbarManager.ToolbarAvailable)
+					{
+						contractScenario.Instance.stockToolbar = GUI.Toggle(r, contractScenario.Instance.stockToolbar, "Use Stock Toolbar", contractSkins.configToggle);
+						r.y += 35;
+					}
+
+					if (stockToolbar)
+					{
+						contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, "Replace Stock Toolbar", contractSkins.configToggle);
+						r.y += 35;
+					}
+
+					if (GUI.Button(r, "Close", contractSkins.resetButton))
+					{
+						toolbar = false;
+						popup = false;
+					}
+				}
+
 				else
 					popup = false;
 			}
@@ -1080,9 +1110,10 @@ namespace ContractsWindow
 
 			//Contract config window button
 			r.x = 188 + size * 28;
-			if (GUI.Button(r, new GUIContent(contractSkins.settingsIcon, "Contract Configuration")))
+			if (GUI.Button(r, new GUIContent(contractSkins.settingsIcon, "Toolbar Options")))
 			{
-				
+				popup = true;
+				toolbar = true;
 			}
 		}
 
@@ -1164,6 +1195,27 @@ namespace ContractsWindow
 
 				nextRemoveList.Clear();
 				refreshContracts(cList);
+			}
+
+			if (stockToolbar != contractScenario.Instance.stockToolbar)
+			{
+				stockToolbar = contractScenario.Instance.stockToolbar;
+				if (stockToolbar)
+				{
+					contractScenario.Instance.appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
+					if (contractScenario.Instance.blizzyToolbarButton != null)
+					{
+						Destroy(contractScenario.Instance.blizzyToolbarButton);
+					}
+				}
+				else
+				{
+					contractScenario.Instance.blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
+					if (contractScenario.Instance.appLauncherButton != null)
+					{
+						Destroy(contractScenario.Instance.appLauncherButton);
+					}
+				}
 			}
 
 			//Close the sort menu if clicked outside of its rectangle
