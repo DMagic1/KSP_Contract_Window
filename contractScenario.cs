@@ -58,7 +58,7 @@ namespace ContractsWindow
 				}
 				catch(Exception e)
 				{
-					print(string.Format("[Contracts+] Could not find Contracts Window Scenario Module: {0}", e));
+					DMC_MBE.LogFormatted("[Contracts+] Could not find Contracts Window Scenario Module: {0}", e);
 					return null;
 				}
 			}
@@ -67,7 +67,7 @@ namespace ContractsWindow
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "1.0.3.3";
+		public string version = "1.0.3.4";
 
 		[KSPField(isPersistant = true)]
 		public bool stockToolbar = true;
