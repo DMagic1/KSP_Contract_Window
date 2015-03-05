@@ -40,11 +40,10 @@ namespace ContractsWindow
 	{
 		private Contract contract;
 		private double totalReward, duration;
-		private bool showParams, showNote;
+		private bool showNote;
 		private string daysToExpire;
 		private string title = "";
 		private string notes = "";
-		private int? listOrder;
 		private double fundsReward, fundsPenalty;
 		private float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
@@ -55,9 +54,7 @@ namespace ContractsWindow
 		internal contractContainer(Contract c)
 		{
 			contract = c;
-			showParams = true;
 			showNote = false;
-			listOrder = null;
 			title = c.Title;
 			notes = c.Notes;
 
@@ -178,12 +175,6 @@ namespace ContractsWindow
 			internal set { duration = value; }
 		}
 
-		public bool ShowParams
-		{
-			get { return showParams; }
-			internal set { showParams = value; }
-		}
-
 		public bool ShowNote
 		{
 			get { return showNote; }
@@ -206,12 +197,6 @@ namespace ContractsWindow
 		{
 			get { return notes; }
 			internal set { notes = value; }
-		}
-
-		public int? ListOrder
-		{
-			get { return listOrder; }
-			internal set { listOrder = value; }
 		}
 
 		public double FundsReward
