@@ -14,6 +14,8 @@ namespace ContractsWindow
 		internal contractUIObject(contractContainer c)
 		{
 			container = c;
+			showParams = true;
+			order = null;
 		}
 
 		public contractContainer Container
