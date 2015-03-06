@@ -13,8 +13,8 @@ namespace ContractsWindow
 		private Dictionary<Guid, contractUIObject> missionList;
 		private List<Guid> activeMissionList;
 		private List<Guid> hiddenMissionList;
-		private bool ascendingOrder;
-		private bool showActiveMissions;
+		private bool ascendingOrder = true;
+		private bool showActiveMissions = true;
 		private sortClass orderMode = sortClass.Difficulty;
 		private bool masterMission;
 
@@ -184,7 +184,7 @@ namespace ContractsWindow
 
 		internal void addMission(contractContainer c)
 		{
-			if (!activeMissionList.Contains(c.Contract.ContractGuid) || !hiddenMissionList.Contains(c.Contract.ContractGuid))
+			if (!missionList.ContainsKey(c.Contract.ContractGuid) && !activeMissionList.Contains(c.Contract.ContractGuid) && !hiddenMissionList.Contains(c.Contract.ContractGuid))
 			{
 				activeMissionList.Add(c.Contract.ContractGuid);
 				addToMasterList(c);
