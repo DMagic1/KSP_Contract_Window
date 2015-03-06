@@ -85,7 +85,12 @@ namespace ContractsWindow
 
 		private Dictionary<string, contractMission> missionList = new Dictionary<string,contractMission>();
 
-		private contractMission masterMission;
+		private contractMission masterMission = new contractMission("MasterMission");
+
+		public contractMission MasterMission
+		{
+			get { return masterMission; }
+		}
 
 		//initialize data for each gamescene
 		internal int[] windowMode = new int[4];
@@ -149,7 +154,9 @@ namespace ContractsWindow
 									sortMode = 0;
 
 								contractMission mission = new contractMission(name, activeString, hiddenString, ascending, showActive, sortMode, master);
-								masterMission = mission;
+
+								if (master)
+									masterMission = mission;
 
 								if (!missionList.ContainsKey(name))
 									missionList.Add(name, mission);
@@ -386,6 +393,31 @@ namespace ContractsWindow
 			contractMission mission = new contractMission(s);
 			mission.MasterMission = true;
 			missionList.Add(name, mission);
+			addAllContractsToMaster();
+			masterMission = mission;
+		}
+
+		private void addAllContractsToMaster()
+		{
+			contractMission Master = null;
+			foreach(contractMission m in missionList.Values)
+			{
+				if (m != null)
+				{
+					if (m.MasterMission)
+					{
+						Master = m;
+						break;
+					}
+				}
+			}
+			if (Master != null)
+			{
+				foreach (contractContainer c in masterList.Values)
+				{
+					Master.addMission(c);
+				}
+			}
 		}
 
 		internal void removeMissionList(string name)
@@ -452,6 +484,7 @@ namespace ContractsWindow
 						m.buildMissionList();
 						foreach (contractContainer c in masterList.Values)
 							m.addMission(c);
+						masterMission = m;
 					}
 					else
 						m.buildMissionList();
