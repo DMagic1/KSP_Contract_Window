@@ -57,8 +57,9 @@ namespace ContractsWindow
 		private string version, inputField;
 		private Vector2 scroll, missionScroll;
 		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar;
-		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar;
-		private float dragStart, windowHeight;
+		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionDelete;
+		private Vector2 dragStart;
+		private float windowHeight, windowWidth;
 		private int timer;
 		private Rect popupRect;
 		private int sceneInt;
@@ -130,6 +131,7 @@ namespace ContractsWindow
 					timer++;
 				else
 				{
+					LogFormatted_DebugOnly("Contract Load Triggered");
 					contractsLoading = false;
 					loaded = true;
 
@@ -141,24 +143,32 @@ namespace ContractsWindow
 					//Load ordering lists and contract settings after primary contract dictionary has been loaded
 					if (currentMission != null)
 					{
+						LogFormatted_DebugOnly("Current Mission Set");
 						if (currentMission.ShowActiveMissions)
 						{
+							LogFormatted_DebugOnly("Active List Set");
 							cList = currentMission.ActiveMissionList;
 							pinnedList = currentMission.loadPinnedContracts(cList);
 						}
 						else
 						{
+							LogFormatted_DebugOnly("Hidden List Set");
 							cList = currentMission.HiddenMissionList;
 							pinnedList = currentMission.loadPinnedContracts(cList);
 						}
 					}
 
-					if (cList.Count == 0)
-						contractScenario.Instance.addFullMissionList();
-						//rebuildList();
+					LogFormatted_DebugOnly("List Count: [{0}]", cList.Count);
 
 					if (cList.Count > 0)
 						refreshContracts(cList);
+					else
+					{
+						LogFormatted_DebugOnly("List Count = 0");
+						contractScenario.Instance.addFullMissionList();
+						currentMission = contractScenario.Instance.MasterMission;
+						cList = currentMission.ActiveMissionList;
+					}
 				}
 			}
 		}
@@ -245,6 +255,8 @@ namespace ContractsWindow
 				agencyPopup = false;
 				missionCreator = false;
 				missionSelector = false;
+				missionTextBox = false;
+				missionDelete = false;
 			}
 		}
 
@@ -255,24 +267,37 @@ namespace ContractsWindow
 			buildMenuBar(id, windowSizeAdjust);
 
 			GUILayout.BeginVertical();
-			GUILayout.Space(8);
+			GUILayout.Space(20 + (windowSizeAdjust * 4));
+
+			Rect lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 18 + (windowSizeAdjust * 4));
+
+			GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
+
+			if (!currentMission.MasterMission)
+			{
+				lastRect.x += 210 + (windowSizeAdjust * 24);
+				lastRect.y += 2 + (windowSizeAdjust * 2);
+				lastRect.width = 16 + (windowSizeAdjust * 4);
+				lastRect.height = 16 + (windowSizeAdjust * 4);
+
+				if (GUI.Button(lastRect, new GUIContent(contractSkins.closeIcon, "Delete Mission")))
+				{
+					popup = true;
+					missionDelete = true;
+				}
+			}
 
 			scroll = GUILayout.BeginScrollView(scroll);
 
-			//if (contractScenario.Instance.windowMode[sceneInt] == 1)
-			//{
-			//	Rect r = new Rect(WindowRect.x + 250 + contractScenario.Instance.windowSize * 30, WindowRect.y, WindowRect.width - (250 + contractScenario.Instance.windowSize * 30), WindowRect.height);
-
-			//	rewardScroll = GUI.BeginScrollView(r, rewardScroll, new Rect (r.x, r.y, 280 + contractScenario.Instance.windowSize * 120, r.height));
-			//}
-
-			Rect lastRect = new Rect(0, -2, 10, 0);
+			lastRect = new Rect(0, -2, 10, 0);
 
 			//Contract List Begins
 			foreach (Guid gID in cList)
 			{
 				contractUIObject c = currentMission.getContract(gID);
-				//Contracts
+
+				if (c == null)
+					continue;
 
 				GUILayout.Space(-1);
 
@@ -293,11 +318,6 @@ namespace ContractsWindow
 					}
 				}
 			}
-
-			//if (contractScenario.Instance.windowMode[sceneInt] == 1)
-			//{
-			//	GUI.EndScrollView();
-			//}
 
 			GUILayout.EndScrollView();
 			GUILayout.Space(18 + windowSizeAdjust * 4);
@@ -327,8 +347,6 @@ namespace ContractsWindow
 			}
 
 			r.x += 26 + (sizeAdjust * 9);
-			r.width = 26 + (sizeAdjust * 6);
-			r.height = 18 + (sizeAdjust * 6);
 
 			if (currentMission.AscendingOrder)
 			{
@@ -371,10 +389,10 @@ namespace ContractsWindow
 				}
 			}
 
-			r.x = WindowRect.width - 50 - (sizeAdjust * 4);
+			r.x = WindowRect.width - 32 - (sizeAdjust * 4);
 
 			//Mission selection icon
-			if (GUI.Button(r, new GUIContent(contractSkins.revealHideIcon, "Select Mission")))
+			if (GUI.Button(r, new GUIContent(contractSkins.missionSelectionIcon, "Select Mission")))
 			{
 				popup = true;
 				missionSelector = true;
@@ -383,26 +401,26 @@ namespace ContractsWindow
 			r.x += 26 + (sizeAdjust * 8);
 			r.width = 16 + (sizeAdjust * 4);
 
-			//Expand and contract icons
-			if (contractScenario.Instance.windowMode[sceneInt] == 0)
-			{
-				if (GUI.Button(r, contractSkins.expandRight))
-				{
-					contractScenario.Instance.windowMode[sceneInt] = 1;
-					WindowRect.width = 540 + contractScenario.Instance.windowSize * 150;
-					DragRect.width = WindowRect.width - 19;
-				}
-			}
-			else
-			{
-				r.x -= 2;
-				if (GUI.Button(r, contractSkins.collapseLeft))
-				{
-					contractScenario.Instance.windowMode[sceneInt] = 0;
-					WindowRect.width = 250 + contractScenario.Instance.windowSize * 30;
-					DragRect.width = WindowRect.width - 19;
-				}
-			}
+			////Expand and contract icons
+			//if (contractScenario.Instance.windowMode[sceneInt] == 0)
+			//{
+			//	if (GUI.Button(r, contractSkins.expandRight))
+			//	{
+			//		contractScenario.Instance.windowMode[sceneInt] = 1;
+			//		WindowRect.width = 540 + contractScenario.Instance.windowSize * 150;
+			//		DragRect.width = WindowRect.width - 19;
+			//	}
+			//}
+			//else
+			//{
+			//	r.x -= 2;
+			//	if (GUI.Button(r, contractSkins.collapseLeft))
+			//	{
+			//		contractScenario.Instance.windowMode[sceneInt] = 0;
+			//		WindowRect.width = 250 + contractScenario.Instance.windowSize * 30;
+			//		DragRect.width = WindowRect.width - 19;
+			//	}
+			//}
 
 			GUI.DrawTexture(new Rect(2, 17 + (sizeAdjust * 6), WindowRect.width - 4, 4), contractSkins.headerBar);
 		}
@@ -429,7 +447,7 @@ namespace ContractsWindow
 				else
 					GUI.DrawTexture(r, contractSkins.goldStarThree);
 
-				r.x += r.width + 4;
+				r.x += r.width;
 				r.width = 58 + (size * 15);
 
 				//Expiration date
@@ -442,7 +460,7 @@ namespace ContractsWindow
 				else
 					GUI.Label(r, c.Container.DaysToExpire, contractSkins.timerFinished);
 
-				r.x += 60 + (size * 15);
+				r.x += 60 + (size * 10);
 				r.width = 16 + (size * 4);
 				r.height += 1;
 
@@ -476,9 +494,7 @@ namespace ContractsWindow
 					else
 					{
 						if (GUI.Button(r, new GUIContent(contractSkins.closeIcon, "Remove Contract"), contractSkins.texButtonSmall))
-						{
 							nextRemoveList.Add(c);
-						}
 					}
 
 					r.x += 22 + (size * 4);
@@ -501,8 +517,7 @@ namespace ContractsWindow
 					}
 
 					r.x += 22 + (size * 4);
-					r.width = 12 + (size * 4);
-					r.height = 14 + (size * 4);
+					r.width = 16 + (size * 4);
 
 					//Mission list button
 					if (currentMission.MasterMission)
@@ -516,11 +531,13 @@ namespace ContractsWindow
 					}
 					else
 					{
+						r.width -= 2;
 						if (GUI.Button(r, new GUIContent(contractSkins.cancelMissionIcon, "Remove From Mission List"), contractSkins.texButtonSmall))
 							nextRemoveMissionList.Add(c);
 					}
 
-					r.x += 22 + (size * 4);
+					r.width = 12 + (size * 4);
+					r.x += 18 + (size * 4);
 
 					//Note icon button
 					if (c.Container.Contract.ContractState == Contract.State.Active && !string.IsNullOrEmpty(c.Container.Notes))
@@ -568,16 +585,19 @@ namespace ContractsWindow
 					}
 
 					r.x += 22 + (size * 4);
-					r.width = 12 + (size * 4);
-					r.height = 14 + (size * 4);
+					r.width = 16 + (size * 4);
 
 					//Mission list button
 					if (currentMission.MasterMission)
 						GUI.Label(r, contractSkins.missionIcon, contractSkins.texButtonSmall);
 					else
+					{
+						r.width -= 2;
 						GUI.Label(r, contractSkins.cancelMissionIcon, contractSkins.texButtonSmall);
+					}
 
-					r.x += 22 + (size * 4);
+					r.x += 18 + (size * 4);
+					r.width = 12 + (size * 4);
 
 					//Note icon button
 					if (c.Container.Contract.ContractState == Contract.State.Active && !string.IsNullOrEmpty(c.Container.Notes))
@@ -617,7 +637,7 @@ namespace ContractsWindow
 
 			r = GUILayoutUtility.GetLastRect();
 
-			if (contractScenario.Instance.windowMode[sceneInt] == 1)
+			if (WindowRect.width >= 270 + (size* 30))
 			{
 				if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (20 + size * 6)))
 				{
@@ -661,57 +681,63 @@ namespace ContractsWindow
 
 					rewardsRect.x += 124 + (size * 20);
 
-					//Rep rewards and penalty amounts
-					if (c.Container.RepReward > 0 || c.Container.RepPenalty > 0)
+					if (WindowRect.width >= 350 + (size * 30))
 					{
-						rewardsRect.width = 12 + (size * 4);
-						rewardsRect.height = 12 + (size * 4);
-
-						if (c.Container.RepReward > 0 && active)
-						{
-							Rect repRect = rewardsRect;
-
-							GUI.DrawTexture(repRect, contractSkins.repGreen);
-
-							repRect.x += 14 + (size * 4);
-							repRect.width = 66 + (size * 12);
-							repRect.height += 4;
-
-							GUI.Label(repRect, c.Container.RepRewString, contractSkins.reward);
-						}
-						if (c.Container.RepPenalty > 0 && failed)
-						{
-							Rect repRect = rewardsRect;
-
-							repRect.y += 14 + (size * 5);
-
-							GUI.DrawTexture(repRect, contractSkins.repRed);
-
-							repRect.x += 14 + (size * 4);
-							repRect.width = 66 + (size * 12);
-							repRect.height += 4;
-
-							GUI.Label(repRect, c.Container.RepPenString, contractSkins.penalty);
-						}
-					}
-
-					rewardsRect.x += 86 + (size * 10);
-
-					//Science reward
-					if (c.Container.ScienceReward > 0)
-					{
-						if (active)
+						//Rep rewards and penalty amounts
+						if (c.Container.RepReward > 0 || c.Container.RepPenalty > 0)
 						{
 							rewardsRect.width = 12 + (size * 4);
 							rewardsRect.height = 12 + (size * 4);
 
-							GUI.DrawTexture(rewardsRect, contractSkins.science);
+							if (c.Container.RepReward > 0 && active)
+							{
+								Rect repRect = rewardsRect;
 
-							rewardsRect.x += 14 + (size * 4);
-							rewardsRect.width = 66 + (size * 12);
-							rewardsRect.height += 4;
+								GUI.DrawTexture(repRect, contractSkins.repGreen);
 
-							GUI.Label(rewardsRect, c.Container.SciRewString, contractSkins.scienceReward);
+								repRect.x += 14 + (size * 4);
+								repRect.width = 66 + (size * 12);
+								repRect.height += 4;
+
+								GUI.Label(repRect, c.Container.RepRewString, contractSkins.reward);
+							}
+							if (c.Container.RepPenalty > 0 && failed)
+							{
+								Rect repRect = rewardsRect;
+
+								repRect.y += 14 + (size * 5);
+
+								GUI.DrawTexture(repRect, contractSkins.repRed);
+
+								repRect.x += 14 + (size * 4);
+								repRect.width = 66 + (size * 12);
+								repRect.height += 4;
+
+								GUI.Label(repRect, c.Container.RepPenString, contractSkins.penalty);
+							}
+						}
+
+						rewardsRect.x += 86 + (size * 10);
+
+						if (WindowRect.width >= 440 + (size * 30))
+						{
+							//Science reward
+							if (c.Container.ScienceReward > 0)
+							{
+								if (active)
+								{
+									rewardsRect.width = 12 + (size * 4);
+									rewardsRect.height = 12 + (size * 4);
+
+									GUI.DrawTexture(rewardsRect, contractSkins.science);
+
+									rewardsRect.x += 14 + (size * 4);
+									rewardsRect.width = 66 + (size * 12);
+									rewardsRect.height += 4;
+
+									GUI.Label(rewardsRect, c.Container.SciRewString, contractSkins.scienceReward);
+								}
+							}
 						}
 					}
 				}
@@ -790,7 +816,7 @@ namespace ContractsWindow
 			GUILayout.EndHorizontal();
 
 			//Parameter reward info
-			if (contractScenario.Instance.windowMode[sceneInt] == 1 && active)
+			if (WindowRect.width >= 270 + (size * 30))
 			{
 				if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (30 + size * 6)))
 				{
@@ -833,53 +859,59 @@ namespace ContractsWindow
 
 					rewardsRect.x += 124 + (size * 20);
 
-					if (cP.RepReward > 0 || cP.RepPenalty > 0)
+					if (WindowRect.width >= 350 + (size * 30))
 					{
-						rewardsRect.width = 12 + (size * 4);
-						rewardsRect.height = 12 + (size * 4);
-
-						if (cP.RepReward > 0 && greenState)
+						if (cP.RepReward > 0 || cP.RepPenalty > 0)
 						{
-							Rect repRect = rewardsRect;
+							rewardsRect.width = 12 + (size * 4);
+							rewardsRect.height = 12 + (size * 4);
 
-							GUI.DrawTexture(repRect, contractSkins.repGreen);
+							if (cP.RepReward > 0 && greenState)
+							{
+								Rect repRect = rewardsRect;
 
-							repRect.x += 14 + (size * 4);
-							repRect.width = 66 + (size * 12);
-							repRect.height += 4;
+								GUI.DrawTexture(repRect, contractSkins.repGreen);
 
-							GUI.Label(repRect, cP.RepRewString, contractSkins.reward);
+								repRect.x += 14 + (size * 4);
+								repRect.width = 66 + (size * 12);
+								repRect.height += 4;
+
+								GUI.Label(repRect, cP.RepRewString, contractSkins.reward);
+							}
+							if (cP.RepPenalty > 0 && redState)
+							{
+								Rect repRect = rewardsRect;
+
+								repRect.y += 14 + (size * 4);
+
+								GUI.DrawTexture(repRect, contractSkins.repRed);
+
+								repRect.x += 14 + (size * 4);
+								repRect.width = 66 + (size * 12);
+								repRect.height += 4;
+
+								GUI.Label(repRect, cP.RepPenString, contractSkins.penalty);
+							}
 						}
-						if (cP.RepPenalty > 0 && redState)
+
+						rewardsRect.x += 86 + (size * 10);
+
+						if (WindowRect.width >= 440 + (size * 30))
 						{
-							Rect repRect = rewardsRect;
+							if (cP.ScienceReward > 0 && greenState)
+							{
+								rewardsRect.width = 12 + (size * 4);
+								rewardsRect.height = 12 + (size * 4);
 
-							repRect.y += 14 + (size * 4);
+								GUI.DrawTexture(rewardsRect, contractSkins.science);
 
-							GUI.DrawTexture(repRect, contractSkins.repRed);
+								rewardsRect.x += 14 + (size * 4);
+								rewardsRect.width = 66 + (size * 12);
+								rewardsRect.height += 4;
 
-							repRect.x += 14 + (size * 4);
-							repRect.width = 66 + (size * 12);
-							repRect.height += 4;
-
-							GUI.Label(repRect, cP.RepPenString, contractSkins.penalty);
+								GUI.Label(rewardsRect, cP.SciRewString, contractSkins.scienceReward);
+							}
 						}
-					}
-
-					rewardsRect.x += 86 + (size * 10);
-
-					if (cP.ScienceReward > 0 && greenState)
-					{
-						rewardsRect.width = 12 + (size * 4);
-						rewardsRect.height = 12 + (size * 4);
-
-						GUI.DrawTexture(rewardsRect, contractSkins.science);
-
-						rewardsRect.x += 14 + (size * 4);
-						rewardsRect.width = 66 + (size * 12);
-						rewardsRect.height += 4;
-
-						GUI.Label(rewardsRect, cP.SciRewString, contractSkins.scienceReward);
 					}
 				}
 			}
@@ -962,6 +994,7 @@ namespace ContractsWindow
 						generateList();
 						rebuildList();
 						resetWindow();
+						popup = false;
 						rebuild = false;
 					}
 				}
@@ -996,7 +1029,7 @@ namespace ContractsWindow
 							Rect r = new Rect(2, (25 * i) + 2, 150 + size * 20, 25);
 							if (i == 0)
 							{
-								if (GUI.Button(r, "Create New Mission", contractSkins.sortMenu))
+								if (GUI.Button(r, "Create New Mission", contractSkins.missionMenuCenter))
 								{
 									inputField = "";
 									missionTextBox = true;
@@ -1005,10 +1038,9 @@ namespace ContractsWindow
 							}
 							else
 							{
-								if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.sortMenu))
+								if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.missionMenu))
 								{
-									contractScenario.Instance.MissionList.ElementAt(i).Value.addMission(tempContainer);
-									tempContainer = null;
+									contractScenario.Instance.MissionList.ElementAt(i).Value.addContract(tempContainer, true);
 									popup = false;
 									missionCreator = false;
 								}
@@ -1019,7 +1051,7 @@ namespace ContractsWindow
 					else
 					{
 						Rect r = new Rect(popupRect.x + 2, popupRect.y + 2, 150 + size * 20, 25);
-						GUI.Label(r, "Create New Mission", contractSkins.sortMenu);
+						GUI.Label(r, "Create New Mission", contractSkins.missionMenuCenter);
 
 						r.y += 30;
 
@@ -1033,8 +1065,7 @@ namespace ContractsWindow
 							{
 								contractMission cM = contractScenario.Instance.getMissionList(inputField);
 								if (cM != null)
-									cM.addMission(tempContainer);
-								tempContainer = null;
+									cM.addContract(tempContainer, true);
 								popup = false;
 								missionTextBox = false;
 								missionCreator = false;
@@ -1045,13 +1076,13 @@ namespace ContractsWindow
 
 				else if (missionSelector)
 				{
-					popupRect = new Rect(20, 30, 230 + size * 20, 200);
+					popupRect = new Rect(20, 30, 180 + size * 20, 200);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 					for (int i = 0; i < contractScenario.Instance.MissionList.Count; i++)
 					{
-						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 260, 25 * contractScenario.Instance.MissionList.Count));
-						Rect r = new Rect(2, (25 * i) + 2, 250, 25);
-						if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.sortMenu))
+						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 170 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
+						Rect r = new Rect(2, (25 * i) + 2, 150 + size * 20, 25);
+						if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.missionMenu))
 						{
 							currentMission = contractScenario.Instance.getMissionList(contractScenario.Instance.MissionList.ElementAt(i).Value.Name);
 
@@ -1062,6 +1093,8 @@ namespace ContractsWindow
 								cList = currentMission.ActiveMissionList;
 							else
 								cList = currentMission.HiddenMissionList;
+
+							pinnedList = currentMission.loadPinnedContracts(cList);
 
 							refreshContracts(cList);
 
@@ -1097,6 +1130,20 @@ namespace ContractsWindow
 					{
 						toolbar = false;
 						popup = false;
+					}
+				}
+
+				else if (missionDelete)
+				{
+					popupRect = new Rect(20, 40, 180 + size * 20, 160);
+					GUI.Box(popupRect, "", contractSkins.dropDown);
+					GUI.Label(new Rect(popupRect.x + 7, popupRect.y + 10, popupRect.width - 14, 100), "Delete Current Mission:\n<b>Will Not</b> Affect Contract Status", contractSkins.resetBox);
+					if (GUI.Button(new Rect(popupRect.x + 20, popupRect.y + 110, popupRect.width - 40, 25), "Delete Mission", contractSkins.resetButton))
+					{
+						contractScenario.Instance.removeMissionList(currentMission.Name);
+						currentMission = contractScenario.Instance.MasterMission;
+						popup = false;
+						missionDelete = false;
 					}
 				}
 
@@ -1161,20 +1208,14 @@ namespace ContractsWindow
 				{
 					contractScenario.Instance.windowSize = 1;
 					contractSkins.windowFontSize = 2;
-					if (contractScenario.Instance.windowMode[sceneInt] == 0)
-						WindowRect.width += 30;
-					else
-						WindowRect.width += 60;
+					WindowRect.width += 30;
 					DragRect.width = WindowRect.width - 19;
 				}
 				else
 				{
 					contractScenario.Instance.windowSize = 0;
 					contractSkins.windowFontSize = 0;
-					if (contractScenario.Instance.windowMode[sceneInt] == 0)
-						WindowRect.width -= 30;
-					else
-						WindowRect.width -= 60;
+					WindowRect.width -= 30;
 					DragRect.width = WindowRect.width - 19;
 				}
 				contractSkins.initializeSkins();
@@ -1204,8 +1245,10 @@ namespace ContractsWindow
 				if (resizer.Contains(Event.current.mousePosition))
 				{
 					resizing = true;
-					dragStart = Input.mousePosition.y;
+					dragStart.x = Input.mousePosition.x;
+					dragStart.y = Input.mousePosition.y;
 					windowHeight = WindowRect.height;
+					windowWidth = WindowRect.width;
 					Event.current.Use();
 				}
 			}
@@ -1215,23 +1258,38 @@ namespace ContractsWindow
 				{
 					resizing = false;
 					WindowRect.yMax = WindowRect.y + windowHeight;
+					WindowRect.xMax = WindowRect.x + windowWidth;
 				}
 				else
 				{
-					//Only consider y direction of mouse input
 					float height = Input.mousePosition.y;
+					float width = Input.mousePosition.x;
 					if (Input.mousePosition.y < 0)
 						height = 0;
-					windowHeight += dragStart - height;
-					dragStart = height;
+					if (Input.mousePosition.x < 0)
+						width = 0;
+					windowHeight += dragStart.y - height;
+					dragStart.y = height;
+					windowWidth += width - dragStart.x;
+					dragStart.x = width;
 					WindowRect.yMax = WindowRect.y + windowHeight;
+					WindowRect.xMax = WindowRect.x + windowWidth;
 					if (WindowRect.yMax > Screen.height)
 					{
 						WindowRect.yMax = Screen.height;
 						windowHeight = WindowRect.yMax - WindowRect.y;
 					}
+					if (WindowRect.xMax > Screen.width)
+					{
+						WindowRect.xMax = Screen.width;
+						windowWidth = WindowRect.xMax - WindowRect.x;
+					}
 					if (windowHeight < 200)
 						windowHeight = 200;
+					if (windowWidth < 250 + (size * 30))
+						windowWidth = 250 + (size * 30);
+					if (windowWidth > 540 + (size * 100))
+						windowWidth = 540 + (size * 100);
 				}
 			}
 		}
@@ -1324,8 +1382,9 @@ namespace ContractsWindow
 			pinnedList.Clear();
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
-				if (contractScenario.Instance.getContract(c.ContractGuid) != null)
-					currentMission.ActiveMissionList.Add(c.ContractGuid);
+				contractContainer cC = contractScenario.Instance.getContract(c.ContractGuid);
+				if (cC != null)
+					currentMission.addContract(cC, true);
 			}
 			cList = currentMission.ActiveMissionList;
 			refreshContracts(cList);
@@ -1339,7 +1398,6 @@ namespace ContractsWindow
 			TooltipsEnabled = true;
 			Visible = true;
 			DragRect.width = WindowRect.width - 19;
-			contractScenario.Instance.windowMode[sceneInt] = 0;
 			contractScenario.Instance.windowRects[sceneInt] = WindowRect;
 			contractScenario.Instance.fontSmall = true;
 			contractScenario.Instance.windowSize = 0;
@@ -1411,10 +1469,10 @@ namespace ContractsWindow
 			foreach (Guid removeID in removeList)
 				gID.Remove(removeID);
 			gID = sortList(gID, currentMission.OrderMode, currentMission.AscendingOrder);
-			if (currentMission.ShowActiveMissions)
-				currentMission.ActiveMissionList = gID;
-			else
-				currentMission.HiddenMissionList = gID;
+			//if (currentMission.ShowActiveMissions)
+			//	currentMission.ActiveMissionList = gID;
+			//else
+			//	currentMission.HiddenMissionList = gID;
 		}
 
 		//Remove contract from current list and update
@@ -1602,11 +1660,12 @@ namespace ContractsWindow
 		private void contractAccepted(Contract c)
 		{
 			contractScenario.Instance.addContract(c.ContractGuid, new contractContainer(c));
-			currentMission.ActiveMissionList.Add(c.ContractGuid);
-			if (currentMission.ShowActiveMissions)
+			contractContainer cC = contractScenario.Instance.getContract(c.ContractGuid);
+			if (cC != null)
 			{
-				currentMission.ActiveMissionList = sortList(currentMission.ActiveMissionList, currentMission.OrderMode, currentMission.ShowActiveMissions);
-				cList = currentMission.ActiveMissionList;
+				currentMission.addContract(cC, true);
+				if (currentMission.ShowActiveMissions)
+					refreshContracts(cList);
 			}
 		}
 
