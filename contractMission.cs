@@ -26,13 +26,13 @@ namespace ContractsWindow
 		public List<Guid> ActiveMissionList
 		{
 			get { return activeMissionList; }
-			internal set { activeMissionList = value; }
+			//internal set { activeMissionList = value; }
 		}
 
 		public List<Guid> HiddenMissionList
 		{
 			get { return hiddenMissionList; }
-			internal set { hiddenMissionList = value; }
+			//internal set { hiddenMissionList = value; }
 		}
 
 		public bool AscendingOrder
@@ -91,21 +91,20 @@ namespace ContractsWindow
 
 		internal void buildMissionList()
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Start Mission Build: [{0}]", name);
 			resetMasterList();
-			buildMissionList(activeString, activeMissionList);
-			buildMissionList(hiddenString, hiddenMissionList);
+			buildMissionList(activeString, true);
+			buildMissionList(hiddenString, false);
 		}
 
-		private void buildMissionList(string s, List<Guid> IDList)
+		private void buildMissionList(string s, bool Active)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Build Mission List");
 			if (string.IsNullOrEmpty(s))
-			{
-				IDList = new List<Guid>();
-			}
+				return;
 			else
 			{
 				string[] sA = s.Split(',');
-				List<Guid> gID = new List<Guid>();
 				for (int i = 0; i < sA.Length; i++)
 				{
 					contractContainer c = null;
@@ -117,11 +116,14 @@ namespace ContractsWindow
 						c = contractScenario.Instance.getContract(g);
 						if (c != null)
 						{
-							addToMasterList(c);
+							DMC_MBE.LogFormatted_DebugOnly("Fetch Contract Container");
+							addContract(c, Active);
 							cUI = getContract(g);
 							if (cUI == null)
 								continue;
-							gID.Add(g);
+							DMC_MBE.LogFormatted_DebugOnly("Fetch Contract UI Object");
+							cUI.Order = stringIntParse(sB[1]);
+							cUI.ShowParams = stringBoolParse(sB[2]);
 						}
 						else
 							continue;
@@ -131,17 +133,13 @@ namespace ContractsWindow
 						DMC_MBW.LogFormatted("Guid invalid: {0}", e);
 						continue;
 					}
-
-					cUI.Order = stringIntParse(sB[1]);
-					cUI.ShowParams = stringBoolParse(sB[2]);
 				}
-
-				IDList = gID;
 			}
 		}
 
 		internal List<Guid> loadPinnedContracts(List<Guid> gID)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Loading Pinned List");
 			List<contractUIObject> temp = new List<contractUIObject>();
 			List<Guid> idTemp = new List<Guid>();
 			foreach (Guid id in gID)
@@ -182,23 +180,35 @@ namespace ContractsWindow
 			return null;
 		}
 
-		internal void addMission(contractContainer c)
+		internal void addContract(contractContainer c, bool active)
 		{
-			if (!missionList.ContainsKey(c.Contract.ContractGuid) && !activeMissionList.Contains(c.Contract.ContractGuid) && !hiddenMissionList.Contains(c.Contract.ContractGuid))
+			if (!activeMissionList.Contains(c.Contract.ContractGuid) && !hiddenMissionList.Contains(c.Contract.ContractGuid))
 			{
-				activeMissionList.Add(c.Contract.ContractGuid);
-				addToMasterList(c);
+				DMC_MBE.LogFormatted_DebugOnly("Add New Contract To Mission");
+				if (addToMasterList(c))
+				{
+					if (active)
+						activeMissionList.Add(c.Contract.ContractGuid);
+					else
+						hiddenMissionList.Add(c.Contract.ContractGuid);
+				}
 			}
 			else
 				DMC_MBE.LogFormatted("Mission List Already Contains Contract: {0}", c.Title);
 		}
 
-		private void addToMasterList(contractContainer c)
+		private bool addToMasterList(contractContainer c)
 		{
 			if (!missionList.ContainsKey(c.Contract.ContractGuid))
+			{
+				DMC_MBE.LogFormatted_DebugOnly("Add Contract To Mission Master List");
 				missionList.Add(c.Contract.ContractGuid, new contractUIObject(c));
+				return true;
+			}
 			else
 				DMC_MBE.LogFormatted("Master Mission List For: [{0}] Already Contains Contract: [{1}]", name, c.Title);
+
+			return false;
 		}
 
 		internal void removeMission(contractContainer c)
