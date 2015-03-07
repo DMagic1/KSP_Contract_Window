@@ -93,7 +93,6 @@ namespace ContractsWindow
 		}
 
 		//initialize data for each gamescene
-		internal int[] windowMode = new int[4];
 		internal bool[] windowVisible = new bool[4];
 		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
@@ -118,7 +117,6 @@ namespace ContractsWindow
 					if (scenes != null)
 					{
 						//Scene settings
-						windowMode = stringSplit(scenes.GetValue("WindowMode"));
 						windowPos = stringSplit(scenes.GetValue("WindowPosition"));
 						windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
 						int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
@@ -156,7 +154,10 @@ namespace ContractsWindow
 								contractMission mission = new contractMission(name, activeString, hiddenString, ascending, showActive, sortMode, master);
 
 								if (master)
+								{
 									masterMission = mission;
+									DMC_MBE.LogFormatted_DebugOnly("Setting Master Mission During Load");
+								}
 
 								if (!missionList.ContainsKey(name))
 									missionList.Add(name, mission);
@@ -194,7 +195,6 @@ namespace ContractsWindow
 				ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
 
 				//Scene settings
-				scenes.AddValue("WindowMode", stringConcat(windowMode, windowMode.Length));
 				scenes.AddValue("WindowPosition", stringConcat(windowPos, windowPos.Length));
 				scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 
@@ -330,23 +330,6 @@ namespace ContractsWindow
 			return b;
 		}
 
-		private int stringintParse(string s)
-		{
-			int i;
-			if (int.TryParse(s, out i)) return i;
-			return 0;
-		}
-
-		private float stringFloatParse(string s, bool b)
-		{
-			float f;
-			if (float.TryParse(s, out f)) return f;
-			if (b)
-				return 1;
-			else
-				return 10;
-		}
-
 		#endregion
 
 		#region contract Events
@@ -387,9 +370,13 @@ namespace ContractsWindow
 
 		internal void addFullMissionList()
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Regen Master Mission");
 			string s = "MasterMission";
 			if (missionList.ContainsKey(s))
+			{
 				removeMissionList(s);
+				DMC_MBE.LogFormatted_DebugOnly("Removing Old Master Mission");
+			}
 			contractMission mission = new contractMission(s);
 			mission.MasterMission = true;
 			missionList.Add(name, mission);
@@ -413,9 +400,10 @@ namespace ContractsWindow
 			}
 			if (Master != null)
 			{
+				DMC_MBE.LogFormatted_DebugOnly("Adding All Contracts To MasterMission");
 				foreach (contractContainer c in masterList.Values)
 				{
-					Master.addMission(c);
+					Master.addContract(c, true);
 				}
 			}
 		}
@@ -465,6 +453,7 @@ namespace ContractsWindow
 
 		internal void loadAllContracts()
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Load Scenario Master Contract List");
 			resetList();
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
@@ -477,13 +466,16 @@ namespace ContractsWindow
 		{
 			foreach (contractMission m in missionList.Values)
 			{
+				DMC_MBE.LogFormatted_DebugOnly("{0} Missions Found For Loading", missionList.Count);
 				if (m != null)
 				{
+					DMC_MBE.LogFormatted_DebugOnly("Begin Mission List Load: [{0}]", m.Name);
 					if (m.MasterMission)
 					{
+						DMC_MBE.LogFormatted_DebugOnly("Initial Master Mission Load");
 						m.buildMissionList();
 						foreach (contractContainer c in masterList.Values)
-							m.addMission(c);
+							m.addContract(c, true);
 						masterMission = m;
 					}
 					else
@@ -572,10 +564,7 @@ namespace ContractsWindow
 			int i = currentScene(HighLogic.LoadedScene);
 			windowPos[i * 4] = (int)source.x;
 			windowPos[(i * 4) + 1] = (int)source.y;
-			if (windowMode[i] == 0)
-				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
-			else
-				windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 150);
+			windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
@@ -583,10 +572,7 @@ namespace ContractsWindow
 		{
 			int i = currentScene(HighLogic.LoadedScene);
 			windowRects[i] = new Rect(window[0], window[1], window[2], window[3]);
-			if (windowMode[i] == 0)
-				windowRects[i].width += (windowSize * 30);
-			else
-				windowRects[i].width += (windowSize * 150);
+			windowRects[i].width += (windowSize * 30);
 		}
 
 		#endregion
