@@ -23,6 +23,11 @@ namespace ContractsWindow
 			get { return name; }
 		}
 
+		public int ActiveContracts
+		{
+			get { return missionList.Count; }
+		}
+
 		public List<Guid> ActiveMissionList
 		{
 			get { return activeMissionList; }
