@@ -27,6 +27,7 @@ THE SOFTWARE.
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
@@ -60,7 +61,7 @@ namespace ContractsWindow
 		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionDelete;
 		private Vector2 dragStart;
 		private float windowHeight, windowWidth;
-		private int timer;
+		//private int timer;
 		private Rect popupRect;
 		private int sceneInt;
 		private const string lockID = "ContractsWindow_LockID";
@@ -119,57 +120,54 @@ namespace ContractsWindow
 
 		protected override void Update()
 		{
-			if (HighLogic.LoadedScene == GameScenes.FLIGHT && !loaded && !contractsLoading)
+			if (contractsLoading && !loaded)
+				StartCoroutine(loadContracts());
+		}
+
+		private IEnumerator loadContracts()
+		{
+			LogFormatted_DebugOnly("Contract Load Triggered");
+			int activeC = ContractSystem.Instance.GetActiveContractCount();
+			int i = 0;
+			contractsLoading = false;
+			loaded = true;
+
+			while (activeC < contractScenario.Instance.ContractCount && i < 500)
 			{
-				contractsLoading = true;
-				timer = 0;
+				i++;
+				yield return null;
 			}
-			//Start a timer after contracts begin loading to ensure that all contracts are loaded before we populate the lists
-			else if (contractsLoading && !loaded)
+
+			LogFormatted_DebugOnly("Contract System Loaded; Active Count: {0}; Timer Count; {1}", activeC, i);
+
+			contractScenario.Instance.loadAllContracts();
+			contractScenario.Instance.loadAllMissionLists();
+
+			currentMission = contractScenario.Instance.MasterMission;
+
+			//Load ordering lists and contract settings after primary contract dictionary has been loaded
+			if (currentMission != null)
 			{
-				if (timer < 30)
-					timer++;
+
+				if (currentMission.ShowActiveMissions)
+				{
+					cList = currentMission.ActiveMissionList;
+					pinnedList = currentMission.loadPinnedContracts(cList);
+				}
 				else
 				{
-					LogFormatted_DebugOnly("Contract Load Triggered");
-					contractsLoading = false;
-					loaded = true;
-
-					contractScenario.Instance.loadAllContracts();
-					contractScenario.Instance.loadAllMissionLists();
-
-					currentMission = contractScenario.Instance.MasterMission;
-
-					//Load ordering lists and contract settings after primary contract dictionary has been loaded
-					if (currentMission != null)
-					{
-						LogFormatted_DebugOnly("Current Mission Set");
-						if (currentMission.ShowActiveMissions)
-						{
-							LogFormatted_DebugOnly("Active List Set");
-							cList = currentMission.ActiveMissionList;
-							pinnedList = currentMission.loadPinnedContracts(cList);
-						}
-						else
-						{
-							LogFormatted_DebugOnly("Hidden List Set");
-							cList = currentMission.HiddenMissionList;
-							pinnedList = currentMission.loadPinnedContracts(cList);
-						}
-					}
-
-					LogFormatted_DebugOnly("List Count: [{0}]", cList.Count);
-
-					if (cList.Count > 0)
-						refreshContracts(cList);
-					else
-					{
-						LogFormatted_DebugOnly("List Count = 0");
-						contractScenario.Instance.addFullMissionList();
-						currentMission = contractScenario.Instance.MasterMission;
-						cList = currentMission.ActiveMissionList;
-					}
+					cList = currentMission.HiddenMissionList;
+					pinnedList = currentMission.loadPinnedContracts(cList);
 				}
+			}
+
+			if (cList.Count > 0)
+				refreshContracts(cList);
+			else
+			{
+				contractScenario.Instance.addFullMissionList();
+				currentMission = contractScenario.Instance.MasterMission;
+				cList = currentMission.ActiveMissionList;
 			}
 		}
 
@@ -1025,8 +1023,8 @@ namespace ContractsWindow
 					{
 						for (int i = 0; i < contractScenario.Instance.MissionList.Count; i++)
 						{
-							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 170 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
-							Rect r = new Rect(2, (25 * i) + 2, 150 + size * 20, 25);
+							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
+							Rect r = new Rect(2, (25 * i) + 2, 140 + size * 20, 25);
 							if (i == 0)
 							{
 								if (GUI.Button(r, "Create New Mission", contractSkins.missionMenuCenter))
@@ -1038,12 +1036,17 @@ namespace ContractsWindow
 							}
 							else
 							{
-								if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.missionMenu))
+								contractMission m = contractScenario.Instance.MissionList.ElementAt(i).Value;
+								if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 								{
-									contractScenario.Instance.MissionList.ElementAt(i).Value.addContract(tempContainer, true);
+									m.addContract(tempContainer, true);
 									popup = false;
 									missionCreator = false;
 								}
+								r.x += 145 + size * 18;
+								r.y += 4;
+								r.width = 15 + size * 5;
+								GUI.Label(r, m.ActiveContracts.ToString(), contractSkins.timerGood);
 							}
 							GUI.EndScrollView();
 						}
@@ -1061,15 +1064,20 @@ namespace ContractsWindow
 
 						if (GUI.Button(r, "Create Mission", contractSkins.resetButton))
 						{
-							if (contractScenario.Instance.addMissionList(inputField))
+							if (!string.IsNullOrEmpty(inputField))
 							{
-								contractMission cM = contractScenario.Instance.getMissionList(inputField);
-								if (cM != null)
-									cM.addContract(tempContainer, true);
-								popup = false;
-								missionTextBox = false;
-								missionCreator = false;
+								if (contractScenario.Instance.addMissionList(inputField))
+								{
+									contractMission cM = contractScenario.Instance.getMissionList(inputField);
+									if (cM != null)
+										cM.addContract(tempContainer, true);
+									popup = false;
+									missionTextBox = false;
+									missionCreator = false;
+								}
 							}
+							else
+								ScreenMessages.PostScreenMessage("Contract mission list must have a name", 5f, ScreenMessageStyle.UPPER_CENTER);
 						}
 					}
 				}
@@ -1080,11 +1088,12 @@ namespace ContractsWindow
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 					for (int i = 0; i < contractScenario.Instance.MissionList.Count; i++)
 					{
-						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 170 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
-						Rect r = new Rect(2, (25 * i) + 2, 150 + size * 20, 25);
-						if (GUI.Button(r, contractScenario.Instance.MissionList.ElementAt(i).Value.Name, contractSkins.missionMenu))
+						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
+						Rect r = new Rect(2, (25 * i) + 2, 140 + size * 20, 25);
+						contractMission m = contractScenario.Instance.MissionList.ElementAt(i).Value;
+						if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 						{
-							currentMission = contractScenario.Instance.getMissionList(contractScenario.Instance.MissionList.ElementAt(i).Value.Name);
+							currentMission = contractScenario.Instance.getMissionList(m.Name);
 
 							if (currentMission == null)
 								currentMission = contractScenario.Instance.MasterMission;
@@ -1101,6 +1110,10 @@ namespace ContractsWindow
 							popup = false;
 							missionSelector = false; ;
 						}
+						r.x += 145 + size * 18;
+						r.y += 4;
+						r.width = 15 + size * 5;
+						GUI.Label(r, m.ActiveContracts.ToString(), contractSkins.timerGood);
 						GUI.EndScrollView();
 					}
 				}
@@ -1674,7 +1687,6 @@ namespace ContractsWindow
 		{
 			if (!contractsLoading && !loaded)
 			{
-				timer = 0;
 				contractsLoading = true;
 			}
 		}
