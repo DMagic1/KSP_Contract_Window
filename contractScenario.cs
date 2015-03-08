@@ -106,11 +106,46 @@ namespace ContractsWindow
 
 		internal contractsWindow cWin;
 
+		private int contractCount;
+
+		public int ContractCount
+		{
+			get { return contractCount; }
+		}
+
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
 			try
 			{
+				ConfigNode gameNode = HighLogic.CurrentGame.config;
+				if (gameNode != null)
+				{
+					ConfigNode contractSystemNode = gameNode.GetNodes("SCENARIO").FirstOrDefault(c => c.GetValue("name") == "ContractSystem");
+					if (contractSystemNode != null)
+					{
+						ConfigNode cNode = contractSystemNode.GetNode("CONTRACTS");
+						if (cNode != null)
+						{
+							foreach (ConfigNode C in cNode.GetNodes("CONTRACT"))
+							{
+								if (C != null)
+								{
+									string state = "";
+									if (C.HasValue("state"))
+										state = C.GetValue("state");
+
+									if (state == "Active")
+										contractCount++;
+								}
+							}
+						}
+						DMC_MBE.LogFormatted_DebugOnly("Contract System Can't Be Checked... Node Invalid");
+					}
+				}
+
+				DMC_MBE.LogFormatted_DebugOnly("[{0}] Active Contracts Counted", contractCount);
+
 				if (version == contractAssembly.Version)
 				{
 					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
