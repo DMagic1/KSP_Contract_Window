@@ -152,6 +152,18 @@ namespace ContractsWindow
 			}
 		}
 
+		internal void updateParemeterInfo(Type t)
+		{
+			foreach (parameterContainer pC in allParamList)
+			{
+				if (pC.CParam.GetType() == t)
+				{
+					pC.paramRewards(pC.CParam);
+					pC.paramPenalties(pC.CParam);
+				}
+			}
+		}
+
 		internal void addToParamList(parameterContainer pC)
 		{
 			allParamList.Add(pC);
