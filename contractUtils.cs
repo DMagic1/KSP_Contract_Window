@@ -177,5 +177,69 @@ namespace ContractsWindow
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// A method for updating all reward values for active contracts
+		/// </summary>
+		/// <param name="contractType">Type of contract that needs to be updated; must be a subclass of Contracts.Contract</param>
+		public static void UpdateContractType(Type contractType)
+		{
+			if (contractType == null)
+			{
+				Debug.LogWarning("[Contracts +] Type provided for update contract method is null");
+				return;
+			}
+			if (contractType.IsSubclassOf(typeof(Contracts.Contract)))
+			{
+				Debug.LogWarning("[Contracts +] Type provided is not derived from the base Contract class");
+				return;
+			}
+			if (contractScenario.Instance == null)
+			{
+				Debug.LogWarning("[Contracts +] Contracts Window + scenario module is not loaded");
+				return;
+			}
+
+			try
+			{
+				contractScenario.Instance.contractChanged(contractType);
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Error while updating contract values: " + e);
+			}
+		}
+
+		/// <summary>
+		/// A method for updating contract parameter reward values for active contracts
+		/// </summary>
+		/// <param name="parameterType">Type of parameter that needs to be updated; must be a subclass of Contracts.ContractParameter</param>
+		public static void UpdateParameterType(Type parameterType)
+		{
+			if (parameterType == null)
+			{
+				Debug.LogWarning("[Contracts +] Type provided for update parameter method is null");
+				return;
+			}
+			if (parameterType.IsSubclassOf(typeof(Contracts.ContractParameter)))
+			{
+				Debug.LogWarning("[Contracts +] Type provided is not derived from the base Contract Parameter class");
+				return;
+			}
+			if (contractScenario.Instance == null)
+			{
+				Debug.LogWarning("[Contracts +] Contracts Window + scenario module is not loaded");
+				return;
+			}
+
+			try
+			{
+				contractScenario.Instance.paramChanged(parameterType);
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Error while updating parameter values: " + e);
+			}
+		}
 	}
 }
