@@ -97,10 +97,6 @@ namespace ContractsWindow
 		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
 		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
 
-		//Contract config event
-		internal static EventData<float[]> onContractChange;
-		internal static EventData<float[]> onParamChange;
-
 		internal contractStockToolbar appLauncherButton = null;
 		internal contractToolbar blizzyToolbarButton = null;
 
@@ -257,13 +253,6 @@ namespace ContractsWindow
 
 		private void Start()
 		{
-			if (onContractChange == null)
-				onContractChange = new EventData<float[]>("onContractChange");
-			if (onParamChange == null)
-				onParamChange = new EventData<float[]>("onParamChange");
-			onContractChange.Add(contractChanged);
-			onParamChange.Add(paramChanged);
-
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
@@ -281,10 +270,8 @@ namespace ContractsWindow
 		//Remove our contract window object
 		private void OnDestroy()
 		{
-			Destroy(cWin);
-			onContractChange.Remove(contractChanged);
-			onParamChange.Remove(paramChanged);
-
+			if (cWin != null)
+				Destroy(cWin);
 			if (appLauncherButton != null)
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
@@ -369,19 +356,20 @@ namespace ContractsWindow
 
 		#region contract Events
 
-		private void paramChanged(float[] originals)
+		internal void paramChanged(Type t)
 		{
-			for (int j = 0; j < masterList.Count; j++)
+			foreach (contractContainer cC in masterList.Values)
 			{
-				masterList.ElementAt(j).Value.updateParameterInfo();
+				cC.updateParemeterInfo(t);
 			}
 		}
 
-		private void contractChanged(float[] originals)
+		internal void contractChanged(Type t)
 		{
-			for (int j = 0; j < masterList.Count; j++)
+			foreach (contractContainer cC in masterList.Values)
 			{
-				masterList.ElementAt(j).Value.updateContractInfo();
+				if (cC.Contract.GetType() == t)
+					cC.updateContractInfo();
 			}
 		}
 
