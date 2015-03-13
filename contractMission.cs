@@ -1,10 +1,40 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+Contract Mission - Object to hold info about a mission list
+
+Copyright (c) 2014 DMagic
+
+KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ContractsWindow
 {
+	/// <summary>
+	/// A list of contracts; each with its own sort order and separate lists for active and hidden contracts
+	/// A special master mission list is used to store all contracts and is used as the source for all other missions
+	/// </summary>
 	public class contractMission
 	{
 		private string name;
@@ -31,13 +61,11 @@ namespace ContractsWindow
 		public List<Guid> ActiveMissionList
 		{
 			get { return activeMissionList; }
-			//internal set { activeMissionList = value; }
 		}
 
 		public List<Guid> HiddenMissionList
 		{
 			get { return hiddenMissionList; }
-			//internal set { hiddenMissionList = value; }
 		}
 
 		public bool AscendingOrder
@@ -96,7 +124,6 @@ namespace ContractsWindow
 
 		internal void buildMissionList()
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Start Mission Build: [{0}]", name);
 			resetMasterList();
 			buildMissionList(activeString, true);
 			buildMissionList(hiddenString, false);
@@ -104,7 +131,6 @@ namespace ContractsWindow
 
 		private void buildMissionList(string s, bool Active)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Build Mission List");
 			if (string.IsNullOrEmpty(s))
 				return;
 			else
@@ -118,20 +144,20 @@ namespace ContractsWindow
 					try
 					{
 						Guid g = new Guid(sB[0]);
-						c = contractScenario.Instance.getContract(g);
-						if (c != null)
-						{
-							DMC_MBE.LogFormatted_DebugOnly("Fetch Contract Container");
-							addContract(c, Active);
-							cUI = getContract(g);
-							if (cUI == null)
-								continue;
-							DMC_MBE.LogFormatted_DebugOnly("Fetch Contract UI Object");
-							cUI.Order = stringIntParse(sB[1]);
-							cUI.ShowParams = stringBoolParse(sB[2]);
-						}
-						else
+						if (g == null)
 							continue;
+
+						c = contractScenario.Instance.getContract(g);
+						if (c == null)
+							continue;
+
+						addContract(c, Active, true);
+						cUI = getContract(g);
+						if (cUI == null)
+							continue;
+
+						cUI.Order = stringIntParse(sB[1]);
+						cUI.ShowParams = stringBoolParse(sB[2]);
 					}
 					catch (Exception e)
 					{
@@ -144,7 +170,6 @@ namespace ContractsWindow
 
 		internal List<Guid> loadPinnedContracts(List<Guid> gID)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Loading Pinned List");
 			List<contractUIObject> temp = new List<contractUIObject>();
 			List<Guid> idTemp = new List<Guid>();
 			foreach (Guid id in gID)
@@ -185,11 +210,10 @@ namespace ContractsWindow
 			return null;
 		}
 
-		internal void addContract(contractContainer c, bool active)
+		internal void addContract(contractContainer c, bool active, bool warn)
 		{
 			if (!activeMissionList.Contains(c.Contract.ContractGuid) && !hiddenMissionList.Contains(c.Contract.ContractGuid))
 			{
-				DMC_MBE.LogFormatted_DebugOnly("Add New Contract To Mission");
 				if (addToMasterList(c))
 				{
 					if (active)
@@ -198,7 +222,7 @@ namespace ContractsWindow
 						hiddenMissionList.Add(c.Contract.ContractGuid);
 				}
 			}
-			else
+			else if (warn)
 				DMC_MBE.LogFormatted("Mission List Already Contains Contract: {0}", c.Title);
 		}
 
@@ -206,7 +230,6 @@ namespace ContractsWindow
 		{
 			if (!missionList.ContainsKey(c.Contract.ContractGuid))
 			{
-				DMC_MBE.LogFormatted_DebugOnly("Add Contract To Mission Master List");
 				missionList.Add(c.Contract.ContractGuid, new contractUIObject(c));
 				return true;
 			}
