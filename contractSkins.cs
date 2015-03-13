@@ -187,6 +187,7 @@ namespace ContractsWindow
 			newWindowStyle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
 			newWindowStyle.fontSize = 14 + normalFontSize + windowFontSize;
+			newWindowStyle.fontStyle = FontStyle.Bold;
 			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
 			newWindowStyle.normal.background = windowTex;
 			newWindowStyle.focused.background = newWindowStyle.normal.background;
