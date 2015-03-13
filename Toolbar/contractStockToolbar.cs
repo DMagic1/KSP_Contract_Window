@@ -95,26 +95,38 @@ namespace ContractsWindow.Toolbar
 
 			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
 
-			stockContracts.toggleButton.onDisable();
-
-			stockContracts.toggleButton.onTrue = stockToolbarButton.toggleButton.onTrue;
-			stockContracts.toggleButton.onFalse = stockToolbarButton.toggleButton.onFalse;
-			stockContracts.toggleButton.onHover = stockToolbarButton.toggleButton.onHover;
-			stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
-			stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
-			stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
-
-			ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
-
-			LogFormatted("Stock Contracts App Replaced With Contracts Window +");
-
-			try
+			if (stockContracts != null)
 			{
-				removeButton(HighLogic.LoadedScene);
+				stockContracts.toggleButton.onDisable();
+
+				stockContracts.toggleButton.onTrue = stockToolbarButton.toggleButton.onTrue;
+				stockContracts.toggleButton.onFalse = stockToolbarButton.toggleButton.onFalse;
+				stockContracts.toggleButton.onHover = stockToolbarButton.toggleButton.onHover;
+				stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
+				stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
+				stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
+
+				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
+
+				LogFormatted("Stock Contracts App Replaced With Contracts Window +");
+
+				try
+				{
+					removeButton(HighLogic.LoadedScene);
+				}
+				catch (Exception e)
+				{
+					LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+				}
 			}
-			catch (Exception e)
+			else
 			{
-				LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+				LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
+
+				if (stockToolbarButton != null)
+					GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
+				else
+					StartCoroutine(addButton());
 			}
 		}
 
