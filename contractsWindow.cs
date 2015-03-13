@@ -30,7 +30,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
 using System.Reflection;
 
 using Contracts;
@@ -49,6 +48,7 @@ namespace ContractsWindow
 
 		private List<Guid> cList = new List<Guid>();
 		private List<Guid> pinnedList = new List<Guid>();
+		private List<contractMission> missionList = new List<contractMission>();
 		private List<contractUIObject> nextRemoveList = new List<contractUIObject>();
 		private List<contractUIObject> nextRemoveMissionList = new List<contractUIObject>();
 		private List<contractUIObject> nextPinnedList = new List<contractUIObject>();
@@ -83,7 +83,7 @@ namespace ContractsWindow
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 
 			//Set up the various GUI options to their default values here
-			WindowCaption = "    Contracts +";
+			WindowCaption = "Contracts +";
 			WindowRect = new Rect(40, 80, 250, 300);
 			WindowOptions = new GUILayoutOption[1] { GUILayout.MaxHeight(Screen.height) };
 			WindowStyle = contractSkins.newWindowStyle;
@@ -100,7 +100,10 @@ namespace ContractsWindow
 
 		protected override void Start()
 		{
-			currentMission = new contractMission("");
+			missionList = contractScenario.Instance.getAllMissions();
+			currentMission = missionList[0];
+			if (currentMission == null)
+				currentMission = new contractMission("");
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
 			PersistenceLoad();
@@ -134,6 +137,7 @@ namespace ContractsWindow
 
 			while (activeC < contractScenario.Instance.ContractCount && i < 500)
 			{
+				activeC = ContractSystem.Instance.GetActiveContractCount();
 				i++;
 				yield return null;
 			}
@@ -179,6 +183,7 @@ namespace ContractsWindow
 		{
 			//Update the drag rectangle
 			DragRect.height = WindowRect.height - 24 - contractScenario.Instance.windowSize * 8;
+			DragRect.width = WindowRect.width - 19;
 
 			//Prevent click through from activating part options
 			if (HighLogic.LoadedSceneIsFlight)
@@ -267,7 +272,7 @@ namespace ContractsWindow
 			GUILayout.BeginVertical();
 			GUILayout.Space(20 + (windowSizeAdjust * 4));
 
-			Rect lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 18 + (windowSizeAdjust * 4));
+			Rect lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 24 + (windowSizeAdjust * 4));
 
 			GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
 
@@ -284,6 +289,8 @@ namespace ContractsWindow
 					missionDelete = true;
 				}
 			}
+
+			GUILayout.Space(4);
 
 			scroll = GUILayout.BeginScrollView(scroll);
 
@@ -344,7 +351,7 @@ namespace ContractsWindow
 				showSort = !showSort;
 			}
 
-			r.x += 26 + (sizeAdjust * 9);
+			r.x += 36 + (sizeAdjust * 9);
 
 			if (currentMission.AscendingOrder)
 			{
@@ -363,7 +370,7 @@ namespace ContractsWindow
 				}
 			}
 
-			r.x += 26 + (sizeAdjust * 8);
+			r.x = WindowRect.width - 68 - (sizeAdjust * 9);
 
 			//Show and hide icons
 			if (currentMission.ShowActiveMissions)
@@ -387,7 +394,7 @@ namespace ContractsWindow
 				}
 			}
 
-			r.x = WindowRect.width - 32 - (sizeAdjust * 4);
+			r.x += 36 + (sizeAdjust * 6);
 
 			//Mission selection icon
 			if (GUI.Button(r, new GUIContent(contractSkins.missionSelectionIcon, "Select Mission")))
@@ -395,30 +402,6 @@ namespace ContractsWindow
 				popup = true;
 				missionSelector = true;
 			}
-
-			r.x += 26 + (sizeAdjust * 8);
-			r.width = 16 + (sizeAdjust * 4);
-
-			////Expand and contract icons
-			//if (contractScenario.Instance.windowMode[sceneInt] == 0)
-			//{
-			//	if (GUI.Button(r, contractSkins.expandRight))
-			//	{
-			//		contractScenario.Instance.windowMode[sceneInt] = 1;
-			//		WindowRect.width = 540 + contractScenario.Instance.windowSize * 150;
-			//		DragRect.width = WindowRect.width - 19;
-			//	}
-			//}
-			//else
-			//{
-			//	r.x -= 2;
-			//	if (GUI.Button(r, contractSkins.collapseLeft))
-			//	{
-			//		contractScenario.Instance.windowMode[sceneInt] = 0;
-			//		WindowRect.width = 250 + contractScenario.Instance.windowSize * 30;
-			//		DragRect.width = WindowRect.width - 19;
-			//	}
-			//}
 
 			GUI.DrawTexture(new Rect(2, 17 + (sizeAdjust * 6), WindowRect.width - 4, 4), contractSkins.headerBar);
 		}
@@ -1021,9 +1004,9 @@ namespace ContractsWindow
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 					if (!missionTextBox)
 					{
-						for (int i = 0; i < contractScenario.Instance.MissionList.Count; i++)
+						for (int i = 0; i < missionList.Count; i++)
 						{
-							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
+							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * missionList.Count));
 							Rect r = new Rect(2, (25 * i) + 2, 140 + size * 20, 25);
 							if (i == 0)
 							{
@@ -1036,7 +1019,7 @@ namespace ContractsWindow
 							}
 							else
 							{
-								contractMission m = contractScenario.Instance.MissionList.ElementAt(i).Value;
+								contractMission m = missionList[i];
 								if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 								{
 									m.addContract(tempContainer, true);
@@ -1086,11 +1069,11 @@ namespace ContractsWindow
 				{
 					popupRect = new Rect(20, 30, 180 + size * 20, 200);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
-					for (int i = 0; i < contractScenario.Instance.MissionList.Count; i++)
+					for (int i = 0; i < missionList.Count; i++)
 					{
-						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * contractScenario.Instance.MissionList.Count));
+						missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * missionList.Count));
 						Rect r = new Rect(2, (25 * i) + 2, 140 + size * 20, 25);
-						contractMission m = contractScenario.Instance.MissionList.ElementAt(i).Value;
+						contractMission m = missionList[i];
 						if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 						{
 							currentMission = contractScenario.Instance.getMissionList(m.Name);
