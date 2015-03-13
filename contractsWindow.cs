@@ -129,7 +129,6 @@ namespace ContractsWindow
 
 		private IEnumerator loadContracts()
 		{
-			LogFormatted_DebugOnly("Contract Load Triggered");
 			int activeC = ContractSystem.Instance.GetActiveContractCount();
 			int i = 0;
 			contractsLoading = false;
@@ -142,12 +141,7 @@ namespace ContractsWindow
 				yield return null;
 			}
 
-			LogFormatted_DebugOnly("Contract System Loaded; Active Count: {0}; Timer Count; {1}", activeC, i);
-
-			contractScenario.Instance.loadAllContracts();
-			contractScenario.Instance.loadAllMissionLists();
-
-			currentMission = contractScenario.Instance.MasterMission;
+			generateList();
 
 			//Load ordering lists and contract settings after primary contract dictionary has been loaded
 			if (currentMission != null)
@@ -168,11 +162,7 @@ namespace ContractsWindow
 			if (cList.Count > 0)
 				refreshContracts(cList);
 			else
-			{
-				contractScenario.Instance.addFullMissionList();
-				currentMission = contractScenario.Instance.MasterMission;
-				cList = currentMission.ActiveMissionList;
-			}
+				rebuildList();
 		}
 
 		#endregion
@@ -1022,7 +1012,7 @@ namespace ContractsWindow
 								contractMission m = missionList[i];
 								if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 								{
-									m.addContract(tempContainer, true);
+									m.addContract(tempContainer, true, true);
 									popup = false;
 									missionCreator = false;
 								}
@@ -1053,7 +1043,7 @@ namespace ContractsWindow
 								{
 									contractMission cM = contractScenario.Instance.getMissionList(inputField);
 									if (cM != null)
-										cM.addContract(tempContainer, true);
+										cM.addContract(tempContainer, true, true);
 									popup = false;
 									missionTextBox = false;
 									missionCreator = false;
@@ -1205,14 +1195,12 @@ namespace ContractsWindow
 					contractScenario.Instance.windowSize = 1;
 					contractSkins.windowFontSize = 2;
 					WindowRect.width += 30;
-					DragRect.width = WindowRect.width - 19;
 				}
 				else
 				{
 					contractScenario.Instance.windowSize = 0;
 					contractSkins.windowFontSize = 0;
 					WindowRect.width -= 30;
-					DragRect.width = WindowRect.width - 19;
 				}
 				contractSkins.initializeSkins();
 				WindowStyle = contractSkins.newWindowStyle;
@@ -1372,16 +1360,23 @@ namespace ContractsWindow
 		//Reset contract list from the "refresh" button
 		private void rebuildList()
 		{
+			contractScenario.Instance.addFullMissionList();
+
+			currentMission = contractScenario.Instance.MasterMission;
+
 			currentMission.ActiveMissionList.Clear();
 			currentMission.HiddenMissionList.Clear();
+
 			cList.Clear();
 			pinnedList.Clear();
+
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
 				contractContainer cC = contractScenario.Instance.getContract(c.ContractGuid);
 				if (cC != null)
-					currentMission.addContract(cC, true);
+					currentMission.addContract(cC, true, true);
 			}
+
 			cList = currentMission.ActiveMissionList;
 			refreshContracts(cList);
 		}
@@ -1393,7 +1388,6 @@ namespace ContractsWindow
 			WindowRect = new Rect(40, 80, 250, 300);
 			TooltipsEnabled = true;
 			Visible = true;
-			DragRect.width = WindowRect.width - 19;
 			contractScenario.Instance.windowRects[sceneInt] = WindowRect;
 			contractScenario.Instance.fontSmall = true;
 			contractScenario.Instance.windowSize = 0;
@@ -1411,14 +1405,9 @@ namespace ContractsWindow
 		//Initial contract load
 		private void generateList()
 		{
-			contractScenario.Instance.resetList();
-			contractScenario.Instance.resetMissionsList();
-			foreach (Contract c in ContractSystem.Instance.Contracts)
-			{
-				if (c.ContractState == Contract.State.Active)
-					contractScenario.Instance.addContract(c.ContractGuid, new contractContainer(c));
-			}
-			contractScenario.Instance.addFullMissionList();
+			contractScenario.Instance.loadAllContracts();
+			contractScenario.Instance.loadAllMissionLists();
+			currentMission = contractScenario.Instance.MasterMission;
 		}
 
 		//Update contract values
@@ -1465,10 +1454,6 @@ namespace ContractsWindow
 			foreach (Guid removeID in removeList)
 				gID.Remove(removeID);
 			gID = sortList(gID, currentMission.OrderMode, currentMission.AscendingOrder);
-			//if (currentMission.ShowActiveMissions)
-			//	currentMission.ActiveMissionList = gID;
-			//else
-			//	currentMission.HiddenMissionList = gID;
 		}
 
 		//Remove contract from current list and update
@@ -1659,7 +1644,7 @@ namespace ContractsWindow
 			contractContainer cC = contractScenario.Instance.getContract(c.ContractGuid);
 			if (cC != null)
 			{
-				currentMission.addContract(cC, true);
+				currentMission.addContract(cC, true, true);
 				if (currentMission.ShowActiveMissions)
 					refreshContracts(cList);
 			}
