@@ -36,6 +36,9 @@ using System.Reflection;
 
 namespace ContractsWindow
 {
+	/// <summary>
+	/// This object is used to store locally cached data for each contract and a list of its parameters
+	/// </summary>
 	public class contractContainer
 	{
 		private Contract contract;
@@ -274,7 +277,9 @@ namespace ContractsWindow
 		#endregion
 	}
 
-	//Store some info about contract parameters
+	/// <summary>
+	/// Stores locally cached data about contract parameters
+	/// </summary>
 	public class parameterContainer
 	{
 		private contractContainer root;

@@ -34,9 +34,11 @@ using UnityEngine;
 
 namespace ContractsWindow
 {
+	/// <summary>
+	/// A static helper class intended primarily for use by external assemblies through reflection
+	/// </summary>
 	public static class contractUtils
 	{
-
 		/// <summary>
 		/// A method for manually resetting a locally cached contract title.
 		/// </summary>
@@ -183,7 +185,6 @@ namespace ContractsWindow
 		/// <param name="contractType">Type of contract that needs to be updated; must be a subclass of Contracts.Contract</param>
 		public static void UpdateContractType(Type contractType)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Attempt Contract Value Update");
 			if (contractType == null)
 			{
 				Debug.LogWarning("[Contracts +] Type provided for update contract method is null");
@@ -211,7 +212,6 @@ namespace ContractsWindow
 		/// <param name="parameterType">Type of parameter that needs to be updated; must be a subclass of Contracts.ContractParameter</param>
 		public static void UpdateParameterType(Type parameterType)
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Attempt Parameter Value Update");
 			if (parameterType == null)
 			{
 				Debug.LogWarning("[Contracts +] Type provided for update parameter method is null");
