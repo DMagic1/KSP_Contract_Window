@@ -278,11 +278,6 @@ namespace ContractsWindow
 				Destroy(blizzyToolbarButton);
 		}
 
-		public Dictionary<string, contractMission> MissionList
-		{
-			get { return missionList; }
-		}
-
 	#endregion
 
 		#region utilities
@@ -450,6 +445,25 @@ namespace ContractsWindow
 				return missionList[name];
 			else
 				return null;
+		}
+
+		internal List<contractMission> getAllMissions()
+		{
+			List<contractMission> mList = new List<contractMission>();
+			List<contractMission> tempList = new List<contractMission>();
+
+			foreach (contractMission m in missionList.Values)
+			{
+				if (m.MasterMission)
+					mList.Add(m);
+				else
+					tempList.Add(m);
+			}
+
+			if (tempList.Count > 0)
+				mList.AddRange(tempList);
+
+			return mList;
 		}
 
 		//Populate the contract lists based on contract Guid values
