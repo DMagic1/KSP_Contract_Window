@@ -58,7 +58,7 @@ namespace ContractsWindow
 				}
 				catch(Exception e)
 				{
-					DMC_MBE.LogFormatted("[Contracts+] Could not find Contracts Window Scenario Module: {0}", e);
+					DMC_MBE.LogFormatted("Could not find Contracts Window Scenario Module: {0}", e);
 					return null;
 				}
 			}
@@ -80,11 +80,13 @@ namespace ContractsWindow
 		[KSPField(isPersistant = true)]
 		public int windowSize = 0;
 
-		//Master contract storage
+		//Primary contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
 
+		//Primary mission storage
 		private Dictionary<string, contractMission> missionList = new Dictionary<string,contractMission>();
 
+		//A specific contractMission is assigned to hold all contracts; contracts can't be removed from this
 		private contractMission masterMission = new contractMission("MasterMission");
 
 		public contractMission MasterMission
@@ -102,6 +104,7 @@ namespace ContractsWindow
 
 		internal contractsWindow cWin;
 
+		//A count of all active contracts as determined by manually checking the Game config node
 		private int contractCount;
 
 		public int ContractCount
@@ -114,6 +117,7 @@ namespace ContractsWindow
 		{
 			try
 			{
+				//The first step is manually checking for active contracts from the Game ConfigNode (ie persistent.sfs file); the count of active contracts will be used later when the window is loading
 				ConfigNode gameNode = HighLogic.CurrentGame.config;
 				if (gameNode != null)
 				{
@@ -127,31 +131,32 @@ namespace ContractsWindow
 							{
 								if (C != null)
 								{
-									string state = "";
 									if (C.HasValue("state"))
-										state = C.GetValue("state");
-
-									if (state == "Active")
-										contractCount++;
+									{
+										if (C.GetValue("state") == "Active")
+											contractCount++;
+									}
 								}
 							}
 						}
-						DMC_MBE.LogFormatted_DebugOnly("Contract System Can't Be Checked... Node Invalid");
+						DMC_MBE.LogFormatted("Contract System Can't Be Checked... Node Invalid");
 					}
 				}
 
-				DMC_MBE.LogFormatted_DebugOnly("[{0}] Active Contracts Counted", contractCount);
-
+				//The next step is checking the current version number and comparing it to the saved value;
+				//if a newer version number is detected the rest of the load process is skipped;
+				//this resets all values for version updates
 				if (version == contractAssembly.Version)
 				{
 					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 					if (scenes != null)
 					{
-						//Scene settings
 						windowPos = stringSplit(scenes.GetValue("WindowPosition"));
 						windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
 						int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
 
+						//All saved contract missions are loaded here
+						//Each mission has a separate contract list
 						foreach (ConfigNode m in scenes.GetNodes("Contracts_Window_Mission"))
 						{
 							if (m != null)
@@ -351,6 +356,7 @@ namespace ContractsWindow
 
 		#region contract Events
 
+		//Used by external assemblies to update parameter values for the UI
 		internal void paramChanged(Type t)
 		{
 			foreach (contractContainer cC in masterList.Values)
@@ -359,6 +365,7 @@ namespace ContractsWindow
 			}
 		}
 
+		//Used by external assemblies to update contract values for the UI
 		internal void contractChanged(Type t)
 		{
 			foreach (contractContainer cC in masterList.Values)
@@ -386,15 +393,12 @@ namespace ContractsWindow
 			return false;
 		}
 
+		//Used to add the master contract mission list; usually when something has gone wrong
 		internal void addFullMissionList()
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Regen Master Mission");
 			string s = "MasterMission";
 			if (missionList.ContainsKey(s))
-			{
 				removeMissionList(s);
-				DMC_MBE.LogFormatted_DebugOnly("Removing Old Master Mission");
-			}
 			contractMission mission = new contractMission(s);
 			mission.MasterMission = true;
 			missionList.Add(name, mission);
@@ -402,6 +406,7 @@ namespace ContractsWindow
 			masterMission = mission;
 		}
 
+		//Adds all contracts to the master mission
 		private void addAllContractsToMaster()
 		{
 			contractMission Master = null;
@@ -418,10 +423,9 @@ namespace ContractsWindow
 			}
 			if (Master != null)
 			{
-				DMC_MBE.LogFormatted_DebugOnly("Adding All Contracts To MasterMission");
 				foreach (contractContainer c in masterList.Values)
 				{
-					Master.addContract(c, true);
+					Master.addContract(c, true, true);
 				}
 			}
 		}
@@ -447,6 +451,7 @@ namespace ContractsWindow
 				return null;
 		}
 
+		//Returns an ordered list of missions for the main window; the master mission is always first
 		internal List<contractMission> getAllMissions()
 		{
 			List<contractMission> mList = new List<contractMission>();
@@ -466,7 +471,6 @@ namespace ContractsWindow
 			return mList;
 		}
 
-		//Populate the contract lists based on contract Guid values
 		internal contractContainer getContract(Guid id)
 		{
 			if (masterList.ContainsKey(id))
@@ -488,9 +492,9 @@ namespace ContractsWindow
 			masterList.Clear();
 		}
 
+		//Loads all active contracts into the master dictionary
 		internal void loadAllContracts()
 		{
-			DMC_MBE.LogFormatted_DebugOnly("Load Scenario Master Contract List");
 			resetList();
 			foreach (Contract c in ContractSystem.Instance.Contracts)
 			{
@@ -499,20 +503,18 @@ namespace ContractsWindow
 			}
 		}
 
+		//Initializes all missions that were added during the loading process
 		internal void loadAllMissionLists()
 		{
 			foreach (contractMission m in missionList.Values)
 			{
-				DMC_MBE.LogFormatted_DebugOnly("{0} Missions Found For Loading", missionList.Count);
 				if (m != null)
 				{
-					DMC_MBE.LogFormatted_DebugOnly("Begin Mission List Load: [{0}]", m.Name);
 					if (m.MasterMission)
 					{
-						DMC_MBE.LogFormatted_DebugOnly("Initial Master Mission Load");
 						m.buildMissionList();
 						foreach (contractContainer c in masterList.Values)
-							m.addContract(c, true);
+							m.addContract(c, true, false);
 						masterMission = m;
 					}
 					else
