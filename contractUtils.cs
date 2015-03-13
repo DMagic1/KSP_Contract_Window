@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Contracts;
-using Contracts.Parameters;
 using UnityEngine;
 
 namespace ContractsWindow
@@ -184,14 +183,10 @@ namespace ContractsWindow
 		/// <param name="contractType">Type of contract that needs to be updated; must be a subclass of Contracts.Contract</param>
 		public static void UpdateContractType(Type contractType)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Attempt Contract Value Update");
 			if (contractType == null)
 			{
 				Debug.LogWarning("[Contracts +] Type provided for update contract method is null");
-				return;
-			}
-			if (contractType.IsSubclassOf(typeof(Contracts.Contract)))
-			{
-				Debug.LogWarning("[Contracts +] Type provided is not derived from the base Contract class");
 				return;
 			}
 			if (contractScenario.Instance == null)
@@ -216,14 +211,10 @@ namespace ContractsWindow
 		/// <param name="parameterType">Type of parameter that needs to be updated; must be a subclass of Contracts.ContractParameter</param>
 		public static void UpdateParameterType(Type parameterType)
 		{
+			DMC_MBE.LogFormatted_DebugOnly("Attempt Parameter Value Update");
 			if (parameterType == null)
 			{
 				Debug.LogWarning("[Contracts +] Type provided for update parameter method is null");
-				return;
-			}
-			if (parameterType.IsSubclassOf(typeof(Contracts.ContractParameter)))
-			{
-				Debug.LogWarning("[Contracts +] Type provided is not derived from the base Contract Parameter class");
 				return;
 			}
 			if (contractScenario.Instance == null)
