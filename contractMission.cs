@@ -40,7 +40,7 @@ namespace ContractsWindow
 		private string name;
 		private string activeString;
 		private string hiddenString;
-		private Dictionary<Guid, contractUIObject> missionList;
+		private Dictionary<Guid, contractUIObject> contractList;
 		private List<Guid> activeMissionList;
 		private List<Guid> hiddenMissionList;
 		private bool ascendingOrder = true;
@@ -55,7 +55,7 @@ namespace ContractsWindow
 
 		public int ActiveContracts
 		{
-			get { return missionList.Count; }
+			get { return contractList.Count; }
 		}
 
 		public List<Guid> ActiveMissionList
@@ -101,7 +101,7 @@ namespace ContractsWindow
 			showActiveMissions = showActive;
 			masterMission = Master;
 			orderMode = (sortClass)sMode;
-			missionList = new Dictionary<Guid, contractUIObject>();
+			contractList = new Dictionary<Guid, contractUIObject>();
 			activeMissionList = new List<Guid>();
 			hiddenMissionList = new List<Guid>();
 		}
@@ -109,15 +109,21 @@ namespace ContractsWindow
 		internal contractMission(string n)
 		{
 			name = n;
-			missionList = new Dictionary<Guid, contractUIObject>();
+			contractList = new Dictionary<Guid, contractUIObject>();
 			activeMissionList = new List<Guid>();
 			hiddenMissionList = new List<Guid>();
 		}
 
 		internal contractUIObject getContract(Guid id)
 		{
-			if (missionList.ContainsKey(id))
-				return missionList[id];
+			if (contractList.ContainsKey(id))
+			{
+				contractUIObject c = contractList[id];
+				if (c.Container == null)
+					return null;
+				else
+					return c;
+			}
 			else
 				return null;
 		}
@@ -228,9 +234,9 @@ namespace ContractsWindow
 
 		private bool addToMasterList(contractContainer c)
 		{
-			if (!missionList.ContainsKey(c.Contract.ContractGuid))
+			if (!contractList.ContainsKey(c.Contract.ContractGuid))
 			{
-				missionList.Add(c.Contract.ContractGuid, new contractUIObject(c));
+				contractList.Add(c.Contract.ContractGuid, new contractUIObject(c));
 				return true;
 			}
 			else
@@ -239,32 +245,21 @@ namespace ContractsWindow
 			return false;
 		}
 
-		internal void removeMission(contractContainer c)
+		internal void removeContract(contractContainer c)
 		{
-			foreach(Guid g in activeMissionList)
-			{
-				if (g == c.Contract.ContractGuid)
-					activeMissionList.Remove(g);
-			}
-
-			foreach(Guid g in hiddenMissionList)
-			{
-				if (g == c.Contract.ContractGuid)
-					hiddenMissionList.Remove(g);
-			}
-
-			removeFromMasterList(c);
+			if (contractScenario.ListRemove(activeMissionList, c.Contract.ContractGuid) || contractScenario.ListRemove(hiddenMissionList, c.Contract.ContractGuid))
+				removeFromMasterList(c);
 		}
 
 		private void removeFromMasterList(contractContainer c)
 		{
-			if (missionList.ContainsKey(c.Contract.ContractGuid))
-				missionList.Remove(c.Contract.ContractGuid);
+			if (contractList.ContainsKey(c.Contract.ContractGuid))
+				contractList.Remove(c.Contract.ContractGuid);
 		}
 
 		private void resetMasterList()
 		{
-			missionList.Clear();
+			contractList.Clear();
 		}
 
 		internal string stringConcat(List<Guid> source)
