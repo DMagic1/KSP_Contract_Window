@@ -84,7 +84,7 @@ namespace ContractsWindow
 		internal static GUIStyle agentName;
 		internal static GUIStyle agentBackground;
 
-		internal static GUIStyle configToggle;
+		internal static GUIStyle toolbarToggle;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -342,14 +342,16 @@ namespace ContractsWindow
 
 			resetBox = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			resetBox.name = "ResetBox";
-			resetBox.fontSize = 16;
+			resetBox.fontSize = 14;
 			resetBox.normal.textColor = XKCDColors.VomitYellow;
+			resetBox.fontStyle = FontStyle.Bold;
 			resetBox.wordWrap = true;
 			resetBox.alignment = TextAnchor.UpperCenter;
 
 			resetButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			resetButton.name = "ResetButton";
 			resetButton.fontSize = 15;
+			resetButton.fontStyle = FontStyle.Bold;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			agentName = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
@@ -367,9 +369,10 @@ namespace ContractsWindow
 			agentBackDrop.Apply();
 			agentBackground.normal.background = agentBackDrop;
 
-			configToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
-			configToggle.name = "ConfigToggle";
-			configToggle.fontSize = 13 + normalFontSize + windowFontSize;
+			toolbarToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
+			toolbarToggle.name = "ToolbarToggle";
+			toolbarToggle.fontStyle = FontStyle.Bold;
+			toolbarToggle.fontSize = 13 + normalFontSize + windowFontSize;
 
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
@@ -377,12 +380,14 @@ namespace ContractsWindow
 			DMC_SkinsLibrary.List["ContractUnitySkin"].box = new GUIStyle(noteText);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].label = new GUIStyle(texLabel);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].textField = new GUIStyle(missionTextBox);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].toggle = new GUIStyle(toolbarToggle);
 
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", newWindowStyle);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", missionTextBox);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", toolbarToggle);
 		}
 	}
 }
