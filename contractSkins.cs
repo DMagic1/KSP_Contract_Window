@@ -163,7 +163,7 @@ namespace ContractsWindow
 			closeIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CloseIcon", false);
 			fontSize = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/FontSizeIcon", false);
 			windowSize = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/WindowSizeIcon", false);
-			settingsIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/SettingsIcon", false);
+			settingsIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ToolbarSettingsIcon", false);
 			agencyIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/AgentIcon", false);
 			toolbarIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ContractsIconApp", false);
 			missionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckBoxIcon", false);
