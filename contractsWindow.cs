@@ -57,8 +57,8 @@ namespace ContractsWindow
 		private Agent currentAgent;
 		private string version, inputField;
 		private Vector2 scroll, missionScroll;
-		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar;
-		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionDelete;
+		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar, replaceStock;
+		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionDelete, replaceStockPopup;
 		private Vector2 dragStart;
 		private float windowHeight, windowWidth;
 		//private int timer;
@@ -1092,29 +1092,64 @@ namespace ContractsWindow
 
 				else if (toolbar)
 				{
-					popupRect = new Rect(10, WindowRect.height - 180, 230, 150);
+					popupRect = new Rect(10, WindowRect.height - 170, 230, 140);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
-					Rect r = new Rect(popupRect.x + 7, popupRect.y + 10, popupRect.width - 14, 30);
+					Rect r = new Rect(popupRect.x + 10, popupRect.y + 10, popupRect.width - 20, 30);
 					GUI.Label(r, "Toolbar Options:", contractSkins.resetBox);
 
-					r.y += 35;
+					r.y += 30;
 
 					if (ToolbarManager.ToolbarAvailable)
 					{
-						contractScenario.Instance.stockToolbar = GUI.Toggle(r, contractScenario.Instance.stockToolbar, "Use Stock Toolbar", contractSkins.configToggle);
-						r.y += 35;
+						contractScenario.Instance.stockToolbar = GUI.Toggle(r, contractScenario.Instance.stockToolbar, " Use Stock Toolbar");
+						r.y += 30;
 					}
 
-					if (stockToolbar)
+					if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 					{
-						contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, "Replace Stock Toolbar", contractSkins.configToggle);
-						r.y += 35;
+						contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, " Replace Stock Toolbar");
+						r.y += 30;
 					}
+
+					r.x += 70;
+					r.width = 70;
 
 					if (GUI.Button(r, "Close", contractSkins.resetButton))
 					{
 						toolbar = false;
 						popup = false;
+					}
+				}
+
+				else if (replaceStockPopup)
+				{
+					popupRect = new Rect(10, WindowRect.height - 195, 230, 165);
+					GUI.Box(popupRect, "", contractSkins.dropDown);
+					Rect r = new Rect(popupRect.x + 5, popupRect.y + 5, 210, 90);
+					GUI.Label(r, "Warning:\nReplacing Stock Contracts App May Produce Errors\nUse This Option\nAt Your Own Risk", contractSkins.resetBox);
+
+					r.y += 95;
+					r.width = 210;
+					r.height = 30;
+
+					contractScenario.Instance.replaceStockWarned = GUI.Toggle(r, contractScenario.Instance.replaceStockWarned, "Do Not Display This Warning");
+
+					r.x += 70;
+					r.y += 30;
+					r.width = 75;
+
+					if (GUI.Button(r, "Confirm", contractSkins.resetButton))
+					{
+						popup = false;
+						replaceStockPopup = false;
+						if (contractScenario.Instance.appLauncherButton != null)
+						{
+							contractScenario.Instance.appLauncherButton.replaceStockApp();
+							replaceStock = true;
+							contractScenario.Instance.replaceStockToolbar = true;
+						}
+						else
+							LogFormatted("Error In Setting Stock App Launcher Button...");
 					}
 				}
 
@@ -1344,6 +1379,22 @@ namespace ContractsWindow
 					if (contractScenario.Instance.appLauncherButton != null)
 					{
 						Destroy(contractScenario.Instance.appLauncherButton);
+					}
+				}
+			}
+
+			if (!contractScenario.Instance.replaceStockWarned)
+			{
+				if (replaceStock != contractScenario.Instance.replaceStockToolbar)
+				{
+					replaceStock = contractScenario.Instance.replaceStockToolbar;
+					if (replaceStock)
+					{
+						contractScenario.Instance.replaceStockToolbar = false;
+						replaceStock = false;
+						popup = true;
+						toolbar = false;
+						replaceStockPopup = true;
 					}
 				}
 			}
@@ -1706,6 +1757,7 @@ namespace ContractsWindow
 			if (contractScenario.Instance != null)
 			{
 				stockToolbar = contractScenario.Instance.stockToolbar;
+				replaceStock = contractScenario.Instance.replaceStockToolbar;
 				cList.Clear();
 				WindowRect = contractScenario.Instance.windowRects[sceneInt];
 				if (contractScenario.Instance.fontSmall)
