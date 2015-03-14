@@ -60,7 +60,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Framework\ExtensionsUnity.cs" />
-    <Compile Include="Framework\KSPAddonImproved.cs" />
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
     <Compile Include="Framework\MonoBehaviourWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
