@@ -131,6 +131,7 @@ namespace ContractsWindow
 		internal void buildMissionList()
 		{
 			resetMasterList();
+			clearLists();
 			buildMissionList(activeString, true);
 			buildMissionList(hiddenString, false);
 		}
@@ -260,6 +261,12 @@ namespace ContractsWindow
 		private void resetMasterList()
 		{
 			contractList.Clear();
+		}
+
+		private void clearLists()
+		{
+			activeMissionList.Clear();
+			hiddenMissionList.Clear();
 		}
 
 		internal string stringConcat(List<Guid> source)
