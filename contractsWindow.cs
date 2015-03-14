@@ -294,6 +294,9 @@ namespace ContractsWindow
 				if (c == null)
 					continue;
 
+				if (c.Container == null)
+					continue;
+
 				GUILayout.Space(-1);
 
 				buildContractTitleBar(c, id, windowSizeAdjust, ref lastRect);
@@ -465,7 +468,7 @@ namespace ContractsWindow
 					else
 					{
 						if (GUI.Button(r, new GUIContent(contractSkins.closeIcon, "Remove Contract"), contractSkins.texButtonSmall))
-							nextRemoveList.Add(c);
+							nextRemoveMissionList.Add(c);
 					}
 
 					r.x += 22 + (size * 4);
@@ -474,17 +477,13 @@ namespace ContractsWindow
 					if (c.Order == null)
 					{
 						if (GUI.Button(r, new GUIContent(contractSkins.pinIcon, "Pin Contract"), contractSkins.texButtonSmall))
-						{
 							nextPinnedList.Add(c);
-						}
 					}
 					else
 					{
 						r.width -= 2;
 						if (GUI.Button(r, new GUIContent(contractSkins.pinDownIcon, "Un-Pin Contract"), contractSkins.texButtonSmall))
-						{
 							nextPinnedList.Add(c);
-						}
 					}
 
 					r.x += 22 + (size * 4);
@@ -962,7 +961,6 @@ namespace ContractsWindow
 					if (GUI.Button(new Rect(popupRect.x + 20, popupRect.y + 110, popupRect.width - 40, 25), "Reset Display", contractSkins.resetButton))
 					{
 						LogFormatted("Rebuilding Contract Window List");
-						generateList();
 						rebuildList();
 						resetWindow();
 						popup = false;
@@ -1287,11 +1285,8 @@ namespace ContractsWindow
 			{
 				foreach(contractUIObject c in nextPinnedList)
 				{
-					if (pinnedList.Contains(c.Container.Contract.ContractGuid))
-					{
-						pinnedList.Remove(c.Container.Contract.ContractGuid);
+					if (contractScenario.ListRemove(pinnedList, c.Container.Contract.ContractGuid))
 						c.Order = null;
-					}
 					else
 					{
 						c.Order = pinnedList.Count;
@@ -1316,7 +1311,16 @@ namespace ContractsWindow
 			if (nextRemoveMissionList.Count > 0)
 			{
 				foreach (contractUIObject c in nextRemoveMissionList)
-					currentMission.removeMission(c.Container);
+				{
+					if (c.Container.Contract.ContractState != Contract.State.Active)
+					{
+						contractScenario.Instance.removeContract(c.Container.Contract.ContractGuid);
+						foreach (contractMission m in missionList)
+							m.removeContract(c.Container);
+					}
+					else
+						currentMission.removeContract(c.Container);
+				}
 
 				nextRemoveMissionList.Clear();
 				refreshContracts(cList);
@@ -1360,12 +1364,10 @@ namespace ContractsWindow
 		//Reset contract list from the "refresh" button
 		private void rebuildList()
 		{
+			contractScenario.Instance.loadAllContracts();
 			contractScenario.Instance.addFullMissionList();
 
 			currentMission = contractScenario.Instance.MasterMission;
-
-			currentMission.ActiveMissionList.Clear();
-			currentMission.HiddenMissionList.Clear();
 
 			cList.Clear();
 			pinnedList.Clear();
@@ -1374,7 +1376,7 @@ namespace ContractsWindow
 			{
 				contractContainer cC = contractScenario.Instance.getContract(c.ContractGuid);
 				if (cC != null)
-					currentMission.addContract(cC, true, true);
+					currentMission.addContract(cC, true, false);
 			}
 
 			cList = currentMission.ActiveMissionList;
@@ -1414,6 +1416,7 @@ namespace ContractsWindow
 		private void refreshContracts(List<Guid> gID)
 		{
 			List<Guid> removeList = new List<Guid>();
+			List<Guid> pinnedRemoveList = new List<Guid>();
 			foreach (Guid id in gID)
 			{
 				contractContainer cC = contractScenario.Instance.getContract(id);
@@ -1430,6 +1433,7 @@ namespace ContractsWindow
 						cC.DaysToExpire = "----";
 						continue;
 					}
+
 					//Update contract timers
 					if (cC.Contract.DateDeadline <= 0)
 					{
@@ -1442,8 +1446,10 @@ namespace ContractsWindow
 						//Calculate time in day values using Kerbin or Earth days
 						cC.DaysToExpire = contractScenario.timeInDays(cC.Duration);
 					}
+
 					cC.Title = cC.Contract.Title;
 					cC.Notes = cC.Contract.Notes;
+
 					foreach (parameterContainer pC in cC.AllParamList)
 					{
 						pC.Title = pC.CParam.Title;
@@ -1451,8 +1457,20 @@ namespace ContractsWindow
 					}
 				}
 			}
-			foreach (Guid removeID in removeList)
-				gID.Remove(removeID);
+
+			foreach(Guid id in pinnedList)
+			{
+				contractContainer cC = contractScenario.Instance.getContract(id);
+				if (cC == null)
+					pinnedRemoveList.Add(id);
+			}
+
+			foreach (Guid id in removeList)
+				contractScenario.ListRemove(gID, id);
+
+			foreach (Guid id in pinnedRemoveList)
+				contractScenario.ListRemove(pinnedList, id);
+
 			gID = sortList(gID, currentMission.OrderMode, currentMission.AscendingOrder);
 		}
 
@@ -1466,12 +1484,12 @@ namespace ContractsWindow
 					currentMission.HiddenMissionList.Add(c.Container.Contract.ContractGuid);
 					c.ShowParams = false;
 				}
-				currentMission.ActiveMissionList.Remove(c.Container.Contract.ContractGuid);
-				if (pinnedList.Contains(c.Container.Contract.ContractGuid))
-				{
-					pinnedList.Remove(c.Container.Contract.ContractGuid);
+
+				contractScenario.ListRemove(currentMission.ActiveMissionList, c.Container.Contract.ContractGuid);
+
+				if (contractScenario.ListRemove(pinnedList, c.Container.Contract.ContractGuid))
 					c.Order = null;
-				}
+
 				cList = currentMission.ActiveMissionList;
 			}
 			else
@@ -1481,13 +1499,21 @@ namespace ContractsWindow
 					currentMission.ActiveMissionList.Add(c.Container.Contract.ContractGuid);
 					c.ShowParams = true;
 				}
-				currentMission.HiddenMissionList.Remove(c.Container.Contract.ContractGuid);
-				if (pinnedList.Contains(c.Container.Contract.ContractGuid))
-				{
-					pinnedList.Remove(c.Container.Contract.ContractGuid);
+
+				contractScenario.ListRemove(currentMission.HiddenMissionList, c.Container.Contract.ContractGuid);
+
+				if (contractScenario.ListRemove(pinnedList, c.Container.Contract.ContractGuid))
 					c.Order = null;
-				}
+
 				cList = currentMission.HiddenMissionList;
+			}
+
+			if (c.Container.Contract.ContractState != Contract.State.Active)
+			{
+				contractScenario.Instance.removeContract(c.Container.Contract.ContractGuid);
+				currentMission.removeContract(c.Container);
+				foreach (contractMission m in missionList)
+					m.removeContract(c.Container);
 			}
 		}
 
