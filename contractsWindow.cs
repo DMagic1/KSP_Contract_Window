@@ -593,10 +593,10 @@ namespace ContractsWindow
 			bool failed = c.Container.Contract.ContractState == Contract.State.Active || c
 				.Container.Contract.ContractState == Contract.State.Cancelled || c.Container.Contract.ContractState == Contract.State.DeadlineExpired || c.Container.Contract.ContractState == Contract.State.Failed;
 
-			//Contract title buttons
-
+			//Add in space for the contract title buttons
 			GUILayout.Space(23 + size * 4);
 
+			//Draw inactive buttons if any popup window is open
 			if (!popup)
 			{
 				if (GUILayout.Button(contractTitle, cStyle, GUILayout.MaxWidth(225 + size * 30)))
@@ -607,6 +607,7 @@ namespace ContractsWindow
 
 			r = GUILayoutUtility.GetLastRect();
 
+			//Only draw the rewards if they are visible in the window
 			if (WindowRect.width >= 270 + (size* 30))
 			{
 				if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (20 + size * 6)))
@@ -1205,7 +1206,7 @@ namespace ContractsWindow
 				DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
 			}
 
-			//Contract config window button
+			//Toolbar options button
 			r.x = 188 + size * 28;
 			if (GUI.Button(r, new GUIContent(contractSkins.settingsIcon, "Toolbar Options")))
 			{
@@ -1220,7 +1221,7 @@ namespace ContractsWindow
 
 		private void buildResizer(int id, int size)
 		{
-			Rect resizer = new Rect(WindowRect.width - 16 - size * 3, WindowRect.height - 25 - size * 3, 14 + size * 4, 22 + size * 4);
+			Rect resizer = new Rect(WindowRect.width - 25 - size * 3, WindowRect.height - 25 - size * 3, 22 + size * 4, 22 + size * 4);
 			GUI.Label(resizer, contractSkins.expandIcon, contractSkins.dragButton);
 			if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
 			{
