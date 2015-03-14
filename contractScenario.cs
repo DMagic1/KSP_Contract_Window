@@ -74,6 +74,8 @@ namespace ContractsWindow
 		[KSPField(isPersistant = true)]
 		public bool replaceStockToolbar = false;
 		[KSPField(isPersistant = true)]
+		public bool replaceStockWarned = false;
+		[KSPField(isPersistant = true)]
 		public bool toolTips = true;
 		[KSPField(isPersistant = true)]
 		public bool fontSmall = true;
