@@ -397,43 +397,37 @@ namespace ContractsWindow
 		internal void addFullMissionList()
 		{
 			string s = "MasterMission";
+
 			if (missionList.ContainsKey(s))
 				removeMissionList(s);
-			contractMission mission = new contractMission(s);
-			mission.MasterMission = true;
-			missionList.Add(name, mission);
-			addAllContractsToMaster();
-			masterMission = mission;
+
+			if (addMissionList(s))
+			{
+				missionList[s].MasterMission = true;
+				addAllContractsToMaster();
+				masterMission = missionList[s];
+			}
 		}
 
 		//Adds all contracts to the master mission
 		private void addAllContractsToMaster()
 		{
-			contractMission Master = null;
-			foreach(contractMission m in missionList.Values)
-			{
-				if (m != null)
-				{
-					if (m.MasterMission)
-					{
-						Master = m;
-						break;
-					}
-				}
-			}
+			contractMission Master = missionList.FirstOrDefault(a => a.Value.MasterMission).Value;
 			if (Master != null)
 			{
 				foreach (contractContainer c in masterList.Values)
-				{
 					Master.addContract(c, true, true);
-				}
 			}
 		}
 
 		internal void removeMissionList(string name)
 		{
 			if (missionList.ContainsKey(name))
+			{
+				contractMission c = missionList[name];
 				missionList.Remove(name);
+				c = null;
+			}
 			else
 				DMC_MBE.LogFormatted("No Mission List Of Name: [{0}] Found", name);
 		}
@@ -487,7 +481,19 @@ namespace ContractsWindow
 				DMC_MBE.LogFormatted("Error Adding Contract; Already Present In Master List");
 		}
 
-		internal void resetList()
+		internal void removeContract(Guid id)
+		{
+			if (masterList.ContainsKey(id))
+			{
+				contractContainer c = masterList[id];
+				masterList.Remove(id);
+				c = null;
+			}
+			else
+				DMC_MBE.LogFormatted("Error Removing Contract; Does Not Exist In Master List");
+		}
+
+		private void resetList()
 		{
 			masterList.Clear();
 		}
@@ -591,6 +597,17 @@ namespace ContractsWindow
 				s = string.Format("{0}m", time[1]);
 
 			return s;
+		}
+
+		internal static bool ListRemove(List<Guid> list, Guid id)
+		{
+			if (list.Contains(id))
+			{
+				list.Remove(id);
+				return true;
+			}
+
+			return false;
 		}
 
 		#endregion
