@@ -64,6 +64,7 @@ namespace ContractsWindow
 		//private int timer;
 		private Rect popupRect;
 		private int sceneInt;
+		private int timer;
 		private const string lockID = "ContractsWindow_LockID";
 		private const string centerLockID = "ContractsWindow_SC_LockID";
 		private const string trackingLockID = "ContractsWindow_TS_LockID";
@@ -81,6 +82,7 @@ namespace ContractsWindow
 			}
 
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+			timer = 0;
 
 			//Set up the various GUI options to their default values here
 			WindowCaption = "Contracts +";
@@ -100,10 +102,6 @@ namespace ContractsWindow
 
 		protected override void Start()
 		{
-			missionList = contractScenario.Instance.getAllMissions();
-			currentMission = missionList[0];
-			if (currentMission == null)
-				currentMission = new contractMission("");
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
 			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
 			PersistenceLoad();
@@ -123,24 +121,24 @@ namespace ContractsWindow
 
 		protected override void Update()
 		{
+			//Loading process triggered by the ContractSystem GameEvent
 			if (contractsLoading && !loaded)
 				StartCoroutine(loadContracts());
+
+			//This is a backup loading system in case something blows up while the ContractSystem is loading
+			if (timer < 500 && !loaded)
+				timer++;
+			else if (!loaded)
+			{
+				loadLists();
+
+				contractsLoading = false;
+				loaded = true;
+			}
 		}
 
-		private IEnumerator loadContracts()
+		private void loadLists()
 		{
-			int activeC = ContractSystem.Instance.GetActiveContractCount();
-			int i = 0;
-			contractsLoading = false;
-			loaded = true;
-
-			while (activeC < contractScenario.Instance.ContractCount && i < 500)
-			{
-				activeC = ContractSystem.Instance.GetActiveContractCount();
-				i++;
-				yield return null;
-			}
-
 			generateList();
 
 			//Load ordering lists and contract settings after primary contract dictionary has been loaded
@@ -163,6 +161,23 @@ namespace ContractsWindow
 				refreshContracts(cList);
 			else
 				rebuildList();
+		}
+
+		private IEnumerator loadContracts()
+		{
+			int activeC = ContractSystem.Instance.GetActiveContractCount();
+			int i = 0;
+			contractsLoading = false;
+			loaded = true;
+
+			while (activeC < contractScenario.Instance.ContractCount && i < 200)
+			{
+				activeC = ContractSystem.Instance.GetActiveContractCount();
+				i++;
+				yield return null;
+			}
+
+			loadLists();
 		}
 
 		#endregion
@@ -250,6 +265,8 @@ namespace ContractsWindow
 				missionSelector = false;
 				missionTextBox = false;
 				missionDelete = false;
+				replaceStockPopup = false;
+				toolbar = false;
 			}
 		}
 
@@ -1030,7 +1047,7 @@ namespace ContractsWindow
 
 						r.y += 30;
 
-						inputField = GUI.TextField(r, inputField, 30);
+						inputField = GUI.TextField(r, inputField, 20);
 
 						r.y += 30;
 
@@ -1043,6 +1060,7 @@ namespace ContractsWindow
 									contractMission cM = contractScenario.Instance.getMissionList(inputField);
 									if (cM != null)
 										cM.addContract(tempContainer, true, true);
+									missionList = contractScenario.Instance.getAllMissions();
 									popup = false;
 									missionTextBox = false;
 									missionCreator = false;
@@ -1080,7 +1098,7 @@ namespace ContractsWindow
 							refreshContracts(cList);
 
 							popup = false;
-							missionSelector = false; ;
+							missionSelector = false;
 						}
 						r.x += 145 + size * 18;
 						r.y += 4;
@@ -1161,7 +1179,18 @@ namespace ContractsWindow
 					if (GUI.Button(new Rect(popupRect.x + 20, popupRect.y + 110, popupRect.width - 40, 25), "Delete Mission", contractSkins.resetButton))
 					{
 						contractScenario.Instance.removeMissionList(currentMission.Name);
+						missionList = contractScenario.Instance.getAllMissions();
 						currentMission = contractScenario.Instance.MasterMission;
+
+						if (currentMission.ShowActiveMissions)
+							cList = currentMission.ActiveMissionList;
+						else
+							cList = currentMission.HiddenMissionList;
+
+						pinnedList = currentMission.loadPinnedContracts(cList);
+
+						refreshContracts(cList);
+
 						popup = false;
 						missionDelete = false;
 					}
@@ -1759,6 +1788,10 @@ namespace ContractsWindow
 				stockToolbar = contractScenario.Instance.stockToolbar;
 				replaceStock = contractScenario.Instance.replaceStockToolbar;
 				cList.Clear();
+				missionList = contractScenario.Instance.getAllMissions();
+				currentMission = missionList[0];
+				if (currentMission == null)
+					currentMission = new contractMission("");
 				WindowRect = contractScenario.Instance.windowRects[sceneInt];
 				if (contractScenario.Instance.fontSmall)
 					contractSkins.normalFontSize = 0;
