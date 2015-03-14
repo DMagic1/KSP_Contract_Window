@@ -141,7 +141,8 @@ namespace ContractsWindow
 								}
 							}
 						}
-						DMC_MBE.LogFormatted("Contract System Can't Be Checked... Node Invalid");
+						else
+							DMC_MBE.LogFormatted("Contract System Can't Be Checked... Node Invalid");
 					}
 				}
 
