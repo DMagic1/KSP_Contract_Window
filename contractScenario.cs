@@ -462,6 +462,12 @@ namespace ContractsWindow
 					tempList.Add(m);
 			}
 
+			if (mList.Count == 0)
+			{
+				if (addMissionList("MasterMission"))
+					mList.Add(getMissionList("MasterMission"));
+			}
+
 			if (tempList.Count > 0)
 				mList.AddRange(tempList);
 
