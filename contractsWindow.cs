@@ -1110,7 +1110,7 @@ namespace ContractsWindow
 
 				else if (toolbar)
 				{
-					popupRect = new Rect(10, WindowRect.height - 170, 230, 140);
+					popupRect = new Rect(10, WindowRect.height - 170, 230 + (size * 20), 140);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 					Rect r = new Rect(popupRect.x + 10, popupRect.y + 10, popupRect.width - 20, 30);
 					GUI.Label(r, "Toolbar Options:", contractSkins.resetBox);
@@ -1141,13 +1141,12 @@ namespace ContractsWindow
 
 				else if (replaceStockPopup)
 				{
-					popupRect = new Rect(10, WindowRect.height - 195, 230, 165);
+					popupRect = new Rect(10, WindowRect.height - 195, 230 + (size * 20), 165);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
-					Rect r = new Rect(popupRect.x + 5, popupRect.y + 5, 210, 90);
+					Rect r = new Rect(popupRect.x + 5, popupRect.y + 5, popupRect.width - 10, 90);
 					GUI.Label(r, "Warning:\nReplacing Stock Contracts App May Produce Errors\nUse This Option\nAt Your Own Risk", contractSkins.resetBox);
 
 					r.y += 95;
-					r.width = 210;
 					r.height = 30;
 
 					contractScenario.Instance.replaceStockWarned = GUI.Toggle(r, contractScenario.Instance.replaceStockWarned, "Do Not Display This Warning");
