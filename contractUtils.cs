@@ -30,14 +30,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Contracts;
-using Contracts.Parameters;
 using UnityEngine;
 
 namespace ContractsWindow
 {
+	/// <summary>
+	/// A static helper class intended primarily for use by external assemblies through reflection
+	/// </summary>
 	public static class contractUtils
 	{
-
 		/// <summary>
 		/// A method for manually resetting a locally cached contract title.
 		/// </summary>
@@ -175,6 +176,60 @@ namespace ContractsWindow
 			{
 				Debug.LogWarning("[Contracts +] Something went wrong when attempting to get a Parameter Container object: " + e);
 				return null;
+			}
+		}
+
+		/// <summary>
+		/// A method for updating all reward values for active contracts
+		/// </summary>
+		/// <param name="contractType">Type of contract that needs to be updated; must be a subclass of Contracts.Contract</param>
+		public static void UpdateContractType(Type contractType)
+		{
+			if (contractType == null)
+			{
+				Debug.LogWarning("[Contracts +] Type provided for update contract method is null");
+				return;
+			}
+			if (contractScenario.Instance == null)
+			{
+				Debug.LogWarning("[Contracts +] Contracts Window + scenario module is not loaded");
+				return;
+			}
+
+			try
+			{
+				contractScenario.Instance.contractChanged(contractType);
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Error while updating contract values: " + e);
+			}
+		}
+
+		/// <summary>
+		/// A method for updating contract parameter reward values for active contracts
+		/// </summary>
+		/// <param name="parameterType">Type of parameter that needs to be updated; must be a subclass of Contracts.ContractParameter</param>
+		public static void UpdateParameterType(Type parameterType)
+		{
+			if (parameterType == null)
+			{
+				Debug.LogWarning("[Contracts +] Type provided for update parameter method is null");
+				return;
+			}
+			if (contractScenario.Instance == null)
+			{
+				Debug.LogWarning("[Contracts +] Contracts Window + scenario module is not loaded");
+				return;
+			}
+
+			try
+			{
+				contractScenario.Instance.paramChanged(parameterType);
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning("[Contracts +] Error while updating parameter values: " + e);
 			}
 		}
 	}

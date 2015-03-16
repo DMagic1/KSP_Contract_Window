@@ -42,6 +42,8 @@ namespace ContractsWindow
 
 		internal static GUIStyle newWindowStyle;
 
+		internal static GUIStyle missionLabel;
+
 		internal static GUIStyle contractActive;
 		internal static GUIStyle contractCompleted;
 		internal static GUIStyle contractFailed;
@@ -59,6 +61,9 @@ namespace ContractsWindow
 
 		internal static GUIStyle dropDown;
 		internal static GUIStyle sortMenu;
+		internal static GUIStyle missionMenu;
+		internal static GUIStyle missionMenuCenter;
+		internal static GUIStyle missionTextBox;
 
 		internal static GUIStyle timerGood;
 		internal static GUIStyle timerBad;
@@ -79,15 +84,7 @@ namespace ContractsWindow
 		internal static GUIStyle agentName;
 		internal static GUIStyle agentBackground;
 
-		internal static GUIStyle smallLabel;
-		internal static GUIStyle configDropDown;
-		internal static GUIStyle configHeader;
-		internal static GUIStyle configClose;
-		internal static GUIStyle configDropMenu;
-		internal static GUIStyle configLabel;
-		internal static GUIStyle configCenterLabel;
-		internal static GUIStyle configButton;
-		internal static GUIStyle configToggle;
+		internal static GUIStyle toolbarToggle;
 
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
@@ -96,8 +93,6 @@ namespace ContractsWindow
 		internal static Texture2D science;
 		internal static Texture2D expandIcon;
 		internal static Texture2D dropDownTex;
-		internal static Texture2D expandRight;
-		internal static Texture2D collapseLeft;
 		internal static Texture2D orderAsc;
 		internal static Texture2D orderDesc;
 		internal static Texture2D windowTex;
@@ -126,6 +121,9 @@ namespace ContractsWindow
 		internal static Texture2D settingsIcon;
 		internal static Texture2D agencyIcon;
 		internal static Texture2D toolbarIcon;
+		internal static Texture2D missionIcon;
+		internal static Texture2D cancelMissionIcon;
+		internal static Texture2D missionSelectionIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -133,43 +131,44 @@ namespace ContractsWindow
 		protected override void OnGUIOnceOnly()
 		{
 			//Fetch icon textures
-			fundsGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsGreenIcon", false);
-			fundsRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FundsRedIcon", false);
-			repGreen = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepGreenIcon", false);
-			repRed = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RepRedIcon", false);
-			science = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ScienceIcon", false);
-			expandIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResizeIcon", false);
-			expandRight = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ExpandRight", false);
-			collapseLeft = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CollapseLeft", false);
-			orderAsc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderAsc", false);
-			orderDesc = GameDatabase.Instance.GetTexture("Contracts Window/Textures/OrderDesc", false);
-			windowTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowTex", false);
-			dropDownTex = GameDatabase.Instance.GetTexture("Contracts Window/Textures/DropDownTex", false);
-			sortIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SortIcon", false);
-			hideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HideIcon", false);
-			showIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ShowIcon", false);
-			revealHideIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealHideIcon", false);
-			revealShowIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/RevealShowIcon", false);
-			tooltipIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ToolTipIcon", false);
-			buttonHover = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ButtonHover", false);
-			headerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/HeaderBar", false);
-			footerBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FooterBar", false);
-			verticalBar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/VerticalBar", false);
-			resetIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ResetIcon", false);
-			partIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PartIcon", false);
-			noteIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIcon", false);
-			noteIconOff = GameDatabase.Instance.GetTexture("Contracts Window/Textures/NoteIconOff", false);
-			goldStar = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStar", false);
-			goldStarTwo = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStarTwo", false);
-			goldStarThree = GameDatabase.Instance.GetTexture("Contracts Window/Textures/GoldStarThree", false);
-			pinIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinIcon", false);
-			pinDownIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/PinDownIcon", false);
-			closeIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/CloseIcon", false);
-			fontSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/FontSizeIcon", false);
-			windowSize = GameDatabase.Instance.GetTexture("Contracts Window/Textures/WindowSizeIcon", false);
-			settingsIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/SettingsIcon", false);
-			agencyIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/AgentIcon", false);
-			toolbarIcon = GameDatabase.Instance.GetTexture("Contracts Window/Textures/ContractsIconApp", false);
+			fundsGreen = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/FundsGreenIcon", false);
+			fundsRed = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/FundsRedIcon", false);
+			repGreen = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/RepGreenIcon", false);
+			repRed = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/RepRedIcon", false);
+			science = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ScienceIcon", false);
+			expandIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ResizeIcon", false);
+			orderAsc = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/OrderAsc", false);
+			orderDesc = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/OrderDesc", false);
+			windowTex = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/WindowTex", false);
+			dropDownTex = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/DropDownTex", false);
+			sortIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/SortIcon", false);
+			hideIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/HideIcon", false);
+			showIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ShowIcon", false);
+			revealHideIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/RevealHideIcon", false);
+			revealShowIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/RevealShowIcon", false);
+			tooltipIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ToolTipIcon", false);
+			buttonHover = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ButtonHover", false);
+			headerBar = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/HeaderBar", false);
+			footerBar = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/FooterBar", false);
+			verticalBar = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/VerticalBar", false);
+			resetIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ResetIcon", false);
+			partIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/PartIcon", false);
+			noteIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/NoteIcon", false);
+			noteIconOff = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/NoteIconOff", false);
+			goldStar = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/GoldStar", false);
+			goldStarTwo = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/GoldStarTwo", false);
+			goldStarThree = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/GoldStarThree", false);
+			pinIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/PinIcon", false);
+			pinDownIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/PinDownIcon", false);
+			closeIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CloseIcon", false);
+			fontSize = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/FontSizeIcon", false);
+			windowSize = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/WindowSizeIcon", false);
+			settingsIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ToolbarSettingsIcon", false);
+			agencyIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/AgentIcon", false);
+			toolbarIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ContractsIconApp", false);
+			missionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckBoxIcon", false);
+			cancelMissionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckCloseIcon", false);
+			missionSelectionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/MissionListIcon", false);
 
 			initializeSkins();
 		}
@@ -188,10 +187,18 @@ namespace ContractsWindow
 			newWindowStyle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.window);
 			newWindowStyle.name = "WindowStyle";
 			newWindowStyle.fontSize = 14 + normalFontSize + windowFontSize;
+			newWindowStyle.fontStyle = FontStyle.Bold;
 			newWindowStyle.padding = new RectOffset(0, 1, 20, 12);
 			newWindowStyle.normal.background = windowTex;
 			newWindowStyle.focused.background = newWindowStyle.normal.background;
 			newWindowStyle.onNormal.background = newWindowStyle.normal.background;
+
+			missionLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			missionLabel.name = "MissionLabel";
+			missionLabel.fontSize = 13 + normalFontSize + windowFontSize;
+			missionLabel.alignment = TextAnchor.MiddleCenter;
+			missionLabel.wordWrap = false;
+			missionLabel.fontStyle = FontStyle.Bold;
 
 			//Contract Title Style
 			contractActive = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
@@ -307,6 +314,18 @@ namespace ContractsWindow
 			sortMenu.hover.background = sortBackground;
 			sortMenu.alignment = TextAnchor.MiddleLeft;
 
+			missionMenu = new GUIStyle(sortMenu);
+			missionMenu.name = "MissionMenu";
+			missionMenu.fontSize = 13 + normalFontSize + windowFontSize;
+
+			missionMenuCenter = new GUIStyle(missionMenu);
+			missionMenuCenter.alignment = TextAnchor.MiddleCenter;
+
+			missionTextBox = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.textField);
+			missionTextBox.name = "MissionTextBox";
+			missionTextBox.fontSize = 12 + normalFontSize + windowFontSize;
+			missionTextBox.alignment = TextAnchor.MiddleCenter;
+
 			texButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			texButton.name = "TexButton";
 			texButton.normal.background = DMC_SkinsLibrary.DefUnitySkin.label.normal.background;
@@ -323,14 +342,16 @@ namespace ContractsWindow
 
 			resetBox = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			resetBox.name = "ResetBox";
-			resetBox.fontSize = 16;
+			resetBox.fontSize = 14;
 			resetBox.normal.textColor = XKCDColors.VomitYellow;
+			resetBox.fontStyle = FontStyle.Bold;
 			resetBox.wordWrap = true;
 			resetBox.alignment = TextAnchor.UpperCenter;
 
 			resetButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
 			resetButton.name = "ResetButton";
 			resetButton.fontSize = 15;
+			resetButton.fontStyle = FontStyle.Bold;
 			resetButton.alignment = TextAnchor.MiddleCenter;
 
 			agentName = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
@@ -348,60 +369,25 @@ namespace ContractsWindow
 			agentBackDrop.Apply();
 			agentBackground.normal.background = agentBackDrop;
 
-			//Config styles
-			smallLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
-			smallLabel.name = "SmallLabel";
-			smallLabel.fontSize = 10;
-			smallLabel.normal.textColor = Color.white;
-
-			configDropMenu = new GUIStyle(sortMenu);
-			configDropMenu.name = "ConfigDropMenu";
-			configDropMenu.fontSize = 12 + normalFontSize;
-			configDropMenu.wordWrap = false;
-
-			configDropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
-			configDropDown.name = "ConfigDropDown";
-			configDropDown.fontSize = 16 + normalFontSize;
-			configDropDown.normal.textColor = XKCDColors.DustyOrange;
-			configDropDown.alignment = TextAnchor.MiddleCenter;
-
-			configHeader = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
-			configHeader.name = "ConfigHeader";
-			configHeader.fontSize = 16 + normalFontSize;
-			configHeader.normal.textColor = XKCDColors.DustyOrange;
-			configHeader.alignment = TextAnchor.MiddleLeft;
-
-			configClose = new GUIStyle(texButton);
-			configClose.name = "ConfigClose";
-			configClose.normal.textColor = XKCDColors.DustyOrange;
-
-			configLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
-			configLabel.name = "ConfigLabel";
-			configLabel.alignment = TextAnchor.MiddleRight;
-			configLabel.fontSize = 12 + normalFontSize;
-
-			configButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
-			configButton.name = "ConfigButton";
-			configButton.fontSize = 12 + normalFontSize;
-
-			configToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
-			configToggle.name = "ConfigToggle";
-			configToggle.fontSize = 12 + normalFontSize;
-
-			configCenterLabel = new GUIStyle(configLabel);
-			configCenterLabel.name = "ConfigCenterLabel";
-			configCenterLabel.alignment = TextAnchor.MiddleCenter;
+			toolbarToggle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.toggle);
+			toolbarToggle.name = "ToolbarToggle";
+			toolbarToggle.fontStyle = FontStyle.Bold;
+			toolbarToggle.fontSize = 13 + normalFontSize + windowFontSize;
 
 			//Add skins and styles to the library
 			DMC_SkinsLibrary.List["ContractUnitySkin"].window = new GUIStyle(newWindowStyle);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].button = new GUIStyle(texButton);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].box = new GUIStyle(noteText);
 			DMC_SkinsLibrary.List["ContractUnitySkin"].label = new GUIStyle(texLabel);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].textField = new GUIStyle(missionTextBox);
+			DMC_SkinsLibrary.List["ContractUnitySkin"].toggle = new GUIStyle(toolbarToggle);
 
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", newWindowStyle);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texButton);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", noteText);
 			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", texLabel);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", missionTextBox);
+			DMC_SkinsLibrary.AddStyle("ContractUnitySkin", toolbarToggle);
 		}
 	}
 }

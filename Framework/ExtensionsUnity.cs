@@ -69,18 +69,18 @@ namespace ContractsWindow
 			}
 		}
 
-		public static float reverseLog(this float f)
-		{
-			if (f <= 0.009 && !contractScenario.Instance.allowZero)
-				return -1;
-			else if (f >= 0.000 && f < 0.95)
-				return f - 1;
-			else if (f >= 0.95 && f < 1.05)
-				return 0;
-			else if (f > 1.05 && f < 10)
-				return (float)Math.Log10(f);
-			else
-				return 10;
-		}
+		//public static float reverseLog(this float f)
+		//{
+		//	if (f <= 0.009 && !contractScenario.Instance.allowZero)
+		//		return -1;
+		//	else if (f >= 0.000 && f < 0.95)
+		//		return f - 1;
+		//	else if (f >= 0.95 && f < 1.05)
+		//		return 0;
+		//	else if (f > 1.05 && f < 10)
+		//		return (float)Math.Log10(f);
+		//	else
+		//		return 10;
+		//}
     }
 }

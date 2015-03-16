@@ -36,15 +36,17 @@ using System.Reflection;
 
 namespace ContractsWindow
 {
+	/// <summary>
+	/// This object is used to store locally cached data for each contract and a list of its parameters
+	/// </summary>
 	public class contractContainer
 	{
 		private Contract contract;
 		private double totalReward, duration;
-		private bool showParams, showNote;
+		private bool showNote;
 		private string daysToExpire;
 		private string title = "";
 		private string notes = "";
-		private int? listOrder;
 		private double fundsReward, fundsPenalty;
 		private float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
@@ -55,9 +57,7 @@ namespace ContractsWindow
 		internal contractContainer(Contract c)
 		{
 			contract = c;
-			showParams = true;
 			showNote = false;
-			listOrder = null;
 			title = c.Title;
 			notes = c.Notes;
 
@@ -155,6 +155,18 @@ namespace ContractsWindow
 			}
 		}
 
+		internal void updateParemeterInfo(Type t)
+		{
+			foreach (parameterContainer pC in allParamList)
+			{
+				if (pC.CParam.GetType() == t)
+				{
+					pC.paramRewards(pC.CParam);
+					pC.paramPenalties(pC.CParam);
+				}
+			}
+		}
+
 		internal void addToParamList(parameterContainer pC)
 		{
 			allParamList.Add(pC);
@@ -176,12 +188,6 @@ namespace ContractsWindow
 		{
 			get { return duration; }
 			internal set { duration = value; }
-		}
-
-		public bool ShowParams
-		{
-			get { return showParams; }
-			internal set { showParams = value; }
 		}
 
 		public bool ShowNote
@@ -206,12 +212,6 @@ namespace ContractsWindow
 		{
 			get { return notes; }
 			internal set { notes = value; }
-		}
-
-		public int? ListOrder
-		{
-			get { return listOrder; }
-			internal set { listOrder = value; }
 		}
 
 		public double FundsReward
@@ -277,7 +277,9 @@ namespace ContractsWindow
 		#endregion
 	}
 
-	//Store some info about contract parameters
+	/// <summary>
+	/// Stores locally cached data about contract parameters
+	/// </summary>
 	public class parameterContainer
 	{
 		private contractContainer root;
