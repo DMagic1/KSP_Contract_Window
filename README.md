@@ -48,65 +48,77 @@ license][CWPLicense]
 #### Top Bar
 ![][CWP:top-bar]
 
-  * The top bar has several buttons that are used to adjust contract ordering and display options. 
-    * The top-left icon opens a new window with options for changing sort order based on several criteria.
-    * The next icon toggles between ascending and descending order for the selected sorting type.
-    * The eyeball icon on the right toggles between the active and hidden contract list. Each mission list has its own active and hidden contract lists.
-    * The top-right icon opens a new window displaying all of the existing contract missions. Selecting a mission will switch the primary display to those contracts. The primary mission is always at the top of the list and contains all contracts.
+##### The top bar has several buttons that are used to adjust contract ordering and display options. 
+  * The top-left icon opens a new window with options for changing **sort order** based on several criteria.
+  * The next icon toggles between **ascending and descending order** for the selected sorting type.
+  * The eyeball icon on the right toggles between the **active and hidden contract list**. Each mission list has its own active and hidden contract lists.
+  * The top-right icon opens a new **mission selection** window, displaying all of the existing contract missions. 
+    * Selecting a mission will switch the primary display to those contracts. 
+	* The primary mission is always at the top of the list and contains all contracts.
 
 #### Bottom Bar
 ![][CWP:bottom-bar]
 
-  * The bottom bar has several buttons that control various window options.
-    * The version number is displayed on the left.
-    * Tooltips for most buttons can be toggled on and off with the next icon.
-    * The spinning arrows icon is used to reset the window and primary contract list. A confirmation box will open upon pushing this button.
-      *This should generally not be needed, but if there are errors in the contract window (no contracts displayed, no "MasterMission" contract list, the window is too small, etc…) this can be used. All window size, font size, and position options will be reset; the internal list of contracts will be updated with all active contracts and the "MasterMission" will be reset with this internal list. All other mission lists ***should*** be unaffected, these can be manually deleted if there are any other problems.
-    * The aA icon controls font size for most of the window's labels. Each font is increased by one unit.
-    * The next icon toggles the overall window and texture element size. It also increases the font size by two units.
-      * Between the font and window size options there are four available font sizes and two window element size options.
+##### The bottom bar has several buttons that control various window options.
+  * The **version number** is displayed on the left.
+  * **Tooltips** for most buttons can be toggled on and off with the next icon.
+  * The spinning arrows icon is used to **reset the window** and primary contract list. A confirmation box will open upon pushing this button.
+    * This should generally not be needed, but if there are errors in the contract window (no contracts displayed, no "MasterMission" contract list, the window is too small, etc…) this can be used. All window size, font size, and position options will be reset; the internal list of contracts will be updated with all active contracts and the "MasterMission" will be reset with this internal list. All other mission lists ***should*** be unaffected, these can be manually deleted if there are any other problems.
+  * The aA icon controls **font size** for most of the window's labels. Each font is increased by one unit.
+  * The next icon toggles the overall **window and texture element size**. It also increases the font size by two units.
+    * Between the font and window size options there are four available font sizes and two window element size options.
 
 #### Contract Title Bar
 ![][CWP:title-bar]
 
 ##### Each contract has a title bar above it with information and options for the contract. 
-  * The contract difficulty, or prestige, is displayed on the left with one to three stars.
-  * The time remaining for the contract is shown next. It updates every five seconds (at high time-warp several days can go by during this period) and switches to days and hours, and turns yellow, when the counter gets low. The year/day time is dependent on your selection of Earth/Kerbin days in the KSP settings menu.
-  * The A icon can be used to display the flag and name of the contract's agency.
-  * The eyeball icon can be used to move the contract into the hidden or active contract list.
-  * The pin icon can be used to pin the icon to the top of the list, regardless of sort type or order; a contract's pinned state is persistent.
-  * The checkbox icon can be used to move the contract into a different contract mission list or create a new one. If the currently selected mission is not the "MasterMission" this will be a red X icon and can be used to remove the contract from that mission.
-  * The blue icon at the end can be used to display contract notes if they exist; these are different from individual parameter notes.
+  * The **contract difficulty**, or prestige, is displayed on the left with one to three stars.
+  * The **time remaining** for the contract is shown next. It updates every five seconds (at high time-warp several days can go by during this period) and switches to days and hours, and turns yellow, when the counter gets low. The year/day time is dependent on your selection of Earth/Kerbin days in the KSP settings menu.
+  * The A icon can be used to display the **flag and agency name** for the contract.
+  * The eyeball icon can be used to move the contract into the **hidden or active contract list**.
+  * The pin icon can be used to **pin the contract** to the top of the list.
+    * Pinned order ignores sort and order type.
+    * A contract's pinned state is persistent.
+  * The checkbox icon can be used to move the contract into a different **contract mission list** or create a new one.
+    * If the currently selected mission is not the "MasterMission" this will be a red X icon and can be used to **remove the contract** from that mission.
+  * The blue icon at the end can be used to **display contract notes** if they exist.
+    * These are different from individual parameter notes.
 
 #### Contract and Parameter Titles
 ![][CWP:contract-param-title]
 
 ##### The primary contract and parameter display generally shows the same information as the stock contract window.
-  * In orange is the contract title. It is a button that can be pushed to collapse or expand the contract's parameters. When completed the contract text will turn green; when failed it will turn red.
-  * The contract parameters are shown in white. When completed these will turn green.
-  * Contract parameter notes can be displayed using the blue icon.
-  * Sub-parameters are offset slightly and are shown in a darker color. When all sub-parameters are completed they will be collapsed into their parent parameter and no longer displayed.
+  * In orange is the **contract title**. It is a button that can be pushed to collapse or expand the contract's parameters.
+    * When completed the contract text will turn green; when failed it will turn red.
+  * The **contract parameters** are shown in white.
+    * When completed these will turn green.
+  * **Contract parameter notes** can be displayed using the blue icon.
+  * **Sub-parameters** are offset slightly and are shown in a darker color.
+    * When all sub-parameters are completed they will be collapsed into their parent parameter and no longer be displayed.
 
 #### Contract and Parameter Rewards
 ![][CWP:rewards]
 
 ##### The rewards for each contract and their parameters are displayed on the right side of the window. 
-  * Funds, Rep, and Science rewards are displayed depending on how wide the window is. Rewards are in green, penalties are in red.
-  * The amount of any reward/penalty due to strategies, if any, is displayed in parenthesis.
+  * **Funds, Rep, and Science rewards** are displayed depending on how wide the window is.
+    * Rewards are in green, penalties are in red.
+  * The amount of any reward/penalty due to **strategies**, if any, is displayed in parenthesis.
 
 #### Mission Creator Window
 ![][CWP:mission-creator]
 
 ##### When the green checkbox icon is selected the mission list will appear. 
-  * The current contract mission lists are displayed; the green number to the right is the amount of contracts in that list.
-  * Selecting any existing mission will add the contract to it.
-  * Selecting the "Create New Mission" option will open the mission creator window
-  * New missions can be created after giving them a name. Missions must have a name, can't use the same name, and must be under 20 characters.
+  * The current **contract mission lists are displayed**.
+    * The green number to the right is the **amount of contracts** in that list.
+  * Selecting any **existing mission** will add the contract to it.
+  * Selecting the **Create New Mission** option will open the mission creator window.
+  * **New missions** can be created after giving them a name.
+    * Missions must have a name, can't use the same name, and must be under 20 characters.
 
 #### Mission Title Bar
 ![][CWP:mission-title]
 
-##### The mission title bar is shown at the top of the window; it can be used to delete all but the "MasterMission".
+##### The mission title bar is shown at the top of the window; it can be used to **delete any mission** except the "MasterMission".
 
 [DMagic]: http://forum.kerbalspaceprogram.com/members/59127
 [TriggerAu]: http://forum.kerbalspaceprogram.com/members/59550
