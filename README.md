@@ -63,7 +63,7 @@ license][CWPLicense]
   * The **version number** is displayed on the left.
   * **Tooltips** for most buttons can be toggled on and off with the next icon.
   * The spinning arrows icon is used to **reset the window** and primary contract list. A confirmation box will open upon pushing this button.
-    * This should generally not be needed, but if there are errors in the contract window (no contracts displayed, no "MasterMission" contract list, the window is too small, etc…) this can be used. All window size, font size, and position options will be reset; the internal list of contracts will be updated with all active contracts and the "MasterMission" will be reset with this internal list. All other mission lists ***should*** be unaffected, these can be manually deleted if there are any other problems.
+    * This should generally not be needed, but if there are errors in the contract window (no contracts displayed, no "MasterMission" contract list, the window is too small, etc…) this can be used. All window size, font size, and position options will be reset; the internal list of contracts will be updated with all active contracts and the "MasterMission" will be reset with this internal list. All other mission lists *should* be unaffected, these can be manually deleted if there are any other problems.
   * The aA icon controls **font size** for most of the window's labels. Each font is increased by one unit.
   * The next icon toggles the overall **window and texture element size**. It also increases the font size by two units.
     * Between the font and window size options there are four available font sizes and two window element size options.
@@ -80,7 +80,7 @@ license][CWPLicense]
     * Pinned order ignores sort and order type.
     * A contract's pinned state is persistent.
   * The checkbox icon can be used to move the contract into a different **contract mission list** or create a new one.
-    * If the currently selected mission is not the "MasterMission" this will be a red X icon and can be used to **remove the contract** from that mission.
+    * If the currently selected mission is not the **MasterMission** this will be a red X icon and can be used to **remove the contract** from that mission.
   * The blue icon at the end can be used to **display contract notes** if they exist.
     * These are different from individual parameter notes.
 
