@@ -47,8 +47,6 @@ namespace ContractsWindow
 		private string daysToExpire;
 		private string title = "";
 		private string notes = "";
-		private double fundsReward, fundsPenalty;
-		private float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
 		private List<parameterContainer> paramList = new List<parameterContainer>();
 		private List<parameterContainer> allParamList = new List<parameterContainer>();
@@ -98,45 +96,51 @@ namespace ContractsWindow
 		private void contractRewards(Contract c)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)c.FundsCompletion, c.ScienceCompletion, c.ReputationCompletion);
-			fundsReward = c.FundsCompletion;
-			fundsRewString = "+ " + fundsReward.ToString("N0");
-			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+
+			fundsRewString = "";
+			if (c.FundsCompletion != 0)
+				fundsRewString = "+ " + c.FundsCompletion.ToString("N0");
+			float fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if (fundsRewStrat != 0f)
-			{
-				fundsRewString = string.Format("+ {0:N0} ({1:N0})", fundsReward + fundsRewStrat, fundsRewStrat);
-			}
-			repReward = c.ReputationCompletion;
-			repRewString = "+ " + repReward.ToString("N0");
-			repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+				fundsRewString = string.Format("+ {0:N0} ({1:N0})", c.FundsCompletion + fundsRewStrat, fundsRewStrat);
+
+			repRewString = "";
+			if (c.ReputationCompletion != 0)
+				repRewString = "+ " + c.ReputationCompletion.ToString("N0");
+			float repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repRewStrat != 0f)
-			{
-				repRewString = string.Format("+ {0:N0} ({1:N0})", repReward + repRewStrat, repRewStrat);
-			}
-			scienceReward = c.ScienceCompletion;
-			sciRewString = "+ " + scienceReward.ToString("N0");
-			sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
+				repRewString = string.Format("+ {0:N0} ({1:N0})", c.ReputationCompletion + repRewStrat, repRewStrat);
+
+			sciRewString = "";
+			if (c.ScienceCompletion != 0)
+				sciRewString = "+ " + c.ScienceCompletion.ToString("N0");
+			float sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
 			if (sciRewStrat != 0f)
 			{
-				sciRewString = string.Format("+ {0:N0} ({1:N0})", scienceReward + sciRewStrat, sciRewStrat);
+				sciRewString = string.Format("+ {0:N0} ({1:N0})", c.ScienceCompletion + sciRewStrat, sciRewStrat);
 			}
 		}
 
 		private void contractPenalties(Contract c)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)c.FundsFailure, 0f, c.ReputationFailure);
-			fundsPenalty = c.FundsFailure;
-			fundsPenString = "- " + fundsPenalty.ToString("N0");
-			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+
+			fundsPenString = "";
+			if (c.FundsFailure != 0);
+				fundsPenString = "- " + c.FundsFailure.ToString("N0");
+			float fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if (fundsPenStrat != 0f)
 			{
-				fundsPenString = string.Format("- {0:N0} ({1:N0})", fundsPenalty + fundsPenStrat, fundsPenStrat);
+				fundsPenString = string.Format("- {0:N0} ({1:N0})", c.FundsFailure + fundsPenStrat, fundsPenStrat);
 			}
-			repPenalty = c.ReputationFailure;
-			repPenString = "- " + repPenalty.ToString("N0");
-			repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+
+			repPenString = "";
+			if (c.ReputationFailure != 0)
+				repPenString = "- " + c.ReputationFailure.ToString("N0");
+			float repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repPenStrat != 0f)
 			{
-				repPenString = string.Format("- {0:N0} ({1:N0})", repPenalty + repPenStrat, repPenStrat);
+				repPenString = string.Format("- {0:N0} ({1:N0})", c.ReputationFailure + repPenStrat, repPenStrat);
 			}
 		}
 
@@ -214,31 +218,6 @@ namespace ContractsWindow
 			internal set { notes = value; }
 		}
 
-		public double FundsReward
-		{
-			get { return fundsReward; }
-		}
-
-		public double FundsPenalty
-		{
-			get { return fundsPenalty; }
-		}
-
-		public float RepReward
-		{
-			get { return repReward; }
-		}
-
-		public float RepPenalty
-		{
-			get { return repPenalty; }
-		}
-
-		public float ScienceReward
-		{
-			get { return scienceReward; }
-		}
-
 		public string FundsRewString
 		{
 			get { return fundsRewString; }
@@ -288,8 +267,6 @@ namespace ContractsWindow
 		private string title = "";
 		private string notes = "";
 		private int level;
-		private double fundsReward, fundsPenalty;
-		private float repReward, repPenalty, scienceReward, fundsRewStrat, fundsPenStrat, repRewStrat, repPenStrat, sciRewStrat;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
 		private AvailablePart part;
 		private List<parameterContainer> paramList = new List<parameterContainer>();
@@ -381,45 +358,55 @@ namespace ContractsWindow
 		internal void paramRewards(ContractParameter cP)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractReward, (float)cP.FundsCompletion, cP.ScienceCompletion, cP.ReputationCompletion);
-			fundsReward = cP.FundsCompletion;
-			fundsRewString = "+ " + fundsReward.ToString("N0");
-			fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+
+			fundsRewString = "";
+			if (cP.FundsCompletion != 0)
+				fundsRewString = "+ " + cP.FundsCompletion.ToString("N0");
+			float fundsRewStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if(fundsRewStrat != 0f)
 			{
-				fundsRewString = string.Format("+ {0:N0} ({1:N0})", fundsReward + fundsRewStrat, fundsRewStrat);
+				fundsRewString = string.Format("+ {0:N0} ({1:N0})", cP.FundsCompletion + fundsRewStrat, fundsRewStrat);
 			}
-			repReward = cP.ReputationCompletion;
-			repRewString = "+ " + repReward.ToString("N0");
-			repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+
+			repRewString = "";
+			if (cP.ReputationCompletion != 0)
+				repRewString = "+ " + cP.ReputationCompletion.ToString("N0");
+			float repRewStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if(repRewStrat != 0f)
 			{
-				repRewString = string.Format("+ {0:N0} ({1:N0})", repReward + repRewStrat, repRewStrat);
+				repRewString = string.Format("+ {0:N0} ({1:N0})", cP.ReputationCompletion + repRewStrat, repRewStrat);
 			}
-			scienceReward = cP.ScienceCompletion;
-			sciRewString = "+ " + scienceReward.ToString("N0");
-			sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
+
+			sciRewString = "";
+			if (cP.ScienceCompletion != 0)
+				sciRewString = "+ " + cP.ScienceCompletion.ToString("N0");
+			float sciRewStrat = currencyQuery.GetEffectDelta(Currency.Science);
 			if (sciRewStrat != 0f)
 			{
-				sciRewString = string.Format("+ {0:N0} ({1:N0})", scienceReward + sciRewStrat, sciRewStrat);
+				sciRewString = string.Format("+ {0:N0} ({1:N0})", cP.ScienceCompletion + sciRewStrat, sciRewStrat);
 			}
 		}
 
 		internal void paramPenalties(ContractParameter cP)
 		{
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)cP.FundsFailure, 0f, cP.ReputationFailure);
-			fundsPenalty = cP.FundsFailure;
-			fundsPenString = "- " + fundsPenalty.ToString("N0");
-			fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
+
+			fundsPenString = "";
+			if (cP.FundsFailure != 0)
+				fundsPenString = "- " + cP.FundsFailure.ToString("N0");
+			float fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if(fundsPenStrat != 0f)
 			{
-				fundsPenString = string.Format("- {0:N0} ({1:N0})", fundsPenalty + fundsPenStrat, fundsPenStrat);
+				fundsPenString = string.Format("- {0:N0} ({1:N0})", cP.FundsFailure + fundsPenStrat, fundsPenStrat);
 			}
-			repPenalty = cP.ReputationFailure;
-			repPenString = "- " + repPenalty.ToString("N0");
-			repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
+
+			repPenString = "";
+			if (cP.ReputationFailure != 0)
+				repPenString = "- " + cP.ReputationFailure.ToString("N0");
+			float repPenStrat = currencyQuery.GetEffectDelta(Currency.Reputation);
 			if (repPenStrat != 0f)
 			{
-				repPenString = string.Format("- {0:N0} ({1:N0})", repPenalty + repPenStrat, repPenStrat);
+				repPenString = string.Format("- {0:N0} ({1:N0})", cP.ReputationFailure + repPenStrat, repPenStrat);
 			}
 		}
 
@@ -458,31 +445,6 @@ namespace ContractsWindow
 		public int Level
 		{
 			get { return level; }
-		}
-
-		public double FundsReward
-		{
-			get { return fundsReward; }
-		}
-
-		public double FundsPenalty
-		{
-			get { return fundsPenalty; }
-		}
-
-		public float RepReward
-		{
-			get { return repReward; }
-		}
-
-		public float RepPenalty
-		{
-			get { return repPenalty; }
-		}
-
-		public float ScienceReward
-		{
-			get { return scienceReward; }
 		}
 
 		public string FundsRewString

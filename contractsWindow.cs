@@ -631,103 +631,13 @@ namespace ContractsWindow
 				{
 					Rect rewardsRect = r;
 					rewardsRect.x = 230 + (size * 30);
-					rewardsRect.y -= 4;
+					rewardsRect.y -= (2 + (size *2));
 
-					//Reward and penalty amounts
-					if (c.Container.FundsReward > 0 || c.Container.FundsPenalty > 0)
-					{
-						rewardsRect.width = 8 + (size * 2);
-						rewardsRect.height = 11 + (size * 5);
+					scaledContent(ref rewardsRect, c.Container.FundsRewString, c.Container.FundsPenString, Currency.Funds, size, active, failed);
 
-						if (c.Container.FundsReward > 0 && active)
-						{
-							Rect fundsRect = rewardsRect;
+					scaledContent(ref rewardsRect, c.Container.SciRewString, "", Currency.Science, size, active, failed);
 
-							GUI.DrawTexture(fundsRect, contractSkins.fundsGreen);
-
-							fundsRect.x += 9 + (size * 2);
-							fundsRect.width = 110 + (size * 18);
-							fundsRect.height += 4;
-
-							GUI.Label(fundsRect, c.Container.FundsRewString, contractSkins.reward);
-						}
-						if (c.Container.FundsPenalty > 0 && failed)
-						{
-							Rect fundsRect = rewardsRect;
-
-							fundsRect.y += 14 + (size * 5);
-
-							GUI.DrawTexture(fundsRect, contractSkins.fundsRed);
-
-							fundsRect.x += 9 + (size * 2);
-							fundsRect.width = 110 + (size * 18);
-							fundsRect.height += 4;
-
-							GUI.Label(fundsRect, c.Container.FundsPenString, contractSkins.penalty);
-						}
-					}
-
-					rewardsRect.x += 124 + (size * 20);
-
-					if (WindowRect.width >= 350 + (size * 30))
-					{
-						//Rep rewards and penalty amounts
-						if (c.Container.RepReward > 0 || c.Container.RepPenalty > 0)
-						{
-							rewardsRect.width = 12 + (size * 4);
-							rewardsRect.height = 12 + (size * 4);
-
-							if (c.Container.RepReward > 0 && active)
-							{
-								Rect repRect = rewardsRect;
-
-								GUI.DrawTexture(repRect, contractSkins.repGreen);
-
-								repRect.x += 14 + (size * 4);
-								repRect.width = 66 + (size * 12);
-								repRect.height += 4;
-
-								GUI.Label(repRect, c.Container.RepRewString, contractSkins.reward);
-							}
-							if (c.Container.RepPenalty > 0 && failed)
-							{
-								Rect repRect = rewardsRect;
-
-								repRect.y += 14 + (size * 5);
-
-								GUI.DrawTexture(repRect, contractSkins.repRed);
-
-								repRect.x += 14 + (size * 4);
-								repRect.width = 66 + (size * 12);
-								repRect.height += 4;
-
-								GUI.Label(repRect, c.Container.RepPenString, contractSkins.penalty);
-							}
-						}
-
-						rewardsRect.x += 86 + (size * 10);
-
-						if (WindowRect.width >= 440 + (size * 30))
-						{
-							//Science reward
-							if (c.Container.ScienceReward > 0)
-							{
-								if (active)
-								{
-									rewardsRect.width = 12 + (size * 4);
-									rewardsRect.height = 12 + (size * 4);
-
-									GUI.DrawTexture(rewardsRect, contractSkins.science);
-
-									rewardsRect.x += 14 + (size * 4);
-									rewardsRect.width = 66 + (size * 12);
-									rewardsRect.height += 4;
-
-									GUI.Label(rewardsRect, c.Container.SciRewString, contractSkins.scienceReward);
-								}
-							}
-						}
-					}
+					scaledContent(ref rewardsRect, c.Container.RepRewString, c.Container.RepPenString, Currency.Reputation, size, active, failed);
 				}
 			}
 
@@ -812,95 +722,11 @@ namespace ContractsWindow
 					rewardsRect.x = 230 + (size * 30);
 					rewardsRect.y += 4;
 
-					if (cP.FundsReward > 0 || cP.FundsPenalty > 0)
-					{
-						rewardsRect.width = 8 + (size * 2);
-						rewardsRect.height = 11 + (size * 5);
+					scaledContent(ref rewardsRect, cP.FundsRewString, cP.FundsPenString, Currency.Funds, size, greenState, redState);
 
-						if (cP.FundsReward > 0 && greenState)
-						{
-							Rect fundsRect = rewardsRect;
+					scaledContent(ref rewardsRect, cP.SciRewString, "", Currency.Science, size, greenState, redState);
 
-							GUI.DrawTexture(fundsRect, contractSkins.fundsGreen);
-
-							fundsRect.x += 9 + (size * 2);
-							fundsRect.width = 110 + (size * 18);
-							fundsRect.height += 4;
-
-							GUI.Label(fundsRect, cP.FundsRewString, contractSkins.reward);
-						}
-						if (cP.FundsPenalty > 0 && redState)
-						{
-							Rect fundsRect = rewardsRect;
-
-							fundsRect.y += 12 + (size * 5);
-
-							GUI.DrawTexture(fundsRect, contractSkins.fundsRed);
-
-							fundsRect.x += 9 + (size * 2);
-							fundsRect.width = 110 + (size * 18);
-							fundsRect.height += 4;
-
-							GUI.Label(fundsRect, cP.FundsPenString, contractSkins.penalty);
-						}
-					}
-
-					rewardsRect.x += 124 + (size * 20);
-
-					if (WindowRect.width >= 350 + (size * 30))
-					{
-						if (cP.RepReward > 0 || cP.RepPenalty > 0)
-						{
-							rewardsRect.width = 12 + (size * 4);
-							rewardsRect.height = 12 + (size * 4);
-
-							if (cP.RepReward > 0 && greenState)
-							{
-								Rect repRect = rewardsRect;
-
-								GUI.DrawTexture(repRect, contractSkins.repGreen);
-
-								repRect.x += 14 + (size * 4);
-								repRect.width = 66 + (size * 12);
-								repRect.height += 4;
-
-								GUI.Label(repRect, cP.RepRewString, contractSkins.reward);
-							}
-							if (cP.RepPenalty > 0 && redState)
-							{
-								Rect repRect = rewardsRect;
-
-								repRect.y += 14 + (size * 4);
-
-								GUI.DrawTexture(repRect, contractSkins.repRed);
-
-								repRect.x += 14 + (size * 4);
-								repRect.width = 66 + (size * 12);
-								repRect.height += 4;
-
-								GUI.Label(repRect, cP.RepPenString, contractSkins.penalty);
-							}
-						}
-
-						rewardsRect.x += 86 + (size * 10);
-
-						if (WindowRect.width >= 440 + (size * 30))
-						{
-							if (cP.ScienceReward > 0 && greenState)
-							{
-								rewardsRect.width = 12 + (size * 4);
-								rewardsRect.height = 12 + (size * 4);
-
-								GUI.DrawTexture(rewardsRect, contractSkins.science);
-
-								rewardsRect.x += 14 + (size * 4);
-								rewardsRect.width = 66 + (size * 12);
-								rewardsRect.height += 4;
-
-								GUI.Label(rewardsRect, cP.SciRewString, contractSkins.scienceReward);
-							}
-						}
-					}
+					scaledContent(ref rewardsRect, cP.RepRewString, cP.RepPenString, Currency.Reputation, size, greenState, redState);
 				}
 			}
 
@@ -925,6 +751,96 @@ namespace ContractsWindow
 				}
 			}
 
+		}
+
+		#endregion
+
+		#region Rewards
+
+		private void scaledContent(ref Rect r, string top, string bottom, Currency type, int i, bool active, bool failed)
+		{
+			bool t = string.IsNullOrEmpty(top);
+			bool b = string.IsNullOrEmpty(bottom);
+			if (t && b)
+				return;
+
+			int width = 0;
+			int height = 0;
+			if (type == Currency.Funds)
+			{
+				width = 8 + (i * 2);
+				height = 11 + (i * 5);
+			}
+			else
+			{
+				width = 12 + (i * 4);
+				height = 12 + (i * 4);
+			}
+
+			r.width = width;
+			r.height = height;
+
+			GUIStyle sTop = currencyStyle(type, true);
+			Vector2 szTop = sTop.CalcSize(new GUIContent(top));
+			if (!t && active)
+			{
+				GUI.DrawTexture(r, currencyIcon(type, true));
+
+				r.x += r.width + 2 + (i * 2);
+
+				r.width = szTop.x;
+				r.height = szTop.y;
+
+				GUI.Label(r, top, sTop);
+			}
+
+			r.width = width;
+			r.height = height;
+
+			GUIStyle sBot = currencyStyle(type, false);
+			Vector2 szBot = sBot.CalcSize(new GUIContent(bottom));
+			if (!b && failed)
+			{
+				r.x -= (width + 2 + (i * 2));
+				r.y += 14 + (i * 5);
+				GUI.DrawTexture(r, currencyIcon(type, false));
+
+				r.x += r.width + 2 + (i * 2);
+
+				r.width = szBot.x;
+				r.height = szBot.y;
+
+				GUI.Label(r, bottom, sBot);
+				r.y -= (14 + (i * 5));
+			}
+
+			r.x += Math.Max(szTop.x, szBot.x) + 4 + (i * 4);
+		}
+
+		private GUIStyle currencyStyle(Currency t, bool reward)
+		{
+			switch (t)
+			{
+				case Currency.Funds:
+					return reward ? contractSkins.reward : contractSkins.penalty;
+				case Currency.Reputation:
+					return reward ? contractSkins.repReward : contractSkins.repPenalty;
+				default:
+					return contractSkins.scienceReward;
+			}
+		}
+
+		private Texture2D currencyIcon(Currency t, bool reward)
+		{
+			switch (t)
+			{
+				case Currency.Funds:
+					return reward ? contractSkins.fundsGreen : contractSkins.fundsRed;
+				case Currency.Reputation:
+					return reward ? contractSkins.repGreen : contractSkins.repRed;
+				default:
+					return contractSkins.science;
+			}
 		}
 
 		#endregion
@@ -1493,7 +1409,7 @@ namespace ContractsWindow
 		}
 
 		//Update contract values
-		private void refreshContracts(List<Guid> gID)
+		private void refreshContracts(List<Guid> gID, bool sort = true)
 		{
 			List<Guid> removeList = new List<Guid>();
 			List<Guid> pinnedRemoveList = new List<Guid>();
@@ -1511,6 +1427,16 @@ namespace ContractsWindow
 					{
 						cC.Duration = 0;
 						cC.DaysToExpire = "----";
+
+						cC.Title = cC.Contract.Title;
+						cC.Notes = cC.Contract.Notes;
+
+						foreach (parameterContainer pC in cC.AllParamList)
+						{
+							pC.Title = pC.CParam.Title;
+							pC.Notes = pC.CParam.Notes;
+						}
+
 						continue;
 					}
 
@@ -1551,7 +1477,8 @@ namespace ContractsWindow
 			foreach (Guid id in pinnedRemoveList)
 				contractScenario.ListRemove(pinnedList, id);
 
-			gID = sortList(gID, currentMission.OrderMode, currentMission.AscendingOrder);
+			if (sort)
+				gID = sortList(gID, currentMission.OrderMode, currentMission.AscendingOrder);
 		}
 
 		//Remove contract from current list and update
@@ -1772,7 +1699,7 @@ namespace ContractsWindow
 		protected override void RepeatingWorker()
 		{
 			if (cList.Count > 0)
-				refreshContracts(cList);
+				refreshContracts(cList, false);
 		}
 
 		#endregion

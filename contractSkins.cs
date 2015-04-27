@@ -71,6 +71,8 @@ namespace ContractsWindow
 
 		internal static GUIStyle reward;
 		internal static GUIStyle penalty;
+		internal static GUIStyle repReward;
+		internal static GUIStyle repPenalty;
 		internal static GUIStyle scienceReward;
 		internal static GUIStyle texLabel;
 
@@ -295,7 +297,12 @@ namespace ContractsWindow
 			scienceReward = new GUIStyle(reward);
 			scienceReward.name = "ScienceReward";
 			scienceReward.normal.textColor = XKCDColors.AquaBlue;
-			scienceReward.padding = new RectOffset(1, 1, 1, 3);
+
+			repReward = new GUIStyle(reward);
+			repReward.normal.textColor = XKCDColors.BrownishYellow;
+
+			repPenalty = new GUIStyle(reward);
+			repPenalty.normal.textColor = XKCDColors.OrangeyRed;
 
 			//Other Styles
 			dropDown = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.box);
