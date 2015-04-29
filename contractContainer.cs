@@ -126,7 +126,7 @@ namespace ContractsWindow
 			CurrencyModifierQuery currencyQuery = CurrencyModifierQuery.RunQuery(TransactionReasons.ContractPenalty, (float)c.FundsFailure, 0f, c.ReputationFailure);
 
 			fundsPenString = "";
-			if (c.FundsFailure != 0);
+			if (c.FundsFailure != 0)
 				fundsPenString = "- " + c.FundsFailure.ToString("N0");
 			float fundsPenStrat = currencyQuery.GetEffectDelta(Currency.Funds);
 			if (fundsPenStrat != 0f)
