@@ -133,6 +133,12 @@ namespace ContractsWindow
 							{
 								if (C != null)
 								{
+									if (C.HasValue("autoAccept"))
+									{
+										if (C.GetValue("autoAccept") == "True")
+											continue;
+									}
+
 									if (C.HasValue("state"))
 									{
 										if (C.GetValue("state") == "Active")
