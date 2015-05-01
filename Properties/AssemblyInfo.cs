@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("f18527dd-a54e-4711-9dcd-c73a221ebb2d")]
 
-[assembly: AssemblyVersion("1.0.5.0")]
-[assembly: AssemblyFileVersion("1.0.5.0")]
-[assembly: AssemblyInformationalVersion("v5.0")]
-[assembly: KSPAssembly("Contracts_Window", 5, 0)]
+[assembly: AssemblyVersion("1.0.5.1")]
+[assembly: AssemblyFileVersion("1.0.5.1")]
+[assembly: AssemblyInformationalVersion("v5.1")]
+[assembly: KSPAssembly("Contracts_Window", 5, 1)]
