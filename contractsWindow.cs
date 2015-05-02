@@ -91,6 +91,8 @@ namespace ContractsWindow
 			WindowStyle = contractSkins.newWindowStyle;
 			Visible = false;
 			DragEnabled = true;
+			ClampToScreen = true;
+			ClampToScreenOffset = new RectOffset(-200, -200, -200, -200);
 			TooltipMouseOffset = new Vector2d(-10, -25);
 			RepeatingWorkerInitialWait = 10;
 

@@ -84,7 +84,7 @@ namespace ContractsWindow.Toolbar
 
 		IEnumerator replaceStockContractApp()
 		{
-			while (ContractsApp.Instance.appLauncherButton == null && !ApplicationLauncher.Ready)
+			while (ContractsApp.Instance.appLauncherButton == null || !ApplicationLauncher.Ready)
 				yield return null;
 
 			if (stockToolbarButton == null)
