@@ -7,7 +7,6 @@
 ![][CWP:header]
 
 [![][shield:support-toolbar]][toolbar:release]&nbsp;
-[![][shield:support-ccfg]][cconfig:release]&nbsp;
 [![][shield:support-crm]][crm:release]&nbsp;
 
 
