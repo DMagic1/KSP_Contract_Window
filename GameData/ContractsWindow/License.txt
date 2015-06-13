@@ -32,7 +32,7 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public L
 
 ---------------
 
-The show/hide icons, mission check box icon, and reset icons are from the Font Awesome icon library:
+The show/hide icons, mission check box icon, edit icon, and reset icon are from the Font Awesome icon library:
 
 http://fortawesome.github.io/Font-Awesome/
 
