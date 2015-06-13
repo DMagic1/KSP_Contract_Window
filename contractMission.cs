@@ -27,6 +27,7 @@ THE SOFTWARE.
 #endregion
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace ContractsWindow
@@ -40,6 +41,8 @@ namespace ContractsWindow
 		private string name;
 		private string activeString;
 		private string hiddenString;
+		private string vesselIDString;
+		private Dictionary<Guid, Vessel> currentVessels;
 		private Dictionary<Guid, contractUIObject> contractList;
 		private List<Guid> activeMissionList;
 		private List<Guid> hiddenMissionList;
@@ -51,6 +54,12 @@ namespace ContractsWindow
 		public string Name
 		{
 			get { return name; }
+			internal set { name = value; }
+		}
+
+		public string VesselIDs
+		{
+			get { return vesselIDString; }
 		}
 
 		public int ActiveContracts
@@ -92,11 +101,20 @@ namespace ContractsWindow
 			internal set { masterMission = value; }
 		}
 
-		internal contractMission(string n, string active, string hidden, bool asc, bool showActive, int sMode, bool Master)
+		public bool ContainsVessel(Vessel v)
+		{
+			if (v == null)
+				return false;
+
+			return currentVessels.ContainsKey(v.id);
+		}
+
+		internal contractMission(string n, string active, string hidden, string vessels, bool asc, bool showActive, int sMode, bool Master)
 		{
 			name = n;
 			activeString = active;
 			hiddenString = hidden;
+			vesselIDString = vessels;
 			ascendingOrder = asc;
 			showActiveMissions = showActive;
 			masterMission = Master;
@@ -104,6 +122,7 @@ namespace ContractsWindow
 			contractList = new Dictionary<Guid, contractUIObject>();
 			activeMissionList = new List<Guid>();
 			hiddenMissionList = new List<Guid>();
+			currentVessels = new Dictionary<Guid, Vessel>();
 		}
 
 		internal contractMission(string n)
@@ -112,6 +131,7 @@ namespace ContractsWindow
 			contractList = new Dictionary<Guid, contractUIObject>();
 			activeMissionList = new List<Guid>();
 			hiddenMissionList = new List<Guid>();
+			currentVessels = new Dictionary<Guid, Vessel>();
 		}
 
 		internal contractUIObject getContract(Guid id)
@@ -134,6 +154,7 @@ namespace ContractsWindow
 			clearLists();
 			buildMissionList(activeString, true);
 			buildMissionList(hiddenString, false);
+			buildVesselList(vesselIDString);
 		}
 
 		private void buildMissionList(string s, bool Active)
@@ -269,6 +290,22 @@ namespace ContractsWindow
 			hiddenMissionList.Clear();
 		}
 
+		private void addToVessels(Vessel v, bool warn = true)
+		{
+			if (!currentVessels.ContainsKey(v.id))
+				currentVessels.Add(v.id, v);
+			else if (warn)
+				DMC_MBE.LogFormatted("Mission [{0}] Vessel List Already Contains A Vessel With ID: [{1}] And Title [{2}]", name, v.id, v.vesselName);
+		}
+
+		private void removeFromVessels(Vessel v, bool warn = true)
+		{
+			if (currentVessels.ContainsKey(v.id))
+				currentVessels.Remove(v.id);
+			else if (warn)
+				DMC_MBE.LogFormatted("Mission [{0}] Vessel List Does Not Contain A Vessel With ID: [{1}] And Title [{2}]", name, v.id, v.vesselName);
+		}
+
 		internal string stringConcat(List<Guid> source)
 		{
 			if (source.Count == 0)
@@ -290,6 +327,68 @@ namespace ContractsWindow
 			}
 
 			return string.Join(",", s.ToArray());
+		}
+
+		internal string vesselConcat(contractMission m)
+		{
+			if (m == null || !HighLogic.LoadedSceneIsFlight)
+				return vesselIDString;
+
+			Vessel v = FlightGlobals.ActiveVessel;
+
+			if (v == null)
+				return vesselIDString;
+
+			bool withVessel = ContainsVessel(v);
+			bool currentMission = m == this;
+
+			if (withVessel && !currentMission)
+				removeFromVessels(v, false);
+			else if (!withVessel && currentMission)
+				addToVessels(v, false);
+
+			List<Vessel> source = currentVessels.Values.ToList();
+
+			int i = source.Count;
+			if (i <= 0)
+				return "";
+			string[] s = new string[i];
+			for (int j = 0; j < i; j++)
+			{
+				if (source[j] != null)
+					s[j] = source[j].id.ToString();
+			}
+
+			return string.Join(",", s);
+		}
+
+		private void buildVesselList(string s)
+		{
+			if (!HighLogic.LoadedSceneIsFlight)
+				return;
+
+			if (string.IsNullOrEmpty(s))
+				return;
+
+			string[] a = s.Split(',');
+
+			for (int i = 0; i < a.Length; i++)
+			{
+				try
+				{
+					Guid g = new Guid(a[i]);
+					Vessel v = FlightGlobals.Vessels.FirstOrDefault(V => V.id == g);
+
+					if (v == null)
+						continue;
+
+					addToVessels(v);
+				}
+				catch (Exception e)
+				{
+					DMC_MBE.LogFormatted("Guid invalid: {0} for mission [{1}]", e, name);
+				}
+			}
 		}
 	}
 }
