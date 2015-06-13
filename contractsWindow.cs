@@ -55,10 +55,10 @@ namespace ContractsWindow
 		private contractMission currentMission;
 		private contractContainer tempContainer;
 		private Agent currentAgent;
-		private string version, inputField;
+		private string version, inputField, editField;
 		private Vector2 scroll, missionScroll;
 		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar, replaceStock;
-		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionDelete, replaceStockPopup;
+		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionEdit, replaceStockPopup;
 		private Vector2 dragStart;
 		private float windowHeight, windowWidth;
 		//private int timer;
@@ -266,7 +266,7 @@ namespace ContractsWindow
 				missionCreator = false;
 				missionSelector = false;
 				missionTextBox = false;
-				missionDelete = false;
+				missionEdit = false;
 				replaceStockPopup = false;
 				toolbar = false;
 			}
@@ -289,13 +289,14 @@ namespace ContractsWindow
 			{
 				lastRect.x += 210 + (windowSizeAdjust * 24);
 				lastRect.y += 2 + (windowSizeAdjust * 2);
-				lastRect.width = 16 + (windowSizeAdjust * 4);
-				lastRect.height = 16 + (windowSizeAdjust * 4);
+				lastRect.width = 20 + (windowSizeAdjust * 4);
+				lastRect.height = 20 + (windowSizeAdjust * 4);
 
-				if (GUI.Button(lastRect, new GUIContent(contractSkins.closeIcon, "Delete Mission")))
+				if (GUI.Button(lastRect, new GUIContent(contractSkins.missionEditIcon, "Edit Mission")))
 				{
+					editField = currentMission.Name;
 					popup = true;
-					missionDelete = true;
+					missionEdit = true;
 				}
 			}
 
@@ -855,37 +856,19 @@ namespace ContractsWindow
 			{
 				if (showSort)
 				{
-					popupRect = new Rect(10, 20, 80 + size * 15, 110 + size * 23);
+					popupRect = new Rect(10, 20, 80 + size * 15, 132 + size * 23);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
-					if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 2, popupRect.width - 4, 20 + size * 5), "Expiration", contractSkins.sortMenu))
+
+					var sortTypes = Enum.GetNames(typeof(sortClass));
+
+					for (int i = 0; i < sortTypes.Length; i++)
 					{
-						showSort = false;
-						currentMission.OrderMode = sortClass.Expiration;
-						refreshContracts(cList);
-					}
-					if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 23 + size * 5, popupRect.width - 4, 20 + size * 5), "Acceptance", contractSkins.sortMenu))
-					{
-						showSort = false;
-						currentMission.OrderMode = sortClass.Acceptance;
-						refreshContracts(cList);
-					}
-					if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 44 + size * 10, popupRect.width - 4, 20 + size * 5), "Difficulty", contractSkins.sortMenu))
-					{
-						showSort = false;
-						currentMission.OrderMode = sortClass.Difficulty;
-						refreshContracts(cList);
-					}
-					if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 65 + size * 15, popupRect.width - 4, 20 + size * 5), "Reward", contractSkins.sortMenu))
-					{
-						showSort = false;
-						currentMission.OrderMode = sortClass.Reward;
-						refreshContracts(cList);
-					}
-					if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 86 + size * 20, popupRect.width - 4, 20 + size * 5), "Type", contractSkins.sortMenu))
-					{
-						showSort = false;
-						currentMission.OrderMode = sortClass.Type;
-						refreshContracts(cList);
+						if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 2 + ((21 + size * 4) * i), popupRect.width - 4, 20 + size * 5), sortTypes[i], contractSkins.sortMenu))
+						{
+							showSort = false;
+							currentMission.OrderMode = (sortClass)Enum.Parse(typeof(sortClass), sortTypes[i]);
+							refreshContracts(cList);
+						}
 					}
 				}
 
@@ -1001,10 +984,7 @@ namespace ContractsWindow
 						contractMission m = missionList[i];
 						if (GUI.Button(r, m.Name, contractSkins.missionMenu))
 						{
-							currentMission = contractScenario.Instance.getMissionList(m.Name);
-
-							if (currentMission == null)
-								currentMission = contractScenario.Instance.MasterMission;
+							currentMission = contractScenario.Instance.setCurrentMission(m.Name);
 
 							if (currentMission.ShowActiveMissions)
 								cList = currentMission.ActiveMissionList;
@@ -1088,12 +1068,69 @@ namespace ContractsWindow
 					}
 				}
 
-				else if (missionDelete)
+				else if (missionEdit)
 				{
-					popupRect = new Rect(20, 40, 180 + size * 20, 160);
+					popupRect = new Rect(20, 40, 180 + size * 20, 200);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
-					GUI.Label(new Rect(popupRect.x + 7, popupRect.y + 10, popupRect.width - 14, 100), "Delete Current Mission:\n<b>Will Not</b> Affect Contract Status", contractSkins.resetBox);
-					if (GUI.Button(new Rect(popupRect.x + 20, popupRect.y + 110, popupRect.width - 40, 25), "Delete Mission", contractSkins.resetButton))
+
+					Rect r = new Rect(popupRect.x + 2, popupRect.y + 2, popupRect.width - 14, 30);
+					GUI.Label(r, "Edit Mission Title", contractSkins.resetBox);
+
+					r.x += 10;
+					r.y += 30;
+					r.width = 150 + size * 20;
+					r.height = 25;
+
+					editField = GUI.TextField(r, editField, 20);
+
+					r.y += 30;
+
+					if (GUI.Button(r, "Change Name", contractSkins.resetButton))
+					{
+						if (!string.IsNullOrEmpty(editField))
+						{
+							string oldName = currentMission.Name;
+							contractScenario.Instance.removeMissionList(oldName, false);
+
+							currentMission.Name = editField;
+
+							if (contractScenario.Instance.addMissionList(currentMission))
+							{
+								missionList = contractScenario.Instance.getAllMissions();
+								currentMission = contractScenario.Instance.setCurrentMission(editField);
+
+								if (currentMission.ShowActiveMissions)
+									cList = currentMission.ActiveMissionList;
+								else
+									cList = currentMission.HiddenMissionList;
+
+								pinnedList = currentMission.loadPinnedContracts(cList);
+
+								refreshContracts(cList);
+
+								popup = false;
+								missionEdit = false;
+							}
+							else
+								currentMission.Name = oldName;
+						}
+						else
+							ScreenMessages.PostScreenMessage("Contract mission list must have a name", 5f, ScreenMessageStyle.UPPER_CENTER);
+					}
+
+					r.x -= 10;
+					r.y += 30;
+					r.width = popupRect.width - 14;
+					r.height = 60;
+
+					GUI.Label(r, "Delete Current Mission:\n<b>Will Not</b> Affect Contract Status", contractSkins.resetBox);
+
+					r.x += 10;
+					r.y += 60;
+					r.width -= 25;
+					r.height = 25;
+
+					if (GUI.Button(r, "Delete Mission", contractSkins.resetButton))
 					{
 						contractScenario.Instance.removeMissionList(currentMission.Name);
 						missionList = contractScenario.Instance.getAllMissions();
@@ -1109,7 +1146,7 @@ namespace ContractsWindow
 						refreshContracts(cList);
 
 						popup = false;
-						missionDelete = false;
+						missionEdit = false;
 					}
 				}
 
@@ -1407,7 +1444,10 @@ namespace ContractsWindow
 		{
 			contractScenario.Instance.loadAllContracts();
 			contractScenario.Instance.loadAllMissionLists();
-			currentMission = contractScenario.Instance.MasterMission;
+			if (HighLogic.LoadedSceneIsFlight)
+				currentMission = contractScenario.Instance.setLoadedMission(FlightGlobals.ActiveVessel);
+			else
+				currentMission = contractScenario.Instance.MasterMission;
 		}
 
 		//Update contract values
@@ -1540,20 +1580,27 @@ namespace ContractsWindow
 						cL.Add(cC);
 				}
 			}
-			if (s == sortClass.Default)
-				return gID;
-			else if (s == sortClass.Expiration)
-				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Duration.CompareTo(b.Container.Duration), a.Container.Title.CompareTo(b.Container.Title)));
-			else if (s == sortClass.Acceptance)
-				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.DateAccepted.CompareTo(b.Container.Contract.DateAccepted), a.Container.Title.CompareTo(b.Container.Title)));
-			else if (s == sortClass.Reward)
-				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.TotalReward.CompareTo(b.Container.TotalReward), a.Container.Title.CompareTo(b.Container.Title)));
-			else if (s == sortClass.Difficulty)
-				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.Prestige.CompareTo(b.Container.Contract.Prestige), a.Container.Title.CompareTo(b.Container.Title)));
-			else if (s == sortClass.Type)
+			switch (s)
 			{
-				cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.GetType().Name.CompareTo(b.Container.Contract.GetType().Name), a.Container.Title.CompareTo(b.Container.Title)));
-				cL = typeSort(cL, Asc);
+				case sortClass.Expiration:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Duration.CompareTo(b.Container.Duration), a.Container.Title.CompareTo(b.Container.Title)));
+					break;
+				case sortClass.Acceptance:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.DateAccepted.CompareTo(b.Container.Contract.DateAccepted), a.Container.Title.CompareTo(b.Container.Title)));
+					break;
+				case sortClass.Reward:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.TotalReward.CompareTo(b.Container.TotalReward), a.Container.Title.CompareTo(b.Container.Title)));
+					break;
+				case sortClass.Difficulty:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.Prestige.CompareTo(b.Container.Contract.Prestige), a.Container.Title.CompareTo(b.Container.Title)));
+					break;
+				case sortClass.Planet:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.TargetPlanet.CompareTo(b.Container.TargetPlanet), a.Container.Title.CompareTo(b.Container.Title)));
+					break;
+				case sortClass.Type:
+					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Contract.GetType().Name.CompareTo(b.Container.Contract.GetType().Name), a.Container.Title.CompareTo(b.Container.Title)));
+					cL = typeSort(cL, Asc);
+					break;
 			}
 			gID.Clear();
 			
@@ -1682,6 +1729,9 @@ namespace ContractsWindow
 				currentMission.addContract(cC, true, true);
 				if (currentMission.ShowActiveMissions)
 					refreshContracts(cList);
+
+				if (!currentMission.MasterMission)
+					contractScenario.Instance.MasterMission.addContract(cC, true, true);
 			}
 		}
 
@@ -1749,12 +1799,12 @@ namespace ContractsWindow
 
 	public enum sortClass
 	{
-		Default = 1,
+		Difficulty = 1,
 		Expiration = 2,
 		Acceptance = 3,
-		Difficulty = 4,
-		Reward = 5,
-		Type = 6,
+		Reward = 4,
+		Type = 5,
+		Planet = 6,
 	}
 
 	#endregion
