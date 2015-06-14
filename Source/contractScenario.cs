@@ -91,6 +91,9 @@ namespace ContractsWindow
 		//A specific contractMission is assigned to hold all contracts; contracts can't be removed from this
 		private contractMission masterMission = new contractMission("MasterMission");
 
+		//The currently active mission
+		private contractMission currentMission;
+
 		public contractMission MasterMission
 		{
 			get { return masterMission; }
@@ -173,6 +176,7 @@ namespace ContractsWindow
 								string name;
 								string activeString = "";
 								string hiddenString = "";
+								string vesselString = "";
 								bool ascending, showActive;
 								int sortMode;
 								bool master = false;
@@ -188,6 +192,8 @@ namespace ContractsWindow
 									activeString = m.GetValue("ActiveListID");
 								if (m.HasValue("HiddenListID"))
 									hiddenString = m.GetValue("HiddenListID");
+								if (m.HasValue("VesselIDs"))
+									vesselString = m.GetValue("VesselIDs");
 
 								if (!bool.TryParse(m.GetValue("AscendingSort"), out ascending))
 									ascending = true;
@@ -196,7 +202,7 @@ namespace ContractsWindow
 								if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
 									sortMode = 0;
 
-								contractMission mission = new contractMission(name, activeString, hiddenString, ascending, showActive, sortMode, master);
+								contractMission mission = new contractMission(name, activeString, hiddenString, vesselString, ascending, showActive, sortMode, master);
 
 								if (master)
 								{
@@ -250,6 +256,7 @@ namespace ContractsWindow
 					missionNode.AddValue("MissionName", m.Name);
 					missionNode.AddValue("ActiveListID", m.stringConcat(m.ActiveMissionList));
 					missionNode.AddValue("HiddenListID", m.stringConcat(m.HiddenMissionList));
+					missionNode.AddValue("VesselIDs", m.vesselConcat(currentMission));
 					missionNode.AddValue("AscendingSort", m.AscendingOrder);
 					missionNode.AddValue("ShowActiveList", m.ShowActiveMissions);
 					missionNode.AddValue("SortMode", (int)m.OrderMode);
@@ -402,6 +409,19 @@ namespace ContractsWindow
 			return false;
 		}
 
+		internal bool addMissionList(contractMission mission)
+		{
+			if (!missionList.ContainsKey(mission.Name))
+			{
+				missionList.Add(mission.Name, mission);
+				return true;
+			}
+			else
+				DMC_MBE.LogFormatted("Missions List Already Contains Mission Of Name: [{0}]; Please Rename", name);
+
+			return false;
+		}
+
 		//Used to add the master contract mission list; usually when something has gone wrong
 		internal void addFullMissionList()
 		{
@@ -429,13 +449,16 @@ namespace ContractsWindow
 			}
 		}
 
-		internal void removeMissionList(string name)
+		internal void removeMissionList(string name, bool delete = true)
 		{
 			if (missionList.ContainsKey(name))
 			{
-				contractMission c = missionList[name];
+				if (delete)
+				{
+					contractMission c = missionList[name];
+					c = null;
+				}
 				missionList.Remove(name);
-				c = null;
 			}
 			else
 				DMC_MBE.LogFormatted("No Mission List Of Name: [{0}] Found", name);
@@ -446,12 +469,42 @@ namespace ContractsWindow
 			missionList.Clear();
 		}
 
-		internal contractMission getMissionList(string name)
+		internal contractMission getMissionList(string name, bool warn = false)
 		{
 			if (missionList.ContainsKey(name))
 				return missionList[name];
-			else
-				return null;
+			else if (warn)
+				DMC_MBE.LogFormatted("No Mission Of Name [{0}] Found In Primary Mission List", name);
+
+			return null;
+		}
+
+		internal contractMission setCurrentMission(string s)
+		{
+			contractMission m = getMissionList(s, true);
+
+			if (m != null)
+			{
+				currentMission = m;
+				return currentMission;
+			}
+
+			currentMission = masterMission;
+			return currentMission;
+		}
+
+		internal contractMission setLoadedMission(Vessel v)
+		{
+			if (v == null)
+				return masterMission;
+
+			foreach (contractMission m in missionList.Values)
+			{
+				if (m.ContainsVessel(v))
+					return m;
+			}
+
+			return masterMission;
 		}
 
 		//Returns an ordered list of missions for the main window; the master mission is always first
@@ -473,6 +526,8 @@ namespace ContractsWindow
 				if (addMissionList("MasterMission"))
 					mList.Add(getMissionList("MasterMission"));
 			}
+
+			tempList.Sort((a,b) => RUIutils.SortAscDescPrimarySecondary(false, a.ActiveContracts.CompareTo(b.ActiveContracts), a.Name.CompareTo(b.Name)));
 
 			if (tempList.Count > 0)
 				mList.AddRange(tempList);

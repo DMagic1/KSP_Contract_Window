@@ -29,8 +29,12 @@ THE SOFTWARE.
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Contracts;
-using Contracts.Parameters;
+using Contracts.Templates;
+using FinePrint.Contracts;
+using FinePrint.Contracts.Parameters;
+using FinePrint.Utilities;
 using UnityEngine;
 using System.Reflection;
 
@@ -45,6 +49,7 @@ namespace ContractsWindow
 		private double totalReward, duration;
 		private bool showNote;
 		private string daysToExpire;
+		private string targetPlanet;
 		private string title = "";
 		private string notes = "";
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
@@ -84,6 +89,10 @@ namespace ContractsWindow
 				ContractParameter param = c.GetParameter(i);
 				addContractParam(param, 0);
 			}
+
+			CelestialBody t = getTargetBody();
+
+			targetPlanet = t == null ? "" : t.name;
 		}
 
 		private void addContractParam(ContractParameter param, int Level)
@@ -176,6 +185,97 @@ namespace ContractsWindow
 			allParamList.Add(pC);
 		}
 
+		private CelestialBody getTargetBody()
+		{
+			if (contract == null)
+				return null;
+
+			bool checkTitle = false;
+
+			Type t = contract.GetType();
+
+			if (t == typeof(CollectScience))
+				return ((CollectScience)contract).TargetBody;
+			else if (t == typeof(ExploreBody))
+				return ((ExploreBody)contract).TargetBody;
+			else if (t == typeof(PartTest))
+			{
+				var fields = typeof(PartTest).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				return fields[1].GetValue((PartTest)contract) as CelestialBody;
+			}
+			else if (t == typeof(PlantFlag))
+				return ((PlantFlag)contract).TargetBody;
+			else if (t == typeof(RecoverAsset))
+			{
+				var fields = typeof(RecoverAsset).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				return fields[0].GetValue((RecoverAsset)contract) as CelestialBody;
+			}
+			else if (t == typeof(GrandTour))
+				return ((GrandTour)contract).TargetBodies.LastOrDefault();
+			else if (t == typeof(ARMContract))
+			{
+				var fields = typeof(ARMContract).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				return fields[0].GetValue((ARMContract)contract) as CelestialBody;
+			}
+			else if (t == typeof(BaseContract))
+				return ((BaseContract)contract).targetBody;
+			else if (t == typeof(ISRUContract))
+				return ((ISRUContract)contract).targetBody;
+			else if (t == typeof(RecordTrackContract))
+				return null;
+			else if (t == typeof(SatelliteContract))
+			{
+				SpecificOrbitParameter p = contract.GetParameter<SpecificOrbitParameter>();
+
+				if (p == null)
+					return null;
+
+				return p.targetBody;
+			}
+			else if (t == typeof(StationContract))
+				return ((StationContract)contract).targetBody;
+			else if (t == typeof(SurveyContract))
+				return ((SurveyContract)contract).targetBody;
+			else if (t == typeof(TourismContract))
+				return null;
+			else if (t == typeof(WorldFirstContract))
+			{
+				ProgressTrackingParameter p = contract.GetParameter<ProgressTrackingParameter>();
+
+				if (p == null)
+					return null;
+
+				var fields = typeof(ProgressTrackingParameter).GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				var milestone = fields[0].GetValue(p) as ProgressMilestone;
+
+				if (milestone == null)
+					return null;
+
+				return milestone.body;
+			}
+			else
+				checkTitle = true;
+
+			if (checkTitle)
+			{
+				foreach (CelestialBody b in FlightGlobals.Bodies)
+				{
+					string n = b.name;
+
+					Regex r = new Regex(string.Format(@"\b{0}\b", n));
+
+					if (r.IsMatch(title))
+						return b;
+				}
+			}
+
+			return null;
+		}
+
 		#region Public Accessors
 
 		public Contract Contract
@@ -216,6 +316,11 @@ namespace ContractsWindow
 		{
 			get { return notes; }
 			internal set { notes = value; }
+		}
+
+		public string TargetPlanet
+		{
+			get { return targetPlanet; }
 		}
 
 		public string FundsRewString
@@ -295,7 +400,7 @@ namespace ContractsWindow
 			{
 				if (PartTestName == "partTest")
 				{
-					part = ((PartTest)cParam).tgtPartInfo;
+					part = ((Contracts.Parameters.PartTest)cParam).tgtPartInfo;
 					DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Stock Part Test");
 				}
 				else if (PartTestName == "MCEScience")
