@@ -117,7 +117,12 @@ license][CWPLicense]
 #### Mission Title Bar
 ![][CWP:mission-title]
 
-##### The mission title bar is shown at the top of the window; it can be used to **delete any mission** except the "MasterMission".
+##### The mission title bar is shown at the top of the window; it can be used to **edit any mission** except the "MasterMission".
+
+##### Mission Edit Window
+![][CWP:mission-edit]
+
+  * **Change the name** or **delete any mission** from within this window.
 
 [DMagic]: http://forum.kerbalspaceprogram.com/members/59127
 [TriggerAu]: http://forum.kerbalspaceprogram.com/members/59550
@@ -133,9 +138,10 @@ license][CWPLicense]
 [CWP:contract-param-title]: http://i.imgur.com/KxYahnb.jpg
 [CWP:rewards]: http://i.imgur.com/azJO6gk.jpg
 [CWP:mission-creator]: http://i.imgur.com/gViT457.jpg
-[CWP:mission-title]: http://i.imgur.com/ydVA3Ew.jpg
+[CWP:mission-title]: http://i.imgur.com/Nr9eErc.png
 [CWP:annotated-breakout]: http://i.imgur.com/lk97EUs.jpg
 [CWP:annotated-interior]: http://i.imgur.com/pBdZQRl.jpg
+[CWP:mission-edit]: http://i.imgur.com/vIA8q5L.png
 
 [CWP:issues]: https://github.com/DMagic1/KSP_Contract_Window/issues
 [CWP:release]: http://forum.kerbalspaceprogram.com/threads/91034
