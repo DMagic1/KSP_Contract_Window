@@ -349,14 +349,19 @@ namespace ContractsWindow
 
 			List<Vessel> source = currentVessels.Values.ToList();
 
-			int i = source.Count;
+			return vesselConcat(source);
+		}
+
+		private string vesselConcat(List<Vessel> v)
+		{
+			int i = v.Count;
 			if (i <= 0)
 				return "";
 			string[] s = new string[i];
 			for (int j = 0; j < i; j++)
 			{
-				if (source[j] != null)
-					s[j] = source[j].id.ToString();
+				if (v[j] != null)
+					s[j] = v[j].id.ToString();
 			}
 
 			return string.Join(",", s);
@@ -389,6 +394,10 @@ namespace ContractsWindow
 					DMC_MBE.LogFormatted("Guid invalid: {0} for mission [{1}]", e, name);
 				}
 			}
+
+			List<Vessel> source = currentVessels.Values.ToList();
+
+			vesselIDString = vesselConcat(source);
 		}
 	}
 }
