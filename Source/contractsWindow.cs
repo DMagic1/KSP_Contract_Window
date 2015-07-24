@@ -569,13 +569,7 @@ namespace ContractsWindow
 					r.width = 16 + (size * 4);
 
 					//Mission list button
-					if (currentMission.MasterMission)
-						GUI.Label(r, contractSkins.missionIcon, contractSkins.texButtonSmall);
-					else
-					{
-						r.width -= 2;
-						GUI.Label(r, contractSkins.cancelMissionIcon, contractSkins.texButtonSmall);
-					}
+					GUI.Label(r, contractSkins.missionIcon, contractSkins.texButtonSmall);
 
 					r.x += 18 + (size * 4);
 					r.width = 12 + (size * 4);
@@ -918,11 +912,13 @@ namespace ContractsWindow
 							else
 							{
 								contractMission m = missionList[i];
+								bool containsContract = m.containsContract(tempContainer.Container.Contract.ContractGuid);
 
 								r.x += 15;
-								if (m.containsContract(tempContainer.Container.Contract.ContractGuid))
+
+								if (containsContract)
 								{
-									GUI.DrawTexture(new Rect(r.x - 15, r.y, 14 + size * 2, 12 + size * 2), contractSkins.checkIcon);
+									GUI.DrawTexture(new Rect(r.x - 15, r.y + 6, 12 + size * 2, 10 + size * 2), contractSkins.checkIcon);
 
 									GUI.Label(r, m.Name, contractSkins.missionMenu);
 								}
@@ -942,12 +938,20 @@ namespace ContractsWindow
 
 								GUI.Label(r, m.ActiveContracts.ToString(), contractSkins.timerGood);
 
-								r.x += 15 + size * 4;
-								r.width = 14 + size * 4;
-								r.height = 14 + size * 4;
+								if (!m.MasterMission && containsContract)
+								{
+									r.x += 15 + size * 2;
+									r.width = 14 + size * 4;
+									r.height = 14 + size * 4;
 
-								if (GUI.Button(r, new GUIContent(contractSkins.cancelMissionIcon, "Remove From Mission List"), contractSkins.texButtonSmall))
-									nextRemoveMissionList.Add(tempContainer);
+									if (GUI.Button(r, new GUIContent(contractSkins.cancelMissionIcon, "Remove From Mission List"), contractSkins.texButtonSmall))
+									{
+										if (m == currentMission)
+											nextRemoveMissionList.Add(tempContainer);
+										else
+											m.removeContract(tempContainer.Container);
+									}
+								}
 							}
 							GUI.EndScrollView();
 						}
