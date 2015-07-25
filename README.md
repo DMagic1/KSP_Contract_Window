@@ -106,7 +106,7 @@ license][CWPLicense]
 ![][CWP:mission-creator]
 
 ##### When the green checkbox icon is selected the mission list will appear. 
-  * The current **contract mission lists are displayed**.
+  * The current **contract mission lists** are displayed.
     * A green checkmark indicator on the left indicates that the currently selected contract is already in that mission
     * The green number to the right is the **amount of contracts** in that list.
 	* The red x box on the right can be used to remove a contract from any mission that it is present in.
@@ -153,7 +153,7 @@ license][CWPLicense]
 
 [shield:license-mit]: http://img.shields.io/badge/license-mit-a31f34.svg
 [shield:license-cc-by-sa]: http://img.shields.io/badge/license-CC%20BY--SA-green.svg
-[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.0.2-bad455.svg
+[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.0.4-bad455.svg
 [shield:ckan]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
-[shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.8-7c69c0.svg
+[shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.9-7c69c0.svg
 [shield:support-crm]: https://img.shields.io/badge/works%20with%20Contract%20Reward%20Modifier-2.0-orange.svg
