@@ -145,8 +145,8 @@ namespace ContractsWindow
 				//The next step is checking the current version number and comparing it to the saved value;
 				//if a newer version number is detected the rest of the load process is skipped;
 				//this resets all values for version updates
-				if (version == contractAssembly.Version)
-				{
+				//if (version == contractAssembly.Version)
+				//{
 					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 					if (scenes != null)
 					{
@@ -204,7 +204,7 @@ namespace ContractsWindow
 						}
 						loadWindow(winPos);
 					}
-				}
+				//}
 
 				version = contractAssembly.Version;
 			}
