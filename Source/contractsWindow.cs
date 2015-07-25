@@ -53,7 +53,7 @@ namespace ContractsWindow
 		private List<contractUIObject> nextRemoveMissionList = new List<contractUIObject>();
 		private List<contractUIObject> nextPinnedList = new List<contractUIObject>();
 		private contractMission currentMission;
-		private contractContainer tempContainer;
+		private contractUIObject tempContainer;
 		private Agent currentAgent;
 		private string version, inputField, editField;
 		private Vector2 scroll, missionScroll;
@@ -510,20 +510,11 @@ namespace ContractsWindow
 					r.width = 16 + (size * 4);
 
 					//Mission list button
-					if (currentMission.MasterMission)
+					if (GUI.Button(r, new GUIContent(contractSkins.missionIcon, "Add To Mission List"),contractSkins.texButtonSmall))
 					{
-						if (GUI.Button(r, new GUIContent(contractSkins.missionIcon, "Add To Mission List"), contractSkins.texButtonSmall))
-						{
-							tempContainer = c.Container;
-							popup = true;
-							missionCreator = true;
-						}
-					}
-					else
-					{
-						r.width -= 2;
-						if (GUI.Button(r, new GUIContent(contractSkins.cancelMissionIcon, "Remove From Mission List"), contractSkins.texButtonSmall))
-							nextRemoveMissionList.Add(c);
+						tempContainer = c;
+						popup = true;
+						missionCreator = true;
 					}
 
 					r.width = 12 + (size * 4);
@@ -578,13 +569,7 @@ namespace ContractsWindow
 					r.width = 16 + (size * 4);
 
 					//Mission list button
-					if (currentMission.MasterMission)
-						GUI.Label(r, contractSkins.missionIcon, contractSkins.texButtonSmall);
-					else
-					{
-						r.width -= 2;
-						GUI.Label(r, contractSkins.cancelMissionIcon, contractSkins.texButtonSmall);
-					}
+					GUI.Label(r, contractSkins.missionIcon, contractSkins.texButtonSmall);
 
 					r.x += 18 + (size * 4);
 					r.width = 12 + (size * 4);
@@ -907,13 +892,13 @@ namespace ContractsWindow
 
 				else if (missionCreator)
 				{
-					popupRect = new Rect(20, 30, 180 + size * 20, 200);
+					popupRect = new Rect(20, 30, 210 + size * 20, 200);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 					if (!missionTextBox)
 					{
 						for (int i = 0; i < missionList.Count; i++)
 						{
-							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 160 + size * 20, 25 * missionList.Count));
+							missionScroll = GUI.BeginScrollView(popupRect, missionScroll, new Rect(0, 0, 190 + size * 20, 25 * missionList.Count));
 							Rect r = new Rect(2, (25 * i) + 2, 140 + size * 20, 25);
 							if (i == 0)
 							{
@@ -927,16 +912,46 @@ namespace ContractsWindow
 							else
 							{
 								contractMission m = missionList[i];
-								if (GUI.Button(r, m.Name, contractSkins.missionMenu))
+								bool containsContract = m.containsContract(tempContainer.Container.Contract.ContractGuid);
+
+								r.x += 15;
+
+								if (containsContract)
 								{
-									m.addContract(tempContainer, true, true);
-									popup = false;
-									missionCreator = false;
+									GUI.DrawTexture(new Rect(r.x - 15, r.y + 6, 12 + size * 2, 10 + size * 2), contractSkins.checkIcon);
+
+									GUI.Label(r, m.Name, contractSkins.missionMenu);
 								}
+								else
+								{
+									if (GUI.Button(r, m.Name, contractSkins.missionMenu))
+									{
+										m.addContract(tempContainer.Container, true, true);
+										popup = false;
+										missionCreator = false;
+									}
+								}
+
 								r.x += 145 + size * 18;
 								r.y += 4;
 								r.width = 15 + size * 5;
+
 								GUI.Label(r, m.ActiveContracts.ToString(), contractSkins.timerGood);
+
+								if (!m.MasterMission && containsContract)
+								{
+									r.x += 15 + size * 2;
+									r.width = 14 + size * 4;
+									r.height = 14 + size * 4;
+
+									if (GUI.Button(r, new GUIContent(contractSkins.cancelMissionIcon, "Remove From Mission List"), contractSkins.texButtonSmall))
+									{
+										if (m == currentMission)
+											nextRemoveMissionList.Add(tempContainer);
+										else
+											m.removeContract(tempContainer.Container);
+									}
+								}
 							}
 							GUI.EndScrollView();
 						}
@@ -960,7 +975,7 @@ namespace ContractsWindow
 								{
 									contractMission cM = contractScenario.Instance.getMissionList(inputField);
 									if (cM != null)
-										cM.addContract(tempContainer, true, true);
+										cM.addContract(tempContainer.Container, true, true);
 									missionList = contractScenario.Instance.getAllMissions();
 									popup = false;
 									missionTextBox = false;

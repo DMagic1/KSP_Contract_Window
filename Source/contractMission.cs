@@ -148,6 +148,11 @@ namespace ContractsWindow
 				return null;
 		}
 
+		internal bool containsContract(Guid id)
+		{
+			return contractList.ContainsKey(id);
+		}
+
 		internal void buildMissionList()
 		{
 			resetMasterList();

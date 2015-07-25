@@ -43,31 +43,14 @@ namespace ContractsWindow
 	[KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	public class contractScenario : ScenarioModule
 	{
-		internal static contractScenario Instance
+		public static contractScenario Instance
 		{
-			get
-			{
-				Game g = HighLogic.CurrentGame;
-				try
-				{
-					var mod = g.scenarios.FirstOrDefault(m => m.moduleName == typeof(contractScenario).Name);
-					if (mod != null)
-						return (contractScenario)mod.moduleRef;
-					else
-						return null;
-				}
-				catch(Exception e)
-				{
-					DMC_MBE.LogFormatted("Could not find Contracts Window Scenario Module: {0}", e);
-					return null;
-				}
-			}
-			private set { }
+			get { return instance; }
 		}
 
 		//Use this to reset settings on updates
 		[KSPField(isPersistant = true)]
-		public string version = "1.0.3.4";
+		public string version = "1.0.5.2";
 
 		[KSPField(isPersistant = true)]
 		public bool stockToolbar = true;
@@ -81,6 +64,8 @@ namespace ContractsWindow
 		public bool fontSmall = true;
 		[KSPField(isPersistant = true)]
 		public int windowSize = 0;
+
+		private static contractScenario instance;
 
 		//Primary contract storage
 		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
@@ -120,6 +105,8 @@ namespace ContractsWindow
 		//Convert all of our saved strings into the appropriate arrays for each game scene
 		public override void OnLoad(ConfigNode node)
 		{
+			instance = this;
+
 			try
 			{
 				//The first step is manually checking for active contracts from the Game ConfigNode (ie persistent.sfs file); the count of active contracts will be used later when the window is loading
@@ -134,19 +121,19 @@ namespace ContractsWindow
 						{
 							foreach (ConfigNode C in cNode.GetNodes("CONTRACT"))
 							{
-								if (C != null)
-								{
-									if (C.HasValue("autoAccept"))
-									{
-										if (C.GetValue("autoAccept") == "True")
-											continue;
-									}
+								if (C == null)
+									continue;
 
-									if (C.HasValue("state"))
-									{
-										if (C.GetValue("state") == "Active")
-											contractCount++;
-									}
+								if (C.HasValue("autoAccept"))
+								{
+									if (C.GetValue("autoAccept") == "True")
+										continue;
+								}
+
+								if (C.HasValue("state"))
+								{
+									if (C.GetValue("state") == "Active")
+										contractCount++;
 								}
 							}
 						}
@@ -158,8 +145,8 @@ namespace ContractsWindow
 				//The next step is checking the current version number and comparing it to the saved value;
 				//if a newer version number is detected the rest of the load process is skipped;
 				//this resets all values for version updates
-				if (version == contractAssembly.Version)
-				{
+				//if (version == contractAssembly.Version)
+				//{
 					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
 					if (scenes != null)
 					{
@@ -171,69 +158,59 @@ namespace ContractsWindow
 						//Each mission has a separate contract list
 						foreach (ConfigNode m in scenes.GetNodes("Contracts_Window_Mission"))
 						{
-							if (m != null)
+							if (m == null)
+								continue;
+
+							string name;
+							string activeString = "";
+							string hiddenString = "";
+							string vesselString = "";
+							bool ascending, showActive;
+							int sortMode;
+							bool master = false;
+
+							if (m.HasValue("MissionName"))
+								name = m.GetValue("MissionName");
+							else
+								continue;
+
+							if (name == "MasterMission")
+								master = true;
+
+							if (m.HasValue("ActiveListID"))
+								activeString = m.GetValue("ActiveListID");
+							if (m.HasValue("HiddenListID"))
+								hiddenString = m.GetValue("HiddenListID");
+							if (m.HasValue("VesselIDs"))
+								vesselString = m.GetValue("VesselIDs");
+
+							if (!bool.TryParse(m.GetValue("AscendingSort"), out ascending))
+								ascending = true;
+							if (!bool.TryParse(m.GetValue("ShowActiveList"), out showActive))
+								showActive = true;
+							if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
+								sortMode = 0;
+
+							contractMission mission = new contractMission(name, activeString, hiddenString, vesselString, ascending, showActive, sortMode, master);
+
+							if (master)
 							{
-								string name;
-								string activeString = "";
-								string hiddenString = "";
-								string vesselString = "";
-								bool ascending, showActive;
-								int sortMode;
-								bool master = false;
-								if (m.HasValue("MissionName"))
-									name = m.GetValue("MissionName");
-								else
-									continue;
-
-								if (name == "MasterMission")
-									master = true;
-
-								if (m.HasValue("ActiveListID"))
-									activeString = m.GetValue("ActiveListID");
-								if (m.HasValue("HiddenListID"))
-									hiddenString = m.GetValue("HiddenListID");
-								if (m.HasValue("VesselIDs"))
-									vesselString = m.GetValue("VesselIDs");
-
-								if (!bool.TryParse(m.GetValue("AscendingSort"), out ascending))
-									ascending = true;
-								if (!bool.TryParse(m.GetValue("ShowActiveList"), out showActive))
-									showActive = true;
-								if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
-									sortMode = 0;
-
-								contractMission mission = new contractMission(name, activeString, hiddenString, vesselString, ascending, showActive, sortMode, master);
-
-								if (master)
-								{
-									masterMission = mission;
-									DMC_MBE.LogFormatted_DebugOnly("Setting Master Mission During Load");
-								}
-
-								if (!missionList.ContainsKey(name))
-									missionList.Add(name, mission);
+								masterMission = mission;
+								DMC_MBE.LogFormatted_DebugOnly("Setting Master Mission During Load");
 							}
+
+							if (!missionList.ContainsKey(name))
+								missionList.Add(name, mission);
 						}
 						loadWindow(winPos);
 					}
-				}
+				//}
 
 				version = contractAssembly.Version;
-
 			}
 			catch (Exception e)
 			{
 				DMC_MBE.LogFormatted("Contracts Window Settings Cannot Be Loaded: {0}", e);
-			}
-
-			//Start the window object
-			try
-			{
-				cWin = gameObject.AddComponent<contractsWindow>();
-			}
-			catch (Exception e)
-			{
-				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
 			}
 		}
 
@@ -274,6 +251,16 @@ namespace ContractsWindow
 
 		private void Start()
 		{
+			//Start the window object
+			try
+			{
+				cWin = gameObject.AddComponent<contractsWindow>();
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
+			}
+
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();

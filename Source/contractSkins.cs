@@ -127,6 +127,7 @@ namespace ContractsWindow
 		internal static Texture2D cancelMissionIcon;
 		internal static Texture2D missionSelectionIcon;
 		internal static Texture2D missionEditIcon;
+		internal static Texture2D checkIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -173,6 +174,7 @@ namespace ContractsWindow
 			cancelMissionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckCloseIcon", false);
 			missionSelectionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/MissionListIcon", false);
 			missionEditIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/MissionEditIcon", false);
+			checkIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckIcon", false);
 
 			initializeSkins();
 		}

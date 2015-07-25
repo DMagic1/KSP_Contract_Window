@@ -78,8 +78,7 @@ license][CWPLicense]
   * The pin icon can be used to **pin the contract** to the top of the list.
     * Pinned order ignores sort and order type.
     * A contract's pinned state is persistent.
-  * The checkbox icon can be used to move the contract into a different **contract mission list** or create a new one.
-    * If the currently selected mission is not the **MasterMission** this will be a red X icon and can be used to **remove the contract** from that mission.
+  * The checkbox icon can be used to move the contract into a different **contract mission list** or create a new one; this can be used from any mission list.
   * The blue icon at the end can be used to **display contract notes** if they exist.
     * These are different from individual parameter notes.
 
@@ -107,8 +106,10 @@ license][CWPLicense]
 ![][CWP:mission-creator]
 
 ##### When the green checkbox icon is selected the mission list will appear. 
-  * The current **contract mission lists are displayed**.
+  * The current **contract mission lists** are displayed.
+    * A green checkmark indicator on the left indicates that the currently selected contract is already in that mission
     * The green number to the right is the **amount of contracts** in that list.
+	* The red x box on the right can be used to remove a contract from any mission that it is present in.
   * Selecting any **existing mission** will add the contract to it.
   * Selecting the **Create New Mission** option will open the mission creator window.
   * **New missions** can be created after giving them a name.
@@ -137,9 +138,9 @@ license][CWPLicense]
 [CWP:title-bar]: http://i.imgur.com/aSIBDjd.jpg
 [CWP:contract-param-title]: http://i.imgur.com/KxYahnb.jpg
 [CWP:rewards]: http://i.imgur.com/azJO6gk.jpg
-[CWP:mission-creator]: http://i.imgur.com/gViT457.jpg
+[CWP:mission-creator]: http://i.imgur.com/LzkNCtl.png
 [CWP:mission-title]: http://i.imgur.com/Nr9eErc.png
-[CWP:annotated-breakout]: http://i.imgur.com/lk97EUs.jpg
+[CWP:annotated-breakout]: http://i.imgur.com/pcEe8TM.png
 [CWP:annotated-interior]: http://i.imgur.com/pBdZQRl.jpg
 [CWP:mission-edit]: http://i.imgur.com/vIA8q5L.png
 
@@ -152,7 +153,7 @@ license][CWPLicense]
 
 [shield:license-mit]: http://img.shields.io/badge/license-mit-a31f34.svg
 [shield:license-cc-by-sa]: http://img.shields.io/badge/license-CC%20BY--SA-green.svg
-[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.0.2-bad455.svg
+[shield:support-ksp]: http://img.shields.io/badge/for%20KSP-v1.0.4-bad455.svg
 [shield:ckan]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
-[shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.8-7c69c0.svg
+[shield:support-toolbar]: http://img.shields.io/badge/works%20with%20Blizzy's%20Toolbar-1.7.9-7c69c0.svg
 [shield:support-crm]: https://img.shields.io/badge/works%20with%20Contract%20Reward%20Modifier-2.0-orange.svg
