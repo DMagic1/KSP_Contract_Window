@@ -224,8 +224,6 @@ namespace ContractsWindow
 				return ((BaseContract)contract).targetBody;
 			else if (t == typeof(ISRUContract))
 				return ((ISRUContract)contract).targetBody;
-			else if (t == typeof(RecordTrackContract))
-				return null;
 			else if (t == typeof(SatelliteContract))
 			{
 				SpecificOrbitParameter p = contract.GetParameter<SpecificOrbitParameter>();
@@ -233,7 +231,7 @@ namespace ContractsWindow
 				if (p == null)
 					return null;
 
-				return p.targetBody;
+				return p.TargetBody;
 			}
 			else if (t == typeof(StationContract))
 				return ((StationContract)contract).targetBody;
