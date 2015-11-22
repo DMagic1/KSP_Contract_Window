@@ -273,6 +273,8 @@ namespace ContractsWindow
 				if (appLauncherButton != null)
 					Destroy(appLauncherButton);
 			}
+
+			GameEvents.Contract.onParameterChange.Add(onParamChange);
 		}
 
 		//Remove our contract window object
@@ -284,6 +286,8 @@ namespace ContractsWindow
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
 				Destroy(blizzyToolbarButton);
+
+			GameEvents.Contract.onParameterChange.Remove(onParamChange);
 		}
 
 	#endregion
@@ -364,7 +368,7 @@ namespace ContractsWindow
 		{
 			foreach (contractContainer cC in masterList.Values)
 			{
-				cC.updateParemeterInfo(t);
+				cC.updateParameterInfo(t);
 			}
 		}
 
@@ -376,6 +380,17 @@ namespace ContractsWindow
 				if (cC.Contract.GetType() == t)
 					cC.updateContractInfo();
 			}
+		}
+
+		private void onParamChange(Contract c, ContractParameter p)
+		{
+			contractContainer cc = getContract(c.ContractGuid);
+
+			if (cc == null)
+				return;
+
+			if (c.AllParameters.Count() > cc.ParameterCount)
+				cc.updateFullParamInfo();
 		}
 
 		#endregion
