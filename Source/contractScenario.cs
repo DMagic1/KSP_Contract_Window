@@ -606,12 +606,6 @@ namespace ContractsWindow
 			if (param.GetType() == typeof(PartTest))
 				return "partTest";
 
-			if (contractAssembly.FPLoaded)
-			{
-				if (param.GetType() == contractAssembly._FPType)
-					return "FinePrint";
-			}
-
 			if (contractAssembly.MCELoaded)
 			{
 				if (param.GetType() == contractAssembly._MCEType)
