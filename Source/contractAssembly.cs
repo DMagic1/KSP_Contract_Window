@@ -33,6 +33,7 @@ using System.Reflection;
 using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
+using FinePrint.Contracts.Parameters;
 
 namespace ContractsWindow
 {
@@ -46,40 +47,41 @@ namespace ContractsWindow
 			//DMALoaded = DMAnomalyAvailable();
 			//DMAstLoaded = DMAsteroidAvailable();
 			//MCELoaded = MCEAvailable();
-			//FPLoaded = FPAssemblyLoaded();
-			DMLoaded = DMALoaded = DMAstLoaded = MCELoaded = FPLoaded = false;
+			FPPartLoaded = FPPartListLoaded();
+			FPModLoaded = FPModListLoaded();
+			FPVesselSystemsLoaded = FPVesSysListLoaded();
+			DMLoaded = DMALoaded = DMAstLoaded = MCELoaded = false;
 			Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		}
 
 		internal static string Version;
 
-		internal static bool DMLoaded, DMALoaded, DMAstLoaded, MCELoaded, FPLoaded;
+		internal static bool DMLoaded, DMALoaded, DMAstLoaded, MCELoaded, FPPartLoaded, FPModLoaded, FPVesselSystemsLoaded;
 
 		private const string DMCollectTypeName = "DMagic.DMCollectScience";
 		private const string DMAnomalyTypeName = "DMagic.DMAnomalyParameter";
 		private const string DMAsteroidTypeName = "DMagic.DMAsteroidParameter";
 		private const string MCETypeName = "MissionControllerEC.PartGoal";
-		private const string FPContractTypeName = "FinePrint.Contracts.Parameters.PartNameParameter";
 
-		private static bool DMCRun, DMARun, DMAstRun, MCERun, FPRun = false;
+		private static bool DMCRun, DMARun, DMAstRun, MCERun, FPPartRun, FPModRun, FPVesRun;
 
 		private delegate string DMCollectSci(ContractParameter cP);
 		private delegate string DMAnomalySci(ContractParameter cP);
 		private delegate string DMAstSci(ContractParameter cP);
 		private delegate string MCESci(ContractParameter cP);
-		private delegate string FPSci(ContractParameter cP);
 
 		private static DMCollectSci _DMCollect;
 		private static DMAnomalySci _DMAnomaly;
 		private static DMAstSci _DMAst;
 		private static MCESci _MCE;
-		private static FPSci _FP;
+		private static FieldInfo _FPPartList;
+		private static FieldInfo _FPModList;
+		private static FieldInfo _FPSysList;
 
 		internal static Type _DMCType;
 		internal static Type _DMAType;
 		internal static Type _DMAstType;
 		internal static Type _MCEType;
-		internal static Type _FPType;
 
 		internal static string DMagicSciencePartName(ContractParameter cParam)
 		{
@@ -101,50 +103,155 @@ namespace ContractsWindow
 			return _MCE(cParam);
 		}
 
-		internal static string FPPartName(ContractParameter cParam)
+		internal static List<string> FPPartRequestList(PartRequestParameter p)
 		{
-			return _FP(cParam);
-		}
-
-		private static bool FPAssemblyLoaded()
-		{
-			if (_FP != null)
-				return true;
-
-			if (FPRun)
-				return false;
-
-			FPRun = true;
+			List<string> l = new List<string>();
 
 			try
 			{
-				Type FPType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
-					.SingleOrDefault(t => t.FullName == FPContractTypeName);
-
-				if (FPType == null)
-				{
-					DMC_MBE.LogFormatted_DebugOnly("Fine Print Type Not Found");
-					return false;
-				}
-
-				_FPType = FPType;
-
-				MethodInfo FPMethod = FPType.GetMethod("PartName", new Type[] { typeof(ContractParameter) });
-
-				if (FPMethod == null)
-				{
-					DMC_MBE.LogFormatted_DebugOnly("Fine Print String Method Not Found");
-					return false;
-				}
-
-				_FP = (FPSci)Delegate.CreateDelegate(typeof(FPSci), FPMethod);
-				DMC_MBE.LogFormatted("Fine Print Reflection Method Assigned");
-
-				return _FP != null;
+				l = (List<string>)_FPPartList.GetValue(p);
 			}
 			catch (Exception e)
 			{
-				DMC_MBE.LogFormatted("Exception While Loading Fine Print Accessor: {0}", e);
+				DMC_MBE.LogFormatted("Error In Detecting Fine Print Part Request Part List Field\n{0}", e);
+			}
+
+			return l;
+		}
+
+		internal static List<string> FPModuleRequestList(PartRequestParameter p)
+		{
+			List<string> l = new List<string>();
+
+			try
+			{
+				l = (List<string>)_FPModList.GetValue(p);
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error In Detecting Fine Print Part Request Module List Field\n{0}", e);
+			}
+
+			return l;
+		}
+
+		internal static List<string> FPVesselSystemsList(VesselSystemsParameter p)
+		{
+			List<string> l = new List<string>();
+
+			try
+			{
+				l = (List<string>)_FPSysList.GetValue(p);
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error In Detecting Fine Print Vessel Systems Module List Field\n{0}", e);
+			}
+
+			return l;
+		}
+
+
+		private static bool FPPartListLoaded()
+		{
+			if (_FPPartList != null)
+				return true;
+
+			if (FPPartRun)
+				return false;
+
+			FPPartRun = true;
+
+			try
+			{
+				Type fpType = typeof(PartRequestParameter);
+
+				var field = fpType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				_FPPartList = field[4];
+
+				if (_FPPartList == null)
+				{
+					DMC_MBE.LogFormatted("Fine Print Part Request Part List Field Could Not Be Assigned...");
+					return false;
+				}
+
+				DMC_MBE.LogFormatted("Fine Print Part Request Part List Field Assigned...");
+				return true;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error In Assigning Fine Print Part Request Part List Field\n{0}", e);
+			}
+
+			return false;
+		}
+
+		private static bool FPModListLoaded()
+		{
+			if (_FPModList != null)
+				return true;
+
+			if (FPModRun)
+				return false;
+
+			FPModRun = true;
+
+			try
+			{
+				Type fpType = typeof(PartRequestParameter);
+
+				var field = fpType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				_FPModList = field[5];
+
+				if (_FPModList == null)
+				{
+					DMC_MBE.LogFormatted("Fine Print Part Request Module List Field Could Not Be Assigned...");
+					return false;
+				}
+
+				DMC_MBE.LogFormatted("Fine Print Part Request Module List Field Assigned...");
+				return true;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error In Assigning Fine Print Part Request Module List Field\n{0}", e);
+			}
+
+			return false;
+		}
+
+		private static bool FPVesSysListLoaded()
+		{
+			if (_FPSysList != null)
+				return true;
+
+			if (FPVesRun)
+				return false;
+
+			FPVesRun = true;
+
+			try
+			{
+				Type fpType = typeof(VesselSystemsParameter);
+
+				var field = fpType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+				_FPSysList = field[0];
+
+				if (_FPSysList == null)
+				{
+					DMC_MBE.LogFormatted("Fine Print Vessel Systems Module List Field Could Not Be Assigned...");
+					return false;
+				}
+
+				DMC_MBE.LogFormatted("Fine Print Vessel Systems Module List Field Assigned...");
+				return true;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error In Assigning Fine Print Vessel Systems Module List Field\n{0}", e);
 			}
 
 			return false;
