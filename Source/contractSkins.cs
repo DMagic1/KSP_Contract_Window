@@ -88,6 +88,12 @@ namespace ContractsWindow
 
 		internal static GUIStyle toolbarToggle;
 
+		internal static GUIStyle progressTitle;
+		internal static GUIStyle progressTitleBehind;
+		internal static GUIStyle progressNodeTitle;
+		internal static GUIStyle progressBodyTitle;
+		internal static GUIStyle progressBodyTitleBehind;
+
 		internal static Texture2D fundsGreen;
 		internal static Texture2D fundsRed;
 		internal static Texture2D repGreen;
@@ -128,6 +134,8 @@ namespace ContractsWindow
 		internal static Texture2D missionSelectionIcon;
 		internal static Texture2D missionEditIcon;
 		internal static Texture2D checkIcon;
+
+		internal static Texture2D progressIcon = new Texture2D(24, 24);
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -237,6 +245,34 @@ namespace ContractsWindow
 			contractFailedBehind.name = "ContractFailedTextBehind";
 			contractFailedBehind.hover.background = contractFailedBehind.normal.background;
 			contractFailedBehind.hover.textColor = contractFailedBehind.normal.textColor;
+
+			//Progress Node Style
+			progressTitle = new GUIStyle(contractActive);
+			progressTitle.name = "ProgressTitle";
+			progressTitle.alignment = TextAnchor.MiddleCenter;
+			progressTitle.fontSize = 14 + normalFontSize + windowFontSize;
+
+			progressTitleBehind = new GUIStyle(progressTitle);
+			progressTitleBehind.name = "ProgressTitleBehind";
+			progressTitleBehind.hover.background = progressTitleBehind.normal.background;
+			progressTitleBehind.hover.textColor = progressTitleBehind.normal.textColor;
+
+			progressNodeTitle = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
+			progressNodeTitle.name = "ProgressNodeTitle";
+			progressNodeTitle.fontSize = 12 + normalFontSize + windowFontSize;
+			progressNodeTitle.alignment = TextAnchor.MiddleLeft;
+			progressNodeTitle.normal.textColor = XKCDColors.PaleGrey;
+
+			progressBodyTitle = new GUIStyle(progressTitle);
+			progressBodyTitle.name = "ProgressBodyTitle";
+			progressBodyTitle.fontSize = 14 + normalFontSize + windowFontSize;
+			progressBodyTitle.alignment = TextAnchor.MiddleCenter;
+			progressBodyTitle.normal.textColor = XKCDColors.LightGrey;
+
+			progressBodyTitleBehind = new GUIStyle(progressBodyTitle);
+			progressBodyTitleBehind.name = "ProgressBodyTitleBehind";
+			progressBodyTitleBehind.hover.background = progressBodyTitleBehind.normal.background;
+			progressBodyTitleBehind.hover.textColor = progressBodyTitleBehind.normal.textColor;
 
 			//Parameter Style
 			paramText = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
