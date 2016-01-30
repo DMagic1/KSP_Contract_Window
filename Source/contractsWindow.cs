@@ -330,12 +330,12 @@ namespace ContractsWindow
 				lastRect = new Rect(20, 20 + (windowSizeAdjust * 6), 180 + (windowSizeAdjust * 30), 26 + (windowSizeAdjust * 4));
 
 				if (popup)
-					GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
+					GUI.Label(lastRect, "   " + currentMission.Name + ":", contractSkins.missionLabel);
 				else
 				{
-					if (GUI.Button(lastRect, new GUIContent(currentMission.Name + ":", "Go To Progress Records"), contractSkins.missionLabel))
+					if (GUI.Button(lastRect, new GUIContent("   " + currentMission.Name + ":", "Go To Progress Records"), contractSkins.missionLabel))
 					{
-						toggleProgress = !toggleProgress;
+						toggleProgress = true;
 					}
 				}
 
@@ -405,7 +405,7 @@ namespace ContractsWindow
 				{
 					if (GUI.Button(lastRect, new GUIContent("Progress Nodes:", "Go To Contracts"), contractSkins.missionLabel))
 					{
-						toggleProgress = !toggleProgress;
+						toggleProgress = false;
 					}
 				}
 
@@ -941,6 +941,7 @@ namespace ContractsWindow
 							showSort = false;
 							currentMission.OrderMode = (sortClass)Enum.Parse(typeof(sortClass), sortTypes[i]);
 							refreshContracts(cList);
+							toggleProgress = false;
 						}
 					}
 				}
@@ -957,6 +958,7 @@ namespace ContractsWindow
 						resetWindow();
 						popup = false;
 						rebuild = false;
+						toggleProgress = false;
 					}
 				}
 
@@ -1017,6 +1019,7 @@ namespace ContractsWindow
 										m.addContract(tempContainer.Container, true, true);
 										popup = false;
 										missionCreator = false;
+										toggleProgress = false;
 									}
 								}
 
@@ -1038,6 +1041,7 @@ namespace ContractsWindow
 											nextRemoveMissionList.Add(tempContainer);
 										else
 											m.removeContract(tempContainer.Container);
+										toggleProgress = false;
 									}
 								}
 							}
@@ -1068,6 +1072,7 @@ namespace ContractsWindow
 									popup = false;
 									missionTextBox = false;
 									missionCreator = false;
+									toggleProgress = false;
 								}
 							}
 							else
@@ -1100,6 +1105,7 @@ namespace ContractsWindow
 
 							popup = false;
 							missionSelector = false;
+							toggleProgress = false;
 						}
 						r.x += 145 + size * 18;
 						r.y += 4;
@@ -1213,6 +1219,7 @@ namespace ContractsWindow
 
 								popup = false;
 								missionEdit = false;
+								toggleProgress = false;
 							}
 							else
 								currentMission.Name = oldName;
@@ -1565,7 +1572,7 @@ namespace ContractsWindow
 
 			if (p.ShowRecords)
 			{
-				for (int i = 1; i <= p.Interval; i++)
+				for (int i = 1; i < p.Interval; i++)
 				{
 					GUILayout.Label(p.Descriptor + " Record " + i.ToString() + ": " + p.getRecord(i).ToString(), contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
 
