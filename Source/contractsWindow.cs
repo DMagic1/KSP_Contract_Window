@@ -319,35 +319,29 @@ namespace ContractsWindow
 			buildMenuBar(id, windowSizeAdjust);
 
 			GUILayout.BeginVertical();
-			GUILayout.Space(20 + (windowSizeAdjust * 4));
+			GUILayout.Space(20 + (windowSizeAdjust * 10));
 
-			Rect lastRect = new Rect(6, 20 + (windowSizeAdjust * 5), 28 + (windowSizeAdjust * 4), 28 + (windowSizeAdjust * 4));
-
-			Color old = GUI.color;
-
-			GUI.color = XKCDColors.LightBlue;
-			if (popup)
-			{
-				GUI.Label(lastRect, new GUIContent(progressController.MessageIcon));
-			}
-			else
-			{
-				if (GUI.Button(lastRect, new GUIContent(progressController.MessageIcon, "Progress Records")))
-				{
-					toggleProgress = !toggleProgress;
-				}
-			}
-			GUI.color = old;
+			Rect lastRect = new Rect(26, 22 + (windowSizeAdjust * 6), 22 + (windowSizeAdjust * 4), 22 + (windowSizeAdjust * 4));
 
 			if (!showProgress)
 			{
-				lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 24 + (windowSizeAdjust * 4));
+				GUI.DrawTexture(lastRect, contractSkins.contractIcon);
 
-				GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
+				lastRect = new Rect(20, 20 + (windowSizeAdjust * 6), 180 + (windowSizeAdjust * 30), 26 + (windowSizeAdjust * 4));
+
+				if (popup)
+					GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
+				else
+				{
+					if (GUI.Button(lastRect, new GUIContent(currentMission.Name + ":", "Go To Progress Records"), contractSkins.missionLabel))
+					{
+						toggleProgress = !toggleProgress;
+					}
+				}
 
 				if (!currentMission.MasterMission)
 				{
-					lastRect.x += 210 + (windowSizeAdjust * 24);
+					lastRect.x += 180 + (windowSizeAdjust * 24);
 					lastRect.y += 2 + (windowSizeAdjust * 2);
 					lastRect.width = 20 + (windowSizeAdjust * 4);
 					lastRect.height = 20 + (windowSizeAdjust * 4);
@@ -360,7 +354,7 @@ namespace ContractsWindow
 					}
 				}
 
-				GUILayout.Space(5);
+				GUILayout.Space(7);
 
 				scroll = GUILayout.BeginScrollView(scroll);
 
@@ -401,11 +395,21 @@ namespace ContractsWindow
 			}
 			else
 			{
-				lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 24 + (windowSizeAdjust * 4));
+				GUI.DrawTexture(lastRect, contractSkins.progressIcon);
 
-				GUI.Label(lastRect, "Progress Nodes:", contractSkins.missionLabel);
+				lastRect = new Rect(20, 20 + (windowSizeAdjust * 6), 180 + (windowSizeAdjust * 30), 26 + (windowSizeAdjust * 4));
 
-				GUILayout.Space(4 + windowSizeAdjust * 4);
+				if (popup)
+					GUI.Label(lastRect, "Progress Nodes:", contractSkins.missionLabel);
+				else
+				{
+					if (GUI.Button(lastRect, new GUIContent("Progress Nodes:", "Go To Contracts"), contractSkins.missionLabel))
+					{
+						toggleProgress = !toggleProgress;
+					}
+				}
+
+				GUILayout.Space(8);
 
 				scroll = GUILayout.BeginScrollView(scroll);
 
@@ -1561,9 +1565,9 @@ namespace ContractsWindow
 
 			if (p.ShowRecords)
 			{
-				for (int i = 1; i < p.Interval; i++)
+				for (int i = 1; i <= p.Interval; i++)
 				{
-					GUILayout.Label(p.Descriptor + " Record: " + p.getRecord(i).ToString(), contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
+					GUILayout.Label(p.Descriptor + " Record " + i.ToString() + ": " + p.getRecord(i).ToString(), contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
 
 					r = GUILayoutUtility.GetLastRect();
 
