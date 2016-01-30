@@ -53,7 +53,13 @@ namespace ContractsWindow
 
 		public string Name
 		{
-			get { return name; }
+			get
+			{
+				if (masterMission)
+					return "All Contracts";
+
+				return name;
+			}
 			internal set { name = value; }
 		}
 
