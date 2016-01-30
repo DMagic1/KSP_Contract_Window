@@ -63,6 +63,11 @@ namespace ContractsWindow
 			internal set { name = value; }
 		}
 
+		public string InternalName
+		{
+			get { return name; }
+		}
+
 		public string VesselIDs
 		{
 			get { return vesselIDString; }
