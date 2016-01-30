@@ -135,7 +135,8 @@ namespace ContractsWindow
 		internal static Texture2D missionEditIcon;
 		internal static Texture2D checkIcon;
 
-		internal static Texture2D progressIcon = new Texture2D(24, 24);
+		internal static Texture2D progressIcon;
+		internal static Texture2D contractIcon;
 
 		internal static int normalFontSize = 0;
 		internal static int windowFontSize = 0;
@@ -183,6 +184,8 @@ namespace ContractsWindow
 			missionSelectionIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/MissionListIcon", false);
 			missionEditIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/MissionEditIcon", false);
 			checkIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/CheckIcon", false);
+			progressIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ProgressIcon", false);
+			contractIcon = GameDatabase.Instance.GetTexture("ContractsWindow/Textures/ContractIcon", false);
 
 			initializeSkins();
 		}
@@ -206,13 +209,6 @@ namespace ContractsWindow
 			newWindowStyle.normal.background = windowTex;
 			newWindowStyle.focused.background = newWindowStyle.normal.background;
 			newWindowStyle.onNormal.background = newWindowStyle.normal.background;
-
-			missionLabel = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
-			missionLabel.name = "MissionLabel";
-			missionLabel.fontSize = 13 + normalFontSize + windowFontSize;
-			missionLabel.alignment = TextAnchor.MiddleCenter;
-			missionLabel.wordWrap = false;
-			missionLabel.fontStyle = FontStyle.Bold;
 
 			//Contract Title Style
 			contractActive = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.button);
@@ -382,6 +378,13 @@ namespace ContractsWindow
 			texButtonSmall = new GUIStyle(texButton);
 			texButtonSmall.name = "TexButtonSmall";
 			texButtonSmall.padding = new RectOffset(1, 1, 1, 1);
+
+			missionLabel = new GUIStyle(texButtonSmall);
+			missionLabel.name = "MissionLabel";
+			missionLabel.fontSize = 14 + normalFontSize + windowFontSize;
+			missionLabel.alignment = TextAnchor.MiddleCenter;
+			missionLabel.wordWrap = false;
+			missionLabel.fontStyle = FontStyle.Bold;
 
 			dragButton = new GUIStyle(DMC_SkinsLibrary.DefUnitySkin.label);
 			dragButton.name = "DragButton";
