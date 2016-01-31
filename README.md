@@ -64,8 +64,8 @@ license][CWPLicense]
   * The spinning arrows icon is used to **reset the window** and primary contract list. A confirmation box will open upon pushing this button.
     * This should generally not be needed, but if there are errors in the contract window (no contracts displayed, no "MasterMission" contract list, the window is too small, etc…) this can be used. All window size, font size, and position options will be reset; the internal list of contracts will be updated with all active contracts and the "MasterMission" will be reset with this internal list. All other mission lists *should* be unaffected, these can be manually deleted if there are any other problems.
   * The aA icon controls **font size** for most of the window's labels. Each font is increased by one unit.
-  * The next icon toggles the overall **window and texture element size**. It also increases the font size by two units.
-    * Between the font and window size options there are four available font sizes and two window element size options.
+  * The next icon cycles the overall **window and texture element size**. It also increases the font size by two units.
+    * Between the font and window size options there are six available font sizes and three window element size options.
 
 #### Contract Title Bar
 ![][CWP:title-bar]
