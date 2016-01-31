@@ -32,6 +32,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Contracts;
 using Contracts.Templates;
+using FinePrint;
 using FinePrint.Contracts;
 using FinePrint.Contracts.Parameters;
 using FinePrint.Utilities;
@@ -392,6 +393,7 @@ namespace ContractsWindow
 		private bool showNote;
 		private string title = "";
 		private string notes = "";
+		private string customNotes = "";
 		private int level;
 		private string fundsRewString, fundsPenString, repRewString, repPenString, sciRewString;
 		private AvailablePart part;
@@ -407,6 +409,9 @@ namespace ContractsWindow
 			paramPenalties(cP);
 			title = cParam.Title;
 			notes = cParam.Notes;
+
+			if (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedScene == GameScenes.SPACECENTER)
+				customNotes = setCustomNotes();
 
 			if (level < 4)
 			{
@@ -468,17 +473,166 @@ namespace ContractsWindow
 							DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
 					}
 				}
-				else if (PartTestName == "FinePrint")
-				{
-					part = PartLoader.getPartInfoByName(contractAssembly.FPPartName(cParam));
-					if (part != null)
-						DMC_MBE.LogFormatted_DebugOnly("Part Assigned For Fine Print Contract");
-					else
-						DMC_MBE.LogFormatted_DebugOnly("Part Not Found");
-				}
 				else
 					part = null;
 			}
+		}
+
+		private string setCustomNotes()
+		{
+			string s = "";
+			Type pType = cParam.GetType();
+
+			if (pType == typeof(PartRequestParameter))
+			{
+				List<string> l = new List<string>();
+
+				if (contractAssembly.FPPartLoaded)
+				{
+					l = contractAssembly.FPPartRequestList((PartRequestParameter)cParam);
+
+					if (l.Count > 0)
+					{
+						List<string> titles = getPartTitles(l);
+
+						if (titles.Count > 0)
+						{
+							if (!string.IsNullOrEmpty(notes))
+								s = "\n";
+
+							s += "The following parts are acceptable:";
+
+							for (int i = 0; i < titles.Count; i++)
+							{
+								string t = titles[i];
+
+								s += "\n" + t;
+							}
+						}
+					}
+				}
+
+				if (contractAssembly.FPModLoaded)
+				{
+					l = contractAssembly.FPModuleRequestList((PartRequestParameter)cParam);
+
+					if (l.Count > 0)
+					{
+						List<string> titles = getPartTitlesFromModules(l);
+
+						if (titles.Count > 0)
+						{
+							if (string.IsNullOrEmpty(s))
+							{
+								if (!string.IsNullOrEmpty(notes))
+									s = "\n";
+
+								s = "The following parts are acceptable:";
+							}
+
+							for (int i = 0; i < titles.Count; i++)
+							{
+								string t = titles[i];
+
+								s += "\n" + t;
+							}
+						}
+					}
+				}
+			}
+			else if (pType == typeof(VesselSystemsParameter))
+			{
+				List<string> l = new List<string>();
+
+				if (contractAssembly.FPVesselSystemsLoaded)
+				{
+					l = contractAssembly.FPVesselSystemsList((VesselSystemsParameter)cParam);
+
+					if (l.Count > 0)
+					{
+
+						for (int j = 0; j < l.Count; j++)
+						{
+							List<string> modNames = FinePrint.ContractDefs.GetModules(l[j]);
+
+							List<string> titles = getPartTitlesFromModules(modNames);
+
+							if (titles.Count > 0)
+							{
+								s += string.Format("\nThe following parts are acceptable for Module Type - {0}:", l[j]);
+
+								for (int i = 0; i < titles.Count; i++)
+								{
+									string t = titles[i];
+
+									s += "\n" + t;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return s;
+		}
+
+		private List<string> getPartTitles(List<string> names)
+		{
+			List<string> l = new List<string>();
+
+			for (int i = 0; i < names.Count; i++)
+			{
+				string s = names[i];
+
+				if (string.IsNullOrEmpty(s))
+					continue;
+
+				AvailablePart p = PartLoader.getPartInfoByName(s);
+
+				if (p == null)
+					continue;
+
+				if (!ResearchAndDevelopment.PartModelPurchased(p))
+					continue;
+
+				l.Add(p.title);
+			}
+
+			return l;
+		}
+
+		private List<string> getPartTitlesFromModules(List<string> names)
+		{
+			List<string> l = new List<string>();
+
+			for (int i = 0; i < names.Count; i++)
+			{
+				string s = names[i];
+
+				if (string.IsNullOrEmpty(s))
+					continue;
+
+				for (int j = 0; j < PartLoader.LoadedPartsList.Count; j++)
+				{
+					AvailablePart p = PartLoader.LoadedPartsList[j];
+
+					if (p == null)
+						continue;
+
+					if (!ResearchAndDevelopment.PartModelPurchased(p))
+						continue;
+
+					if (p.partPrefab == null)
+						continue;
+
+					if (!p.partPrefab.Modules.Contains(s))
+						continue;
+
+					l.Add(p.title);
+				}
+			}
+
+			return l;
 		}
 
 		internal void paramRewards(ContractParameter cP)
@@ -564,7 +718,7 @@ namespace ContractsWindow
 
 		public string Notes
 		{
-			get { return notes; }
+			get { return notes + customNotes; }
 			internal set { notes = value; }
 		}
 

@@ -50,3 +50,25 @@ http://ionicons.com/
 
 Licensed under the MIT license (see above)
 
+---------------
+
+The contract icon is from the Elegant Themes Icon library:
+
+https://www.elegantthemes.com/blog/resources/elegant-icon-font
+
+Licensed under the MIT license (see above)
+
+---------------
+
+The globe icon is modified from the Linecons Icon library:
+
+http://designmodo.com/linecons-free/
+
+Created by Adrian:
+
+http://designmodo.com/author/adrian/
+
+Licensed under the Creative Commons Attribution 3.0 International Public License:
+
+http://creativecommons.org/licenses/by/3.0/
+

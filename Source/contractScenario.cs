@@ -230,7 +230,7 @@ namespace ContractsWindow
 				{
 					ConfigNode missionNode = new ConfigNode("Contracts_Window_Mission");
 
-					missionNode.AddValue("MissionName", m.Name);
+					missionNode.AddValue("MissionName", m.InternalName);
 					missionNode.AddValue("ActiveListID", m.stringConcat(m.ActiveMissionList));
 					missionNode.AddValue("HiddenListID", m.stringConcat(m.HiddenMissionList));
 					missionNode.AddValue("VesselIDs", m.vesselConcat(currentMission));
@@ -605,12 +605,6 @@ namespace ContractsWindow
 		{
 			if (param.GetType() == typeof(PartTest))
 				return "partTest";
-
-			if (contractAssembly.FPLoaded)
-			{
-				if (param.GetType() == contractAssembly._FPType)
-					return "FinePrint";
-			}
 
 			if (contractAssembly.MCELoaded)
 			{

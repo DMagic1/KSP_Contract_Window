@@ -31,7 +31,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
+using ProgressParser;
 using Contracts;
 using Contracts.Parameters;
 using Contracts.Agents;
@@ -46,6 +46,14 @@ namespace ContractsWindow
 
 		#region Initialization
 
+		private List<progressInterval> intervalNodes = new List<progressInterval>();
+		private List<progressStandard> standardNodes = new List<progressStandard>();
+		private List<progressStandard> POInodes = new List<progressStandard>();
+		private List<progressBodyCollection> bodyNodes = new List<progressBodyCollection>();
+		private List<List<progressStandard>> bodySubNodes = new List<List<progressStandard>>();
+		private int progressMode = 0;
+		private int selectedBody = 1;
+
 		private List<Guid> cList = new List<Guid>();
 		private List<Guid> pinnedList = new List<Guid>();
 		private List<contractMission> missionList = new List<contractMission>();
@@ -59,6 +67,7 @@ namespace ContractsWindow
 		private Vector2 scroll, missionScroll;
 		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar, replaceStock;
 		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionEdit, replaceStockPopup;
+		private bool showProgress, toggleProgress, oldToggleProgress;
 		private Vector2 dragStart;
 		private float windowHeight, windowWidth;
 		//private int timer;
@@ -125,7 +134,10 @@ namespace ContractsWindow
 		{
 			//Loading process triggered by the ContractSystem GameEvent
 			if (contractsLoading && !loaded)
+			{
 				StartCoroutine(loadContracts());
+				StartCoroutine(loadProgressNodes());
+			}
 
 			//This is a backup loading system in case something blows up while the ContractSystem is loading
 			if (timer < 500 && !loaded)
@@ -157,12 +169,27 @@ namespace ContractsWindow
 					cList = currentMission.HiddenMissionList;
 					pinnedList = currentMission.loadPinnedContracts(cList);
 				}
-			}
+			}			
 
 			if (cList.Count > 0)
 				refreshContracts(cList);
 			else
 				rebuildList();
+		}
+
+		private void loadProgressLists()
+		{
+			intervalNodes = progressParser.getAllIntervalNodes;
+			standardNodes = progressParser.getAllStandardNodes;
+			POInodes = progressParser.getAllPOINodes;
+			bodyNodes = progressParser.getAllBodyNodes;
+
+			bodySubNodes = new List<List<progressStandard>>(bodyNodes.Count);
+
+			for (int i = 0; i < bodyNodes.Count; i++)
+			{
+				bodySubNodes.Add(bodyNodes[i].getAllNodes);	
+			}
 		}
 
 		private IEnumerator loadContracts()
@@ -180,6 +207,18 @@ namespace ContractsWindow
 			}
 
 			loadLists();
+		}
+
+		private IEnumerator loadProgressNodes()
+		{
+			int timer = 0;
+			while (progressParser.Loading && timer < 1000)
+			{
+				timer++;
+				yield return null;
+			}
+
+			loadProgressLists();
 		}
 
 		#endregion
@@ -275,70 +314,119 @@ namespace ContractsWindow
 		protected override void DrawWindow(int id)
 		{
 			int windowSizeAdjust = contractScenario.Instance.windowSize;
+
 			//Menu Bar
 			buildMenuBar(id, windowSizeAdjust);
 
 			GUILayout.BeginVertical();
-			GUILayout.Space(20 + (windowSizeAdjust * 4));
+			GUILayout.Space(20 + (windowSizeAdjust * 10));
 
-			Rect lastRect = new Rect(10, 20 + (windowSizeAdjust * 4), 230 + (windowSizeAdjust * 30), 24 + (windowSizeAdjust * 4));
+			Rect lastRect = new Rect(26, 22 + (windowSizeAdjust * 6), 22 + (windowSizeAdjust * 4), 22 + (windowSizeAdjust * 4));
 
-			GUI.Label(lastRect, currentMission.Name + ":", contractSkins.missionLabel);
-
-			if (!currentMission.MasterMission)
+			if (!showProgress)
 			{
-				lastRect.x += 210 + (windowSizeAdjust * 24);
-				lastRect.y += 2 + (windowSizeAdjust * 2);
-				lastRect.width = 20 + (windowSizeAdjust * 4);
-				lastRect.height = 20 + (windowSizeAdjust * 4);
+				GUI.DrawTexture(lastRect, contractSkins.contractIcon);
 
-				if (GUI.Button(lastRect, new GUIContent(contractSkins.missionEditIcon, "Edit Mission")))
+				lastRect = new Rect(20, 20 + (windowSizeAdjust * 6), 180 + (windowSizeAdjust * 30), 26 + (windowSizeAdjust * 4));
+
+				if (popup)
+					GUI.Label(lastRect, "   " + currentMission.Name + ":", contractSkins.missionLabel);
+				else
 				{
-					editField = currentMission.Name;
-					popup = true;
-					missionEdit = true;
-				}
-			}
-
-			GUILayout.Space(4);
-
-			scroll = GUILayout.BeginScrollView(scroll);
-
-			lastRect = new Rect(0, -2, 10, 0);
-
-			//Contract List Begins
-			foreach (Guid gID in cList)
-			{
-				contractUIObject c = currentMission.getContract(gID);
-
-				if (c == null)
-					continue;
-
-				if (c.Container == null)
-					continue;
-
-				GUILayout.Space(-1);
-
-				buildContractTitleBar(c, id, windowSizeAdjust, ref lastRect);
-
-
-				GUILayout.Space(-5);
-
-				buildContractTitle(c, id, windowSizeAdjust, ref lastRect);
-
-				//Parameters
-				if (c.ShowParams)
-				{
-					foreach (parameterContainer cP in c.Container.ParamList)
+					if (GUI.Button(lastRect, new GUIContent("   " + currentMission.Name + ":", "Go To Progress Records"), contractSkins.missionLabel))
 					{
-						if (cP.Level == 0 && !string.IsNullOrEmpty(cP.Title))
-							buildParameterLabel(cP, c.Container, 0, id, windowSizeAdjust, ref lastRect);
+						toggleProgress = true;
 					}
 				}
+
+				if (!currentMission.MasterMission)
+				{
+					lastRect.x += 180 + (windowSizeAdjust * 24);
+					lastRect.y += 2 + (windowSizeAdjust * 2);
+					lastRect.width = 20 + (windowSizeAdjust * 4);
+					lastRect.height = 20 + (windowSizeAdjust * 4);
+
+					if (GUI.Button(lastRect, new GUIContent(contractSkins.missionEditIcon, "Edit Mission")))
+					{
+						editField = currentMission.Name;
+						popup = true;
+						missionEdit = true;
+					}
+				}
+
+				GUILayout.Space(7);
+
+				scroll = GUILayout.BeginScrollView(scroll);
+
+				lastRect = new Rect(0, -2, 10, 0);
+
+				//Contract List Begins
+				foreach (Guid gID in cList)
+				{
+					contractUIObject c = currentMission.getContract(gID);
+
+					if (c == null)
+						continue;
+
+					if (c.Container == null)
+						continue;
+
+					GUILayout.Space(-1);
+
+					buildContractTitleBar(c, id, windowSizeAdjust, ref lastRect);
+
+					GUILayout.Space(-5);
+
+					buildContractTitle(c, id, windowSizeAdjust, ref lastRect);
+
+					//Parameters
+					if (c.ShowParams)
+					{
+						foreach (parameterContainer cP in c.Container.ParamList)
+						{
+							if (cP.Level == 0 && !string.IsNullOrEmpty(cP.Title))
+								buildParameterLabel(cP, c.Container, 0, id, windowSizeAdjust, ref lastRect);
+						}
+					}
+				}
+
+				GUILayout.EndScrollView();
+				GUILayout.Space(18 + windowSizeAdjust * 4);
+			}
+			else
+			{
+				GUI.DrawTexture(lastRect, contractSkins.progressIcon);
+
+				lastRect = new Rect(20, 20 + (windowSizeAdjust * 6), 180 + (windowSizeAdjust * 30), 26 + (windowSizeAdjust * 4));
+
+				if (popup)
+					GUI.Label(lastRect, "Progress Nodes:", contractSkins.missionLabel);
+				else
+				{
+					if (GUI.Button(lastRect, new GUIContent("Progress Nodes:", "Go To Contracts"), contractSkins.missionLabel))
+					{
+						toggleProgress = false;
+					}
+				}
+
+				GUILayout.Space(8);
+
+				scroll = GUILayout.BeginScrollView(scroll);
+
+				lastRect = new Rect(0, -2, 10, 0);
+
+				buildIntervals(id, windowSizeAdjust, ref lastRect);
+
+				buildStandards(id, windowSizeAdjust, ref lastRect);
+
+				buildPOIs(id, windowSizeAdjust, ref lastRect);
+
+				buildBodies(id, windowSizeAdjust, ref lastRect);
+
+				GUILayout.EndScrollView();
+				GUILayout.Space(18 + windowSizeAdjust * 4);
 			}
 
-			GUILayout.EndScrollView();
-			GUILayout.Space(18 + windowSizeAdjust * 4);
 			GUILayout.EndVertical();
 
 			//Bottom bar
@@ -853,6 +941,7 @@ namespace ContractsWindow
 							showSort = false;
 							currentMission.OrderMode = (sortClass)Enum.Parse(typeof(sortClass), sortTypes[i]);
 							refreshContracts(cList);
+							toggleProgress = false;
 						}
 					}
 				}
@@ -869,6 +958,7 @@ namespace ContractsWindow
 						resetWindow();
 						popup = false;
 						rebuild = false;
+						toggleProgress = false;
 					}
 				}
 
@@ -929,6 +1019,7 @@ namespace ContractsWindow
 										m.addContract(tempContainer.Container, true, true);
 										popup = false;
 										missionCreator = false;
+										toggleProgress = false;
 									}
 								}
 
@@ -950,6 +1041,7 @@ namespace ContractsWindow
 											nextRemoveMissionList.Add(tempContainer);
 										else
 											m.removeContract(tempContainer.Container);
+										toggleProgress = false;
 									}
 								}
 							}
@@ -980,6 +1072,7 @@ namespace ContractsWindow
 									popup = false;
 									missionTextBox = false;
 									missionCreator = false;
+									toggleProgress = false;
 								}
 							}
 							else
@@ -1012,6 +1105,7 @@ namespace ContractsWindow
 
 							popup = false;
 							missionSelector = false;
+							toggleProgress = false;
 						}
 						r.x += 145 + size * 18;
 						r.y += 4;
@@ -1125,6 +1219,7 @@ namespace ContractsWindow
 
 								popup = false;
 								missionEdit = false;
+								toggleProgress = false;
 							}
 							else
 								currentMission.Name = oldName;
@@ -1222,18 +1317,31 @@ namespace ContractsWindow
 			r.x = 150 + size * 22;
 			if (GUI.Button(r, new GUIContent(contractSkins.windowSize, "Change Window Size")))
 			{
-				if (contractScenario.Instance.windowSize == 0)
-				{
-					contractScenario.Instance.windowSize = 1;
-					contractSkins.windowFontSize = 2;
-					WindowRect.width += 30;
-				}
-				else
+				contractScenario.Instance.windowSize += 1;
+
+				if (contractScenario.Instance.windowSize > 2)
 				{
 					contractScenario.Instance.windowSize = 0;
-					contractSkins.windowFontSize = 0;
-					WindowRect.width -= 30;
+					WindowRect.width -= 60;
 				}
+				else
+					WindowRect.width += 30;
+
+				contractSkins.windowFontSize = 2 * contractScenario.Instance.windowSize;
+
+				//if (contractScenario.Instance.windowSize == 0)
+				//{
+				//	contractScenario.Instance.windowSize = 1;
+				//	contractSkins.windowFontSize = 2;
+				//	WindowRect.width += 30;
+				//}
+				//else
+				//{
+				//	contractScenario.Instance.windowSize = 0;
+				//	contractSkins.windowFontSize = 0;
+				//	WindowRect.width -= 30;
+				//}
+
 				contractSkins.initializeSkins();
 				WindowStyle = contractSkins.newWindowStyle;
 				DMC_SkinsLibrary.SetCurrent("ContractUnitySkin");
@@ -1312,8 +1420,337 @@ namespace ContractsWindow
 
 		#endregion
 
+		#region Progress Nodes
+
+		private void buildIntervals(int id, int size, ref Rect r)
+		{
+			if (progressParser.AnyInterval)
+			{
+				if (popup)
+					GUILayout.Label("Interval Nodes:", contractSkins.progressTitleBehind, GUILayout.MaxWidth(200 + size * 30));
+				else
+				{
+					if (GUILayout.Button("Interval Nodes:", contractSkins.progressTitle, GUILayout.MaxWidth(200 + size * 30)))
+					{
+						progressMode = 0;
+					}
+				}
+
+				if (progressMode == 0)
+				{
+					for (int i = 0; i < intervalNodes.Count; i++)
+					{
+						progressInterval p = intervalNodes[i];
+
+						if (p == null)
+							continue;
+
+						if (p.Interval <= 1)
+							continue;
+
+						buildIntervalNode(id, p, size, ref r);
+					}
+				}
+			}
+		}
+
+		private void buildStandards(int id, int size, ref Rect r)
+		{
+			if (progressParser.AnyStandard)
+			{
+				if (popup)
+					GUILayout.Label("Standard Nodes:", contractSkins.progressTitleBehind, GUILayout.MaxWidth(200 + size * 30));
+				else
+				{
+					if (GUILayout.Button("Standard Nodes:", contractSkins.progressTitle, GUILayout.MaxWidth(200 + size * 30)))
+					{
+						progressMode = 1;
+					}
+				}
+
+				r = GUILayoutUtility.GetLastRect();
+
+				if (progressMode == 1)
+				{
+					for (int i = 0; i < standardNodes.Count; i++)
+					{
+						progressStandard p = standardNodes[i];
+
+						if (p == null)
+							continue;
+
+						if (!p.IsComplete)
+							continue;
+
+						buildStandardNode(id, p, size, ref r);
+					}
+				}
+			}
+		}
+
+		private void buildPOIs(int id, int size, ref Rect r)
+		{
+			if (progressParser.AnyPOI)
+			{
+				if (popup)
+					GUILayout.Label("Point Of Interest Nodes:", contractSkins.progressTitleBehind, GUILayout.MaxWidth(200 + size * 30));
+				else
+				{
+					if (GUILayout.Button("Point Of Interest Nodes:", contractSkins.progressTitle, GUILayout.MaxWidth(200 + size * 30)))
+					{
+						progressMode = 2;
+					}
+				}
+
+				r = GUILayoutUtility.GetLastRect();
+
+				if (progressMode == 2)
+				{
+					for (int i = 0; i < POInodes.Count; i++)
+					{
+						progressStandard p = POInodes[i];
+
+						if (p == null)
+							continue;
+
+						if (!p.IsComplete)
+							continue;
+
+						buildPOINode(id, p, size, ref r);
+					}
+				}
+			}
+		}
+
+		private void buildBodies(int id, int size, ref Rect r)
+		{
+			if (progressParser.AnyBody)
+			{
+				if (popup)
+					GUILayout.Label("Celestial Body Nodes:", contractSkins.progressTitleBehind, GUILayout.MaxWidth(200 + size * 30));
+				else
+				{
+					if (GUILayout.Button("Celestial Body Nodes:", contractSkins.progressTitle, GUILayout.MaxWidth(200 + size * 30)))
+					{
+						progressMode = 3;
+					}
+				}
+
+				if (progressMode == 3)
+				{
+					for (int i = 0; i < bodyNodes.Count; i++)
+					{
+						progressBodyCollection p = bodyNodes[i];
+
+						if (p == null)
+							continue;
+
+						if (!p.IsReached)
+							continue;
+
+						buildBodyNode(id, i, p, size, ref r);
+					}
+				}
+			}
+		}
+
+		private void buildIntervalNode(int id, progressInterval p, int size, ref Rect r)
+		{
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(20);
+
+			if (popup)
+				GUILayout.Label(p.Descriptor, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
+			else
+			{
+				if (GUILayout.Button(p.Descriptor, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
+				{
+					p.ShowRecords = !p.ShowRecords;
+				}
+			}
+			GUILayout.EndHorizontal();
+
+			if (p.ShowRecords)
+			{
+				for (int i = 1; i < p.Interval; i++)
+				{
+					GUILayout.Label(p.Descriptor + " Record " + i.ToString() + ": " + p.getRecord(i).ToString(), contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
+
+					r = GUILayoutUtility.GetLastRect();
+
+					//Only draw the rewards if they are visible in the window
+					if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (20 + size * 6)))
+					{
+						Rect rewardsRect = r;
+						rewardsRect.x = 180 + (size * 30);
+						rewardsRect.y += (2 + (size * 2));
+
+						scaledContent(ref rewardsRect, p.getFunds(i).ToString("F0"), "", Currency.Funds, size, true, false);
+
+						scaledContent(ref rewardsRect, p.getScience(i).ToString("F0"), "", Currency.Science, size, true, false);
+
+						scaledContent(ref rewardsRect, p.getRep(i).ToString("F0"), "", Currency.Reputation, size, true, false);
+					}
+				}
+			}
+		}
+
+		private void buildStandardNode(int id, progressStandard p, int size, ref Rect r, string s = "")
+		{
+			GUILayout.BeginHorizontal();
+
+			r.x = 3;
+
+			if (!string.IsNullOrEmpty(p.Note))
+			{
+				r.y += r.height + 4;
+				r.width = 12 + (size * 2);
+				r.height = 14 + (size * 4);
+
+				if (!p.ShowNotes)
+				{
+					if (GUI.Button(r, new GUIContent(contractSkins.noteIcon, "Show Completion Note"), contractSkins.texButtonSmall))
+						p.ShowNotes = !p.ShowNotes;
+				}
+				else
+				{
+					if (GUI.Button(r, new GUIContent(contractSkins.noteIconOff, "Hide Completion Note"), contractSkins.texButtonSmall))
+						p.ShowNotes = !p.ShowNotes;
+				}
+				GUILayout.Space(16 + size * 2);
+			}
+
+			GUILayout.Label(string.Format(p.Descriptor, s), contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
+
+			r = GUILayoutUtility.GetLastRect();
+
+			GUILayout.EndHorizontal();
+
+			//Only draw the rewards if they are visible in the window
+			if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (20 + size * 6)))
+			{
+				Rect rewardsRect = r;
+				rewardsRect.x = 180 + (size * 30);
+				rewardsRect.y += (2 + (size * 2));
+
+				scaledContent(ref rewardsRect, p.FundsReward.ToString("F0"), "", Currency.Funds, size, true, false);
+
+				scaledContent(ref rewardsRect, p.SciReward.ToString("F0"), "", Currency.Science, size, true, false);
+
+				scaledContent(ref rewardsRect, p.RepReward.ToString("F0"), "", Currency.Reputation, size, true, false);
+			}
+
+			//Display note
+			if (!string.IsNullOrEmpty(p.Note) && p.ShowNotes)
+			{
+				GUILayout.Space(-7);
+				GUILayout.Box(string.Format(p.Note, p.NoteReference, p.KSPDateString), GUILayout.MaxWidth(210 + size * 60));
+
+				r.height += GUILayoutUtility.GetLastRect().height;
+			}
+		}
+
+		private void buildPOINode(int id, progressStandard p, int size, ref Rect r)
+		{
+			GUILayout.BeginHorizontal();
+
+			r.x = 3;
+
+			if (!string.IsNullOrEmpty(p.Note))
+			{
+				r.y += r.height + 4;
+				r.width = 12 + (size * 2);
+				r.height = 14 + (size * 4);
+
+				if (!p.ShowNotes)
+				{
+					if (GUI.Button(r, new GUIContent(contractSkins.noteIcon, "Show Completion Note"), contractSkins.texButtonSmall))
+						p.ShowNotes = !p.ShowNotes;
+				}
+				else
+				{
+					if (GUI.Button(r, new GUIContent(contractSkins.noteIconOff, "Hide Completion Note"), contractSkins.texButtonSmall))
+						p.ShowNotes = !p.ShowNotes;
+				}
+				GUILayout.Space(12 + size * 2);
+			}
+
+			GUILayout.Label(p.Descriptor, contractSkins.progressNodeTitle, GUILayout.MaxWidth(165 + size * 30));
+
+			r = GUILayoutUtility.GetLastRect();
+
+			GUILayout.EndHorizontal();
+
+			//Only draw the rewards if they are visible in the window
+			if (r.yMin >= (scroll.y - 20) && r.yMax <= (scroll.y + WindowRect.height - (20 + size * 6)))
+			{
+				Rect rewardsRect = r;
+				rewardsRect.x = 180 + (size * 30);
+				rewardsRect.y += (2 + (size * 2));
+
+				scaledContent(ref rewardsRect, p.FundsReward.ToString("F0"), "", Currency.Funds, size, true, false);
+
+				scaledContent(ref rewardsRect, p.SciReward.ToString("F0"), "", Currency.Science, size, true, false);
+
+				scaledContent(ref rewardsRect, p.RepReward.ToString("F0"), "", Currency.Reputation, size, true, false);
+			}
+
+			//Display note
+			if (!string.IsNullOrEmpty(p.Note) && p.ShowNotes)
+			{
+				GUILayout.Space(-7);
+				GUILayout.Box(string.Format(p.Note, p.NoteReference, p.KSPDateString), GUILayout.MaxWidth(210 + size * 60));
+
+				r.height += GUILayoutUtility.GetLastRect().height;
+			}
+		}
+
+		private void buildBodyNode(int id, int index, progressBodyCollection p, int size, ref Rect r)
+		{
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(20);
+
+			if (popup)
+				GUILayout.Label(p.BodyName, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
+			{
+				if (GUILayout.Button(p.BodyName, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
+				{
+					selectedBody = index;
+				}
+			}
+
+			r = GUILayoutUtility.GetLastRect();
+
+			GUILayout.EndHorizontal();
+
+			if (selectedBody != index)
+				return;
+
+			for (int i = 0; i < bodySubNodes[index].Count; i++)
+			{
+				progressStandard s = bodySubNodes[index][i];
+
+				if (s == null)
+					continue;
+
+				if (!s.IsComplete)
+					continue;
+
+				buildStandardNode(id, s, size, ref r, p.BodyName);
+			}
+		}
+
+		#endregion
+
 		protected override void DrawWindowPost(int id)
 		{
+			if (oldToggleProgress != toggleProgress)
+			{
+				oldToggleProgress = toggleProgress;
+
+				showProgress = toggleProgress;
+			}
+
 			//Pin contracts after the window is drawn
 			if (nextPinnedList.Count > 0)
 			{
