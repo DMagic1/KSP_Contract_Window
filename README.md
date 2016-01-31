@@ -115,10 +115,27 @@ license][CWPLicense]
   * **New missions** can be created after giving them a name.
     * Missions must have a name, can't use the same name, and must be under 20 characters.
 
+#### Progress Node
+![][CWP:progress-nodes]
+
+##### All progress nodes, their rewards, and in some cases, information about when they were completed is shown in this window.
+  * There are four types of **Progress Nodes**.
+    * **Interval Nodes:** These are nodes with multiple levels of progression, such as the altitude or speed records.
+    * **Standard Nodes:** These are nodes not specific to any one Celestial Body.
+    * **Point of Interest Nodes:** These are nodes completed by visiting anomalies.
+    * **Celestial Body-Specific Nodes:** These are nodes which are given separately for each Celestial Body.
+
+#### Interval Nodes
+![][CWP:progress-interval]
+
+#### Standard Nodes
+![][CWP:progress-standard]
+
 #### Mission Title Bar
 ![][CWP:mission-title]
 
 ##### The mission title bar is shown at the top of the window; it can be used to **edit any mission** except the "MasterMission".
+   * The **Title Bar** is a button that can be used to switch to **Progress Node** mode. 
 
 ##### Mission Edit Window
 ![][CWP:mission-edit]
@@ -132,17 +149,20 @@ license][CWPLicense]
 [CKAN:org]: http://ksp-ckan.org/
 [CWPLicense]: https://github.com/DMagic1/KSP_Contract_Window/blob/master/GameData/ContractsWindow/License.txt
 
-[CWP:header]: http://i.imgur.com/MaDfDiA.jpg?1
+[CWP:header]: http://i.imgur.com/2R6qnAM.png
 [CWP:top-bar]: http://i.imgur.com/sedAsbt.jpg
 [CWP:bottom-bar]: http://i.imgur.com/i2EbuHG.jpg
 [CWP:title-bar]: http://i.imgur.com/aSIBDjd.jpg
 [CWP:contract-param-title]: http://i.imgur.com/KxYahnb.jpg
 [CWP:rewards]: http://i.imgur.com/azJO6gk.jpg
 [CWP:mission-creator]: http://i.imgur.com/LzkNCtl.png
-[CWP:mission-title]: http://i.imgur.com/Nr9eErc.png
-[CWP:annotated-breakout]: http://i.imgur.com/pcEe8TM.png
+[CWP:mission-title]: http://i.imgur.com/Djb2xit.png
+[CWP:annotated-breakout]: http://i.imgur.com/cNEClNw.jpg
 [CWP:annotated-interior]: http://i.imgur.com/pBdZQRl.jpg
 [CWP:mission-edit]: http://i.imgur.com/vIA8q5L.png
+[CWP:progress-nodes]: http://i.imgur.com/xVEgs9h.png
+[CWP:progress-standard]: http://i.imgur.com/pW1vByT.png
+[CWP:progress-interval]: http://i.imgur.com/rGgyMiJ.png
 
 [CWP:issues]: https://github.com/DMagic1/KSP_Contract_Window/issues
 [CWP:release]: http://forum.kerbalspaceprogram.com/threads/91034
