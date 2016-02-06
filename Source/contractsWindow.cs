@@ -115,12 +115,14 @@ namespace ContractsWindow
 		protected override void Start()
 		{
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
+			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
 			PersistenceLoad();
 		}
 
 		protected override void OnDestroy()
 		{
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
+			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
 			if (InputLockManager.lockStack.ContainsKey(lockID))
 				EditorLogic.fetch.Unlock(lockID);
 			if (InputLockManager.lockStack.ContainsKey(centerLockID))
@@ -157,7 +159,6 @@ namespace ContractsWindow
 			//Load ordering lists and contract settings after primary contract dictionary has been loaded
 			if (currentMission != null)
 			{
-
 				if (currentMission.ShowActiveMissions)
 				{
 					cList = currentMission.ActiveMissionList;
@@ -1582,11 +1583,11 @@ namespace ContractsWindow
 						rewardsRect.x = 180 + (size * 30);
 						rewardsRect.y += (2 + (size * 2));
 
-						scaledContent(ref rewardsRect, p.getFunds(i).ToString("F0"), "", Currency.Funds, size, true, false);
+						scaledContent(ref rewardsRect, p.getFundsString(i), "", Currency.Funds, size, true, false);
 
-						scaledContent(ref rewardsRect, p.getScience(i).ToString("F0"), "", Currency.Science, size, true, false);
+						scaledContent(ref rewardsRect, p.getScienceString(i), "", Currency.Science, size, true, false);
 
-						scaledContent(ref rewardsRect, p.getRep(i).ToString("F0"), "", Currency.Reputation, size, true, false);
+						scaledContent(ref rewardsRect, p.getRepString(i), "", Currency.Reputation, size, true, false);
 					}
 				}
 			}
@@ -1630,11 +1631,11 @@ namespace ContractsWindow
 				rewardsRect.x = 180 + (size * 30);
 				rewardsRect.y += (2 + (size * 2));
 
-				scaledContent(ref rewardsRect, p.FundsReward.ToString("F0"), "", Currency.Funds, size, true, false);
+				scaledContent(ref rewardsRect, p.FundsRewardString, "", Currency.Funds, size, true, false);
 
-				scaledContent(ref rewardsRect, p.SciReward.ToString("F0"), "", Currency.Science, size, true, false);
+				scaledContent(ref rewardsRect, p.SciRewardString, "", Currency.Science, size, true, false);
 
-				scaledContent(ref rewardsRect, p.RepReward.ToString("F0"), "", Currency.Reputation, size, true, false);
+				scaledContent(ref rewardsRect, p.RepRewardString, "", Currency.Reputation, size, true, false);
 			}
 
 			//Display note
@@ -1685,11 +1686,11 @@ namespace ContractsWindow
 				rewardsRect.x = 180 + (size * 30);
 				rewardsRect.y += (2 + (size * 2));
 
-				scaledContent(ref rewardsRect, p.FundsReward.ToString("F0"), "", Currency.Funds, size, true, false);
+				scaledContent(ref rewardsRect, p.FundsRewardString, "", Currency.Funds, size, true, false);
 
-				scaledContent(ref rewardsRect, p.SciReward.ToString("F0"), "", Currency.Science, size, true, false);
+				scaledContent(ref rewardsRect, p.SciRewardString, "", Currency.Science, size, true, false);
 
-				scaledContent(ref rewardsRect, p.RepReward.ToString("F0"), "", Currency.Reputation, size, true, false);
+				scaledContent(ref rewardsRect, p.RepRewardString, "", Currency.Reputation, size, true, false);
 			}
 
 			//Display note
