@@ -39,6 +39,10 @@
       <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ContractParser">
+      <HintPath>..\..\ContractParser\ContractParser\Output\ContractParser.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ProgressParser">
       <HintPath>..\..\Progress Parser\Progress Parser\Output\ProgressParser.dll</HintPath>
       <Private>False</Private>
@@ -51,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="contractAssembly.cs" />
-    <Compile Include="contractContainer.cs" />
     <Compile Include="contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
