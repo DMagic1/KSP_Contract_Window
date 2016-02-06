@@ -34,6 +34,7 @@ using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
 using ContractsWindow.Toolbar;
+using ContractParser;
 
 namespace ContractsWindow
 {
@@ -66,9 +67,6 @@ namespace ContractsWindow
 		public int windowSize = 0;
 
 		private static contractScenario instance;
-
-		//Primary contract storage
-		private Dictionary<Guid, contractContainer> masterList = new Dictionary<Guid, contractContainer>();
 
 		//Primary mission storage
 		private Dictionary<string, contractMission> missionList = new Dictionary<string,contractMission>();
@@ -273,8 +271,6 @@ namespace ContractsWindow
 				if (appLauncherButton != null)
 					Destroy(appLauncherButton);
 			}
-
-			GameEvents.Contract.onParameterChange.Add(onParamChange);
 		}
 
 		//Remove our contract window object
@@ -286,8 +282,6 @@ namespace ContractsWindow
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
 				Destroy(blizzyToolbarButton);
-
-			GameEvents.Contract.onParameterChange.Remove(onParamChange);
 		}
 
 	#endregion
@@ -366,7 +360,7 @@ namespace ContractsWindow
 		//Used by external assemblies to update parameter values for the UI
 		internal void paramChanged(Type t)
 		{
-			foreach (contractContainer cC in masterList.Values)
+			foreach (contractContainer cC in contractParser.getActiveContracts)
 			{
 				cC.updateParameterInfo(t);
 			}
@@ -375,22 +369,11 @@ namespace ContractsWindow
 		//Used by external assemblies to update contract values for the UI
 		internal void contractChanged(Type t)
 		{
-			foreach (contractContainer cC in masterList.Values)
+			foreach (contractContainer cC in contractParser.getActiveContracts)
 			{
-				if (cC.Contract.GetType() == t)
+				if (cC.Root.GetType() == t)
 					cC.updateContractInfo();
 			}
-		}
-
-		private void onParamChange(Contract c, ContractParameter p)
-		{
-			contractContainer cc = getContract(c.ContractGuid);
-
-			if (cc == null)
-				return;
-
-			if (c.AllParameters.Count() > cc.ParameterCount)
-				cc.updateFullParamInfo();
 		}
 
 		#endregion
@@ -446,7 +429,7 @@ namespace ContractsWindow
 			contractMission Master = missionList.FirstOrDefault(a => a.Value.MasterMission).Value;
 			if (Master != null)
 			{
-				foreach (contractContainer c in masterList.Values)
+				foreach (contractContainer c in contractParser.getActiveContracts)
 					Master.addContract(c, true, true);
 			}
 		}
@@ -537,50 +520,6 @@ namespace ContractsWindow
 			return mList;
 		}
 
-		internal contractContainer getContract(Guid id)
-		{
-			if (masterList.ContainsKey(id))
-				return masterList[id];
-			else
-				return null;
-		}
-
-		internal void addContract(Guid id, contractContainer c)
-		{
-			if (!masterList.ContainsKey(id))
-				masterList.Add(id, c);
-			else
-				DMC_MBE.LogFormatted("Error Adding Contract; Already Present In Master List");
-		}
-
-		internal void removeContract(Guid id)
-		{
-			if (masterList.ContainsKey(id))
-			{
-				contractContainer c = masterList[id];
-				masterList.Remove(id);
-				c = null;
-			}
-			else
-				DMC_MBE.LogFormatted("Error Removing Contract; Does Not Exist In Master List");
-		}
-
-		private void resetList()
-		{
-			masterList.Clear();
-		}
-
-		//Loads all active contracts into the master dictionary
-		internal void loadAllContracts()
-		{
-			resetList();
-			foreach (Contract c in ContractSystem.Instance.Contracts)
-			{
-				if (c.ContractState == Contract.State.Active)
-					addContract(c.ContractGuid, new contractContainer(c));
-			}
-		}
-
 		//Initializes all missions that were added during the loading process
 		internal void loadAllMissionLists()
 		{
@@ -591,7 +530,7 @@ namespace ContractsWindow
 					if (m.MasterMission)
 					{
 						m.buildMissionList();
-						foreach (contractContainer c in masterList.Values)
+						foreach (contractContainer c in contractParser.getActiveContracts)
 							m.addContract(c, true, false);
 						masterMission = m;
 					}

@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Contracts;
 using UnityEngine;
+using ContractParser;
 
 namespace ContractsWindow
 {
@@ -50,7 +51,7 @@ namespace ContractsWindow
 			{
 				if (string.IsNullOrEmpty(name))
 					return;
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				if (c != null)
 				{
 					c.Title = name;
@@ -71,7 +72,7 @@ namespace ContractsWindow
 		{
 			try
 			{
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				if (c != null)
 				{
 					c.Notes = notes;
@@ -93,7 +94,7 @@ namespace ContractsWindow
 		{
 			try
 			{
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				if (c != null)
 				{
 					parameterContainer pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
@@ -119,13 +120,13 @@ namespace ContractsWindow
 		{
 			try
 			{
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				if (c != null)
 				{
 					parameterContainer pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
 					if (pC != null)
 					{
-						pC.Notes = notes;
+						pC.setNotes(notes);
 					}
 				}
 			}
@@ -145,7 +146,7 @@ namespace ContractsWindow
 		{
 			try
 			{
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				return c;
 			}
 			catch (Exception e)
@@ -166,7 +167,7 @@ namespace ContractsWindow
 		{
 			try
 			{
-				contractContainer c = contractScenario.Instance.getContract(contract.ContractGuid);
+				contractContainer c = contractParser.getActiveContract(contract.ContractGuid);
 				parameterContainer pC = null;
 				if (c != null)
 					pC = c.AllParamList.SingleOrDefault(a => a.CParam == parameter);
