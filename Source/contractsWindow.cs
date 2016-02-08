@@ -66,7 +66,7 @@ namespace ContractsWindow
 		private Agent currentAgent;
 		private string version, inputField, editField;
 		private Vector2 scroll, missionScroll;
-		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, contractsLoading, loaded, stockToolbar, replaceStock;
+		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, progressLoaded, contractsLoaded, stockToolbar, replaceStock;
 		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionEdit, replaceStockPopup;
 		private bool showProgress, toggleProgress, oldToggleProgress;
 		private Vector2 dragStart;
@@ -115,14 +115,16 @@ namespace ContractsWindow
 		protected override void Start()
 		{
 			GameEvents.Contract.onAccepted.Add(contractAccepted);
-			GameEvents.Contract.onContractsLoaded.Add(contractLoaded);
+			contractParser.onContractsParsed.Add(onContractsLoaded);
+			progressParser.onProgressParsed.Add(onProgressLoaded);
 			PersistenceLoad();
 		}
 
 		protected override void OnDestroy()
 		{
 			GameEvents.Contract.onAccepted.Remove(contractAccepted);
-			GameEvents.Contract.onContractsLoaded.Remove(contractLoaded);
+			contractParser.onContractsParsed.Remove(onContractsLoaded);
+			progressParser.onProgressParsed.Remove(onProgressLoaded);
 			if (InputLockManager.lockStack.ContainsKey(lockID))
 				EditorLogic.fetch.Unlock(lockID);
 			if (InputLockManager.lockStack.ContainsKey(centerLockID))
@@ -133,23 +135,32 @@ namespace ContractsWindow
 
 		protected override void Update()
 		{
-			//Loading process triggered by the ContractSystem GameEvent
-			if (contractsLoading && !loaded)
-			{
-				StartCoroutine(loadContracts());
-				StartCoroutine(loadProgressNodes());
-			}
+			if (progressLoaded && contractsLoaded)
+				return;
 
 			//This is a backup loading system in case something blows up while the ContractSystem is loading
-			if (timer < 500 && !loaded)
+			if (timer < 500 && (!progressLoaded || !contractsLoaded))
 				timer++;
-			else if (!loaded)
+			else if (!progressLoaded)
+			{
+				loadProgressLists();
+				progressLoaded = true;
+			}
+			else if (!contractsLoaded)
 			{
 				loadLists();
-
-				contractsLoading = false;
-				loaded = true;
+				contractsLoaded = true;
 			}
+		}
+
+		private void onContractsLoaded()
+		{
+			StartCoroutine(loadContracts());
+		}
+
+		private void onProgressLoaded()
+		{
+			StartCoroutine(loadProgressNodes());
 		}
 
 		private void loadLists()
@@ -195,8 +206,8 @@ namespace ContractsWindow
 		private IEnumerator loadContracts()
 		{
 			int i = 0;
-			contractsLoading = false;
-			loaded = true;
+
+			contractsLoaded = true;
 
 			while (!contractParser.Loaded && i < 200)
 			{
@@ -204,16 +215,31 @@ namespace ContractsWindow
 				yield return null;
 			}
 
+			if (i >= 200)
+			{
+				contractsLoaded = false;
+				yield break;
+			}
+
 			loadLists();
 		}
 
 		private IEnumerator loadProgressNodes()
 		{
-			int timer = 0;
-			while (progressParser.Loading && timer < 1000)
+			int i = 0;
+
+			progressLoaded = true;
+
+			while (!progressParser.Loaded && i < 200)
 			{
-				timer++;
+				i++;
 				yield return null;
+			}
+
+			if (i >= 200)
+			{
+				progressLoaded = false;
+				yield break;
 			}
 
 			loadProgressLists();
@@ -2177,15 +2203,6 @@ namespace ContractsWindow
 
 				if (!currentMission.MasterMission)
 					contractScenario.Instance.MasterMission.addContract(cC, true, true);
-			}
-		}
-
-		//Starts the rebuild timer when the contract list is loaded
-		private void contractLoaded()
-		{
-			if (!contractsLoading && !loaded)
-			{
-				contractsLoading = true;
 			}
 		}
 
