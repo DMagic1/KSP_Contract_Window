@@ -114,7 +114,7 @@ namespace ContractsWindow
 
 		protected override void Start()
 		{
-			GameEvents.Contract.onAccepted.Add(contractAccepted);
+			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
 			PersistenceLoad();
@@ -122,7 +122,7 @@ namespace ContractsWindow
 
 		protected override void OnDestroy()
 		{
-			GameEvents.Contract.onAccepted.Remove(contractAccepted);
+			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
 			if (InputLockManager.lockStack.ContainsKey(lockID))
@@ -1735,9 +1735,9 @@ namespace ContractsWindow
 			GUILayout.Space(20);
 
 			if (popup)
-				GUILayout.Label(p.BodyName, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
+				GUILayout.Label(p.Body.theName, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
 			{
-				if (GUILayout.Button(p.BodyName, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
+				if (GUILayout.Button(p.Body.theName, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
 				{
 					selectedBody = index;
 				}
@@ -1760,7 +1760,7 @@ namespace ContractsWindow
 				if (!s.IsComplete)
 					continue;
 
-				buildStandardNode(id, s, size, ref r, p.BodyName);
+				buildStandardNode(id, s, size, ref r, p.Body.theName);
 			}
 		}
 
@@ -1931,6 +1931,9 @@ namespace ContractsWindow
 			foreach (Guid id in gID)
 			{
 				contractContainer cC = contractParser.getActiveContract(id);
+				if (cC == null)
+					cC = contractParser.getCompletedContract(id);
+
 				if (cC == null)
 				{
 					removeList.Add(id);
@@ -2194,6 +2197,12 @@ namespace ContractsWindow
 		//Adds new contracts when they are accepted in Mission Control
 		private void contractAccepted(Contract c)
 		{
+			if (c == null)
+				return;
+
+			if (c.ContractState != Contract.State.Active)
+				return;
+
 			contractContainer cC = contractParser.getActiveContract(c.ContractGuid);
 			if (cC != null)
 			{
