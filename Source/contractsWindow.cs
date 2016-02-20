@@ -1735,9 +1735,9 @@ namespace ContractsWindow
 			GUILayout.Space(20);
 
 			if (popup)
-				GUILayout.Label(p.Body.theName, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
+				GUILayout.Label(p.Body.bodyName, contractSkins.progressBodyTitleBehind, GUILayout.MaxWidth(160 + size * 30));
 			{
-				if (GUILayout.Button(p.Body.theName, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
+				if (GUILayout.Button(p.Body.bodyName, contractSkins.progressBodyTitle, GUILayout.MaxWidth(160 + size * 30)))
 				{
 					selectedBody = index;
 				}
