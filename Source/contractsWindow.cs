@@ -834,7 +834,7 @@ namespace ContractsWindow
 			if (!string.IsNullOrEmpty(cP.Notes()) && cP.ShowNote && active)
 			{
 				GUILayout.Space(-6);
-				GUILayout.Box(cP.Notes(), GUILayout.MaxWidth(320 + size * 60));
+				GUILayout.Box(cP.Notes(HighLogic.LoadedSceneIsEditor || HighLogic.LoadedScene == GameScenes.SPACECENTER), GUILayout.MaxWidth(320 + size * 60));
 
 				r.height += GUILayoutUtility.GetLastRect().height;
 			}
