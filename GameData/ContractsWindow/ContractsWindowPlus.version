@@ -1,0 +1,31 @@
+{
+     "NAME":"Contracts Window Plus",
+	 "URL":"https://raw.githubusercontent.com/DMagic1/KSP_Contract_Window/master/GameData/ContractsWindow/ContractsWindowPlus.version",
+     "DOWNLOAD":"https://spacedock.info/mod/130/Contract%20Window%20+/download/6.1",
+     "GITHUB":{
+         "USERNAME":"DMagic1",
+         "REPOSITORY":"KSP_Contract_Window",
+         "ALLOW_PRE_RELEASE":false,
+     },
+     "VERSION":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":6,
+         "BUILD":1
+     },
+     "KSP_VERSION":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":5
+     },
+     "KSP_VERSION_MIN":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":5
+     },
+     "KSP_VERSION_MAX":{
+         "MAJOR":1,
+         "MINOR":0,
+         "PATCH":99
+     }
+ } 
