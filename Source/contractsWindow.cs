@@ -69,6 +69,7 @@ namespace ContractsWindow
 		private bool resizing, editorLocked, spacecenterLocked, trackingLocked, progressLoaded, contractsLoaded, stockToolbar, replaceStock;
 		private bool popup, showSort, rebuild, agencyPopup, missionCreator, missionTextBox, missionSelector, toolbar, missionEdit, replaceStockPopup;
 		private bool showProgress, toggleProgress, oldToggleProgress;
+		private bool useCustomNotes;
 		private Vector2 dragStart;
 		private float windowHeight, windowWidth;
 		//private int timer;
@@ -118,6 +119,7 @@ namespace ContractsWindow
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
 			PersistenceLoad();
+			useCustomNotes = HighLogic.LoadedSceneIsEditor || HighLogic.LoadedScene == GameScenes.SPACECENTER;
 		}
 
 		protected override void OnDestroy()
@@ -770,7 +772,7 @@ namespace ContractsWindow
 			r.y += r.height;
 
 			//Note icon button
-			if (active && !string.IsNullOrEmpty(cP.Notes()))
+			if (active && !string.IsNullOrEmpty(cP.Notes(useCustomNotes)))
 			{
 				r.x -= 2;
 				r.y += 4;
@@ -804,7 +806,7 @@ namespace ContractsWindow
 			//}
 
 			//Contract parameter title
-			if (!string.IsNullOrEmpty(cP.Notes()))
+			if (!string.IsNullOrEmpty(cP.Notes(useCustomNotes)))
 				GUILayout.Box(paramTitle, pStyle, GUILayout.MaxWidth(208 - (level * 5) + size * 28));
 			else
 				GUILayout.Box(paramTitle, pStyle, GUILayout.MaxWidth(220 - (level * 5) + size * 30));
@@ -831,10 +833,10 @@ namespace ContractsWindow
 			}
 
 			//Display note
-			if (!string.IsNullOrEmpty(cP.Notes()) && cP.ShowNote && active)
+			if (!string.IsNullOrEmpty(cP.Notes(useCustomNotes)) && cP.ShowNote && active)
 			{
 				GUILayout.Space(-6);
-				GUILayout.Box(cP.Notes(HighLogic.LoadedSceneIsEditor || HighLogic.LoadedScene == GameScenes.SPACECENTER), GUILayout.MaxWidth(320 + size * 60));
+				GUILayout.Box(cP.Notes(useCustomNotes), GUILayout.MaxWidth(320 + size * 60));
 
 				r.height += GUILayoutUtility.GetLastRect().height;
 			}
