@@ -29,6 +29,7 @@ THE SOFTWARE.
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using ContractParser;
 
 namespace ContractsWindow
 {
@@ -191,7 +192,7 @@ namespace ContractsWindow
 						if (g == null)
 							continue;
 
-						c = contractScenario.Instance.getContract(g);
+						c = contractParser.getActiveContract(g);
 						if (c == null)
 							continue;
 
@@ -233,7 +234,7 @@ namespace ContractsWindow
 				});
 				foreach (contractUIObject c in temp)
 				{
-					idTemp.Add(c.Container.Contract.ContractGuid);
+					idTemp.Add(c.Container.Root.ContractGuid);
 				}
 			}
 			return idTemp;
@@ -256,14 +257,14 @@ namespace ContractsWindow
 
 		internal void addContract(contractContainer c, bool active, bool warn)
 		{
-			if (!activeMissionList.Contains(c.Contract.ContractGuid) && !hiddenMissionList.Contains(c.Contract.ContractGuid))
+			if (!activeMissionList.Contains(c.Root.ContractGuid) && !hiddenMissionList.Contains(c.Root.ContractGuid))
 			{
 				if (addToMasterList(c))
 				{
 					if (active)
-						activeMissionList.Add(c.Contract.ContractGuid);
+						activeMissionList.Add(c.Root.ContractGuid);
 					else
-						hiddenMissionList.Add(c.Contract.ContractGuid);
+						hiddenMissionList.Add(c.Root.ContractGuid);
 				}
 			}
 			else if (warn)
@@ -272,9 +273,9 @@ namespace ContractsWindow
 
 		private bool addToMasterList(contractContainer c)
 		{
-			if (!contractList.ContainsKey(c.Contract.ContractGuid))
+			if (!contractList.ContainsKey(c.Root.ContractGuid))
 			{
-				contractList.Add(c.Contract.ContractGuid, new contractUIObject(c));
+				contractList.Add(c.Root.ContractGuid, new contractUIObject(c));
 				return true;
 			}
 			else
@@ -285,14 +286,14 @@ namespace ContractsWindow
 
 		internal void removeContract(contractContainer c)
 		{
-			if (contractScenario.ListRemove(activeMissionList, c.Contract.ContractGuid) || contractScenario.ListRemove(hiddenMissionList, c.Contract.ContractGuid))
+			if (contractScenario.ListRemove(activeMissionList, c.Root.ContractGuid) || contractScenario.ListRemove(hiddenMissionList, c.Root.ContractGuid))
 				removeFromMasterList(c);
 		}
 
 		private void removeFromMasterList(contractContainer c)
 		{
-			if (contractList.ContainsKey(c.Contract.ContractGuid))
-				contractList.Remove(c.Contract.ContractGuid);
+			if (contractList.ContainsKey(c.Root.ContractGuid))
+				contractList.Remove(c.Root.ContractGuid);
 		}
 
 		private void resetMasterList()
