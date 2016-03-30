@@ -115,6 +115,8 @@ namespace ContractsWindow
 
 		protected override void Start()
 		{
+			base.Start();
+
 			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
@@ -124,6 +126,8 @@ namespace ContractsWindow
 
 		protected override void OnDestroy()
 		{
+			base.OnDestroy();
+
 			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
@@ -1156,11 +1160,11 @@ namespace ContractsWindow
 						r.y += 30;
 					}
 
-					if (stockToolbar || !ToolbarManager.ToolbarAvailable)
-					{
-						contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, " Replace Stock Toolbar");
-						r.y += 30;
-					}
+					//if (stockToolbar || !ToolbarManager.ToolbarAvailable)
+					//{
+					//	contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, " Replace Stock Toolbar");
+					//	r.y += 30;
+					//}
 
 					r.x += 70;
 					r.width = 70;
