@@ -194,8 +194,10 @@ namespace ContractsWindow
             }
         }
 
-		private void OnGUI()
+		protected override void OnGUIEvery()
 		{
+			base.OnGUIEvery();
+
 			if (!showUI)
 				return;
 
