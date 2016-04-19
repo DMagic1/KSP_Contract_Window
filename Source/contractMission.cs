@@ -42,7 +42,7 @@ namespace ContractsWindow
 		private string name;
 		private string activeString;
 		private string hiddenString;
-		private string vesselIDString;
+		private string vesselIDString = "";
 		private Dictionary<Guid, Vessel> currentVessels;
 		private Dictionary<Guid, contractUIObject> contractList;
 		private List<Guid> activeMissionList;
