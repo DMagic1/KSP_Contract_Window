@@ -1160,11 +1160,11 @@ namespace ContractsWindow
 						r.y += 30;
 					}
 
-					//if (stockToolbar || !ToolbarManager.ToolbarAvailable)
-					//{
-					//	contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, " Replace Stock Toolbar");
-					//	r.y += 30;
-					//}
+					if (stockToolbar || !ToolbarManager.ToolbarAvailable)
+					{
+						contractScenario.Instance.replaceStockToolbar = GUI.Toggle(r, contractScenario.Instance.replaceStockToolbar, " Replace Stock Toolbar");
+						r.y += 30;
+					}
 
 					r.x += 70;
 					r.width = 70;

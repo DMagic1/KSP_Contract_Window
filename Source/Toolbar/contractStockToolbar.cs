@@ -45,10 +45,10 @@ namespace ContractsWindow.Toolbar
 
 		private void setupToolbar()
 		{
-			//if (!contractScenario.Instance.replaceStockToolbar)
+			if (!contractScenario.Instance.replaceStockToolbar)
 				StartCoroutine(addButton());
-			//else
-			//	StartCoroutine(replaceStockContractApp());
+			else
+				StartCoroutine(replaceStockContractApp());
 		}
 
 		protected override void OnDestroy()
@@ -80,56 +80,56 @@ namespace ContractsWindow.Toolbar
 
 		internal void replaceStockApp()
 		{
-			//StartCoroutine(replaceStockContractApp());
+			StartCoroutine(replaceStockContractApp());
 		}
 
-		//IEnumerator replaceStockContractApp()
-		//{
-		//	while (ContractsApp.Instance.appLauncherButton == null || !ApplicationLauncher.Ready)
-		//		yield return null;
+		IEnumerator replaceStockContractApp()
+		{
+			while (ContractsApp.Instance.appLauncherButton == null || !ApplicationLauncher.Ready)
+				yield return null;
 
-		//	if (stockToolbarButton == null)
-		//	{
-		//		LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
-		//		stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
-		//	}
+			if (stockToolbarButton == null)
+			{
+				LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
+				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+			}
 
-		//	ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
+			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
 
-		//	if (stockContracts != null)
-		//	{
-		//		stockContracts.toggleButton.onDisable();
+			if (stockContracts != null)
+			{
+				stockContracts.onDisable();
 
-		//		stockContracts.toggleButton.onTrue = stockToolbarButton.toggleButton.onTrue;
-		//		stockContracts.toggleButton.onFalse = stockToolbarButton.toggleButton.onFalse;
-		//		stockContracts.toggleButton.onHover = stockToolbarButton.toggleButton.onHover;
-		//		stockContracts.toggleButton.onHoverOut = stockToolbarButton.toggleButton.onHoverOut;
-		//		stockContracts.toggleButton.onEnable = stockToolbarButton.toggleButton.onEnable;
-		//		stockContracts.toggleButton.onDisable = stockToolbarButton.toggleButton.onDisable;
+				stockContracts.onTrue = stockToolbarButton.onTrue;
+				stockContracts.onFalse = stockToolbarButton.onFalse;
+				stockContracts.onHover = stockToolbarButton.onHover;
+				stockContracts.onHoverOut = stockToolbarButton.onHoverOut;
+				stockContracts.onEnable = stockToolbarButton.onEnable;
+				stockContracts.onDisable = stockToolbarButton.onDisable;
 
-		//		ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
+				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
 
-		//		LogFormatted("Stock Contracts App Replaced With Contracts Window +");
+				LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 
-		//		try
-		//		{
-		//			removeButton(HighLogic.LoadedScene);
-		//		}
-		//		catch (Exception e)
-		//		{
-		//			LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
-		//		}
-		//	}
-		//	else
-		//	{
-		//		LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
+				try
+				{
+					removeButton(HighLogic.LoadedScene);
+				}
+				catch (Exception e)
+				{
+					LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+				}
+			}
+			else
+			{
+				LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
 
-		//		if (stockToolbarButton != null)
-		//			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
-		//		else
-		//			StartCoroutine(addButton());
-		//	}
-		//}
+				if (stockToolbarButton != null)
+					GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
+				else
+					StartCoroutine(addButton());
+			}
+		}
 
 		private void toggle()
 		{
