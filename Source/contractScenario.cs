@@ -576,34 +576,6 @@ namespace ContractsWindow
 			return "";
 		}
 
-		internal static string timeInDays(double D)
-		{
-			if (D <= 0)
-				return "----";
-
-			int[] time = ((KSPUtil.DefaultDateTimeFormatter)KSPUtil.dateTimeFormatter).GetDateFromUT((int)D);
-			string s = "";
-
-			if (time[4] > 0)
-				s = string.Format("{0}y", time[4]);
-			if (time[3] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}d", time[3]);
-			}
-			if (time[4] <= 0 && time[2] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}h", time[2]);
-			}
-			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
-				s = string.Format("{0}m", time[1]);
-
-			return s;
-		}
-
 		internal static bool ListRemove(List<Guid> list, Guid id)
 		{
 			if (list.Contains(id))

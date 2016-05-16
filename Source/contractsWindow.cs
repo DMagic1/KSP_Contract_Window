@@ -1974,7 +1974,7 @@ namespace ContractsWindow
 					{
 						cC.Duration = cC.Root.DateDeadline - Planetarium.GetUniversalTime();
 						//Calculate time in day values using Kerbin or Earth days
-						cC.DaysToExpire = contractScenario.timeInDays(cC.Duration);
+						cC.DaysToExpire = cC.timeInDays(cC.Duration);
 					}
 
 					cC.Title = cC.Root.Title;
