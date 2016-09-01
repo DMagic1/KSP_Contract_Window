@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSPP_Contracts", "KSPP_Contracts.csproj", "{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractsWindow.Unity", "ContractsWindow.Unity\ContractsWindow.Unity.csproj", "{C6135CF5-6802-4286-8BDA-D62A41A2B1CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6135CF5-6802-4286-8BDA-D62A41A2B1CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6135CF5-6802-4286-8BDA-D62A41A2B1CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6135CF5-6802-4286-8BDA-D62A41A2B1CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6135CF5-6802-4286-8BDA-D62A41A2B1CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

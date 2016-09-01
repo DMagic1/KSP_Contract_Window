@@ -1,0 +1,5 @@
+C:\Users\DMagic\Documents\Visual Studio 2013\Projects\Contracts Plus\Source\ContractsWindow.Unity\Output\ContractsWindow.Unity.dll
+C:\Users\DMagic\Documents\Visual Studio 2013\Projects\Contracts Plus\Source\ContractsWindow.Unity\Output\ContractsWindow.Unity.pdb
+C:\Users\DMagic\Documents\Visual Studio 2013\Projects\Contracts Plus\Source\ContractsWindow.Unity\obj\Release\ContractsWindow.Unity.csprojResolveAssemblyReference.cache
+C:\Users\DMagic\Documents\Visual Studio 2013\Projects\Contracts Plus\Source\ContractsWindow.Unity\obj\Release\ContractsWindow.Unity.dll
+C:\Users\DMagic\Documents\Visual Studio 2013\Projects\Contracts Plus\Source\ContractsWindow.Unity\obj\Release\ContractsWindow.Unity.pdb
