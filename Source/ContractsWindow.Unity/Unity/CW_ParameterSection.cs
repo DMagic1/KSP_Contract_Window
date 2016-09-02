@@ -27,9 +27,9 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform NoteTransform = null;
 
-		private Color textColor = new Color();
-		private Color successColor = new Color();
-		private Color failColor = new Color();
+		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
+		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
+		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
 		private IParameterSection parameterInterface;
 		private CW_Note note;
 
