@@ -33,8 +33,6 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Sprite Stars_Three = null;
 		[SerializeField]
-		private Sprite Close = null;
-		[SerializeField]
 		private TextHighlighter Highlighter = null;
 		[SerializeField]
 		private Toggle ContractNoteToggle = null;
@@ -199,15 +197,14 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowParameters(bool isOn)
 		{
-			if (contractInterface == null)
-				return;
-
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
 
 				if (parameter == null)
 					continue;
+
+				parameter.ToggleSubParams(isOn);
 
 				parameter.gameObject.SetActive(isOn);
 			}

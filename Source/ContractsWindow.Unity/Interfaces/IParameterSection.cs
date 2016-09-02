@@ -12,6 +12,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		ContractState ParameterState { get; }
 
+		int ParamLayer { get; }
+
 		string TitleText { get; }
 
 		string RewardText { get; }
@@ -19,6 +21,8 @@ namespace ContractsWindow.Unity.Interfaces
 		string PenaltyText { get; }
 
 		INote GetNote { get; }
+
+		IList<IParameterSection> GetSubParams();
 
 		void ProcessStyle(GameObject obj);
 

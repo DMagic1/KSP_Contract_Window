@@ -17,21 +17,25 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle NoteToggle = null;
 		[SerializeField]
-		private Image ParameterNoteImage = null;
-		[SerializeField]
-		private Sprite NoteOn = null;
-		[SerializeField]
-		private Sprite NoteOff = null;
-		[SerializeField]
 		private GameObject NotePrefab = null;
 		[SerializeField]
 		private Transform NoteTransform = null;
+		[SerializeField]
+		private GameObject SubParamPrefab = null;
+		[SerializeField]
+		private Transform SubParamTransform = null;
+		[SerializeField]
+		private LayoutElement Spacer = null;
+		[SerializeField]
+		private LayoutElement ParameterLayout = null;
 
 		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
+		private Color subColor = new Color(0.8470588f, 0.8627451f, 0.8392157f, 1f);
 		private IParameterSection parameterInterface;
 		private CW_Note note;
+		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
 
 		public void setParameter(IParameterSection section)
 		{
@@ -41,7 +45,14 @@ namespace ContractsWindow.Unity.Unity
 			if (ParameterText == null || ParameterRewardText == null || ParameterPenaltyText == null)
 				return;
 
+			if (Spacer == null || ParameterLayout == null)
+				return;
+
 			parameterInterface = section;
+
+			Spacer.minWidth = parameterInterface.ParamLayer * 5;
+
+			ParameterLayout.minWidth -= parameterInterface.ParamLayer * 5;
 
 			ParameterText.text = parameterInterface.TitleText;
 
@@ -53,6 +64,24 @@ namespace ContractsWindow.Unity.Unity
 				setNote();
 			else if (NoteToggle != null)
 				NoteToggle.gameObject.SetActive(false);
+
+			if (parameterInterface.ParamLayer < 4)
+				CreateSubParameters(parameterInterface.GetSubParams());
+		}
+
+		public void ToggleSubParams(bool isOn)
+		{
+			for (int i = parameters.Count - 1; i >= 0; i--)
+			{
+				CW_ParameterSection parameter = parameters[i];
+
+				if (parameter == null)
+					continue;
+
+				parameter.ToggleSubParams(isOn);
+
+				parameter.gameObject.SetActive(isOn);
+			}
 		}
 
 		private void Update()
@@ -76,15 +105,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (ParameterNoteImage == null || NoteOn == null || NoteOff == null)
-				return;
-
 			if (note == null)
 				return;
 
 			note.gameObject.SetActive(isOn);
-
-			ParameterNoteImage.sprite = isOn ? NoteOff : NoteOn;
 		}
 
 		private void setNote()
@@ -119,7 +143,10 @@ namespace ContractsWindow.Unity.Unity
 			switch (state)
 			{
 				case ContractState.Active:
-					return textColor;
+					if (parameterInterface.ParamLayer == 0)
+						return textColor;
+					else
+						return subColor;
 				case ContractState.Complete:
 					return successColor;
 				case ContractState.Fail:
@@ -127,6 +154,49 @@ namespace ContractsWindow.Unity.Unity
 				default:
 					return textColor;
 			}
+		}
+
+		private void CreateSubParameters(IList<IParameterSection> sections)
+		{
+			if (sections == null)
+				return;
+
+			if (parameterInterface == null)
+				return;
+
+			if (SubParamPrefab == null || SubParamTransform == null)
+				return;
+
+			for (int i = sections.Count - 1; i >= 0; i--)
+			{
+				IParameterSection section = sections[i];
+
+				if (section == null)
+					continue;
+
+				CreateSubParameter(section);
+			}
+		}
+
+		private void CreateSubParameter(IParameterSection section)
+		{
+			GameObject obj = Instantiate(SubParamPrefab);
+
+			if (obj == null)
+				return;
+
+			parameterInterface.ProcessStyle(obj);
+
+			obj.transform.SetParent(SubParamTransform, false);
+
+			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
+
+			if (paramObject == null)
+				return;
+
+			paramObject.setParameter(section);
+
+			parameters.Add(paramObject);
 		}
 	}
 }
