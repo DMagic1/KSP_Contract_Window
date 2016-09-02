@@ -8,7 +8,31 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; set; }
 
-		void GetMissions();
+		bool SortUp { get; set; }
+
+		bool ShowActive { get; set; }
+
+		bool ShowTooltips { get; set; }
+
+		string Version { get; }
+
+		IList<IMissionSection> GetMissions();
+
+		IMissionEditPanel GetMissionEdit();
+
+		IMissionSelect GetMissionSelect();
+
+		INewMissionPanel GetMissionCreate();
+
+		ISortMenu GetSort();
+
+		IToolbarPanel GetToolbar();
+
+		IRebuildPanel GetRefresh();
+
+		IScalarPanel GetScalar();
+
+		IProgressPanel GetProgress();
 
 		void SetAppState(bool on);
 

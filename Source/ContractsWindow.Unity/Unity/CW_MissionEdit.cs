@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_MissionEdit : MonoBehaviour
+	public class CW_MissionEdit : CW_Popup
 	{
 		[SerializeField]
 		private Text NewMissionName = null;

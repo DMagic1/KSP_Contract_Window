@@ -45,6 +45,16 @@ namespace ContractsWindow.Unity.Unity
 			CreateBodies(panel.GetBodies());
 		}
 
+		public void SetProgressVisible(bool isOn)
+		{
+			if (panelInterface == null)
+				return;
+
+			panelInterface.IsVisible = isOn;
+
+			gameObject.SetActive(isOn);
+		}
+
 		public void ToggleIntervals(bool isOn)
 		{
 			for (int i = intervalTypes.Count - 1; i >= 0; i--)

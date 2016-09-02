@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_Toolbar : MonoBehaviour
+	public class CW_Toolbar : CW_Popup
 	{
 		[SerializeField]
 		private Toggle StockToggle = null;
@@ -51,11 +51,11 @@ namespace ContractsWindow.Unity.Unity
 
 			if (!toolbarInterface.BlizzyAvailable)
 			{
-				toolbarInterface.UseStock(true);
+				toolbarInterface.UsingStock = true;
 				return;
 			}
 
-			toolbarInterface.UseStock(isOn);
+			toolbarInterface.UsingStock = isOn;
 
 			if (!isOn)
 				StockToggle.gameObject.SetActive(false);
@@ -69,7 +69,7 @@ namespace ContractsWindow.Unity.Unity
 			if (toolbarInterface == null)
 				return;
 
-			toolbarInterface.ReplaceStock(isOn);
+			toolbarInterface.ReplacingStock = isOn;
 		}
 
 		public void Close()

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_MissionSelect : MonoBehaviour
+	public class CW_MissionSelect : CW_Popup
 	{
 		[SerializeField]
 		private GameObject MissionObjectPrefab = null;

@@ -77,5 +77,7 @@ namespace ContractsWindow.Unity.Unity
 			if (MissionNumber != null)
 				MissionNumber.text = missionInterface.ContractNumber;
 		}
+
+
 	}
 }

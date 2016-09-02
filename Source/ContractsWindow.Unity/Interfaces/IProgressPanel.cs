@@ -6,7 +6,7 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IProgressPanel
 	{
-		bool IsVisible { get; }
+		bool IsVisible { get; set; }
 
 		IList<IIntervalType> GetIntervalTypes();
 

@@ -7,12 +7,8 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool BlizzyAvailable { get; }
 
-		bool UsingStock { get; }
+		bool UsingStock { get; set; }
 
-		bool ReplacingStock { get; }
-
-		void UseStock(bool yes);
-
-		void ReplaceStock(bool yes);
+		bool ReplacingStock { get; set; }
 	}
 }

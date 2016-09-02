@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_AgencyPanel : MonoBehaviour
+	public class CW_AgencyPanel : CW_Popup
 	{
 		[SerializeField]
 		private Image AgencyLogo = null;
@@ -14,17 +14,11 @@ namespace ContractsWindow.Unity.Unity
 		private Text AgencyTitle = null;
 
 		private IAgencyPanel agentInterface;
-		private CW_Window parent;
 
-		public void setAgent(IAgencyPanel agency, CW_Window p)
+		public void setAgent(IAgencyPanel agency)
 		{
 			if (agency == null)
 				return;
-
-			if (p == null)
-				return;
-
-			parent = p;
 
 			agentInterface = agency;
 

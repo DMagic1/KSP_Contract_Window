@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_Rebuild : MonoBehaviour
+	public class CW_Rebuild : CW_Popup
 	{
 		private IRebuildPanel rebuildInterface;
 		private CW_Window parent;

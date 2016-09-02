@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_MissionCreate : MonoBehaviour
+	public class CW_MissionCreate : CW_Popup
 	{
 		[SerializeField]
 		private Text NewMission = null;
@@ -37,6 +37,11 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.NewMission(NewMission.text);
 
+			DestroyPanel();
+		}
+
+		public void DestroyPanel()
+		{
 			if (parent == null)
 				return;
 

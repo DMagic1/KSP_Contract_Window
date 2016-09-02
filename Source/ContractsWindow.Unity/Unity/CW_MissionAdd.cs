@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_MissionAdd : MonoBehaviour
+	public class CW_MissionAdd : CW_Popup
 	{
 		[SerializeField]
 		private GameObject MissionObjectPrefab = null;
@@ -77,7 +77,10 @@ namespace ContractsWindow.Unity.Unity
 
 		public void CreateNewMission()
 		{
+			if (parent == null)
+				return;
 
+			parent.showCreator();
 
 			DestroyPanel();
 		}

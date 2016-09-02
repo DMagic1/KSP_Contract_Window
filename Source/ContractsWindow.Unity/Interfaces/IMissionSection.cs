@@ -8,7 +8,11 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; set; }
 
-		string MissionTitle { get; set; }
+		string MissionTitle { get; }
+
+		bool MasterMission { get; }
+
+		IList<IContractSection> GetContracts();
 
 		void ProcessStyle(GameObject obj);
 

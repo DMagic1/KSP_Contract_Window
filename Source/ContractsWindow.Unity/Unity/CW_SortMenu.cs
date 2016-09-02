@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_SortMenu : MonoBehaviour
+	public class CW_SortMenu : CW_Popup
 	{
 		private ISortMenu sortInterface;
 		private CW_Window parent;
