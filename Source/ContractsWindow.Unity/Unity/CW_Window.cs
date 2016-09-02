@@ -12,29 +12,11 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 	{
 		[SerializeField]
-		private Image SortOrder = null;
-		[SerializeField]
-		private Image ShowHide = null;
-		[SerializeField]
-		private Image WindowType = null;
-		[SerializeField]
 		private Text VersionText = null;
 		[SerializeField]
 		private Text MissionTitle = null;
 		[SerializeField]
 		private Button MissionEdit = null;
-		[SerializeField]
-		private Sprite OrderUp = null;
-		[SerializeField]
-		private Sprite OrderDown = null;
-		[SerializeField]
-		private Sprite ContractIcon = null;
-		[SerializeField]
-		private Sprite ProgressIcon = null;
-		[SerializeField]
-		private Sprite EyeOpen = null;
-		[SerializeField]
-		private Sprite EyeClosed = null;
 		[SerializeField]
 		private float fastFadeDuration = 0.2f;
 		[SerializeField]
@@ -63,6 +45,8 @@ namespace ContractsWindow.Unity.Unity
 		private GameObject ToolbarPrefab = null;
 		[SerializeField]
 		private GameObject ScalarPrefab = null;
+		[SerializeField]
+		private Toggle SortOrderToggle = null;
 
 		private Vector2 mouseStart;
 		private Vector3 windowStart;
@@ -76,6 +60,7 @@ namespace ContractsWindow.Unity.Unity
 		private CW_ProgressPanel progressPanel;
 
 		private ICW_Window windowInterface;
+		private bool loaded;
 
 		protected override void Awake()
 		{
@@ -104,35 +89,14 @@ namespace ContractsWindow.Unity.Unity
 			CreateMissionSections(window.GetMissions());
 
 			CreateProgressSection(window.GetProgress());
+
+			loaded = true;
 		}
 
 		private void prepareTopBar()
 		{
-			sortSprite(windowInterface.SortUp);
-
-			showHideSprite(windowInterface.ShowActive);
-		}
-
-		private void sortSprite(bool on)
-		{
-			if (SortOrder != null && OrderUp != null && OrderDown != null)
-			{
-				if (on)
-					SortOrder.sprite = OrderUp;
-				else
-					SortOrder.sprite = OrderDown;
-			}
-		}
-
-		private void showHideSprite(bool on)
-		{
-			if (ShowHide != null && EyeOpen != null && EyeClosed != null)
-			{
-				if (on)
-					ShowHide.sprite = EyeOpen;
-				else
-					ShowHide.sprite = EyeClosed;
-			}
+			if (SortOrderToggle != null)
+				SortOrderToggle.isOn = windowInterface.SortDown;
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -261,31 +225,33 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		public void ToggleMainWindow(bool showContracts)
+		public void ToggleMainWindow(bool showProgress)
 		{
-			if (showContracts)
-			{
-				if (progressPanel != null)
-					progressPanel.SetProgressVisible(false);
-
-				if (currentMission != null)
-					currentMission.SetMissionVisible(true);
-			}
-			else
+			if (showProgress)
 			{
 				if (currentMission != null)
 					currentMission.SetMissionVisible(false);
 
 				if (progressPanel != null)
 					progressPanel.SetProgressVisible(true);
-			}
 
-			if (WindowType != null && ContractIcon != null && ProgressIcon != null)
+				if (MissionTitle == null)
+					return;
+
+				MissionTitle.text = "Progress Nodes:";
+			}
+			else
 			{
-				if (showContracts)
-					WindowType.sprite = ContractIcon;
-				else
-					WindowType.sprite = ProgressIcon;
+				if (progressPanel != null)
+					progressPanel.SetProgressVisible(false);
+
+				if (currentMission != null)
+					currentMission.SetMissionVisible(true);
+
+				if (MissionTitle == null || currentMission == null)
+					return;
+
+				MissionTitle.text = currentMission.MissionTitle;
 			}
 		}
 
@@ -311,24 +277,23 @@ namespace ContractsWindow.Unity.Unity
 			sortObject.setSort(windowInterface.GetSort(), this);
 		}
 
-		public void ToggleSortOrder(bool sortUp)
+		public void ToggleSortOrder(bool isOn)
 		{
-			sortSprite(sortUp);
+			if (!loaded)
+				return;
 
 			if (windowInterface == null)
 				return;
 
-			windowInterface.SortUp = sortUp;
+			windowInterface.SortDown = isOn;
 		}
 
-		public void ToggleShowHide(bool showActive)
+		public void ToggleShowHide(bool isOn)
 		{
-			showHideSprite(showActive);
-
 			if (windowInterface == null)
 				return;
 
-			windowInterface.ShowActive = showActive;
+			windowInterface.ShowHidden = isOn;
 		}
 
 		public void showSelector()
@@ -402,7 +367,7 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			windowInterface.ShowTooltips = isOn;
+			windowInterface.HideTooltips = isOn;
 		}
 
 		public void showRefresh()
