@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CanvasFader.cs" />
     <Compile Include="ContractState.cs" />
+    <Compile Include="CW_Popup.cs" />
     <Compile Include="Interfaces\IAgencyPanel.cs" />
     <Compile Include="Interfaces\IBodyNodes.cs" />
     <Compile Include="Interfaces\IContractSection.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Interfaces\IParameterSection.cs" />
     <Compile Include="Interfaces\IProgressPanel.cs" />
     <Compile Include="Interfaces\IRebuildPanel.cs" />
+    <Compile Include="Interfaces\IScalarPanel.cs" />
     <Compile Include="Interfaces\ISortMenu.cs" />
     <Compile Include="Interfaces\IStandardNode.cs" />
     <Compile Include="Interfaces\IToolbarPanel.cs" />
