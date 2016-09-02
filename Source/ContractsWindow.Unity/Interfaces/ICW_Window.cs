@@ -8,11 +8,11 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; set; }
 
-		bool SortUp { get; set; }
+		bool SortDown { get; set; }
 
-		bool ShowActive { get; set; }
+		bool ShowHidden { get; set; }
 
-		bool ShowTooltips { get; set; }
+		bool HideTooltips { get; set; }
 
 		string Version { get; }
 
