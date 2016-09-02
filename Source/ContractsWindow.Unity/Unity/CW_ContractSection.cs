@@ -15,14 +15,6 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text TimeRemaining = null;
 		[SerializeField]
-		private Image ShowHide = null;
-		[SerializeField]
-		private Image Pin = null;
-		[SerializeField]
-		private Image ContractNoteImage = null;
-		[SerializeField]
-		private Toggle ContractNoteToggle = null;
-		[SerializeField]
 		private Text ContractRewardText = null;
 		[SerializeField]
 		private Text ContractPenaltyText = null;
@@ -41,30 +33,29 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Sprite Stars_Three = null;
 		[SerializeField]
-		private Sprite Show = null;
-		[SerializeField]
-		private Sprite Hide = null;
-		[SerializeField]
 		private Sprite Close = null;
 		[SerializeField]
-		private Sprite Pin_Sprite = null;
+		private TextHighlighter Highlighter = null;
 		[SerializeField]
-		private Sprite UnPin = null;
+		private Toggle ContractNoteToggle = null;
 		[SerializeField]
-		private Sprite NoteOn = null;
+		private ToggleSpriteHandler EyesHandler = null;
 		[SerializeField]
-		private Sprite NoteOff = null;
+		private Toggle EyesToggle = null;
+		[SerializeField]
+		private Toggle PinToggle = null;
 
-		private Color textColor = new Color();
-		private Color successColor = new Color();
-		private Color failColor = new Color();
-		private Color timerWarningColor = new Color();
+		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
+		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
+		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
+		private Color timerWarningColor = new Color(0.7803922f, 0.7568628f, 0.04705882f, 1f);
 
 		private IContractSection contractInterface;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
 		private CW_Note note;
 		private CW_Window window;
 		private CW_MissionSection parent;
+		private bool loaded;
 
 		public void setContract(IContractSection contract, CW_Window win, CW_MissionSection mission)
 		{
@@ -88,7 +79,7 @@ namespace ContractsWindow.Unity.Unity
 
 			ContractTitle.text = contract.ContractTitle;
 
-			ContractTitle.color = stateColor(contract.ContractState);
+			handleColors(stateColor(contract.ContractState));
 
 			ContractRewardText.text = contract.RewardText;
 
@@ -97,6 +88,8 @@ namespace ContractsWindow.Unity.Unity
 			prepareHeader();
 
 			CreateParameterSections(contract.GetParameters());
+
+			loaded = true;
 		}
 
 		private void Update()
@@ -113,7 +106,7 @@ namespace ContractsWindow.Unity.Unity
 			{
 				ContractTitle.text = contractInterface.ContractTitle;
 
-				ContractTitle.color = stateColor(contractInterface.ContractState);
+				handleColors(stateColor(contractInterface.ContractState));
 			}
 
 			if (ContractRewardText != null)
@@ -141,8 +134,19 @@ namespace ContractsWindow.Unity.Unity
 			window.ShowAgentWindow(contractInterface);
 		}
 
+		public void ToggleToClose()
+		{
+			if (EyesHandler == null)
+				return;
+
+			EyesHandler.SetAlternate();
+		}
+
 		public void ToggleHidden(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (contractInterface == null)
 				return;
 
@@ -158,20 +162,17 @@ namespace ContractsWindow.Unity.Unity
 			}
 
 			contractInterface.IsHidden = isOn;
-
-			if (ShowHide != null && Show != null && Hide != null)
-				ShowHide.sprite = GetEyes(isOn);
 		}
 
 		public void TogglePinned(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (contractInterface == null)
 				return;
 
 			contractInterface.IsPinned = isOn;
-
-			if (Pin != null && Pin_Sprite != null && UnPin != null)
-				Pin.sprite = GetPin(isOn);
 		}
 
 		public void AddMission()
@@ -190,15 +191,10 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (ContractNoteImage == null || NoteOn == null || NoteOff == null)
-				return;
-
 			if (note == null)
 				return;
 
 			note.gameObject.SetActive(isOn);
-
-			ContractNoteImage.sprite = isOn ? NoteOff : NoteOn;
 		}
 
 		public void ShowParameters(bool isOn)
@@ -229,16 +225,24 @@ namespace ContractsWindow.Unity.Unity
 				TimeRemaining.color = timeColor(contractInterface.TimeState);
 			}
 
-			if (ShowHide != null && Show != null && Hide != null)
-				ShowHide.sprite = GetEyes(contractInterface.IsHidden);
+			if (EyesToggle != null)
+				EyesToggle.isOn = contractInterface.IsHidden;
 
-			if (Pin != null && Pin_Sprite != null && UnPin != null)
-				Pin.sprite = GetPin(contractInterface.IsPinned);
-
+			if (PinToggle != null)
+				PinToggle.isOn = contractInterface.IsPinned;
+				
 			if (contractInterface.HasNote)
 				setNote();
 			else if (ContractNoteToggle != null)
 				ContractNoteToggle.gameObject.SetActive(false);
+		}
+
+		private void handleColors(Color c)
+		{
+			ContractTitle.color = c;
+
+			if (Highlighter != null)
+				Highlighter.setNormalColor(c);
 		}
 
 		private Sprite GetStars(int stars)
@@ -254,22 +258,6 @@ namespace ContractsWindow.Unity.Unity
 				default:
 					return Stars_One;
 			}
-		}
-
-		private Sprite GetEyes(bool hidden)
-		{
-			if (hidden)
-				return Hide;
-			else
-				return Show;
-		}
-
-		private Sprite GetPin(bool pinned)
-		{
-			if (pinned)
-				return UnPin;
-			else
-				return Pin_Sprite;
 		}
 
 		private void setNote()
