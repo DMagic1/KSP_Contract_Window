@@ -43,6 +43,10 @@
       <HintPath>..\..\ContractParser\ContractParser\Output\ContractParser.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ContractsWindow.Unity">
+      <HintPath>ContractsWindow.Unity\Output\ContractsWindow.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="KSPUtil">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPUtil.dll</HintPath>
       <Private>False</Private>
@@ -63,17 +67,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="contractAssembly.cs" />
-    <Compile Include="contractMission.cs" />
+    <Compile Include="PanelInterfaces\contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
     <Compile Include="contractsWindow.cs" />
-    <Compile Include="contractUIObject.cs" />
+    <Compile Include="PanelInterfaces\contractUIObject.cs" />
     <Compile Include="contractUtils.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Framework\ExtensionsUnity.cs" />
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
     <Compile Include="Framework\MonoBehaviourWindow.cs" />
+    <Compile Include="PanelInterfaces\contractWindow.cs" />
+    <Compile Include="PanelInterfaces\parameterUIObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\SkinsLibrary.cs" />
     <Compile Include="Toolbar\contractStockToolbar.cs" />
