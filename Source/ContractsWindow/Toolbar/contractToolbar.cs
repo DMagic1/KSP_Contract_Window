@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 using System.IO;
 using System;
+using ContractsWindow.PanelInterfaces;
 using UnityEngine;
 
 namespace ContractsWindow.Toolbar
@@ -60,20 +61,18 @@ namespace ContractsWindow.Toolbar
 				{
 					if (contractScenario.Instance == null)
 						DMC_MBE.LogFormatted("Contract Scenario Not Loaded...");
-					else if (contractScenario.Instance.cWin == null)
+					else if (contractWindow.Instance == null)
 						DMC_MBE.LogFormatted("Contract Window Not Loaded...");
 					else
 					{
-						if (contractScenario.Instance.cWin.Visible)
+						if (contractWindow.Instance.IsVisible)
 						{
-							contractScenario.Instance.cWin.Visible = false;
-							contractScenario.Instance.cWin.StopRepeatingWorker();
+							contractWindow.Instance.Close();
 							contractScenario.Instance.windowVisible[sceneInt] = false;
 						}
 						else
 						{
-							contractScenario.Instance.cWin.Visible = true;
-							contractScenario.Instance.cWin.StartRepeatingWorker(5);
+							contractWindow.Instance.Open();
 							contractScenario.Instance.windowVisible[sceneInt] = true;
 						}
 					}
