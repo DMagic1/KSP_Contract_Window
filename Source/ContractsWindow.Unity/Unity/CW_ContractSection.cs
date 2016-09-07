@@ -55,6 +55,11 @@ namespace ContractsWindow.Unity.Unity
 		private CW_MissionSection parent;
 		private bool loaded;
 
+		public IContractSection Interface
+		{
+			get { return contractInterface; }
+		}
+
 		public void setContract(IContractSection contract, CW_Window win, CW_MissionSection mission)
 		{
 			if (contract == null)
@@ -85,7 +90,7 @@ namespace ContractsWindow.Unity.Unity
 
 			prepareHeader();
 
-			CreateParameterSections(contract.GetParameters());
+			CreateParameterSections(contract.GetParameters);
 
 			loaded = true;
 		}
@@ -95,10 +100,8 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (!contractInterface.IsVisible)
-				return;
-
-			contractInterface.Update();
+			if (contractInterface.ContractState != ContractState.Active)
+				ToggleToClose();
 
 			if (ContractTitle!= null)
 			{
@@ -148,16 +151,24 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
+			if (parent == null)
+				return;
+
 			if (contractInterface.ContractState != ContractState.Active)
 			{
-				contractInterface.RemoveContract();
-
 				if (parent == null)
 					return;
 
-				parent.DestroyChild(gameObject);
+				parent.RemoveContract(contractInterface.ID);
+
+				contractInterface.RemoveContractFromAll();
+
 				return;
 			}
+
+			parent.SwitchContract(contractInterface.ID, isOn);
+
+			gameObject.SetActive(false);
 
 			contractInterface.IsHidden = isOn;
 		}
@@ -197,6 +208,11 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowParameters(bool isOn)
 		{
+			if (contractInterface == null)
+				return;
+
+			contractInterface.ShowParams = isOn;
+
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
@@ -226,9 +242,9 @@ namespace ContractsWindow.Unity.Unity
 				EyesToggle.isOn = contractInterface.IsHidden;
 
 			if (PinToggle != null)
-				PinToggle.isOn = contractInterface.IsPinned;
+				PinToggle.isOn = contractInterface.Order != null;
 				
-			if (contractInterface.HasNote)
+			if (!string.IsNullOrEmpty(contractInterface.GetNote))
 				setNote();
 			else if (ContractNoteToggle != null)
 				ContractNoteToggle.gameObject.SetActive(false);
@@ -269,8 +285,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			contractInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(ContractNoteTransform, false);
 
@@ -313,8 +327,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			contractInterface.ProcessStyle(obj);
-
 			obj.transform.SetParent(ParamaterSectionTransform, false);
 
 			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
@@ -340,13 +352,13 @@ namespace ContractsWindow.Unity.Unity
 			switch (i)
 			{
 				case 0:
-					return textColor;
+					return successColor;
 				case 1:
 					return timerWarningColor;
 				case 2:
 					return failColor;
 				default:
-					return textColor;
+					return failColor;
 			}
 		}
 

@@ -33,6 +33,7 @@ namespace ContractsWindow.Unity.Unity
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
 		private Color subColor = new Color(0.8470588f, 0.8627451f, 0.8392157f, 1f);
+		private ContractState oldState;
 		private IParameterSection parameterInterface;
 		private CW_Note note;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
@@ -60,17 +61,25 @@ namespace ContractsWindow.Unity.Unity
 
 			ParameterPenaltyText.text = parameterInterface.PenaltyText;
 
-			if (parameterInterface.HasNote)
+			oldState = parameterInterface.ParameterState;
+
+			if (!string.IsNullOrEmpty(parameterInterface.GetNote))
 				setNote();
 			else if (NoteToggle != null)
 				NoteToggle.gameObject.SetActive(false);
 
 			if (parameterInterface.ParamLayer < 4)
-				CreateSubParameters(parameterInterface.GetSubParams());
+				CreateSubParameters(parameterInterface.GetSubParams);
 		}
 
 		public void ToggleSubParams(bool isOn)
 		{
+			if (parameterInterface == null)
+				return;
+
+			if (isOn && parameterInterface.ParameterState == ContractState.Complete)
+				return;
+
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
@@ -89,15 +98,22 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (!parameterInterface.IsVisible)
-				return;
+			if (oldState != parameterInterface.ParameterState)
+			{
+				oldState = parameterInterface.ParameterState;
 
+				if (oldState != ContractState.Active)
+					ToggleSubParams(false);
+				else
+					ToggleSubParams(true);
+			}
+			
 			if (ParameterText == null)
 				return;
 
-			parameterInterface.Update();
+			ParameterText.text = parameterInterface.TitleText;
 
-			ParameterText.color = stateColor(parameterInterface.ParameterState);
+			ParameterText.color = stateColor(oldState);
 		}
 
 		public void ToggleNote(bool isOn)
@@ -123,8 +139,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			parameterInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(NoteTransform, false);
 
@@ -185,8 +199,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			parameterInterface.ProcessStyle(obj);
-
 			obj.transform.SetParent(SubParamTransform, false);
 
 			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
@@ -197,6 +209,8 @@ namespace ContractsWindow.Unity.Unity
 			paramObject.setParameter(section);
 
 			parameters.Add(paramObject);
+
+			paramObject.gameObject.SetActive(parameterInterface.ParameterState != ContractState.Complete);
 		}
 	}
 }
