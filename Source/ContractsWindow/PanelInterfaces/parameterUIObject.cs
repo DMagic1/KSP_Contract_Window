@@ -100,7 +100,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return container.Notes(HighLogic.LoadedScene == GameScenes.SPACECENTER);
+				return container.Notes(HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsEditor);
 			}
 		}
 
