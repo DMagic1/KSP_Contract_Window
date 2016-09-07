@@ -17,11 +17,9 @@ namespace ContractsWindow.Unity.Unity
 		private string missionTitle;
 		private IMissionSection missionInterface;
 		private CW_Window window;
-		private List<CW_ContractSection> activeContracts = new List<CW_ContractSection>();
-		private List<CW_ContractSection> hiddenContracts = new List<CW_ContractSection>();
-
-		private GameObject activeSection;
-		private GameObject hiddenSection;
+		private List<Guid> activeContracts = new List<Guid>();
+		private List<Guid> hiddenContracts = new List<Guid>();
+		private Dictionary<Guid, CW_ContractSection> masterList = new Dictionary<Guid, CW_ContractSection>();
 
 		public bool MasterMission
 		{
@@ -34,6 +32,11 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
+		public IMissionSection MissionInterface
+		{
+			get { return missionInterface; }
+		}
+
 		public void setMission(IMissionSection section, CW_Window parent)
 		{
 			if (section == null)
@@ -42,13 +45,16 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
+			if (parent.Interface == null)
+				return;
+
 			missionInterface = section;
 
 			missionTitle = missionInterface.MissionTitle;
 
 			window = parent;
 
-			CreateContractSections(section.GetContracts());
+			CreateContractSections(section.GetContracts);
 		}
 
 		private void CreateContractSections(IList<IContractSection> contracts)
@@ -66,6 +72,9 @@ namespace ContractsWindow.Unity.Unity
 				if (contract == null)
 					continue;
 
+				if (masterList.ContainsKey(contract.ID))
+					continue;
+
 				CreateContractSection(contract);
 			}
 		}
@@ -77,8 +86,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			missionInterface.ProcessStyle(obj);
-
 			obj.transform.SetParent(ContractSectionTransform, false);
 
 			CW_ContractSection contractObject = obj.GetComponent<CW_ContractSection>();
@@ -88,7 +95,12 @@ namespace ContractsWindow.Unity.Unity
 
 			contractObject.setContract(contract, window, this);
 
-			activeContracts.Add(contractObject);
+			if (contract.IsHidden)
+				hiddenContracts.Add(contract.ID);
+			else
+				activeContracts.Add(contract.ID);
+
+			masterList.Add(contract.ID, contractObject);
 
 			contractObject.gameObject.SetActive(false);
 		}
@@ -98,26 +110,97 @@ namespace ContractsWindow.Unity.Unity
 			if (contract == null)
 				return;
 
+			if (masterList.ContainsKey(contract.ID))
+				return;
+
 			CreateContractSection(contract);
 		}
 
-		public void RemoveContract(CW_ContractSection contract)
+		public void SwitchContract(Guid id, bool hidden)
 		{
-			if (contract == null)
+			if (id == null)
 				return;
 
-			if (activeContracts.Contains(contract))
-				activeContracts.Remove(contract);
+			if (!masterList.ContainsKey(id))
+				return;
+
+			if (hidden)
+			{
+				ListRemove(activeContracts, id);
+				hiddenContracts.Add(id);
+			}
+			else
+			{
+				ListRemove(hiddenContracts, id);
+				activeContracts.Add(id);
+			}
+		}
+
+		public void RemoveContract(Guid id)
+		{
+			if (id == null)
+				return;
+
+			if (ListRemove(activeContracts, id) || ListRemove(hiddenContracts, id))
+				RemoveFromMasterList(id);
+		}
+
+		private void RemoveFromMasterList(Guid id)
+		{
+			if (masterList.ContainsKey(id))
+			{
+				masterList[id].gameObject.SetActive(false);
+				Destroy(masterList[id]);
+				masterList.Remove(id);
+			}
+		}
+
+		private bool ListRemove(List<Guid> list, Guid id)
+		{
+			if (list.Contains(id))
+			{
+				list.Remove(id);
+				return true;
+			}
+
+			return false;
 		}
 
 		public void SetMissionVisible(bool isOn)
 		{
 			if (missionInterface == null)
 				return;
-
-			missionInterface.IsVisible = isOn;
-
+			
 			gameObject.SetActive(isOn);
+		}
+
+		public void ToggleContracts(bool showHidden)
+		{
+			for (int i = activeContracts.Count - 1; i >= 0; i--)
+			{
+				Guid id = activeContracts[i];
+
+				if (id == null)
+					continue; ;
+
+				if (!masterList.ContainsKey(id))
+					continue;
+
+				masterList[id].gameObject.SetActive(!showHidden);
+			}
+
+			for (int i = hiddenContracts.Count - 1; i >= 0; i--)
+			{
+				Guid id = hiddenContracts[i];
+
+				if (id == null)
+					continue; ;
+
+				if (!masterList.ContainsKey(id))
+					continue;
+
+				masterList[id].gameObject.SetActive(showHidden);
+			}
 		}
 
 		public string MissionTitle
