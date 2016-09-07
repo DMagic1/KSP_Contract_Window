@@ -13,31 +13,28 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle StockReplace = null;
 
-		private IToolbarPanel toolbarInterface;
 		private CW_Window parent;
 
-		public void setToolbar(IToolbarPanel toolbar, CW_Window p)
+		public void setToolbar(CW_Window p)
 		{
-			if (toolbar == null)
-				return;
-
 			if (p == null)
 				return;
 
-			toolbarInterface = toolbar;
+			if (p.Interface == null)
+				return;
 
 			parent = p;
 
 			if (StockToggle == null)
 				return;
 
-			if (!toolbar.BlizzyAvailable)
+			if (!p.Interface.BlizzyAvailable)
 				StockToggle.gameObject.SetActive(false);
 
 			if (StockReplace == null)
 				return;
 
-			if (!toolbar.UsingStock)
+			if (!p.Interface.StockToolbar)
 				StockReplace.gameObject.SetActive(false);
 		}
 
@@ -46,19 +43,21 @@ namespace ContractsWindow.Unity.Unity
 			if (StockToggle == null || StockReplace == null)
 				return;
 
-			if (toolbarInterface == null)
+			if (parent == null)
 				return;
 
-			if (!toolbarInterface.BlizzyAvailable)
+			if (parent.Interface == null)
+				return;
+
+			if (!parent.Interface.BlizzyAvailable)
 			{
-				toolbarInterface.UsingStock = true;
+				parent.Interface.StockToolbar = true;
 				return;
 			}
 
-			toolbarInterface.UsingStock = isOn;
+			parent.Interface.StockToolbar = isOn;
 
-			if (!isOn)
-				StockToggle.gameObject.SetActive(false);
+			StockToggle.gameObject.SetActive(isOn);
 		}
 
 		public void ReplaceStockToolbar(bool isOn)
@@ -66,10 +65,13 @@ namespace ContractsWindow.Unity.Unity
 			if (StockReplace == null)
 				return;
 
-			if (toolbarInterface == null)
+			if (parent == null)
 				return;
 
-			toolbarInterface.ReplacingStock = isOn;
+			if (parent.Interface == null)
+				return;
+
+			parent.Interface.ReplaceToolbar = isOn;
 		}
 
 		public void Close()

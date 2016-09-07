@@ -14,12 +14,11 @@ namespace ContractsWindow.Unity.Unity
 		private Transform MissionObjectTransform = null;
 
 		private CW_Window parent;
-		private IMissionAddPanel missionInterface;
-		private List<CW_MissionAddObject> missions = new List<CW_MissionAddObject>();
+		private IContractSection contractInterface;
 
-		public void setMission(IMissionAddPanel mission, CW_Window window)
+		public void setMission(IList<IMissionSection> missions, IContractSection contract, CW_Window window)
 		{
-			if (mission == null)
+			if (missions == null || contract == null)
 				return;
 
 			if (window == null)
@@ -27,12 +26,12 @@ namespace ContractsWindow.Unity.Unity
 
 			parent = window;
 
-			missionInterface = mission;
+			contractInterface = contract;
 
-			CreateMissionSections(missionInterface.GetMissions());
+			CreateMissionSections(missions);
 		}
 
-		private void CreateMissionSections(IList<IMissionAddObject> missions)
+		private void CreateMissionSections(IList<IMissionSection> missions)
 		{
 			if (missions == null)
 				return;
@@ -45,7 +44,7 @@ namespace ContractsWindow.Unity.Unity
 
 			for (int i = missions.Count - 1; i >= 0; i--)
 			{
-				IMissionAddObject mission = missions[i];
+				IMissionSection mission = missions[i];
 
 				if (mission == null)
 					continue;
@@ -54,14 +53,12 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		private void CreateMissionSection(IMissionAddObject mission)
+		private void CreateMissionSection(IMissionSection mission)
 		{
 			GameObject obj = Instantiate(MissionObjectPrefab);
 
 			if (obj == null)
 				return;
-
-			missionInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(MissionObjectTransform, false);
 
@@ -70,9 +67,7 @@ namespace ContractsWindow.Unity.Unity
 			if (missionObject == null)
 				return;
 
-			missionObject.setMission(mission, this);
-
-			missions.Add(missionObject);
+			missionObject.setMission(mission, contractInterface, this);
 		}
 
 		public void CreateNewMission()
@@ -80,7 +75,7 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			parent.showCreator();
+			parent.showCreator(contractInterface);
 
 			DestroyPanel();
 		}

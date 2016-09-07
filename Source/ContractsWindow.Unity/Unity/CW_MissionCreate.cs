@@ -11,31 +11,34 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text NewMission = null;
 
-		private INewMissionPanel missionInterface;
 		private CW_Window parent;
+		private IContractSection contract;
 
-		public void setPanel(INewMissionPanel mission, CW_Window p)
+		public void setPanel(CW_Window p, IContractSection c)
 		{
-			if (mission == null)
+			if (p == null)
 				return;
 
-			if (p == null)
+			if (c == null)
 				return;
 
 			parent = p;
 
-			missionInterface = mission;
+			contract = c;
 		}
 
 		public void CreateMission()
 		{
-			if (missionInterface == null)
+			if (parent == null)
+				return;
+
+			if (parent.Interface == null)
 				return;
 
 			if (NewMission == null)
 				return;
 
-			missionInterface.NewMission(NewMission.text);
+			parent.Interface.NewMission(NewMission.text, contract.ID);
 
 			DestroyPanel();
 		}

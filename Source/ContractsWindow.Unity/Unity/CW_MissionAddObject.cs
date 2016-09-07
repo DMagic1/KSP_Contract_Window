@@ -17,12 +17,13 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Button XMark = null;
 
-		private IMissionAddObject missionInterface;
+		private IMissionSection missionInterface;
+		private IContractSection contractInterface;
 		private CW_MissionAdd parent;
 
-		public void setMission(IMissionAddObject mission, CW_MissionAdd p)
+		public void setMission(IMissionSection mission, IContractSection contract, CW_MissionAdd p)
 		{
-			if (mission == null)
+			if (mission == null || contract == null)
 				return;
 
 			if (MissionTitle == null || MissionNumber == null || Checkmark == null || XMark == null)
@@ -35,11 +36,13 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface = mission;
 
-			MissionTitle.text = mission.MissionName;
+			contractInterface = contract;
+
+			MissionTitle.text = mission.MissionTitle;
 
 			MissionNumber.text = mission.ContractNumber;
 
-			if (!mission.ContractContained)
+			if (!mission.ContractContained(contract))
 			{
 				Checkmark.gameObject.SetActive(false);
 
@@ -47,12 +50,12 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		public void SetMission()
+		public void AddContract()
 		{
 			if (missionInterface == null)
 				return;
 
-			missionInterface.SetMission(this);
+			missionInterface.AddContract(contractInterface);
 
 			if (parent == null)
 				return;
@@ -60,12 +63,12 @@ namespace ContractsWindow.Unity.Unity
 			parent.DestroyPanel();
 		}
 
-		public void RemoveMission()
+		public void RemoveContract()
 		{
 			if (missionInterface == null)
 				return;
 
-			missionInterface.RemoveMission(this);
+			missionInterface.RemoveContract(contractInterface);
 
 			if (Checkmark != null && XMark != null)
 			{

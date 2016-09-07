@@ -13,10 +13,10 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text MissionNumber = null;
 
-		private IMissionSelectObject missionInterface;
+		private IMissionSection missionInterface;
 		private CW_MissionSelect parent;
 
-		public void setMission(IMissionSelectObject mission, CW_MissionSelect p)
+		public void setMission(IMissionSection mission, CW_MissionSelect p)
 		{
 			if (mission == null)
 				return;
@@ -31,31 +31,9 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface = mission;
 
-			MissionTitle.text = mission.MissionName;
+			MissionTitle.text = mission.MissionTitle;
 
 			MissionNumber.text = mission.ContractNumber;
-		}
-
-		private void OnDestroy()
-		{
-			if (parent == null)
-				return;
-
-			parent.RemoveMission(this);
-
-			gameObject.SetActive(false);
-		}
-
-		public void OnUpdate()
-		{
-			if (missionInterface == null)
-				return;
-
-			missionInterface.Update();
-
-			MissionTitle.text = missionInterface.MissionName;
-
-			MissionNumber.text = missionInterface.ContractNumber;
 		}
 
 		public void SetMission()
@@ -63,7 +41,7 @@ namespace ContractsWindow.Unity.Unity
 			if (missionInterface == null)
 				return;
 
-			missionInterface.SetMission(this);
+			missionInterface.SetMission();
 
 			if (parent == null)
 				return;

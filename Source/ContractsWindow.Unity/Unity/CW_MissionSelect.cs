@@ -14,47 +14,10 @@ namespace ContractsWindow.Unity.Unity
 		private Transform MissionObjectTransform = null;
 
 		private CW_Window parent;
-		private IMissionSelect missionInterface;
-		private List<CW_MissionSelectObject> missions = new List<CW_MissionSelectObject>();
 
-		public bool IsVisible
+		public void setMission(IList<IMissionSection> missions, CW_Window window)
 		{
-			get
-			{
-				if (missionInterface == null)
-					return false;
-
-				return missionInterface.IsVisible;
-			}
-		}
-
-		public CW_Window Parent
-		{
-			get { return parent; }
-		}
-
-		private void Update()
-		{
-			if (missionInterface == null)
-				return;
-
-			if (!missionInterface.IsVisible)
-				return;
-
-			for (int i = missions.Count - 1; i >= 0; i--)
-			{
-				CW_MissionSelectObject mission = missions[i];
-
-				if (mission == null)
-					continue;
-
-				mission.OnUpdate();
-			}
-		}
-
-		public void setMission(IMissionSelect mission, CW_Window window)
-		{
-			if (mission == null)
+			if (missions == null)
 				return;
 
 			if (window == null)
@@ -62,14 +25,10 @@ namespace ContractsWindow.Unity.Unity
 
 			parent = window;
 
-			missionInterface = mission;
-
-			CreateMissionSections(missionInterface.GetMissions());
-
-			missionInterface.SetParent(this);
+			CreateMissionSections(missions);
 		}
 
-		private void CreateMissionSections(IList<IMissionSelectObject> missions)
+		private void CreateMissionSections(IList<IMissionSection> missions)
 		{
 			if (missions == null)
 				return;
@@ -82,7 +41,7 @@ namespace ContractsWindow.Unity.Unity
 
 			for (int i = missions.Count - 1; i >= 0; i--)
 			{
-				IMissionSelectObject mission = missions[i];
+				IMissionSection mission = missions[i];
 
 				if (mission == null)
 					continue;
@@ -91,14 +50,12 @@ namespace ContractsWindow.Unity.Unity
 			}			
 		}
 
-		private void CreateMissionSection(IMissionSelectObject mission)
+		private void CreateMissionSection(IMissionSection mission)
 		{
 			GameObject obj = Instantiate(MissionObjectPrefab);
 
 			if (obj == null)
 				return;
-
-			missionInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(MissionObjectTransform, false);
 
@@ -108,25 +65,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			missionObject.setMission(mission, this);
-
-			missions.Add(missionObject);
-		}
-
-		public void AddMission(IMissionSelectObject mission)
-		{
-			if (mission == null)
-				return;
-
-			CreateMissionSection(mission);
-		}
-
-		public void RemoveMission(CW_MissionSelectObject mission)
-		{
-			if (mission == null)
-				return;
-
-			if (missions.Contains(mission))
-				missions.Remove(mission);
 		}
 
 		public void DestroyPanel()

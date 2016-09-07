@@ -11,10 +11,10 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text NewMissionName = null;
 
-		private IMissionEditPanel missionInterface;
+		private IMissionSection missionInterface;
 		private CW_Window parent;
 
-		public void setMission(IMissionEditPanel mission, CW_Window p)
+		public void setMission(IMissionSection mission, CW_Window p)
 		{
 			if (mission == null)
 				return;
@@ -35,7 +35,7 @@ namespace ContractsWindow.Unity.Unity
 			if (NewMissionName == null)
 				return;
 
-			missionInterface.ChangeName(NewMissionName.text);
+			missionInterface.MissionTitle = NewMissionName.text;
 
 			if (parent == null)
 				return;
@@ -48,7 +48,7 @@ namespace ContractsWindow.Unity.Unity
 			if (missionInterface == null)
 				return;
 
-			missionInterface.DeleteMission();
+			missionInterface.RemoveMission();
 
 			if (parent == null)
 				return;

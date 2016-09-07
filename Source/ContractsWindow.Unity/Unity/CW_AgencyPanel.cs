@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ContractsWindow.Unity.Interfaces;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
@@ -12,18 +9,14 @@ namespace ContractsWindow.Unity.Unity
 		private Image AgencyLogo = null;
 		[SerializeField]
 		private Text AgencyTitle = null;
-
-		private IAgencyPanel agentInterface;
-
-		public void setAgent(IAgencyPanel agency)
+		
+		public void setAgent(string title, Sprite logo)
 		{
-			if (agency == null)
+			if (logo == null)
 				return;
 
-			agentInterface = agency;
-
-			AgencyLogo.sprite = agency.AgencyLogo;
-			AgencyTitle.text = agency.AgencyTitle;
+			AgencyLogo.sprite = logo;
+			AgencyTitle.text = title;
 		}
 
 	}
