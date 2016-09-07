@@ -25,6 +25,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		void SetMission();
 
+		void SetSort(int i);
+
 		void AddContract(IContractSection contract);
 
 		void RemoveContract(IContractSection contract);

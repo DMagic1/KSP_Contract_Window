@@ -8,14 +8,20 @@ namespace ContractsWindow.Unity.Unity
 {
 	public class CW_SortMenu : CW_Popup
 	{
+		private IMissionSection missionInterface;
 		private CW_Window parent;
 
-		public void setSort(CW_Window p)
+		public void setSort(CW_Window p, IMissionSection m)
 		{
 			if (p == null)
 				return;
 
+			if (m == null)
+				return;
+
 			parent = p;
+
+			missionInterface = m;
 		}
 
 		public void SortDifficulty()
@@ -23,10 +29,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(0);
+			missionInterface.SetSort(0);
 
 			parent.DestroyChild(gameObject);
 		}
@@ -36,10 +42,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(1);
+			missionInterface.SetSort(1);
 
 			parent.DestroyChild(gameObject);
 		}
@@ -49,10 +55,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(2);
+			missionInterface.SetSort(2);
 
 			parent.DestroyChild(gameObject);
 		}
@@ -62,10 +68,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(3);
+			missionInterface.SetSort(3);
 
 			parent.DestroyChild(gameObject);
 		}
@@ -75,10 +81,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(4);
+			missionInterface.SetSort(4);
 
 			parent.DestroyChild(gameObject);
 		}
@@ -88,10 +94,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
-			if (parent.Interface == null)
+			if (missionInterface == null)
 				return;
 
-			parent.Interface.SetSort(5);
+			missionInterface.SetSort(5);
 
 			parent.DestroyChild(gameObject);
 		}
