@@ -8,8 +8,6 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface ICW_Window
 	{
-		bool IsVisible { get; set; }
-
 		bool HideTooltips { get; set; }
 
 		bool BlizzyAvailable { get; }
@@ -36,11 +34,7 @@ namespace ContractsWindow.Unity.Interfaces
 
 		void Rebuild();
 
-		void SetSort(int i);
-
 		void NewMission(string title, Guid id);
-
-		void SetAppState(bool on);
 
 		void SetWindowPosition(Rect r);
 	}
