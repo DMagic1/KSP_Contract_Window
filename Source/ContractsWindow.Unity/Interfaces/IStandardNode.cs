@@ -14,7 +14,7 @@ namespace ContractsWindow.Unity.Interfaces
 
 		string RewardText { get; }
 
-		INote GetNote { get; }
+		string GetNote { get; }
 
 		void ProcessStyle(GameObject obj);
 	}

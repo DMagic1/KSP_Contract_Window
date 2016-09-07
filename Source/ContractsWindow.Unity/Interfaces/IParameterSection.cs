@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using ContractsWindow.Unity.Unity;
 using UnityEngine;
 
 namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IParameterSection
 	{
-		bool IsVisible { get; set; }
-
-		bool HasNote { get; }
-
 		ContractState ParameterState { get; }
 
 		int ParamLayer { get; }
@@ -20,12 +17,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		string PenaltyText { get; }
 
-		INote GetNote { get; }
+		string GetNote { get; }
 
-		IList<IParameterSection> GetSubParams();
-
-		void ProcessStyle(GameObject obj);
-
-		void Update();
+		IList<IParameterSection> GetSubParams { get; }
 	}
 }

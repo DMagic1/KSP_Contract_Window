@@ -1,30 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using ContractsWindow.Unity.Unity;
 using UnityEngine;
 
 namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IContractSection
 	{
-		bool IsVisible { get; set; }
-
 		bool IsHidden { get; set; }
+
+		bool ShowParams { get; set; }
 
 		bool IsPinned { get; set; }
 
-		bool HasNote { get; }
-
 		ContractState ContractState { get; }
 
-		int Order { get; set; }
+		Guid ID { get; }
+
+		int? Order { get; set; }
 
 		int Difficulty { get; }
 
 		int TimeState { get; }
-
-		IMissionAddPanel GetMissionAdd();
-
-		IAgencyPanel GetAgent();
 
 		Sprite AgencyLogo { get; }
 
@@ -38,14 +35,10 @@ namespace ContractsWindow.Unity.Interfaces
 
 		string PenaltyText { get; }
 
-		INote GetNote { get; }
+		string GetNote { get; }
 
-		IList<IParameterSection> GetParameters();
+		IList<IParameterSection> GetParameters { get; }
 
-		void RemoveContract();
-
-		void ProcessStyle(GameObject obj);
-
-		void Update();
+		void RemoveContractFromAll();
 	}
 }

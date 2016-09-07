@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ContractsWindow.Unity.Unity;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Interfaces
 {
@@ -8,34 +10,38 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; set; }
 
-		bool SortDown { get; set; }
-
-		bool ShowHidden { get; set; }
-
 		bool HideTooltips { get; set; }
+
+		bool BlizzyAvailable { get; }
+
+		bool StockToolbar { get; set; }
+
+		bool ReplaceToolbar { get; set; }
+
+		bool LargeFont { get; set; }
+
+		bool IgnoreScale { get; set; }
+
+		float Scale { get; set; }
+
+		float MasterScale { get; set; }
 
 		string Version { get; }
 
-		IList<IMissionSection> GetMissions();
+		IList<IMissionSection> GetMissions { get; }
 
-		IMissionEditPanel GetMissionEdit();
+		IMissionSection GetCurrentMission { get; }
 
-		IMissionSelect GetMissionSelect();
+		IProgressPanel GetProgress { get; }
 
-		INewMissionPanel GetMissionCreate();
+		void Rebuild();
 
-		ISortMenu GetSort();
+		void SetSort(int i);
 
-		IToolbarPanel GetToolbar();
-
-		IRebuildPanel GetRefresh();
-
-		IScalarPanel GetScalar();
-
-		IProgressPanel GetProgress();
+		void NewMission(string title, Guid id);
 
 		void SetAppState(bool on);
 
-		void ProcessStyle(GameObject obj);
+		void SetWindowPosition(Rect r);
 	}
 }

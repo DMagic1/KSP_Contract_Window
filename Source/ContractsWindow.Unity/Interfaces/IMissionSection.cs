@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using ContractsWindow.Unity.Unity;
 using UnityEngine;
 
 namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IMissionSection
 	{
-		bool IsVisible { get; set; }
+		string MissionTitle { get; set; }
 
-		string MissionTitle { get; }
+		string ContractNumber { get; }
 
 		bool MasterMission { get; }
 
-		IList<IContractSection> GetContracts();
+		bool ContractContained(IContractSection contract);
 
-		void ProcessStyle(GameObject obj);
+		bool DescendingOrder { get; set; }
 
-		void Update();
+		bool ShowHidden { get; set; }
+
+		IList<IContractSection> GetContracts { get; }
+
+		void RemoveMission();
+
+		void SetMission();
+
+		void AddContract(IContractSection contract);
+
+		void RemoveContract(IContractSection contract);
+
+		void SetParent(CW_MissionSection mission);
 	}
 }
