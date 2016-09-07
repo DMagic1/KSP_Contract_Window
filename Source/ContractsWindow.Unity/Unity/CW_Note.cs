@@ -11,35 +11,12 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text NoteText = null;
 
-		private INote noteInterface;
-
-		public void setNote(INote note)
+		public void setNote(string note)
 		{
-			if (note == null)
-				return;
-
-			noteInterface = null;
-
 			if (NoteText == null)
 				return;
 
-			NoteText.text = note.NoteText;
-		}
-
-		public void Update()
-		{
-			if (noteInterface == null)
-				return;
-
-			if (!noteInterface.IsVisible)
-				return;
-
-			if (NoteText == null)
-				return;
-
-			noteInterface.Update();
-
-			NoteText.text = noteInterface.NoteText;
+			NoteText.text = note;
 		}
 	}
 }
