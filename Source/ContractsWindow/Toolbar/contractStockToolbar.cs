@@ -29,16 +29,36 @@ THE SOFTWARE.
 using System;
 using System.Collections;
 using KSP.UI.Screens;
-
+using ContractsWindow.PanelInterfaces;
 using UnityEngine;
 
 namespace ContractsWindow.Toolbar
 {
-	public class contractStockToolbar : DMC_MBE
+	public class contractStockToolbar : ApplicationLauncherButton
 	{
-		private ApplicationLauncherButton stockToolbarButton = null;
+		private ApplicationLauncherButton toolbarButton = null;
+		private bool replaceStock;
+		private static contractStockToolbar instance;
+		
+		public static contractStockToolbar Instance
+		{
+			get { return instance; }
+		}
 
-		protected override void Start()
+		public ApplicationLauncherButton Button
+		{
+			get
+			{
+				if (replaceStock)
+				{
+
+				}
+
+				return toolbarButton;
+			}
+		}
+
+		private void Start()
 		{
 			setupToolbar();
 		}
@@ -51,7 +71,7 @@ namespace ContractsWindow.Toolbar
 				StartCoroutine(replaceStockContractApp());
 		}
 
-		protected override void OnDestroy()
+		private void OnDestroy()
 		{
 			GameEvents.onGUIApplicationLauncherUnreadifying.Remove(removeButton);
 
@@ -64,17 +84,17 @@ namespace ContractsWindow.Toolbar
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
-			stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+			toolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
 		}
 
 		private void removeButton(GameScenes scene)
 		{
-			if (stockToolbarButton != null)
+			if (toolbarButton != null)
 			{
-				ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-				stockToolbarButton = null;
+				ApplicationLauncher.Instance.RemoveModApplication(toolbarButton);
+				toolbarButton = null;
 			}
 		}
 
@@ -88,10 +108,10 @@ namespace ContractsWindow.Toolbar
 			while (ContractsApp.Instance.appLauncherButton == null || !ApplicationLauncher.Ready)
 				yield return null;
 
-			if (stockToolbarButton == null)
+			if (toolbarButton == null)
 			{
-				LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
-				stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(toggle, toggle, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+				DMC_MBE.LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
+				toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 			}
 
 			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
@@ -100,16 +120,16 @@ namespace ContractsWindow.Toolbar
 			{
 				stockContracts.onDisable();
 
-				stockContracts.onTrue = stockToolbarButton.onTrue;
-				stockContracts.onFalse = stockToolbarButton.onFalse;
-				stockContracts.onHover = stockToolbarButton.onHover;
-				stockContracts.onHoverOut = stockToolbarButton.onHoverOut;
-				stockContracts.onEnable = stockToolbarButton.onEnable;
-				stockContracts.onDisable = stockToolbarButton.onDisable;
+				stockContracts.onTrue = toolbarButton.onTrue;
+				stockContracts.onFalse = toolbarButton.onFalse;
+				stockContracts.onHover = toolbarButton.onHover;
+				stockContracts.onHoverOut = toolbarButton.onHoverOut;
+				stockContracts.onEnable = toolbarButton.onEnable;
+				stockContracts.onDisable = toolbarButton.onDisable;
 
 				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
 
-				LogFormatted("Stock Contracts App Replaced With Contracts Window +");
+				DMC_MBE.LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 
 				try
 				{
@@ -117,27 +137,43 @@ namespace ContractsWindow.Toolbar
 				}
 				catch (Exception e)
 				{
-					LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+					DMC_MBE.LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
 				}
 			}
 			else
 			{
-				LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
+				DMC_MBE.LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
 
-				if (stockToolbarButton != null)
+				if (toolbarButton != null)
 					GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
 				else
 					StartCoroutine(addButton());
 			}
 		}
 
+		private void open()
+		{
+			if (contractWindow.Instance == null)
+				return;
+
+			contractWindow.Instance.Open();
+		}
+
+		private void close()
+		{
+			if (contractWindow.Instance == null)
+				return;
+
+			contractWindow.Instance.Close();
+		}
+
 		private void toggle()
 		{
 			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 			if (contractScenario.Instance == null)
-				LogFormatted("Contract Scenario Not Loaded...");
+				DMC_MBE.LogFormatted("Contract Scenario Not Loaded...");
 			else if (contractScenario.Instance.cWin == null)
-				LogFormatted("Contract Window Not Loaded...");
+				DMC_MBE.LogFormatted("Contract Window Not Loaded...");
 			else
 			{
 				if (!contractScenario.Instance.cWin.Visible)
