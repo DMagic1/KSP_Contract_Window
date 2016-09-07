@@ -30,10 +30,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Reflection;
 using UnityEngine;
 using Contracts;
 using Contracts.Parameters;
 using ContractsWindow.Toolbar;
+using ContractsWindow.PanelInterfaces;
 using ContractParser;
 
 namespace ContractsWindow
@@ -65,6 +67,10 @@ namespace ContractsWindow
 		public bool fontSmall = true;
 		[KSPField(isPersistant = true)]
 		public int windowSize = 0;
+		[KSPField(isPersistant = true)]
+		public float windowScale = 1;
+		[KSPField(isPersistant = true)]
+		public bool ignoreScale = false;
 
 		private static contractScenario instance;
 
@@ -91,6 +97,13 @@ namespace ContractsWindow
 		internal contractToolbar blizzyToolbarButton = null;
 
 		internal contractsWindow cWin;
+
+		private string infoVersion;
+
+		public string InfoVersion
+		{
+			get { return infoVersion; }
+		}
 
 		//A count of all active contracts as determined by manually checking the Game config node
 		private int contractCount;
@@ -249,6 +262,14 @@ namespace ContractsWindow
 
 		private void Start()
 		{
+			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
+			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
+			switch (ainfoV == null)
+			{
+				case true: infoVersion = ""; break;
+				default: infoVersion = ainfoV.InformationalVersion; break;
+			}
+
 			//Start the window object
 			try
 			{
@@ -396,9 +417,9 @@ namespace ContractsWindow
 
 		internal bool addMissionList(contractMission mission)
 		{
-			if (!missionList.ContainsKey(mission.Name))
+			if (!missionList.ContainsKey(mission.MissionTitle))
 			{
-				missionList.Add(mission.Name, mission);
+				missionList.Add(mission.MissionTitle, mission);
 				return true;
 			}
 			else
@@ -512,7 +533,7 @@ namespace ContractsWindow
 					mList.Add(getMissionList("MasterMission"));
 			}
 
-			tempList.Sort((a,b) => RUIutils.SortAscDescPrimarySecondary(false, a.ActiveContracts.CompareTo(b.ActiveContracts), a.Name.CompareTo(b.Name)));
+			tempList.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(false, a.ActiveContracts.CompareTo(b.ActiveContracts), a.MissionTitle.CompareTo(b.MissionTitle)));
 
 			if (tempList.Count > 0)
 				mList.AddRange(tempList);
@@ -574,34 +595,6 @@ namespace ContractsWindow
 			}
 
 			return "";
-		}
-
-		internal static string timeInDays(double D)
-		{
-			if (D <= 0)
-				return "----";
-
-			int[] time = ((KSPUtil.DefaultDateTimeFormatter)KSPUtil.dateTimeFormatter).GetDateFromUT((int)D);
-			string s = "";
-
-			if (time[4] > 0)
-				s = string.Format("{0}y", time[4]);
-			if (time[3] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}d", time[3]);
-			}
-			if (time[4] <= 0 && time[2] > 0)
-			{
-				if (!string.IsNullOrEmpty(s))
-					s += " ";
-				s += string.Format("{0}h", time[2]);
-			}
-			if (time[4] <= 0 && time[3] <= 0 && time[2] <= 0 && time[1] > 0)
-				s = string.Format("{0}m", time[1]);
-
-			return s;
 		}
 
 		internal static bool ListRemove(List<Guid> list, Guid id)
