@@ -95,26 +95,50 @@ namespace ContractsWindow.Unity.Unity
 			loaded = true;
 		}
 
+		public void UpdateContract()
+		{
+			if (contractInterface == null)
+				return;
+
+			if (contractInterface.ShowParams)
+			{
+				for (int i = parameters.Count - 1; i >= 0; i--)
+				{
+					CW_ParameterSection param = parameters[i];
+
+					if (param == null)
+						return;
+
+					param.UpdateParameter();
+				}
+			}
+
+			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
+				return;
+
+			ContractTitle.text = contractInterface.ContractTitle;
+
+			ContractRewardText.text = contractInterface.RewardText;
+
+			ContractPenaltyText.text = contractInterface.PenaltyText;
+		}
+
 		private void Update()
 		{
 			if (contractInterface == null)
+				return;
+
+			if (parent == null)
+				return;
+
+			if (contractInterface.IsHidden && !parent.MissionInterface.ShowHidden)
 				return;
 
 			if (contractInterface.ContractState != ContractState.Active)
 				ToggleToClose();
 
 			if (ContractTitle!= null)
-			{
-				ContractTitle.text = contractInterface.ContractTitle;
-
 				handleColors(stateColor(contractInterface.ContractState));
-			}
-
-			if (ContractRewardText != null)
-				ContractRewardText.text = contractInterface.RewardText;
-
-			if (ContractPenaltyText != null)
-				ContractPenaltyText.text = contractInterface.PenaltyText;
 
 			if (TimeRemaining != null)
 			{

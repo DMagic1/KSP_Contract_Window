@@ -116,6 +116,14 @@ namespace ContractsWindow.Unity.Unity
 			CreateContractSection(contract);
 		}
 
+		private CW_ContractSection GetContract(Guid id)
+		{
+			if (masterList.ContainsKey(id))
+				return masterList[id];
+
+			return null;
+		}
+
 		public void SwitchContract(Guid id, bool hidden)
 		{
 			if (id == null)
@@ -133,6 +141,52 @@ namespace ContractsWindow.Unity.Unity
 			{
 				ListRemove(hiddenContracts, id);
 				activeContracts.Add(id);
+			}
+		}
+
+		public void SortChildren(List<Guid> sortedList)
+		{
+			if (missionInterface == null)
+				return;
+
+			if (ContractSectionTransform == null)
+				return;
+
+			int l = sortedList.Count;
+
+			for (int i = l - 1; i >= 0; i--)
+			{
+				Guid id = sortedList[i];
+
+				CW_ContractSection c = GetContract(id);
+
+				if (c == null)
+					continue;
+
+				c.transform.SetParent(null);
+			}			
+
+			for (int i = 0; i < l; i++)
+			{
+				Guid id = sortedList[i];
+
+				CW_ContractSection c = GetContract(id);
+
+				if (c == null)
+					continue;
+
+				c.transform.SetParent(ContractSectionTransform);
+			}
+		}
+
+		public void UpdateChildren()
+		{
+			foreach (CW_ContractSection contract in masterList.Values)
+			{
+				if (contract == null)
+					continue;
+
+				contract.UpdateContract();
 			}
 		}
 

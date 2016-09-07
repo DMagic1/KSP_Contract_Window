@@ -279,7 +279,7 @@ namespace ContractsWindow.Unity.Unity
 			if (SortPrefab == null)
 				return;
 
-			if (windowInterface == null)
+			if (currentMission == null)
 				return;
 
 			GameObject obj = Instantiate(SortPrefab);
@@ -291,7 +291,7 @@ namespace ContractsWindow.Unity.Unity
 			if (sortObject == null)
 				return;
 
-			sortObject.setSort(this);
+			sortObject.setSort(this, currentMission.MissionInterface);
 		}
 
 		public void ToggleSortOrder(bool isOn)
@@ -596,6 +596,22 @@ namespace ContractsWindow.Unity.Unity
 			rect.sizeDelta = new Vector2(r.width, r.height);
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
+		}
+
+		public void SortMissionChildren(List<Guid> sorted)
+		{
+			if (currentMission == null)
+				return;
+
+			currentMission.SortChildren(sorted);
+		}
+
+		public void UpdateMissionChildren()
+		{
+			if (currentMission == null)
+				return;
+
+			currentMission.UpdateChildren();
 		}
 
 		public void FadeIn()

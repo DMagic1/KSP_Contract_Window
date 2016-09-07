@@ -72,6 +72,34 @@ namespace ContractsWindow.Unity.Unity
 				CreateSubParameters(parameterInterface.GetSubParams);
 		}
 
+		public void UpdateParameter()
+		{
+			if (parameterInterface == null)
+				return;
+
+			if (parameterInterface.ParameterState != ContractState.Complete)
+			{
+				for (int i = parameters.Count - 1; i >= 0; i--)
+				{
+					CW_ParameterSection param = parameters[i];
+
+					if (param == null)
+						return;
+
+					param.UpdateParameter();
+				}
+			}
+
+			if (ParameterText == null || ParameterRewardText == null || ParameterPenaltyText == null)
+				return;
+
+			ParameterText.text = parameterInterface.TitleText;
+
+			ParameterRewardText.text = parameterInterface.RewardText;
+
+			ParameterPenaltyText.text = parameterInterface.PenaltyText;
+		}
+
 		public void ToggleSubParams(bool isOn)
 		{
 			if (parameterInterface == null)
@@ -108,12 +136,8 @@ namespace ContractsWindow.Unity.Unity
 					ToggleSubParams(true);
 			}
 			
-			if (ParameterText == null)
-				return;
-
-			ParameterText.text = parameterInterface.TitleText;
-
-			ParameterText.color = stateColor(oldState);
+			if (ParameterText != null)
+				ParameterText.color = stateColor(oldState);
 		}
 
 		public void ToggleNote(bool isOn)
