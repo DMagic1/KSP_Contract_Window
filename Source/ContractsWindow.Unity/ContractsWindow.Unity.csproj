@@ -80,6 +80,7 @@
     <Compile Include="Unity\CW_Style.cs" />
     <Compile Include="Unity\CW_Toolbar.cs" />
     <Compile Include="Unity\CW_Window.cs" />
+    <Compile Include="Unity\Tooltip.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
