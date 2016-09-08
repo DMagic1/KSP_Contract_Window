@@ -52,7 +52,7 @@ namespace ContractsWindow.PanelInterfaces
 		private List<Guid> hiddenMissionList;
 		private bool ascendingOrder = true;
 		private bool showActiveMissions = true;
-		private sortClass orderMode = sortClass.Difficulty;
+		private contractSortClass orderMode = contractSortClass.Difficulty;
 		private bool _masterMission;
 		private CW_MissionSection UIParent;
 
@@ -71,13 +71,29 @@ namespace ContractsWindow.PanelInterfaces
 		public bool ShowHidden
 		{
 			get { return !showActiveMissions; }
-			set { showActiveMissions = !value; }
+			set
+			{
+				showActiveMissions = !value;
+
+				if (contractWindow.Instance == null)
+					return;
+
+				contractWindow.Instance.RefreshContracts();
+			}
 		}
 
 		public bool DescendingOrder
 		{
 			get { return !ascendingOrder; }
-			set { ascendingOrder = !value; }
+			set
+			{
+				ascendingOrder = !value;
+
+				if (contractWindow.Instance == null)
+					return;
+
+				contractWindow.Instance.RefreshContracts();
+			}
 		}
 		
 		public string MissionTitle
@@ -119,6 +135,16 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get { return new List<IContractSection>(contractList.Values.ToArray()); }
 		}
+
+		public void SetSort(int i)
+		{
+			orderMode = (contractSortClass)i;
+
+			if (contractWindow.Instance == null)
+				return;
+
+			contractWindow.Instance.RefreshContracts();
+		}
 		
 		public void RemoveContract(IContractSection contract)
 		{
@@ -138,6 +164,8 @@ namespace ContractsWindow.PanelInterfaces
 		public void SetMission()
 		{
 			contractScenario.Instance.setCurrentMission(_missionTitle);
+
+			contractWindow.Instance.setMission(this);
 		}
 
 		public void SetParent(CW_MissionSection m)
@@ -194,7 +222,7 @@ namespace ContractsWindow.PanelInterfaces
 			internal set { showActiveMissions = value; }
 		}
 
-		public sortClass OrderMode
+		public contractSortClass OrderMode
 		{
 			get { return orderMode; }
 			internal set { orderMode = value; }
@@ -217,7 +245,7 @@ namespace ContractsWindow.PanelInterfaces
 			ascendingOrder = asc;
 			showActiveMissions = showActive;
 			_masterMission = Master;
-			orderMode = (sortClass)sMode;
+			orderMode = (contractSortClass)sMode;
 			contractList = new Dictionary<Guid, contractUIObject>();
 			activeMissionList = new List<Guid>();
 			hiddenMissionList = new List<Guid>();
