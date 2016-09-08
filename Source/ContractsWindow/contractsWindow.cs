@@ -963,14 +963,14 @@ namespace ContractsWindow
 					popupRect = new Rect(10, 20, 80 + size * 15, 132 + size * 23);
 					GUI.Box(popupRect, "", contractSkins.dropDown);
 
-					var sortTypes = Enum.GetNames(typeof(sortClass));
+					var sortTypes = Enum.GetNames(typeof(contractSortClass));
 
 					for (int i = 0; i < sortTypes.Length; i++)
 					{
 						if (GUI.Button(new Rect(popupRect.x + 2, popupRect.y + 2 + ((21 + size * 4) * i), popupRect.width - 4, 20 + size * 5), sortTypes[i], contractSkins.sortMenu))
 						{
 							showSort = false;
-							currentMission.OrderMode = (sortClass)Enum.Parse(typeof(sortClass), sortTypes[i]);
+							currentMission.OrderMode = (contractSortClass)Enum.Parse(typeof(contractSortClass), sortTypes[i]);
 							refreshContracts(cList);
 							toggleProgress = false;
 						}
@@ -2049,7 +2049,7 @@ namespace ContractsWindow
 		}
 
 		//Function to sort the list based on several criteria
-		private List<Guid> sortList(List<Guid> gID, sortClass s, bool Asc)
+		private List<Guid> sortList(List<Guid> gID, contractSortClass s, bool Asc)
 		{
 			List<contractUIObject> cL = new List<contractUIObject>();
 			//Only add non-pinned contracts to the sort list
@@ -2064,22 +2064,22 @@ namespace ContractsWindow
 			}
 			switch (s)
 			{
-				case sortClass.Expiration:
+				case contractSortClass.Expiration:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Duration.CompareTo(b.Container.Duration), a.Container.Title.CompareTo(b.Container.Title)));
 					break;
-				case sortClass.Acceptance:
+				case contractSortClass.Acceptance:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Root.DateAccepted.CompareTo(b.Container.Root.DateAccepted), a.Container.Title.CompareTo(b.Container.Title)));
 					break;
-				case sortClass.Reward:
+				case contractSortClass.Reward:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.TotalReward.CompareTo(b.Container.TotalReward), a.Container.Title.CompareTo(b.Container.Title)));
 					break;
-				case sortClass.Difficulty:
+				case contractSortClass.Difficulty:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Root.Prestige.CompareTo(b.Container.Root.Prestige), a.Container.Title.CompareTo(b.Container.Title)));
 					break;
-				case sortClass.Planet:
+				case contractSortClass.Planet:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.TargetPlanet.CompareTo(b.Container.TargetPlanet), a.Container.Title.CompareTo(b.Container.Title)));
 					break;
-				case sortClass.Type:
+				case contractSortClass.Type:
 					cL.Sort((a, b) => RUIutils.SortAscDescPrimarySecondary(Asc, a.Container.Root.GetType().Name.CompareTo(b.Container.Root.GetType().Name), a.Container.Title.CompareTo(b.Container.Title)));
 					cL = typeSort(cL, Asc);
 					break;
@@ -2272,18 +2272,4 @@ namespace ContractsWindow
 		#endregion
 
 	}
-
-	#region SortClass
-
-	public enum sortClass
-	{
-		Difficulty = 1,
-		Expiration = 2,
-		Acceptance = 3,
-		Reward = 4,
-		Type = 5,
-		Planet = 6,
-	}
-
-	#endregion
 }
