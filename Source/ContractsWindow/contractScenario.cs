@@ -98,11 +98,25 @@ namespace ContractsWindow
 
 		internal contractsWindow cWin;
 
+		private contractWindow _cWin;
+
+		public contractWindow CWin
+		{
+			get { return _cWin; }
+		}
+
 		private string infoVersion;
 
 		public string InfoVersion
 		{
 			get { return infoVersion; }
+		}
+
+		private static Texture stockIcon;
+
+		public static Texture StockIcon
+		{
+			get { return stockIcon; }
 		}
 
 		//A count of all active contracts as determined by manually checking the Game config node
@@ -262,6 +276,9 @@ namespace ContractsWindow
 
 		private void Start()
 		{
+			if (stockIcon == null)
+				stockIcon = contractLoader.Images.LoadAsset<Texture>("toolbar_icon");
+
 			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
 			switch (ainfoV == null)
@@ -270,15 +287,24 @@ namespace ContractsWindow
 				default: infoVersion = ainfoV.InformationalVersion; break;
 			}
 
-			//Start the window object
 			try
 			{
-				cWin = gameObject.AddComponent<contractsWindow>();
+				_cWin = gameObject.AddComponent<contractWindow>();
 			}
 			catch (Exception e)
 			{
 				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
 			}
+
+			////Start the window object
+			//try
+			//{
+			//	cWin = gameObject.AddComponent<contractsWindow>();
+			//}
+			//catch (Exception e)
+			//{
+			//	DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
+			//}
 
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
@@ -297,6 +323,8 @@ namespace ContractsWindow
 		//Remove our contract window object
 		private void OnDestroy()
 		{
+			if (_cWin != null)
+				Destroy(_cWin);
 			if (cWin != null)
 				Destroy(cWin);
 			if (appLauncherButton != null)
@@ -308,6 +336,24 @@ namespace ContractsWindow
 	#endregion
 
 		#region utilities
+
+		internal void toggleToolbars(bool useStock)
+		{
+			if (useStock)
+			{
+				if (blizzyToolbarButton != null)
+					Destroy(blizzyToolbarButton);
+
+				blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
+			}
+			else if (ToolbarManager.ToolbarAvailable)
+			{
+				if (appLauncherButton != null)
+					Destroy(appLauncherButton);
+
+				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
+			}
+		}
 
 		internal static int currentScene(GameScenes s)
 		{
@@ -618,7 +664,7 @@ namespace ContractsWindow
 			int i = currentScene(HighLogic.LoadedScene);
 			windowPos[i * 4] = (int)source.x;
 			windowPos[(i * 4) + 1] = (int)source.y;
-			windowPos[(i * 4) + 2] = (int)source.width - (windowSize * 30);
+			windowPos[(i * 4) + 2] = (int)source.width;
 			windowPos[(i * 4) + 3] = (int)source.height;
 		}
 
@@ -626,7 +672,6 @@ namespace ContractsWindow
 		{
 			int i = currentScene(HighLogic.LoadedScene);
 			windowRects[i] = new Rect(window[0], window[1], window[2], window[3]);
-			windowRects[i].width += (windowSize * 30);
 		}
 
 		#endregion
