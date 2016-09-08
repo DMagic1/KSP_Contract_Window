@@ -182,12 +182,19 @@ namespace ContractsWindow.PanelInterfaces
 			get { return _order != null; }
 			set
 			{
+				if (contractWindow.Instance == null)
+					return;
+
 				if (value)
 				{
+					_order = contractWindow.Instance.GetNextPin();
 
+					contractWindow.Instance.SetPinState(_id);
 				}
 				else
 					_order = null;
+
+				contractWindow.Instance.RefreshContracts();
 			}
 		}
 
