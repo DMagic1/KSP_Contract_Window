@@ -6,7 +6,7 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IStandardNode
 	{
-		bool IsVisible { get; }
+		bool IsComplete { get; }
 
 		string NodeText { get; }
 
