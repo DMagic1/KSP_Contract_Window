@@ -14,19 +14,22 @@ namespace ContractsWindow.Unity.Unity
 		private Text Reward = null;
 
 		private IIntervalNode intervalInterface;
+		private int interval;
 
-		public void setNode(IIntervalNode node)
+		public void setNode(IIntervalNode node, int i)
 		{
 			if (node == null)
 				return;
 
 			intervalInterface = node;
 
+			interval = i;
+
 			if (Title != null)
 				Title.text = getTitle();
 
 			if (Reward != null)
-				Reward.text = node.RewardText;
+				Reward.text = node.RewardText(i);
 		}
 
 		private string getTitle()
@@ -34,7 +37,7 @@ namespace ContractsWindow.Unity.Unity
 			if (intervalInterface == null)
 				return "";
 
-			return string.Format("{0} Record {1}: {2}", intervalInterface.NodeTitle, intervalInterface.NodeOrder, intervalInterface.NodeValue);
+			return string.Format("{0} Record {1}: {2}", intervalInterface.NodeTitle, interval, intervalInterface.NodeValue(interval));
 		}
 	}
 }

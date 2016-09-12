@@ -15,24 +15,35 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform IntervalTransform = null;
 
-		private IIntervalType intervalInterface;
 		private List<CW_IntervalNode> nodes = new List<CW_IntervalNode>();
+		private IIntervalNode intervalInterface;
 
-		public void setIntervalType(IIntervalType type)
+		public IIntervalNode IntervalInterface
 		{
-			if (type == null)
+			get { return intervalInterface; }
+		}
+
+		public void setIntervalType(IIntervalNode node)
+		{
+			if (node == null)
 				return;
 
-			intervalInterface = type;
-
+			intervalInterface = node;
+			
 			if (IntervalType != null)
-				IntervalType.text = type.IntervalName;
+				IntervalType.text = node.NodeTitle;
 
-			CreateIntervalNodes(type.GetNodes);
+			CreateIntervalNodes(node);
 		}
 
 		public void NodesOn(bool isOn)
 		{
+			if (intervalInterface == null)
+				return;
+
+			if (!intervalInterface.IsReached)
+				return;
+
 			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				CW_IntervalNode node = nodes[i];
@@ -40,32 +51,24 @@ namespace ContractsWindow.Unity.Unity
 				if (node == null)
 					continue;
 
-				node.gameObject.SetActive(isOn);
+				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval - 1 >= i);
 			}
 		}
 
-		private void CreateIntervalNodes(IList<IIntervalNode> nodes)
+		private void CreateIntervalNodes(IIntervalNode node)
 		{
-			if (nodes == null)
+			if (node == null)
 				return;
 
-			if (IntervalTransform == null || IntervalPrefab == null)
-				return;
-
-			for (int i = nodes.Count - 1; i >= 0; i--)
+			for (int i = 0; i < node.Intervals; i++)
 			{
-				IIntervalNode node = nodes[i];
-
-				if (node == null)
-					continue;
-
-				CreateIntervalNode(node);
+				CreateIntervalNode(node, i);
 			}
 		}
 
-		private void CreateIntervalNode(IIntervalNode node)
-		{
-			if (intervalInterface == null)
+		private void CreateIntervalNode(IIntervalNode node, int i)
+		{			
+			if (IntervalTransform == null || IntervalPrefab == null)
 				return;
 
 			GameObject obj = Instantiate(IntervalPrefab);
@@ -80,19 +83,19 @@ namespace ContractsWindow.Unity.Unity
 			if (nodeObject == null)
 				return;
 
-			nodeObject.setNode(node);
+			nodeObject.setNode(node, i);
 
 			nodes.Add(nodeObject);
 
 			nodeObject.gameObject.SetActive(false);
 		}
 
-		public void AddIntervalNode(IIntervalNode node)
-		{
-			if (node == null)
-				return;
+		//public void AddIntervalNode(IIntervalNode node)
+		//{
+		//	if (node == null)
+		//		return;
 
-			CreateIntervalNode(node);
-		}
+		//	CreateIntervalNode(node);
+		//}
 	}
 }
