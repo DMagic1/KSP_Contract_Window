@@ -26,5 +26,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.7.0")]
 [assembly: AssemblyInformationalVersion("v7.0")]
 [assembly: KSPAssembly("Contracts_Window", 7, 0)]
-[assembly: KSPAssemblyDependency("Progress Parser", 0, 5)]
-[assembly: KSPAssemblyDependency("Contract Parser", 0, 4)]
+[assembly: KSPAssemblyDependency("Progress Parser", 0, 6)]
+[assembly: KSPAssemblyDependency("Contract Parser", 0, 5)]
