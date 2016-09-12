@@ -25,7 +25,7 @@ namespace ContractsWindow
 			string path = KSPUtil.ApplicationRootPath + "GameData/DMagicUtilities/ContractsWindow/Resources";
 
 			images = AssetBundle.CreateFromFile(path + "/cw_images.ksp");
-			prefabs = AssetBundle.CreateFromFile(path + "/cw_prefabs.ksp");
+			prefabs = AssetBundle.CreateFromFile(path + "/contracts_window_prefabs.ksp");
 		}
 	}
 }
