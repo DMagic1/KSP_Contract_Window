@@ -12,17 +12,11 @@ namespace ContractsWindow.Unity.Unity
 		private Text NewMissionName = null;
 
 		private IMissionSection missionInterface;
-		private CW_Window parent;
 
-		public void setMission(IMissionSection mission, CW_Window p)
+		public void setMission(IMissionSection mission)
 		{
 			if (mission == null)
 				return;
-
-			if (p == null)
-				return;
-
-			parent = p;
 
 			missionInterface = mission;
 		}
@@ -37,10 +31,10 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.MissionTitle = NewMissionName.text;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void DeleteMission()
@@ -50,10 +44,10 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.RemoveMission();
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }

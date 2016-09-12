@@ -17,29 +17,26 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Text SliderValue = null;
 
-		private CW_Window parent;
 		bool loaded;
 
-		public void setScalar(CW_Window p)
+		public void setScalar()
 		{
 			if (SliderScale == null || FontToggle == null || ScaleToggle == null || SliderValue == null)
 				return;
 
-			if (p == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			parent = p;
+			FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
 
-			FontToggle.isOn = parent.Interface.LargeFont;
+			ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
 
-			ScaleToggle.isOn = parent.Interface.IgnoreScale;
+			SliderValue.text = CW_Window.Window.Interface.Scale.ToString("P0");
 
-			SliderValue.text = parent.Interface.Scale.ToString("P0");
-
-			SliderScale.value = parent.Interface.Scale * 10;
+			SliderScale.value = CW_Window.Window.Interface.Scale * 10;
 
 			loaded = true;
 		}
@@ -49,13 +46,15 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			parent.Interface.LargeFont = isOn;
+			CW_Window.Window.Interface.LargeFont = isOn;
+
+			CW_Window.Window.UpdateFontSize(isOn ? 1 : -1);
 		}
 
 		public void IgnoreScale(bool isOn)
@@ -63,18 +62,18 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			parent.Interface.IgnoreScale = isOn;
+			CW_Window.Window.Interface.IgnoreScale = isOn;
 
 			if (isOn)
-				parent.transform.localScale /= parent.Interface.MasterScale;
+				CW_Window.Window.transform.localScale /= CW_Window.Window.Interface.MasterScale;
 			else
-				parent.transform.localScale *= parent.Interface.MasterScale;
+				CW_Window.Window.transform.localScale *= CW_Window.Window.Interface.MasterScale;
 		}
 
 		public void SliderValueChange(float value)
@@ -82,10 +81,10 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
 			float f = value / 10;
@@ -93,17 +92,17 @@ namespace ContractsWindow.Unity.Unity
 			if (SliderValue != null)
 				SliderValue.text = f.ToString("P0");
 
-			parent.Interface.Scale = f;
+			CW_Window.Window.Interface.Scale = f;
 
-			parent.transform.localScale *= f;
+			CW_Window.Window.transform.localScale *= f;
 		}
 
 		public void Close()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }

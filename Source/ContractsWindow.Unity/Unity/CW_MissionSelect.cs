@@ -13,17 +13,10 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform MissionObjectTransform = null;
 
-		private CW_Window parent;
-
-		public void setMission(IList<IMissionSection> missions, CW_Window window)
+		public void setMission(IList<IMissionSection> missions)
 		{
 			if (missions == null)
 				return;
-
-			if (window == null)
-				return;
-
-			parent = window;
 
 			CreateMissionSections(missions);
 		}
@@ -69,10 +62,10 @@ namespace ContractsWindow.Unity.Unity
 
 		public void DestroyPanel()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 	}

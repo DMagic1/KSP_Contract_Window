@@ -9,24 +9,18 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_SortMenu : CW_Popup
 	{
 		private IMissionSection missionInterface;
-		private CW_Window parent;
 
-		public void setSort(CW_Window p, IMissionSection m)
+		public void setSort(IMissionSection m)
 		{
-			if (p == null)
-				return;
-
 			if (m == null)
 				return;
-
-			parent = p;
 
 			missionInterface = m;
 		}
 
 		public void SortDifficulty()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -34,12 +28,12 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(0);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void SortExpiration()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -47,12 +41,12 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(1);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void SortAccept()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -60,12 +54,12 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(2);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void SortReward()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -73,12 +67,12 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(3);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void SortType()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -86,12 +80,12 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(4);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 
 		public void SortPlanet()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
 			if (missionInterface == null)
@@ -99,7 +93,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(5);
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }

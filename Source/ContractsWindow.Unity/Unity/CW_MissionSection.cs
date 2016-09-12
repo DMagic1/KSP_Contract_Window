@@ -16,7 +16,6 @@ namespace ContractsWindow.Unity.Unity
 
 		private string missionTitle;
 		private IMissionSection missionInterface;
-		private CW_Window window;
 		private List<Guid> activeContracts = new List<Guid>();
 		private List<Guid> hiddenContracts = new List<Guid>();
 		private Dictionary<Guid, CW_ContractSection> masterList = new Dictionary<Guid, CW_ContractSection>();
@@ -37,22 +36,14 @@ namespace ContractsWindow.Unity.Unity
 			get { return missionInterface; }
 		}
 
-		public void setMission(IMissionSection section, CW_Window parent)
+		public void setMission(IMissionSection section)
 		{
 			if (section == null)
-				return;
-
-			if (parent == null)
-				return;
-
-			if (parent.Interface == null)
 				return;
 
 			missionInterface = section;
 
 			missionTitle = missionInterface.MissionTitle;
-
-			window = parent;
 
 			CreateContractSections(section.GetContracts);
 		}
@@ -63,6 +54,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (ContractSectionPrefab == null || ContractSectionTransform == null)
+				return;
+
+			if (CW_Window.Window == null)
 				return;
 
 			for (int i = contracts.Count - 1; i >= 0; i--)
@@ -93,7 +87,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contractObject == null)
 				return;
 
-			contractObject.setContract(contract, window, this);
+			contractObject.setContract(contract, CW_Window.Window, this);
 
 			if (contract.IsHidden)
 				hiddenContracts.Add(contract.ID);
@@ -114,6 +108,30 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			CreateContractSection(contract);
+
+			if (CW_Window.Window == null)
+				return;
+
+			if (CW_Window.Window.Interface == null)
+				return;
+
+			CW_ContractSection section = GetContract(contract.ID);
+
+			if (section == null)
+				return;
+
+			var texts = section.GetComponentsInChildren<Text>();
+
+			for (int i = texts.Length - 1; i >= 0; i--)
+			{
+				Text t = texts[i];
+
+				if (t == null)
+					continue;
+
+				t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
+			}
+
 		}
 
 		private CW_ContractSection GetContract(Guid id)
@@ -197,6 +215,9 @@ namespace ContractsWindow.Unity.Unity
 
 			if (ListRemove(activeContracts, id) || ListRemove(hiddenContracts, id))
 				RemoveFromMasterList(id);
+			
+			if (CW_Window.Window != null)
+				CW_Window.Window.UpdateTooltips();
 		}
 
 		private void RemoveFromMasterList(Guid id)

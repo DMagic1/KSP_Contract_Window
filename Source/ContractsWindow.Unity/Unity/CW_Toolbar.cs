@@ -13,28 +13,24 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle StockReplace = null;
 
-		private CW_Window parent;
-
-		public void setToolbar(CW_Window p)
+		public void setToolbar()
 		{
-			if (p == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (p.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
-
-			parent = p;
 
 			if (StockToggle == null)
 				return;
 
-			if (!p.Interface.BlizzyAvailable)
+			if (!CW_Window.Window.Interface.BlizzyAvailable)
 				StockToggle.gameObject.SetActive(false);
 
 			if (StockReplace == null)
 				return;
 
-			if (!p.Interface.StockToolbar)
+			if (!CW_Window.Window.Interface.StockToolbar)
 				StockReplace.gameObject.SetActive(false);
 		}
 
@@ -43,19 +39,19 @@ namespace ContractsWindow.Unity.Unity
 			if (StockToggle == null || StockReplace == null)
 				return;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			if (!parent.Interface.BlizzyAvailable)
+			if (!CW_Window.Window.Interface.BlizzyAvailable)
 			{
-				parent.Interface.StockToolbar = true;
+				CW_Window.Window.Interface.StockToolbar = true;
 				return;
 			}
 
-			parent.Interface.StockToolbar = isOn;
+			CW_Window.Window.Interface.StockToolbar = isOn;
 
 			StockToggle.gameObject.SetActive(isOn);
 		}
@@ -65,21 +61,21 @@ namespace ContractsWindow.Unity.Unity
 			if (StockReplace == null)
 				return;
 
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			parent.Interface.ReplaceToolbar = isOn;
+			CW_Window.Window.Interface.ReplaceToolbar = isOn;
 		}
 
 		public void Close()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }

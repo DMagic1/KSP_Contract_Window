@@ -13,19 +13,13 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform MissionObjectTransform = null;
 
-		private CW_Window parent;
 		private IContractSection contractInterface;
 
-		public void setMission(IList<IMissionSection> missions, IContractSection contract, CW_Window window)
+		public void setMission(IList<IMissionSection> missions, IContractSection contract)
 		{
 			if (missions == null || contract == null)
 				return;
-
-			if (window == null)
-				return;
-
-			parent = window;
-
+			
 			contractInterface = contract;
 
 			CreateMissionSections(missions);
@@ -72,20 +66,20 @@ namespace ContractsWindow.Unity.Unity
 
 		public void CreateNewMission()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
-
-			parent.showCreator(contractInterface);
+			
+			CW_Window.Window.showCreator(contractInterface);
 
 			DestroyPanel();
 		}
 
 		public void DestroyPanel()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }

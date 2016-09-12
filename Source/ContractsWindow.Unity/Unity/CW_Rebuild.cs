@@ -8,27 +8,17 @@ namespace ContractsWindow.Unity.Unity
 {
 	public class CW_Rebuild : CW_Popup
 	{
-		private CW_Window parent;
-
-		public void setInterface(CW_Window p)
-		{
-			if (p == null)
-				return;
-
-			parent = p;
-		}
-
 		public void Rebuild()
 		{
-			if (parent == null)
+			if (CW_Window.Window == null)
 				return;
 
-			if (parent.Interface == null)
+			if (CW_Window.Window.Interface == null)
 				return;
 
-			parent.Interface.Rebuild();
+			CW_Window.Window.Interface.Rebuild();
 
-			parent.DestroyChild(gameObject);
+			CW_Window.Window.DestroyChild(gameObject);
 		}
 	}
 }
