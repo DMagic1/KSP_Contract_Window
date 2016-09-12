@@ -8,12 +8,22 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; set; }
 
-		IList<IIntervalType> GetIntervalTypes { get; }
+		bool AnyInterval { get; }
+
+		bool AnyPOI { get; }
+
+		bool AnyStandard { get; }
+
+		bool AnyBody { get; }
+
+		bool AnyBodyNode(string s);
+
+		IList<IIntervalNode> GetIntervalNodes { get; }
 
 		IList<IStandardNode> GetPOINodes { get; }
 
 		IList<IStandardNode> GetStandardNodes { get; }
 
-		IList<IBodyNodes> GetBodies { get; }
+		Dictionary<string, List<IStandardNode>> GetBodies { get; }
 	}
 }
