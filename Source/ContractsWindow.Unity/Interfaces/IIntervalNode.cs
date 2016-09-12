@@ -5,12 +5,16 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IIntervalNode
 	{
+		bool IsReached { get; }
+
+		int Intervals { get; }
+		
+		int NodeInterval { get; }
+
 		string NodeTitle { get; }
 
-		string NodeValue { get; }
+		string NodeValue(int i);
 
-		string NodeOrder { get; }
-
-		string RewardText { get; }
+		string RewardText(int i);
 	}
 }
