@@ -21,6 +21,7 @@ namespace ContractsWindow.PanelInterfaces
 		private int timer;
 		private int sceneInt;
 		private contractMission currentMission;
+		private progressUIPanel progressPanel;
 		private CW_Window UIWindow;
 		private Rect windowPos;
 
@@ -653,17 +654,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void loadProgressLists()
 		{
-			//intervalNodes = progressParser.getAllIntervalNodes;
-			//standardNodes = progressParser.getAllStandardNodes;
-			//POInodes = progressParser.getAllPOINodes;
-			//bodyNodes = progressParser.getAllBodyNodes;
-
-			//bodySubNodes = new List<List<progressStandard>>(bodyNodes.Count);
-
-			//for (int i = 0; i < bodyNodes.Count; i++)
-			//{
-			//	bodySubNodes.Add(bodyNodes[i].getAllNodes);
-			//}
+			progressPanel = new progressUIPanel();
 		}
 
 		private void contractAccepted(Contract c)
