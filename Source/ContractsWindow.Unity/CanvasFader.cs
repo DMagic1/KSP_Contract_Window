@@ -42,8 +42,6 @@ namespace ContractsWindow.Unity
 		private float SlowRate = 0.9f;
 		[SerializeField]
 		private float FastRate = 0.3f;
-		[SerializeField]
-		private bool Popub = false;
 
 		private CanvasGroup canvas;
 		private RectTransform rect;
