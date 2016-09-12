@@ -72,13 +72,13 @@ namespace ContractsWindow.Unity.Unity
 		}
 
 		//Call this function externally to set the text of the template and activate the tooltip
-		public void SetTooltip(string ttext)
+		public void SetTooltip(string text)
 		{
 
 			if (_guiMode == RenderMode.ScreenSpaceCamera)
 			{
 				//set the text and fit the tooltip panel to the text size
-				_text.text = ttext;
+				_text.text = text;
 
 				_rectTransform.sizeDelta = new Vector2(_text.preferredWidth + 40f, _text.preferredHeight + 25f);
 
