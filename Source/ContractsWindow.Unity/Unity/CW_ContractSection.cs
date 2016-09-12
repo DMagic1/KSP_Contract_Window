@@ -186,7 +186,6 @@ namespace ContractsWindow.Unity.Unity
 				parent.RemoveContract(contractInterface.ID);
 
 				contractInterface.RemoveContractFromAll();
-
 				return;
 			}
 
