@@ -28,6 +28,11 @@ namespace ContractsWindow.Unity.Unity
 		private IStandardNode standardInterface;
 		private CW_Note note;
 
+		public IStandardNode StandardInterface
+		{
+			get { return standardInterface; }
+		}
+
 		public void setNode(IStandardNode node)
 		{
 			if (node == null)
