@@ -40,11 +40,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="ContractParser">
-      <HintPath>..\..\ContractParser\ContractParser\Output\ContractParser.dll</HintPath>
+      <HintPath>..\..\Contract Parser\Output\ContractParser.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ContractsWindow.Unity">
-      <HintPath>ContractsWindow.Unity\Output\ContractsWindow.Unity.dll</HintPath>
+      <HintPath>..\ContractsWindow.Unity\Output\ContractsWindow.Unity.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KSPUtil">
@@ -69,6 +69,7 @@
     <Compile Include="contractAssembly.cs" />
     <Compile Include="contractLoader.cs" />
     <Compile Include="contractSortClass.cs" />
+    <Compile Include="PanelInterfaces\BodyNodeUI.cs" />
     <Compile Include="PanelInterfaces\contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
@@ -81,7 +82,11 @@
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
     <Compile Include="Framework\MonoBehaviourWindow.cs" />
     <Compile Include="PanelInterfaces\contractWindow.cs" />
+    <Compile Include="PanelInterfaces\IntervalNodeUI.cs" />
+    <Compile Include="PanelInterfaces\IntervalTypeUI.cs" />
     <Compile Include="PanelInterfaces\parameterUIObject.cs" />
+    <Compile Include="PanelInterfaces\progressUIPanel.cs" />
+    <Compile Include="PanelInterfaces\StandardNodeUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\SkinsLibrary.cs" />
     <Compile Include="Toolbar\contractStockToolbar.cs" />
