@@ -9,14 +9,44 @@ namespace ContractsWindow.PanelInterfaces
 	{
 		private progressInterval node;
 
-		public string NodeOrder
+		public IntervalNodeUI(progressInterval n)
+		{
+			if (n == null)
+				return;
+
+			node = n;
+		}
+
+		public bool IsReached
 		{
 			get
 			{
 				if (node == null)
-					return "";
+					return false;
 
-				return node.Interval.ToString();
+				return node.IsReached;
+			}
+		}
+
+		public int Intervals
+		{
+			get
+			{
+				if (node == null)
+					return 0;
+
+				return node.TotalIntervals;
+			}
+		}
+
+		public int NodeInterval
+		{
+			get
+			{
+				if (node == null)
+					return 0;
+
+				return node.Interval;
 			}
 		}
 
@@ -31,28 +61,21 @@ namespace ContractsWindow.PanelInterfaces
 			}
 		}
 
-		public string NodeValue
+		public string NodeValue(int i)
 		{
-			get
-			{
-				if (node == null)
-					return "";
+			if (node == null)
+				return "";
 
-				return node.getRecord(node.Interval).ToString();
-			}
+			return node.getRecord(i).ToString();
 		}
 
-		public string RewardText
+		public string RewardText(int i)
 		{
-			get
-			{
-				if (node == null)
-					return "";
+			if (node == null)
+				return "";
 
-				int i = node.Interval;
-
-				return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", node.getFundsString(i), node.getScienceString(i), node.getRepString(i));
-			}
+			return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", node.getFundsString(i), node.getScienceString(i), node.getRepString(i));
 		}
+
 	}
 }
