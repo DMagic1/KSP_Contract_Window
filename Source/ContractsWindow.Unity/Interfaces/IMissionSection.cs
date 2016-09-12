@@ -11,6 +11,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		string ContractNumber { get; }
 
+		bool IsVisible { get; set; }
+
 		bool MasterMission { get; }
 
 		bool ContractContained(IContractSection contract);
