@@ -28,7 +28,7 @@ namespace ContractsWindow.Unity.Unity
 			if (BodyTitle != null)
 				BodyTitle.text = body.BodyName;
 
-			CreateBodyNodes(body.GetNodes());
+			CreateBodyNodes(body.GetNodes);
 		}
 
 		public void NodesOn(bool isOn)
@@ -72,8 +72,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			bodyInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(StandardTransform, false);
 

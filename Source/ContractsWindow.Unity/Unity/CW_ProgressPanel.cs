@@ -36,13 +36,13 @@ namespace ContractsWindow.Unity.Unity
 
 			panelInterface = panel;
 
-			CreateIntervalTypes(panel.GetIntervalTypes());
+			CreateIntervalTypes(panel.GetIntervalTypes);
 
-			CreateStandardNodes(panel.GetStandardNodes());
+			CreateStandardNodes(panel.GetStandardNodes);
 
-			CreatePOINodes(panel.GetPOINodes());
+			CreatePOINodes(panel.GetPOINodes);
 
-			CreateBodies(panel.GetBodies());
+			CreateBodies(panel.GetBodies);
 		}
 
 		public void SetProgressVisible(bool isOn)
@@ -133,8 +133,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			panelInterface.ProcessStyle(obj);
-
 			obj.transform.SetParent(IntervalTransform, false);
 
 			CW_IntervalTypes nodeObject = obj.GetComponent<CW_IntervalTypes>();
@@ -182,8 +180,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			panelInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(POITransform, false);
 
@@ -233,8 +229,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			panelInterface.ProcessStyle(obj);
-
 			obj.transform.SetParent(StandardTransform, false);
 
 			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
@@ -282,8 +276,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			panelInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(BodyTransform, false);
 

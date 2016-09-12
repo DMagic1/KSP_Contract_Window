@@ -41,7 +41,7 @@ namespace ContractsWindow.Unity.Unity
 			if (Reward != null)
 				Reward.text = node.RewardText;
 
-			if (node.HasNote)
+			if (!string.IsNullOrEmpty(node.GetNote))
 				setNote();
 			else if (NoteToggle != null)
 				NoteToggle.gameObject.SetActive(false);
@@ -59,8 +59,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			standardInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(NoteTransform, false);
 

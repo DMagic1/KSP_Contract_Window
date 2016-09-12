@@ -28,7 +28,7 @@ namespace ContractsWindow.Unity.Unity
 			if (IntervalType != null)
 				IntervalType.text = type.IntervalName;
 
-			CreateIntervalNodes(type.GetNodes());
+			CreateIntervalNodes(type.GetNodes);
 		}
 
 		public void NodesOn(bool isOn)
@@ -72,8 +72,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			intervalInterface.ProcessStyle(obj);
 
 			obj.transform.SetParent(IntervalTransform, false);
 
