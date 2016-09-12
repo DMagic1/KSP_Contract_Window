@@ -18,10 +18,6 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Button MissionEdit = null;
 		[SerializeField]
-		private float fastFadeDuration = 0.2f;
-		[SerializeField]
-		private float slowFadeDuration = 0.5f;
-		[SerializeField]
 		private GameObject MissionSectionPrefab = null;
 		[SerializeField]
 		private Transform MissionSectionTransform = null;
@@ -59,10 +55,20 @@ namespace ContractsWindow.Unity.Unity
 
 		private Dictionary<string, CW_MissionSection> missions = new Dictionary<string, CW_MissionSection>();
 		private CW_MissionSection currentMission;
+		private CW_MissionSection masterMission;
 		private CW_ProgressPanel progressPanel;
+
+		private List<TooltipHandler> tooltips = new List<TooltipHandler>();
 
 		private ICW_Window windowInterface;
 		private bool loaded;
+
+		private static CW_Window window;
+
+		public static CW_Window Window
+		{
+			get { return window; }
+		}
 
 		public ICW_Window Interface
 		{
@@ -73,12 +79,16 @@ namespace ContractsWindow.Unity.Unity
 		{
 			base.Awake();
 
+			window = this;
+
 			rect = GetComponent<RectTransform>();
 		}
 
 		private void Start()
 		{
-			Alpha(1);
+			Alpha(0);
+
+			Fade(1, true, true, true);
 		}
 
 		public void setWindow(ICW_Window window)
@@ -94,6 +104,10 @@ namespace ContractsWindow.Unity.Unity
 			CreateMissionSections(window.GetMissions);
 
 			CreateProgressSection(window.GetProgress);
+
+			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
+
+			UpdateFontSize(window.LargeFont ? 1 : 0);
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -157,7 +171,7 @@ namespace ContractsWindow.Unity.Unity
 			if (missionObject == null)
 				return;
 
-			missionObject.setMission(mission, this);
+			missionObject.setMission(mission);
 
 			missions.Add(mission.MissionTitle, missionObject);
 
@@ -291,7 +305,7 @@ namespace ContractsWindow.Unity.Unity
 			if (sortObject == null)
 				return;
 
-			sortObject.setSort(this, currentMission.MissionInterface);
+			sortObject.setSort(currentMission.MissionInterface);
 		}
 
 		public void ToggleSortOrder(bool isOn)
@@ -341,7 +355,7 @@ namespace ContractsWindow.Unity.Unity
 			if (selectorObject == null)
 				return;
 
-			selectorObject.setMission(windowInterface.GetMissions, this);
+			selectorObject.setMission(windowInterface.GetMissions);
 		}
 
 		public void showCreator(IContractSection contract)
@@ -364,7 +378,7 @@ namespace ContractsWindow.Unity.Unity
 			if (creatorObject == null)
 				return;
 
-			creatorObject.setPanel(this, contract);
+			creatorObject.setPanel(contract);
 		}
 
 		public void showEditor()
@@ -387,7 +401,7 @@ namespace ContractsWindow.Unity.Unity
 			if (editorObject == null)
 				return;
 
-			editorObject.setMission(currentMission.MissionInterface, this);
+			editorObject.setMission(currentMission.MissionInterface);
 		}
 
 		public void ToggleTooltips(bool isOn)
@@ -396,6 +410,16 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			windowInterface.HideTooltips = isOn;
+
+			for (int i = tooltips.Count - 1; i >= 0; i--)
+			{
+				TooltipHandler t = tooltips[i];
+
+				if (t == null)
+					continue;
+
+				t.IsActive = isOn;
+			}
 		}
 
 		public void showRefresh()
@@ -409,13 +433,6 @@ namespace ContractsWindow.Unity.Unity
 			GameObject obj = Instantiate(RebuildPrefab);
 
 			obj.transform.SetParent(transform, false);
-
-			CW_Rebuild rebuildObject = obj.GetComponent<CW_Rebuild>();
-
-			if (rebuildObject == null)
-				return;
-
-			rebuildObject.setInterface(this);
 		}
 
 		public void showScale()
@@ -435,7 +452,7 @@ namespace ContractsWindow.Unity.Unity
 			if (scalarObject == null)
 				return;
 
-			scalarObject.setScalar(this);
+			scalarObject.setScalar();
 		}
 
 		public void showToolbar()
@@ -455,7 +472,7 @@ namespace ContractsWindow.Unity.Unity
 			if (toolbarObject == null)
 				return;
 
-			toolbarObject.setToolbar(this);
+			toolbarObject.setToolbar();
 		}
 
 		public void ShowAgentWindow(IContractSection contract)
@@ -495,7 +512,7 @@ namespace ContractsWindow.Unity.Unity
 			if (adderObject == null)
 				return;
 
-			adderObject.setMission(windowInterface.GetMissions, contract, this);
+			adderObject.setMission(windowInterface.GetMissions, contract);
 		}
 
 		public void onResize(BaseEventData eventData)
@@ -614,19 +631,39 @@ namespace ContractsWindow.Unity.Unity
 			currentMission.UpdateChildren();
 		}
 
+		public void UpdateTooltips()
+		{
+			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
+		}
+
+		public void UpdateFontSize(int s)
+		{
+			var texts = GetComponentsInChildren<Text>();
+
+			for (int i = texts.Length - 1; i >= 0; i--)
+			{
+				Text t = texts[i];
+
+				if (t == null)
+					continue;
+
+				t.fontSize += s;
+			}
+		}
+
 		public void FadeIn()
 		{
-			Fade(1, fastFadeDuration);
+			Fade(1, true, false);
 		}
 
 		public void FadeOut()
 		{
-			Fade(0.6f, slowFadeDuration);
+			Fade(0.6f, false, false);
 		}
 
 		public void Close()
 		{
-			Fade(0, fastFadeDuration, Hide);
+			Fade(0, true, true, false, Hide);
 		}
 
 		private void Hide()
