@@ -9,7 +9,24 @@ namespace ContractsWindow.PanelInterfaces
 	{
 		private progressStandard node;
 
-		public bool IsVisible { get; }
+		public StandardNodeUI(progressStandard n)
+		{
+			if (n == null)
+				return;
+
+			node = n;
+		}
+
+		public bool IsComplete
+		{
+			get
+			{
+				if (node == null)
+					return false;
+
+				return node.IsComplete;
+			}
+		}
 
 		public string GetNote
 		{
@@ -39,6 +56,8 @@ namespace ContractsWindow.PanelInterfaces
 			{
 				if (node == null)
 					return "";
+
+				return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", node.FundsRewardString, node.SciRewardString, node.RepRewardString);
 			}
 		}
 	}
