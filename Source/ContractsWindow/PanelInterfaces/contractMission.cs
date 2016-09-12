@@ -123,6 +123,9 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void AddContract(IContractSection contract)
 		{
+			if (UIParent != null)
+				UIParent.AddContract(contract);
+
 			addContract(((contractUIObject)contract).Container, !contract.IsHidden, false);
 		}
 		
@@ -370,7 +373,7 @@ namespace ContractsWindow.PanelInterfaces
 			return null;
 		}
 
-		internal void addContract(contractContainer c, bool active, bool warn)
+		internal void addContract(contractContainer c, bool active, bool warn, bool addToUI = false)
 		{
 			if (!activeMissionList.Contains(c.Root.ContractGuid) && !hiddenMissionList.Contains(c.Root.ContractGuid))
 			{
@@ -386,11 +389,17 @@ namespace ContractsWindow.PanelInterfaces
 				DMC_MBE.LogFormatted("Mission List Already Contains Contract: {0}", c.Title);
 		}
 
-		private bool addToMasterList(contractContainer c)
+		private bool addToMasterList(contractContainer c, bool add = false)
 		{
 			if (!contractList.ContainsKey(c.Root.ContractGuid))
 			{
-				contractList.Add(c.Root.ContractGuid, new contractUIObject(c, this));
+				contractUIObject cUI = new contractUIObject(c, this);
+
+				contractList.Add(c.Root.ContractGuid, cUI);
+
+				if (add && UIParent != null)
+					UIParent.AddContract(cUI);
+
 				return true;
 			}
 			else
