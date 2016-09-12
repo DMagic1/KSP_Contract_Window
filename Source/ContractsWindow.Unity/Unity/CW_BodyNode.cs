@@ -14,25 +14,65 @@ namespace ContractsWindow.Unity.Unity
 		private GameObject StandardPrefab = null;
 		[SerializeField]
 		private Transform StandardTransform = null;
+		[SerializeField]
+		private Toggle BodyToggle = null;
 
-		private IBodyNodes bodyInterface;
 		private List<CW_StandardNode> nodes = new List<CW_StandardNode>();
+		private string bodyName;
 
-		public void setBodyType(IBodyNodes body)
+		public string BodyName
 		{
-			if (body == null)
+			get { return bodyName; }
+		}
+
+		public void setBodyType(string body, List<IStandardNode> nodes)
+		{
+			if (nodes.Count <= 0)
 				return;
 
-			bodyInterface = body;
+			bodyName = body;
 
 			if (BodyTitle != null)
-				BodyTitle.text = body.BodyName;
+				BodyTitle.text = body;
 
-			CreateBodyNodes(body.GetNodes);
+			CreateBodyNodes(nodes);
+
+			if (CW_ProgressPanel.Instance == null)
+				return;
+
+			if (CW_ProgressPanel.Instance.PanelInterface == null)
+				return;
+
+			if (BodyToggle != null)
+				BodyToggle.gameObject.SetActive(CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(body));
+		}
+
+		private void Update()
+		{
+			if (CW_ProgressPanel.Instance == null)
+				return;
+
+			if (CW_ProgressPanel.Instance.PanelInterface == null)
+				return;
+
+			if (!CW_ProgressPanel.Instance.PanelInterface.IsVisible)
+				return;
+
+			if (BodyToggle != null)
+				BodyToggle.gameObject.SetActive(CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName));
 		}
 
 		public void NodesOn(bool isOn)
 		{
+			if (CW_ProgressPanel.Instance == null)
+				return;
+
+			if (CW_ProgressPanel.Instance.PanelInterface == null)
+				return;
+
+			if (!CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName))
+				return;
+			
 			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				CW_StandardNode node = nodes[i];
@@ -40,7 +80,10 @@ namespace ContractsWindow.Unity.Unity
 				if (node == null)
 					continue;
 
-				node.gameObject.SetActive(isOn);
+				if (node.StandardInterface == null)
+					continue;
+
+				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
 			}
 		}
 
@@ -65,9 +108,6 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateBodyNode(IStandardNode node)
 		{
-			if (bodyInterface == null)
-				return;
-
 			GameObject obj = Instantiate(StandardPrefab);
 
 			if (obj == null)
@@ -87,7 +127,7 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.gameObject.SetActive(false);
 		}
 
-		public void AddIntervalBodyNode(IStandardNode node)
+		public void AddBodyNode(IStandardNode node)
 		{
 			if (node == null)
 				return;
