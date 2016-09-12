@@ -116,11 +116,6 @@ namespace ContractsWindow.PanelInterfaces
 			get { return currentMission; }
 		}
 
-		public IProgressPanel GetProgress
-		{
-			get { return null; }
-		}
-
 		public void NewMission(string title, Guid id)
 		{
 			if (string.IsNullOrEmpty(title))
@@ -655,6 +650,11 @@ namespace ContractsWindow.PanelInterfaces
 		private void loadProgressLists()
 		{
 			progressPanel = new progressUIPanel();
+
+			if (UIWindow == null)
+				return;
+
+			UIWindow.setupProgressPanel(progressPanel);
 		}
 
 		private void contractAccepted(Contract c)

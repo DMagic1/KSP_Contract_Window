@@ -103,11 +103,22 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateMissionSections(window.GetMissions);
 
-			CreateProgressSection(window.GetProgress);
-
 			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
 
-			UpdateFontSize(window.LargeFont ? 1 : 0);
+			UpdateFontSize(gameObject, window.LargeFont ? 1 : 0);
+		}
+
+		public void setupProgressPanel(IProgressPanel panel)
+		{
+			if (windowInterface == null)
+				return;
+
+			if (panel == null)
+				return;
+
+			CreateProgressSection(panel);
+
+			UpdateFontSize(progressPanel.gameObject, windowInterface.LargeFont ? 1 : 0);
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -636,9 +647,9 @@ namespace ContractsWindow.Unity.Unity
 			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
 		}
 
-		public void UpdateFontSize(int s)
+		public void UpdateFontSize(GameObject obj, int s)
 		{
-			var texts = GetComponentsInChildren<Text>();
+			var texts = obj.GetComponentsInChildren<Text>();
 
 			for (int i = texts.Length - 1; i >= 0; i--)
 			{
