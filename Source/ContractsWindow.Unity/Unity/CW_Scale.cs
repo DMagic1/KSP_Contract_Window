@@ -54,7 +54,7 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_Window.Window.Interface.LargeFont = isOn;
 
-			CW_Window.Window.UpdateFontSize(isOn ? 1 : -1);
+			CW_Window.Window.UpdateFontSize(CW_Window.Window.gameObject, isOn ? 1 : -1);
 		}
 
 		public void IgnoreScale(bool isOn)
