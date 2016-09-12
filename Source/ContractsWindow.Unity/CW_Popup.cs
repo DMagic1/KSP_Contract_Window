@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ContractsWindow.Unity
 {
-	public abstract class CW_Popup : MonoBehaviour
+	public abstract class CW_Popup : CanvasFader
 	{
 
 	}
