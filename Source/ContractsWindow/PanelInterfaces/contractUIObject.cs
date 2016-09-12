@@ -280,7 +280,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (m == null)
 					return;
 
-				m.removeContract(container);
+				m.RemoveContract(this);
 			}
 		}
 
