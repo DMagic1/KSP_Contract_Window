@@ -245,6 +245,8 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (missionInterface == null)
 				return;
+
+			missionInterface.IsVisible = isOn;
 			
 			gameObject.SetActive(isOn);
 		}
