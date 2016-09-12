@@ -8,14 +8,10 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		bool IsVisible { get; }
 
-		bool HasNote { get; }
-
 		string NodeText { get; }
 
 		string RewardText { get; }
 
 		string GetNote { get; }
-
-		void ProcessStyle(GameObject obj);
 	}
 }

@@ -9,8 +9,6 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		string IntervalName { get; }
 
-		IList<IIntervalNode> GetNodes();
-
-		void ProcessStyle(GameObject obj);
+		IList<IIntervalNode> GetNodes { get; }
 	}
 }

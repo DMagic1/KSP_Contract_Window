@@ -9,8 +9,6 @@ namespace ContractsWindow.Unity.Interfaces
 	{
 		string BodyName { get; }
 
-		IList<IStandardNode> GetNodes();
-
-		void ProcessStyle(GameObject obj);
+		IList<IStandardNode> GetNodes { get; }
 	}
 }
