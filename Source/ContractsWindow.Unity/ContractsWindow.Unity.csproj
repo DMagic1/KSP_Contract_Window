@@ -45,11 +45,9 @@
     <Compile Include="CanvasFader.cs" />
     <Compile Include="ContractState.cs" />
     <Compile Include="CW_Popup.cs" />
-    <Compile Include="Interfaces\IBodyNodes.cs" />
     <Compile Include="Interfaces\IContractSection.cs" />
     <Compile Include="Interfaces\ICW_Window.cs" />
     <Compile Include="Interfaces\IIntervalNode.cs" />
-    <Compile Include="Interfaces\IIntervalType.cs" />
     <Compile Include="Interfaces\IMissionSection.cs" />
     <Compile Include="Interfaces\IParameterSection.cs" />
     <Compile Include="Interfaces\IProgressPanel.cs" />
@@ -86,8 +84,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Users\DMagic\Documents\KSP\Contracts\Contracts Plus\Unity\Contracts Window Plus\Assets\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
