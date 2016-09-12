@@ -252,7 +252,7 @@ namespace ContractsWindow.PanelInterfaces
 					{
 						cC.Duration = cC.Root.DateDeadline - Planetarium.GetUniversalTime();
 						//Calculate time in day values using Kerbin or Earth days
-						cC.DaysToExpire = cC.timeInDays(cC.Duration);
+						//cC.DaysToExpire = cC.timeInDays(cC.Duration);
 					}
 
 					cC.Title = cC.Root.Title;
@@ -677,12 +677,12 @@ namespace ContractsWindow.PanelInterfaces
 			contractContainer cC = contractParser.getActiveContract(c.ContractGuid);
 			if (cC != null)
 			{
-				currentMission.addContract(cC, true, true);
-				//if (currentMission.ShowActiveMissions)
-				//	refreshContracts(cList);
+				currentMission.addContract(cC, true, true, true);
+				if (currentMission.ShowActiveMissions)
+					refreshContracts(cList);
 
 				if (!currentMission.MasterMission)
-					contractScenario.Instance.MasterMission.addContract(cC, true, true);
+					contractScenario.Instance.MasterMission.addContract(cC, true, true, true);
 			}
 		}
 	}
