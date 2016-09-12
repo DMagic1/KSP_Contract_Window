@@ -42,6 +42,7 @@ namespace ContractsWindow.PanelInterfaces
 	/// </summary>
 	public class contractMission : IMissionSection
 	{
+		private bool _isVisible;
 		private string _missionTitle;
 		private string activeString;
 		private string hiddenString;
@@ -60,6 +61,12 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get { return contractList.Count.ToString(); }
 			
+		}
+
+		public bool IsVisible
+		{
+			get { return _isVisible; }
+			set { _isVisible = value; }
 		}
 
 		public bool MasterMission
@@ -377,7 +384,7 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			if (!activeMissionList.Contains(c.Root.ContractGuid) && !hiddenMissionList.Contains(c.Root.ContractGuid))
 			{
-				if (addToMasterList(c))
+				if (addToMasterList(c, addToUI))
 				{
 					if (active)
 						activeMissionList.Add(c.Root.ContractGuid);
