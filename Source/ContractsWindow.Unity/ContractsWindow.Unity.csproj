@@ -58,6 +58,7 @@
     <Compile Include="Styles.cs" />
     <Compile Include="TextHighlighter.cs" />
     <Compile Include="ToggleSpriteHandler.cs" />
+    <Compile Include="TooltipHandler.cs" />
     <Compile Include="Unity\CW_AgencyPanel.cs" />
     <Compile Include="Unity\CW_BodyNode.cs" />
     <Compile Include="Unity\CW_ContractSection.cs" />
@@ -85,7 +86,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Users\DMagic\Documents\KSP\Contracts\Contracts Plus\Unity\Contracts Window Plus\Assets\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
