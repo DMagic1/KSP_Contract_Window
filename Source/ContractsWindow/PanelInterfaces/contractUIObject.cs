@@ -55,7 +55,7 @@ namespace ContractsWindow.PanelInterfaces
 		private contractMission mission;
 		private List<parameterUIObject> paramList = new List<parameterUIObject>();
 
-		internal contractUIObject(contractContainer c, contractMission m)
+		public contractUIObject(contractContainer c, contractMission m)
 		{
 			container = c;
 			mission = m;
@@ -70,15 +70,51 @@ namespace ContractsWindow.PanelInterfaces
 			_difficulty = (int)container.Root.Prestige;
 			_id = container.ID;
 
-			for (int i = 0; i < c.ParameterCount; i++)
+			for (int i = 0; i < c.FirstLevelParameterCount; i++)
 			{
-				parameterContainer p = c.ParamList[i];
+				parameterContainer p = c.getParameterLevelOne(i);
 
 				if (p == null)
 					continue;
 
+				if (string.IsNullOrEmpty(p.Title))
+					continue;
+
 				paramList.Add(new parameterUIObject(p));
 			}
+		}
+
+		public void AddParameter()
+		{
+			if (container == null)
+				return;
+
+			for (int i = paramList.Count - 1; i >= 0; i--)
+			{
+				parameterUIObject p = paramList[i];
+
+				p = null;
+			}
+
+			paramList.Clear();
+
+			for (int i = 0; i < container.FirstLevelParameterCount; i++)
+			{
+				parameterContainer pC = container.getParameterLevelOne(i);
+
+				if (pC == null)
+					continue;
+
+				paramList.Add(new parameterUIObject(pC));
+			}
+		}
+
+		private void UpdateContractUI()
+		{
+			if (mission == null)
+				return;
+
+			mission.RefreshContract(this);
 		}
 
 		public Sprite AgencyLogo
@@ -192,7 +228,11 @@ namespace ContractsWindow.PanelInterfaces
 					contractWindow.Instance.SetPinState(_id);
 				}
 				else
+				{
 					_order = null;
+
+					contractWindow.Instance.UnPin(_id);
+				}
 
 				contractWindow.Instance.RefreshContracts();
 			}
@@ -203,18 +243,15 @@ namespace ContractsWindow.PanelInterfaces
 			get { return _order; }
 			set { _order = value; }
 		}
-		
-		public string PenaltyText
-		{
-			get
-			{
-				if (container == null)
-					return "";
 
-				return string.Format("<color=#FA4224FF>£ {0}</color>  <color=#FA4224FF>¡ {1}</color>", container.FundsPenString, container.RepPenString);
-			}
+		private string coloredText(string s, char c, string color)
+		{
+			if (string.IsNullOrEmpty(s))
+				return "";
+
+			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
 		}
-		
+
 		public string RewardText
 		{
 			get
@@ -222,7 +259,18 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", container.FundsRewString, container.SciRewString, container.RepRewString);
+				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, '£', "#69D84FFF"), coloredText(container.SciRewString, '©', "#02D8E9FF"), coloredText(container.RepRewString, '¡', "#C9B003FF"));
+			}
+		}
+
+		public string PenaltyText
+		{
+			get
+			{
+				if (container == null)
+					return "";
+
+				return string.Format("{0}{1}", coloredText(container.FundsPenString, '£', "#FA4224FF"), coloredText(container.RepPenString, '¡', "#FA4224FF"));
 			}
 		}
 
