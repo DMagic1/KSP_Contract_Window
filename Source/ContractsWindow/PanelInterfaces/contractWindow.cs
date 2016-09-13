@@ -415,6 +415,11 @@ namespace ContractsWindow.PanelInterfaces
 			pinnedList.Add(id);
 		}
 
+		public void UnPin(Guid id)
+		{
+			contractScenario.ListRemove(pinnedList, id);
+		}
+
 		public int GetNextPin()
 		{
 			return pinnedList.Count;
@@ -427,7 +432,9 @@ namespace ContractsWindow.PanelInterfaces
 			instance = this;
 
 			if (windowPrefab == null)
-				windowPrefab = contractLoader.Prefabs.LoadAsset<GameObject>("cw_window");
+				windowPrefab = contractLoader.Prefabs.LoadAsset<GameObject>("cw_plus");
+
+			LogFormatted("Window Prefab is {0}", windowPrefab == null ? "null" : "loaded");
 
 			RepeatingWorkerInitialWait = 10;
 		}
@@ -487,7 +494,9 @@ namespace ContractsWindow.PanelInterfaces
 
 			_isVisible = true;
 
-			UIWindow.SetPosition(windowPos);
+			UIWindow.gameObject.SetActive(true);
+
+			//UIWindow.SetPosition(windowPos);
 
 			UIWindow.FadeIn();
 		}
@@ -506,6 +515,8 @@ namespace ContractsWindow.PanelInterfaces
 
 		private Vector3 GetAnchor()
 		{
+			return contractStockToolbar.Instance.Button.GetAnchor();
+
 			windowPos = contractScenario.Instance.windowRects[sceneInt];
 
 			Vector3 anchor = new Vector3();
@@ -540,6 +551,8 @@ namespace ContractsWindow.PanelInterfaces
 			obj.transform.SetParent(MainCanvasUtil.MainCanvas.transform);
 
 			UIWindow = obj.GetComponent<CW_Window>();
+
+			UIWindow.setWindow(this);
 
 			UIWindow.gameObject.SetActive(false);
 		}
@@ -581,9 +594,9 @@ namespace ContractsWindow.PanelInterfaces
 
 			//Load ordering lists and contract settings after primary contract dictionary has been loaded
 
-			setMission();
-
 			GenerateWindow();
+
+			setMission();
 
 			if (contractScenario.Instance.windowVisible[sceneInt])
 			{
@@ -611,10 +624,10 @@ namespace ContractsWindow.PanelInterfaces
 
 			pinnedList = currentMission.loadPinnedContracts(cList);
 
-			refreshContracts(cList);
-
 			if (UIWindow != null)
 				UIWindow.SelectMission(currentMission);
+
+			refreshContracts(cList);
 		}
 
 		private void generateList()
