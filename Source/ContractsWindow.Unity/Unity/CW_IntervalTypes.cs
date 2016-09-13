@@ -51,7 +51,7 @@ namespace ContractsWindow.Unity.Unity
 				if (node == null)
 					continue;
 
-				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval - 1 >= i);
+				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval >= i - 1);
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace ContractsWindow.Unity.Unity
 			if (node == null)
 				return;
 
-			for (int i = 0; i < node.Intervals; i++)
+			for (int i = 1; i <= node.Intervals; i++)
 			{
 				CreateIntervalNode(node, i);
 			}
@@ -89,13 +89,5 @@ namespace ContractsWindow.Unity.Unity
 
 			nodeObject.gameObject.SetActive(false);
 		}
-
-		//public void AddIntervalNode(IIntervalNode node)
-		//{
-		//	if (node == null)
-		//		return;
-
-		//	CreateIntervalNode(node);
-		//}
 	}
 }
