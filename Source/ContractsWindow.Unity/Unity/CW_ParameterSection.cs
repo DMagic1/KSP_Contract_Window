@@ -21,15 +21,13 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform NoteTransform = null;
 		[SerializeField]
-		private GameObject SubParamPrefab = null;
-		[SerializeField]
 		private Transform SubParamTransform = null;
 		[SerializeField]
 		private LayoutElement Spacer = null;
 		[SerializeField]
 		private LayoutElement ParameterLayout = null;
 
-		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
+		private Color textColor = new Color(0.9921569f, 0.9921569f, 0.9960784f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
 		private Color subColor = new Color(0.8470588f, 0.8627451f, 0.8392157f, 1f);
@@ -37,8 +35,9 @@ namespace ContractsWindow.Unity.Unity
 		private IParameterSection parameterInterface;
 		private CW_Note note;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
+		private CW_ContractSection root;
 
-		public void setParameter(IParameterSection section)
+		public void setParameter(IParameterSection section, CW_ContractSection c)
 		{
 			if (section == null)
 				return;
@@ -48,6 +47,11 @@ namespace ContractsWindow.Unity.Unity
 
 			if (Spacer == null || ParameterLayout == null)
 				return;
+
+			if (c == null)
+				return;
+
+			root = c;
 
 			parameterInterface = section;
 
@@ -107,6 +111,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (isOn && parameterInterface.ParameterState == ContractState.Complete)
 				return;
+
+			print("[CW_UI] Showing " + parameters.Count + " Sub Parameters...");
 
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
@@ -190,7 +196,7 @@ namespace ContractsWindow.Unity.Unity
 				case ContractState.Fail:
 					return failColor;
 				default:
-					return textColor;
+					return Color.yellow;
 			}
 		}
 
@@ -202,10 +208,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (SubParamPrefab == null || SubParamTransform == null)
+			if (root == null || root.ParamPrefab == null || SubParamTransform == null)
 				return;
 
-			for (int i = sections.Count - 1; i >= 0; i--)
+			for (int i = 0; i < sections.Count; i++)
 			{
 				IParameterSection section = sections[i];
 
@@ -218,7 +224,7 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateSubParameter(IParameterSection section)
 		{
-			GameObject obj = Instantiate(SubParamPrefab);
+			GameObject obj = Instantiate(root.ParamPrefab);
 
 			if (obj == null)
 				return;
@@ -230,7 +236,7 @@ namespace ContractsWindow.Unity.Unity
 			if (paramObject == null)
 				return;
 
-			paramObject.setParameter(section);
+			paramObject.setParameter(section, root);
 
 			parameters.Add(paramObject);
 
