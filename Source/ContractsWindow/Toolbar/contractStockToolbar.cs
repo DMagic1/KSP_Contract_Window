@@ -56,10 +56,13 @@ namespace ContractsWindow.Toolbar
 			}
 		}
 
-		private void Start()
+		private void Awake()
 		{
 			instance = this;
+		}
 
+		private void Start()
+		{
 			setupToolbar();
 		}
 
@@ -84,7 +87,7 @@ namespace ContractsWindow.Toolbar
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
-			toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractScenario.StockIcon);
+			toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
 
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
 		}
