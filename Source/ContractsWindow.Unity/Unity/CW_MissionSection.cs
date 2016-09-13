@@ -59,6 +59,9 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
+			if (missionInterface == null)
+				return;
+
 			for (int i = contracts.Count - 1; i >= 0; i--)
 			{
 				IContractSection contract = contracts[i];
@@ -96,12 +99,15 @@ namespace ContractsWindow.Unity.Unity
 
 			masterList.Add(contract.ID, contractObject);
 
-			contractObject.gameObject.SetActive(false);
+			contractObject.gameObject.SetActive(contract.IsHidden && missionInterface.ShowHidden || !contract.IsHidden && !missionInterface.ShowHidden);
 		}
 
 		public void AddContract(IContractSection contract)
 		{
 			if (contract == null)
+				return;
+
+			if (missionInterface == null)
 				return;
 
 			if (masterList.ContainsKey(contract.ID))
@@ -206,6 +212,19 @@ namespace ContractsWindow.Unity.Unity
 
 				contract.UpdateContract();
 			}
+		}
+
+		public void RefreshContract(IContractSection contract)
+		{
+			if (contract == null)
+				return;
+
+			CW_ContractSection c = GetContract(contract.ID);
+
+			if (c == null)
+				return;
+
+			c.RefreshParameters();
 		}
 
 		public void RemoveContract(Guid id)
