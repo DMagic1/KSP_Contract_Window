@@ -454,6 +454,13 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			base.OnDestroy();
 
+			if (UIWindow != null)
+			{
+				UIWindow.gameObject.SetActive(false);
+
+				Destroy(UIWindow);
+			}
+
 			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
