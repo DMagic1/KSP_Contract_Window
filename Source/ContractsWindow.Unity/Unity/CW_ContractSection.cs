@@ -23,9 +23,9 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Transform ContractNoteTransform = null;
 		[SerializeField]
-		private GameObject ParamaterSectionPrefab = null;
+		private GameObject ParameterSectionPrefab = null;
 		[SerializeField]
-		private Transform ParamaterSectionTransform = null;
+		private Transform ParameterSectionTransform = null;
 		[SerializeField]
 		private Sprite Stars_One = null;
 		[SerializeField]
@@ -58,6 +58,11 @@ namespace ContractsWindow.Unity.Unity
 		public IContractSection Interface
 		{
 			get { return contractInterface; }
+		}
+
+		public GameObject ParamPrefab
+		{
+			get { return ParameterSectionPrefab; }
 		}
 
 		public void setContract(IContractSection contract, CW_Window win, CW_MissionSection mission)
@@ -148,6 +153,28 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
+		public void RefreshParameters()
+		{
+			if (contractInterface == null)
+				return;
+
+			for (int i = parameters.Count - 1; i >= 0; i--)
+			{
+				CW_ParameterSection p = parameters[i];
+
+				if (p == null)
+					continue;
+
+				p.gameObject.SetActive(false);
+
+				Destroy(p);
+			}
+
+			parameters.Clear();
+
+			CreateParameterSections(contractInterface.GetParameters);
+		}
+
 		public void ShowAgent()
 		{
 			if (contractInterface == null)
@@ -235,6 +262,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			contractInterface.ShowParams = isOn;
+
+			var p = GetComponentsInChildren<CW_ParameterSection>();
 
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
@@ -329,10 +358,10 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (ParamaterSectionPrefab == null || ParamaterSectionTransform == null)
+			if (ParameterSectionPrefab == null || ParameterSectionTransform == null)
 				return;
 
-			for (int i = sections.Count - 1; i >= 0; i--)
+			for (int i = 0; i < sections.Count; i++)
 			{
 				IParameterSection section = sections[i];
 
@@ -345,19 +374,19 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateParameterSection(IParameterSection section)
 		{
-			GameObject obj = Instantiate(ParamaterSectionPrefab);
+			GameObject obj = Instantiate(ParameterSectionPrefab);
 
 			if (obj == null)
 				return;
 
-			obj.transform.SetParent(ParamaterSectionTransform, false);
+			obj.transform.SetParent(ParameterSectionTransform, false);
 
 			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
 
 			if (paramObject == null)
 				return;
 
-			paramObject.setParameter(section);
+			paramObject.setParameter(section, this);
 
 			parameters.Add(paramObject);
 		}
