@@ -59,8 +59,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		public string ContractNumber
 		{
-			get { return contractList.Count.ToString(); }
-			
+			get { return contractList.Count.ToString(); }			
 		}
 
 		public bool IsVisible
@@ -244,6 +243,17 @@ namespace ContractsWindow.PanelInterfaces
 				return false;
 
 			return currentVessels.ContainsKey(v.id);
+		}
+
+		public void RefreshContract(IContractSection contract)
+		{
+			if (contract == null)
+				return;
+
+			if (UIParent == null)
+				return;
+
+			UIParent.RefreshContract(contract);
 		}
 
 		internal contractMission(string n, string active, string hidden, string vessels, bool asc, bool showActive, int sMode, bool Master)
