@@ -49,7 +49,15 @@ namespace ContractsWindow.PanelInterfaces
 				return node.Descriptor;
 			}
 		}
-		
+
+		private string coloredText(string s, char c, string color)
+		{
+			if (string.IsNullOrEmpty(s))
+				return "";
+
+			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
+		}
+
 		public string RewardText
 		{
 			get
@@ -57,7 +65,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", node.FundsRewardString, node.SciRewardString, node.RepRewardString);
+				return string.Format("{0}{1}{2}", coloredText(node.FundsRewardString, '£', "#69D84FFF"), coloredText(node.SciRewardString, '©', "#02D8E9FF"), coloredText(node.RepRewardString, '¡', "#C9B003FF"));
 			}
 		}
 	}
