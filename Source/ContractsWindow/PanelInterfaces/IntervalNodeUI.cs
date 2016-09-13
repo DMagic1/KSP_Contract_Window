@@ -69,12 +69,20 @@ namespace ContractsWindow.PanelInterfaces
 			return node.getRecord(i).ToString();
 		}
 
+		private string coloredText(string s, char c, string color)
+		{
+			if (string.IsNullOrEmpty(s))
+				return "";
+
+			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
+		}
+
 		public string RewardText(int i)
 		{
 			if (node == null)
 				return "";
 
-			return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", node.getFundsString(i), node.getScienceString(i), node.getRepString(i));
+			return string.Format("{0}{1}{2}", coloredText(node.getFundsString(i), '£', "#69D84FFF"), coloredText(node.getScienceString(i), '©', "#02D8E9FF"), coloredText(node.getRepString(i), '¡', "#C9B003FF"));
 		}
 
 	}
