@@ -17,11 +17,17 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			container = p;
 
+			if (container.Level >= 4)
+				return;
+
 			for (int i = 0; i < p.ParameterCount; i++)
 			{
-				parameterContainer c = p.ParamList[i];
+				parameterContainer c = p.getParameter(i);
 
 				if (c == null)
+					continue;
+
+				if (string.IsNullOrEmpty(c.Title))
 					continue;
 
 				subParams.Add(new parameterUIObject(c));
@@ -71,6 +77,14 @@ namespace ContractsWindow.PanelInterfaces
 			}
 		}
 
+		private string coloredText(string s, char c, string color)
+		{
+			if (string.IsNullOrEmpty(s))
+				return "";
+
+			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
+		}
+
 		public string RewardText
 		{
 			get
@@ -78,7 +92,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("<color=#69D84FFF>£ {0}</color>  <color=#02D8E9FF>© {1}</color>  <color=#C9B003FF>¡ {2}</color>", container.FundsRewString, container.SciRewString, container.RepRewString);
+				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, '£', "#69D84FFF"), coloredText(container.SciRewString, '©', "#02D8E9FF"), coloredText(container.RepRewString, '¡', "#C9B003FF"));
 			}
 		}
 
@@ -89,7 +103,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("<color=#FA4224FF>£ {0}</color>  <color=#FA4224FF>¡ {1}</color>", container.FundsPenString, container.RepPenString);
+				return string.Format("{0}{1}", coloredText(container.FundsPenString, '£', "#FA4224FF"), coloredText(container.RepPenString, '¡', "#FA4224FF"));
 			}
 		}
 
