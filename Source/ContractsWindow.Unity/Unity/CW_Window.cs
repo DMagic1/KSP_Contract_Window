@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace ContractsWindow.Unity.Unity
 {
 	[RequireComponent(typeof(RectTransform))]
-	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 	{
 		[SerializeField]
 		private Text VersionText = null;
@@ -63,6 +63,8 @@ namespace ContractsWindow.Unity.Unity
 		private ICW_Window windowInterface;
 		private bool loaded;
 
+		private bool popupOpen;
+
 		private static CW_Window window;
 
 		public static CW_Window Window
@@ -86,7 +88,7 @@ namespace ContractsWindow.Unity.Unity
 
 		private void Start()
 		{
-			Alpha(0);
+			Alpha(1);
 
 			Fade(1, true, true, true);
 		}
@@ -229,6 +231,9 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_MissionSection section = missions[mission];
 
+			if (section == null)
+				return;
+
 			if (currentMission != null && currentMission.MissionTitle != section.MissionTitle)
 				currentMission.SetMissionVisible(false);
 
@@ -254,8 +259,6 @@ namespace ContractsWindow.Unity.Unity
 
 		private void prepareTopBar()
 		{
-			loaded = true;
-
 			if (currentMission == null)
 				return;
 
@@ -267,6 +270,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (ShowHideToggle != null)
 				ShowHideToggle.isOn = currentMission.MissionInterface.ShowHidden;
+
+			loaded = true;
 		}
 
 		public void ToggleMainWindow(bool showProgress)
@@ -317,6 +322,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			sortObject.setSort(currentMission.MissionInterface);
+
+			popupOpen = true;
 		}
 
 		public void ToggleSortOrder(bool isOn)
@@ -367,6 +374,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			selectorObject.setMission(windowInterface.GetMissions);
+
+			popupOpen = true;
 		}
 
 		public void showCreator(IContractSection contract)
@@ -390,6 +399,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			creatorObject.setPanel(contract);
+
+			popupOpen = true;
 		}
 
 		public void showEditor()
@@ -413,6 +424,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			editorObject.setMission(currentMission.MissionInterface);
+
+			popupOpen = true;
 		}
 
 		public void ToggleTooltips(bool isOn)
@@ -444,6 +457,8 @@ namespace ContractsWindow.Unity.Unity
 			GameObject obj = Instantiate(RebuildPrefab);
 
 			obj.transform.SetParent(transform, false);
+
+			popupOpen = true;
 		}
 
 		public void showScale()
@@ -464,6 +479,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			scalarObject.setScalar();
+
+			popupOpen = true;
 		}
 
 		public void showToolbar()
@@ -484,6 +501,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			toolbarObject.setToolbar();
+
+			popupOpen = true;
 		}
 
 		public void ShowAgentWindow(IContractSection contract)
@@ -504,6 +523,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			agencyObject.setAgent(contract.AgencyName, contract.AgencyLogo);
+
+			popupOpen = true;
 		}
 
 		public void ShowMissionAddWindow(IContractSection contract)
@@ -524,6 +545,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			adderObject.setMission(windowInterface.GetMissions, contract);
+
+			popupOpen = true;
 		}
 
 		public void onResize(BaseEventData eventData)
@@ -692,8 +715,48 @@ namespace ContractsWindow.Unity.Unity
 			Destroy(obj);
 		}
 
-		public void DestroyPopup()
+		public void OnPointerDown(PointerEventData eventData)
 		{
+			if (!popupOpen)
+				return;
+
+			var popups = GetComponentsInChildren<CW_Popup>();
+
+			print("[CW_UI] Found " + popups.Length + " Popups");
+
+			for (int i = popups.Length - 1; i >= 0; i--)
+			{
+				CW_Popup popup = popups[i];
+
+				if (popup == null)
+					continue;
+
+				if (!popup.gameObject.activeSelf)
+				{
+					DestroyPopup(popup);
+					continue;
+				}
+
+				RectTransform r = popup.GetComponent<RectTransform>();
+
+				if (r == null)
+					continue;
+
+				if (RectTransformUtility.RectangleContainsScreenPoint(r, eventData.position, eventData.pressEventCamera))
+					continue;
+
+				DestroyPopup(popup);
+
+				popupOpen = false;
+			}
+		}
+
+		public void DestroyPopup(CW_Popup p)
+		{
+			p.gameObject.SetActive(false);
+
+			Destroy(p);
+
 			var popups = GetComponentsInChildren<CW_Popup>();
 
 			for (int i = popups.Length - 1; i >= 0; i--)
