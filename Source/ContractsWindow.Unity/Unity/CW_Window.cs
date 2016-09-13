@@ -246,7 +246,7 @@ namespace ContractsWindow.Unity.Unity
 			currentMission.SetMissionVisible(true);
 
 			if (MissionTitle != null)
-				MissionTitle.text = currentMission.MissionTitle;
+				MissionTitle.text = currentMission.MissionTitle + ":";
 
 			if (MissionEdit != null)
 			{
@@ -300,12 +300,15 @@ namespace ContractsWindow.Unity.Unity
 				if (MissionTitle == null || currentMission == null)
 					return;
 
-				MissionTitle.text = currentMission.MissionTitle;
+				MissionTitle.text = currentMission.MissionTitle + ":";
 			}
 		}
 
 		public void ShowSort()
 		{
+			if (popupOpen)
+				return;
+
 			if (SortPrefab == null)
 				return;
 
@@ -358,6 +361,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showSelector()
 		{
+			if (popupOpen)
+				return;
+
 			if (MissionSelectPrefab == null)
 				return;
 
@@ -380,6 +386,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showCreator(IContractSection contract)
 		{
+			if (popupOpen)
+				return;
+
 			if (MissionCreatePrefab == null)
 				return;
 
@@ -405,6 +414,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showEditor()
 		{
+			if (popupOpen)
+				return;
+
 			if (MissionEditPrefab == null)
 				return;
 
@@ -448,6 +460,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showRefresh()
 		{
+			if (popupOpen)
+				return;
+
 			if (RebuildPrefab == null)
 				return;
 
@@ -463,6 +478,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showScale()
 		{
+			if (popupOpen)
+				return;
+
 			if (ScalarPrefab == null)
 				return;
 
@@ -485,6 +503,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void showToolbar()
 		{
+			if (popupOpen)
+				return;
+
 			if (ToolbarPrefab == null)
 				return;
 
@@ -507,6 +528,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowAgentWindow(IContractSection contract)
 		{
+			if (popupOpen)
+				return;
+
 			if (AgencyPrefab == null)
 				return;
 
@@ -529,6 +553,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowMissionAddWindow(IContractSection contract)
 		{
+			if (popupOpen)
+				return;
+
 			if (MissionAddPrefab == null)
 				return;
 
