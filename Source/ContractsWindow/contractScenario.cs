@@ -96,7 +96,7 @@ namespace ContractsWindow
 		internal contractStockToolbar appLauncherButton = null;
 		internal contractToolbar blizzyToolbarButton = null;
 
-		internal contractsWindow cWin;
+		//internal contractsWindow cWin;
 
 		private contractWindow _cWin;
 
@@ -276,8 +276,8 @@ namespace ContractsWindow
 
 		private void Start()
 		{
-			if (stockIcon == null)
-				stockIcon = contractLoader.Images.LoadAsset<Texture>("toolbar_icon");
+			//if (stockIcon == null)
+			//	stockIcon = contractLoader.Images.LoadAsset<Texture>("toolbar_icon");
 
 			Assembly assembly = AssemblyLoader.loadedAssemblies.GetByAssembly(Assembly.GetExecutingAssembly()).assembly;
 			var ainfoV = Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
@@ -318,15 +318,19 @@ namespace ContractsWindow
 				if (appLauncherButton != null)
 					Destroy(appLauncherButton);
 			}
+
+			contractParser.onParameterAdded.Add(onParameterAdded);
 		}
 
 		//Remove our contract window object
 		private void OnDestroy()
 		{
+			contractParser.onParameterAdded.Remove(onParameterAdded);
+
 			if (_cWin != null)
 				Destroy(_cWin);
-			if (cWin != null)
-				Destroy(cWin);
+			//if (cWin != null)
+			//	Destroy(cWin);
 			if (appLauncherButton != null)
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
@@ -423,6 +427,33 @@ namespace ContractsWindow
 		#endregion
 
 		#region contract Events
+
+		private void onParameterAdded(Contract c, ContractParameter cP)
+		{
+			DMC_MBE.LogFormatted("Firing On Parameter Added: {0}", cP.Title);
+
+			contractContainer cc = contractParser.getActiveContract(c.ContractGuid);
+
+			if (cc == null)
+				return;
+
+			var missions = getMissionsContaining(cc.ID);
+
+			for (int i = missions.Count - 1; i >= 0; i--)
+			{
+				contractMission m = missions[i];
+
+				if (m == null)
+					continue;
+
+				contractUIObject cUI = m.getContract(cc.ID);
+
+				if (cUI == null)
+					continue;
+
+				cUI.AddParameter();
+			}
+		}
 
 		//Used by external assemblies to update parameter values for the UI
 		internal void paramChanged(Type t)
@@ -557,6 +588,11 @@ namespace ContractsWindow
 			}
 
 			return masterMission;
+		}
+
+		internal List<contractMission> getMissionsContaining(Guid id)
+		{
+			return missionList.Values.Where(m => m.containsContract(id)).ToList();
 		}
 
 		//Returns an ordered list of missions for the main window; the master mission is always first
