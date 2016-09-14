@@ -15,12 +15,6 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle NoteToggle = null;
 		[SerializeField]
-		private Image NoteImage = null;
-		[SerializeField]
-		private Sprite ToggleOnSprite = null;
-		[SerializeField]
-		private Sprite ToggleOffSprite = null;
-		[SerializeField]
 		private GameObject NotePrefab = null;
 		[SerializeField]
 		private Transform NoteTransform = null;
@@ -52,6 +46,18 @@ namespace ContractsWindow.Unity.Unity
 				NoteToggle.gameObject.SetActive(false);
 		}
 
+		public void UpdateText()
+		{
+			if (standardInterface == null)
+				return;
+
+			if (Title != null)
+				Title.text = standardInterface.NodeText;
+
+			if (Reward != null)
+				Reward.text = standardInterface.RewardText;
+		}
+
 		private void setNote()
 		{
 			if (standardInterface == null)
@@ -81,16 +87,14 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (standardInterface == null)
 				return;
-
-			if (NoteImage == null || ToggleOnSprite == null || ToggleOffSprite == null)
-				return;
-
+			
 			if (note == null)
 				return;
 
-			note.gameObject.SetActive(isOn);
+			if (isOn)
+				note.setNote(standardInterface.GetNote);
 
-			NoteImage.sprite = isOn ? ToggleOffSprite : ToggleOnSprite;
+			note.gameObject.SetActive(isOn);
 		}
 	}
 }
