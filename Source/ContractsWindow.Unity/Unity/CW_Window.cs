@@ -604,7 +604,7 @@ namespace ContractsWindow.Unity.Unity
 			if (rect.sizeDelta.x < 250 * windowInterface.Scale)
 				numX = (int)(250 * windowInterface.Scale);
 			else if (rect.sizeDelta.x > 540 * windowInterface.Scale)
-				numX = (int)(540 * windowInterface.Scale);
+				numX = (int)(510 * windowInterface.Scale);
 
 			rect.sizeDelta = new Vector2(numX, numY);
 		}
@@ -734,6 +734,8 @@ namespace ContractsWindow.Unity.Unity
 
 		public void DestroyChild(GameObject obj)
 		{
+			popupOpen = false;
+
 			if (obj == null)
 				return;
 
