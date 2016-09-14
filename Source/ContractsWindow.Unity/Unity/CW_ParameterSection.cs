@@ -112,8 +112,6 @@ namespace ContractsWindow.Unity.Unity
 			if (isOn && parameterInterface.ParameterState == ContractState.Complete)
 				return;
 
-			print("[CW_UI] Showing " + parameters.Count + " Sub Parameters...");
-
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
