@@ -24,9 +24,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void loadIntervals(List<progressInterval> nodes)
 		{
-			int l = nodes.Count;
-
-			for (int i = 0; i < l; i++)
+			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				IntervalNodeUI node = new IntervalNodeUI(nodes[i]);
 
@@ -39,9 +37,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void loadStandards(List<progressStandard> nodes)
 		{
-			int l = nodes.Count;
-
-			for (int i = 0; i < l; i++)
+			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				StandardNodeUI node = new StandardNodeUI(nodes[i]);
 
@@ -54,9 +50,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void loadPOIs(List<progressStandard> nodes)
 		{
-			int l = nodes.Count;
-
-			for (int i = 0; i < l; i++)
+			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				StandardNodeUI node = new StandardNodeUI(nodes[i]);
 
@@ -69,9 +63,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void loadBodies(List<progressBodyCollection> nodes)
 		{
-			int l = nodes.Count;
-
-			for (int i = 0; i < l; i++)
+			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				progressBodyCollection body = nodes[i];
 
@@ -85,9 +77,7 @@ namespace ContractsWindow.PanelInterfaces
 
 				List<IStandardNode> newNodes = new List<IStandardNode>();
 
-				int k = bodySubNodes.Count;
-
-				for (int j = 0; j < k; j++)
+				for (int j = bodySubNodes.Count - 1; j >= 0; j--)
 				{
 					StandardNodeUI node = new StandardNodeUI(bodySubNodes[j]);
 
