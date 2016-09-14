@@ -32,6 +32,18 @@ namespace ContractsWindow.Unity.Unity
 				Reward.text = node.RewardText(i);
 		}
 
+		public void UpdateText()
+		{
+			if (intervalInterface == null)
+				return;
+
+			if (Title != null)
+				Title.text = getTitle();
+
+			if (Reward != null)
+				Reward.text = intervalInterface.RewardText(interval);
+		}
+
 		private string getTitle()
 		{
 			if (intervalInterface == null)

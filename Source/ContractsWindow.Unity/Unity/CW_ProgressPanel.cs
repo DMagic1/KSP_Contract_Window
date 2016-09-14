@@ -142,6 +142,8 @@ namespace ContractsWindow.Unity.Unity
 				if (node.StandardInterface == null)
 					continue;
 
+				node.UpdateText();
+
 				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
 			}
 		}
@@ -157,6 +159,8 @@ namespace ContractsWindow.Unity.Unity
 
 				if (node.StandardInterface == null)
 					continue;
+
+				node.UpdateText();
 
 				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
 			}

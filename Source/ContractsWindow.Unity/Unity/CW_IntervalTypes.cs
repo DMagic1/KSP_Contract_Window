@@ -51,6 +51,8 @@ namespace ContractsWindow.Unity.Unity
 				if (node == null)
 					continue;
 
+				node.UpdateText();
+
 				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval >= i - 1);
 			}
 		}
