@@ -46,6 +46,8 @@ namespace ContractsWindow.Unity.Unity
 			if (parent == null)
 				return;
 
+			parent.ToggleToContracts();
+
 			parent.DestroyPanel();
 		}
 

@@ -60,6 +60,14 @@ namespace ContractsWindow.Unity.Unity
 			missionObject.setMission(mission, this);
 		}
 
+		public void ToggleToContracts()
+		{
+			if (CW_Window.Window == null)
+				return;
+
+			CW_Window.Window.ToggleMainWindow(false);
+		}
+
 		public void DestroyPanel()
 		{
 			if (CW_Window.Window == null)
