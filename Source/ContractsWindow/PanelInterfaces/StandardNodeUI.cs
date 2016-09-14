@@ -46,7 +46,9 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return node.Descriptor;
+				string body = node.Body == null ? "" : node.Body.theName;
+
+				return string.Format(node.Descriptor, body);
 			}
 		}
 
