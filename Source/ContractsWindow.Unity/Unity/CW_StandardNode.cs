@@ -18,6 +18,8 @@ namespace ContractsWindow.Unity.Unity
 		private GameObject NotePrefab = null;
 		[SerializeField]
 		private Transform NoteTransform = null;
+		[SerializeField]
+		private TooltipHandler NoteTooltip = null;
 
 		private IStandardNode standardInterface;
 		private CW_Note note;
@@ -95,6 +97,9 @@ namespace ContractsWindow.Unity.Unity
 				note.setNote(standardInterface.GetNote);
 
 			note.gameObject.SetActive(isOn);
+
+			if (NoteTooltip != null)
+				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Note");
 		}
 	}
 }

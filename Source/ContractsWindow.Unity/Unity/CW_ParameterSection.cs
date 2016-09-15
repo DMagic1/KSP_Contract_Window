@@ -26,6 +26,8 @@ namespace ContractsWindow.Unity.Unity
 		private LayoutElement Spacer = null;
 		[SerializeField]
 		private LayoutElement ParameterLayout = null;
+		[SerializeField]
+		private TooltipHandler NoteTooltip = null;
 
 		private Color textColor = new Color(0.9921569f, 0.9921569f, 0.9960784f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
@@ -58,6 +60,7 @@ namespace ContractsWindow.Unity.Unity
 			Spacer.minWidth = parameterInterface.ParamLayer * 5;
 
 			ParameterLayout.minWidth -= parameterInterface.ParamLayer * 5;
+			ParameterLayout.preferredWidth = ParameterLayout.minWidth;
 
 			ParameterText.text = parameterInterface.TitleText;
 
@@ -153,6 +156,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			note.gameObject.SetActive(isOn);
+
+			if (NoteTooltip != null)
+				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Parameter Note");
 		}
 
 		private void setNote()
@@ -178,6 +184,12 @@ namespace ContractsWindow.Unity.Unity
 			note.setNote(parameterInterface.GetNote);
 
 			note.gameObject.SetActive(false);
+
+			if (ParameterLayout == null)
+				return;
+
+			ParameterLayout.minWidth -= 10;
+			ParameterLayout.preferredWidth -= 10;
 		}
 
 		private Color stateColor(ContractState state)
