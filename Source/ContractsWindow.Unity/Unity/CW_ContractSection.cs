@@ -42,6 +42,12 @@ namespace ContractsWindow.Unity.Unity
 		private Toggle EyesToggle = null;
 		[SerializeField]
 		private Toggle PinToggle = null;
+		[SerializeField]
+		private TooltipHandler EyesTooltip = null;
+		[SerializeField]
+		private TooltipHandler PinTooltip = null;
+		[SerializeField]
+		private TooltipHandler NoteTooltip = null;
 
 		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
@@ -51,7 +57,6 @@ namespace ContractsWindow.Unity.Unity
 		private IContractSection contractInterface;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
 		private CW_Note note;
-		private CW_Window window;
 		private CW_MissionSection parent;
 		private bool loaded;
 
@@ -65,12 +70,9 @@ namespace ContractsWindow.Unity.Unity
 			get { return ParameterSectionPrefab; }
 		}
 
-		public void setContract(IContractSection contract, CW_Window win, CW_MissionSection mission)
+		public void setContract(IContractSection contract, CW_MissionSection mission)
 		{
 			if (contract == null)
-				return;
-
-			if (win == null)
 				return;
 
 			if (mission == null)
@@ -79,13 +81,14 @@ namespace ContractsWindow.Unity.Unity
 			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
 				return;
 
-			window = win;
-
 			parent = mission;
 
 			contractInterface = contract;
 
 			ContractTitle.text = contract.ContractTitle;
+
+			if (CW_Window.Window != null && CW_Window.Window.Scroll != null && Highlighter != null)
+				Highlighter.setScroller(CW_Window.Window.Scroll);
 
 			handleColors(stateColor(contract.ContractState));
 
@@ -142,7 +145,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface.ContractState != ContractState.Active)
 				ToggleToClose();
 
-			if (ContractTitle!= null)
+			if (ContractTitle != null && Highlighter != null && !Highlighter.Hover)
 				handleColors(stateColor(contractInterface.ContractState));
 
 			if (TimeRemaining != null)
@@ -180,10 +183,10 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (window == null)
+			if (CW_Window.Window == null)
 				return;
 
-			window.ShowAgentWindow(contractInterface);
+			CW_Window.Window.ShowAgentWindow(contractInterface);
 		}
 
 		public void ToggleToClose()
@@ -192,6 +195,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			EyesHandler.SetAlternate();
+
+			if (EyesTooltip != null)
+				EyesTooltip.SetNewText("Remove Contract");
 		}
 
 		public void ToggleHidden(bool isOn)
@@ -216,7 +222,12 @@ namespace ContractsWindow.Unity.Unity
 				return;
 			}
 
+			if (EyesTooltip != null)
+				EyesTooltip.SetNewText(isOn ? "Show Contract" : "Hide Contract");
+
 			parent.SwitchContract(contractInterface.ID, isOn);
+
+			ShowParameters(!isOn);
 
 			gameObject.SetActive(false);
 
@@ -232,6 +243,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			contractInterface.IsPinned = isOn;
+
+			if (PinTooltip != null)
+				PinTooltip.SetNewText(isOn ? "Un-Pin Contract" : "Pin Contract");
 		}
 
 		public void AddMission()
@@ -239,10 +253,10 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (window == null)
+			if (CW_Window.Window == null)
 				return;
 
-			window.ShowMissionAddWindow(contractInterface);
+			CW_Window.Window.ShowMissionAddWindow(contractInterface);
 		}
 
 		public void ShowNote(bool isOn)
@@ -254,6 +268,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			note.gameObject.SetActive(isOn);
+
+			if (NoteTooltip != null)
+				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Contract Note");
 		}
 
 		public void ShowParameters(bool isOn)
@@ -293,8 +310,14 @@ namespace ContractsWindow.Unity.Unity
 			if (EyesToggle != null)
 				EyesToggle.isOn = contractInterface.IsHidden;
 
+			if (EyesTooltip != null)
+				EyesTooltip.SetNewText(contractInterface.IsHidden ? "Show Contract" : "Hide Contract");
+
 			if (PinToggle != null)
 				PinToggle.isOn = contractInterface.Order != null;
+
+			if (PinTooltip != null)
+				PinTooltip.SetNewText(contractInterface.Order != null ? "Un-Pin Contract" : "Pin Contract");
 				
 			if (!string.IsNullOrEmpty(contractInterface.GetNote))
 				setNote();
