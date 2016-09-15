@@ -23,7 +23,7 @@ namespace ContractsWindow.Unity.Interfaces
 
 		int TimeState { get; }
 
-		Sprite AgencyLogo { get; }
+		Texture AgencyLogo { get; }
 
 		string TimeRemaining { get; }
 

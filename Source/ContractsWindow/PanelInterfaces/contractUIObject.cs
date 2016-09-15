@@ -48,7 +48,7 @@ namespace ContractsWindow.PanelInterfaces
 		private bool _showParams;
 		private bool _hidden;
 		private int? _order;
-		private Sprite _agencyLogo;
+		private Texture _agencyLogo;
 		private string _agencyName;
 		private Guid _id;
 		private int _difficulty;
@@ -62,9 +62,7 @@ namespace ContractsWindow.PanelInterfaces
 			_showParams = true;
 			_order = null;
 
-			Texture2D tex = container.RootAgent.Logo;
-
-			_agencyLogo = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+			_agencyLogo = container.RootAgent.Logo;
 			_agencyName = container.RootAgent.Name;
 
 			_difficulty = (int)container.Root.Prestige;
@@ -117,7 +115,7 @@ namespace ContractsWindow.PanelInterfaces
 			mission.RefreshContract(this);
 		}
 
-		public Sprite AgencyLogo
+		public Texture AgencyLogo
 		{
 			get { return _agencyLogo; }
 		}

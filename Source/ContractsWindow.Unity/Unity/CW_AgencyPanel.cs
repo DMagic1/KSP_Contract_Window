@@ -7,16 +7,16 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_AgencyPanel : CW_Popup
 	{
 		[SerializeField]
-		private Image AgencyLogo = null;
+		private RawImage AgencyLogo = null;
 		[SerializeField]
 		private Text AgencyTitle = null;
 		
-		public void setAgent(string title, Sprite logo)
+		public void setAgent(string title, Texture logo)
 		{
 			if (logo == null)
 				return;
 
-			AgencyLogo.sprite = logo;
+			AgencyLogo.texture = logo;
 			AgencyTitle.text = title;
 
 			FadeIn();
