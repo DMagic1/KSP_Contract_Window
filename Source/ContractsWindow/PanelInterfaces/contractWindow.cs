@@ -24,6 +24,7 @@ namespace ContractsWindow.PanelInterfaces
 		private progressUIPanel progressPanel;
 		private CW_Window UIWindow;
 		private Rect windowPos;
+		private Canvas _canvas;
 
 		private List<Guid> cList = new List<Guid>();
 		private List<Guid> pinnedList = new List<Guid>();
@@ -63,8 +64,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		public float MasterScale
 		{
-			get { return contractScenario.Instance.windowScale; }
-			set { contractScenario.Instance.windowScale = value; }
+			get { return GameSettings.UI_SCALE; }
 		}
 
 		public float Scale
@@ -97,13 +97,18 @@ namespace ContractsWindow.PanelInterfaces
 			{
 				contractScenario.Instance.stockToolbar = value;
 
-				contractScenario.Instance.toggleToolbars(value);
+				contractScenario.Instance.toggleToolbars();
 			}
 		}
 
 		public string Version
 		{
 			get { return contractScenario.Instance.InfoVersion; }
+		}
+
+		public Canvas MainCanvas
+		{
+			get { return _canvas; }
 		}
 
 		public IList<IMissionSection> GetMissions
@@ -503,8 +508,6 @@ namespace ContractsWindow.PanelInterfaces
 
 			UIWindow.gameObject.SetActive(true);
 
-			//UIWindow.SetPosition(windowPos);
-
 			UIWindow.FadeIn();
 		}
 
@@ -520,46 +523,24 @@ namespace ContractsWindow.PanelInterfaces
 			UIWindow.Close();
 		}
 
-		private Vector3 GetAnchor()
-		{
-			return contractStockToolbar.Instance.Button.GetAnchor();
-
-			windowPos = contractScenario.Instance.windowRects[sceneInt];
-
-			Vector3 anchor = new Vector3();
-
-			if (windowPos == null)
-			{
-				if (contractScenario.Instance.stockToolbar && contractStockToolbar.Instance != null)
-					anchor = contractStockToolbar.Instance.Button.GetAnchor();
-				else
-				{
-					anchor.x = 50;
-					anchor.y = 80;
-				}
-
-			}
-			else
-			{
-				anchor.x = windowPos.x;
-				anchor.y = windowPos.y;
-			}
-
-			return anchor;
-		}
-
 		private void GenerateWindow()
 		{
 			if (windowPrefab == null || UIWindow != null)
 				return;
 
-			GameObject obj = Instantiate(windowPrefab, GetAnchor(), Quaternion.identity) as GameObject;
+			GameObject obj = Instantiate(windowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
-			obj.transform.SetParent(MainCanvasUtil.MainCanvas.transform);
+			_canvas = MainCanvasUtil.MainCanvas;
+
+			obj.transform.SetParent(_canvas.transform, false);
 
 			UIWindow = obj.GetComponent<CW_Window>();
 
 			UIWindow.setWindow(this);
+
+			windowPos = contractScenario.Instance.windowRects[sceneInt];
+
+			UIWindow.SetPosition(windowPos);
 
 			UIWindow.gameObject.SetActive(false);
 		}
