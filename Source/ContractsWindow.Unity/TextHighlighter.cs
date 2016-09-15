@@ -15,6 +15,12 @@ namespace ContractsWindow.Unity
 
 		private ScrollRect scroller;
 		private Text AttachedText;
+		private bool _hover;
+
+		public bool Hover
+		{
+			get { return _hover; }
+		}
 
 		private void Awake()
 		{
@@ -36,6 +42,8 @@ namespace ContractsWindow.Unity
 			if (AttachedText == null)
 				return;
 
+			_hover = true;
+
 			AttachedText.color = HighlightColor;
 
 			eventData.Reset();
@@ -43,6 +51,8 @@ namespace ContractsWindow.Unity
 
 		public void OnPointerExit(PointerEventData eventData)
 		{
+			_hover = false;
+
 			if (AttachedText == null)
 				return;
 
@@ -54,7 +64,7 @@ namespace ContractsWindow.Unity
 			if (scroller == null)
 				return;
 
-			scroller.OnScroll((PointerEventData)eventData);
+			scroller.OnScroll(eventData);
 		}
 
 	}
