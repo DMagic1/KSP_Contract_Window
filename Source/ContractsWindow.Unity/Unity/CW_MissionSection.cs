@@ -90,7 +90,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contractObject == null)
 				return;
 
-			contractObject.setContract(contract, CW_Window.Window, this);
+			contractObject.setContract(contract, this);
 
 			if (contract.IsHidden)
 				hiddenContracts.Add(contract.ID);

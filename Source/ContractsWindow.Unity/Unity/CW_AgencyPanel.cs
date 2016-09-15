@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_AgencyPanel : CW_Popup
 	{
 		[SerializeField]
@@ -17,7 +18,15 @@ namespace ContractsWindow.Unity.Unity
 
 			AgencyLogo.sprite = logo;
 			AgencyTitle.text = title;
+
+			FadeIn();
 		}
 
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
+		}
 	}
 }

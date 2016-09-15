@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_MissionCreate : CW_Popup
 	{
 		[SerializeField]
@@ -43,7 +44,14 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
+		}
+
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
 		}
 	}
 }

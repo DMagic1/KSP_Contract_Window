@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_MissionAdd : CW_Popup
 	{
 		[SerializeField]
@@ -23,6 +24,8 @@ namespace ContractsWindow.Unity.Unity
 			contractInterface = contract;
 
 			CreateMissionSections(missions);
+
+			FadeIn();
 		}
 
 		private void CreateMissionSections(IList<IMissionSection> missions)
@@ -79,7 +82,14 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
+		}
+
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
 		}
 	}
 }

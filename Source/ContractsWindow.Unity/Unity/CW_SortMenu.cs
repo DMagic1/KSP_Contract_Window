@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_SortMenu : CW_Popup
 	{
 		private IMissionSection missionInterface;
@@ -16,6 +17,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			missionInterface = m;
+
+			FadeIn();
 		}
 
 		public void SortDifficulty()
@@ -28,7 +31,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(0);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
 		}
 
 		public void SortExpiration()
@@ -41,7 +44,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(1);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
 		}
 
 		public void SortAccept()
@@ -54,7 +57,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(2);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
 		}
 
 		public void SortReward()
@@ -67,7 +70,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(3);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
 		}
 
 		public void SortType()
@@ -80,7 +83,7 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(4);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
 		}
 
 		public void SortPlanet()
@@ -93,7 +96,14 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetSort(5);
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
+		}
+
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
 		}
 	}
 }
