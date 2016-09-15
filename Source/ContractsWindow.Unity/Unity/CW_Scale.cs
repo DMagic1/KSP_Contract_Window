@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_Scale : CW_Popup
 	{
 		[SerializeField]
@@ -37,6 +38,8 @@ namespace ContractsWindow.Unity.Unity
 			SliderValue.text = CW_Window.Window.Interface.Scale.ToString("P0");
 
 			SliderScale.value = CW_Window.Window.Interface.Scale * 10;
+
+			FadeIn();
 
 			loaded = true;
 		}
@@ -81,20 +84,35 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
+			float f = value / 10;
+
+			if (SliderValue != null)
+				SliderValue.text = f.ToString("P0");
+		}
+
+		public void ApplyScale()
+		{
+			if (SliderScale == null)
+				return;
+
 			if (CW_Window.Window == null)
 				return;
 
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			float f = value / 10;
+			float f = SliderScale.value / 10;
 
-			if (SliderValue != null)
-				SliderValue.text = f.ToString("P0");
+			print(string.Format("[CW_UI] Local Scale: X = {0:N3} Y = {1:N3} Z = {2:N3}", CW_Window.Window.transform.localScale.x, CW_Window.Window.transform.localScale.y, CW_Window.Window.transform.localScale.z));
 
 			CW_Window.Window.Interface.Scale = f;
 
-			CW_Window.Window.transform.localScale *= f;
+			Vector3 scale = new Vector3(1, 1, 1);
+
+			if (CW_Window.Window.Interface.IgnoreScale)
+				scale /= CW_Window.Window.Interface.MasterScale;
+
+			CW_Window.Window.transform.localScale = scale * f;
 		}
 
 		public void Close()
@@ -102,7 +120,14 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
+		}
+
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
 		}
 	}
 }
