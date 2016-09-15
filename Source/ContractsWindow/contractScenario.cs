@@ -296,16 +296,6 @@ namespace ContractsWindow
 				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
 			}
 
-			////Start the window object
-			//try
-			//{
-			//	cWin = gameObject.AddComponent<contractsWindow>();
-			//}
-			//catch (Exception e)
-			//{
-			//	DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
-			//}
-
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
@@ -341,21 +331,29 @@ namespace ContractsWindow
 
 		#region utilities
 
-		internal void toggleToolbars(bool useStock)
+		internal void toggleToolbars()
 		{
-			if (useStock)
+			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				if (blizzyToolbarButton != null)
+				{
 					Destroy(blizzyToolbarButton);
+					blizzyToolbarButton = null;
+				}
 
-				blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
+				if (appLauncherButton == null)
+					appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 			}
-			else if (ToolbarManager.ToolbarAvailable)
+			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
 			{
 				if (appLauncherButton != null)
+				{
 					Destroy(appLauncherButton);
+					appLauncherButton = null;
+				}
 
-				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
+				if (blizzyToolbarButton == null)
+					blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
 			}
 		}
 
