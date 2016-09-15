@@ -34,7 +34,7 @@ using UnityEngine;
 
 namespace ContractsWindow.Toolbar
 {
-	public class contractStockToolbar : ApplicationLauncherButton
+	public class contractStockToolbar : MonoBehaviour
 	{
 		private ApplicationLauncherButton toolbarButton = null;
 		private ApplicationLauncherButton stockAppButton = null;
