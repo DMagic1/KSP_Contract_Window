@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
+	[RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 	public class CW_Toolbar : CW_Popup
 	{
 		[SerializeField]
@@ -21,24 +22,17 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			if (StockToggle == null)
-				return;
-
-			if (!CW_Window.Window.Interface.BlizzyAvailable)
+			if (StockToggle == null && !CW_Window.Window.Interface.BlizzyAvailable)
 				StockToggle.gameObject.SetActive(false);
 
-			if (StockReplace == null)
-				return;
-
-			if (!CW_Window.Window.Interface.StockToolbar)
+			if (StockReplace == null && !CW_Window.Window.Interface.StockToolbar)
 				StockReplace.gameObject.SetActive(false);
+
+			FadeIn();
 		}
 
 		public void UseStockToolbar(bool isOn)
 		{
-			if (StockToggle == null || StockReplace == null)
-				return;
-
 			if (CW_Window.Window == null)
 				return;
 
@@ -53,14 +47,12 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_Window.Window.Interface.StockToolbar = isOn;
 
-			StockToggle.gameObject.SetActive(isOn);
+			if (StockReplace != null)
+				StockReplace.gameObject.SetActive(isOn);
 		}
 
 		public void ReplaceStockToolbar(bool isOn)
 		{
-			if (StockReplace == null)
-				return;
-
 			if (CW_Window.Window == null)
 				return;
 
@@ -75,7 +67,14 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-			CW_Window.Window.DestroyChild(gameObject);
+			CW_Window.Window.FadePopup(this);
+		}
+
+		public override void ClosePopup()
+		{
+			gameObject.SetActive(false);
+
+			Destroy(gameObject);
 		}
 	}
 }
