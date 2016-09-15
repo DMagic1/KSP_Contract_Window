@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace ContractsWindow.Unity.Unity
 {
 	[RequireComponent(typeof(RectTransform))]
-	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
+	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IScrollHandler
 	{
 		[SerializeField]
 		private Text VersionText = null;
@@ -45,6 +45,14 @@ namespace ContractsWindow.Unity.Unity
 		private Toggle SortOrderToggle = null;
 		[SerializeField]
 		private Toggle ShowHideToggle = null;
+		[SerializeField]
+		private ScrollRect Scroller = null;
+		[SerializeField]
+		private TooltipHandler EyesTooltip = null;
+		[SerializeField]
+		private TooltipHandler MainPanelTooltip = null;
+		[SerializeField]
+		private GameObject TooltipPrefab = null;
 		 
 		private Vector2 mouseStart;
 		private Vector3 windowStart;
@@ -77,6 +85,16 @@ namespace ContractsWindow.Unity.Unity
 			get { return windowInterface; }
 		}
 
+		public GameObject Tooltip
+		{
+			get { return TooltipPrefab; }
+		}
+
+		public ScrollRect Scroll
+		{
+			get { return Scroller; }
+		}
+
 		protected override void Awake()
 		{
 			base.Awake();
@@ -90,7 +108,7 @@ namespace ContractsWindow.Unity.Unity
 		{
 			Alpha(1);
 
-			Fade(1, true, true, true);
+			Fade(1, true);
 		}
 
 		public void setWindow(ICW_Window window)
@@ -108,6 +126,11 @@ namespace ContractsWindow.Unity.Unity
 			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
 
 			UpdateFontSize(gameObject, window.LargeFont ? 1 : 0);
+
+			if (window.IgnoreScale)
+				transform.localScale /= window.MasterScale;
+
+			transform.localScale *= window.Scale;
 		}
 
 		public void setupProgressPanel(IProgressPanel panel)
@@ -284,10 +307,11 @@ namespace ContractsWindow.Unity.Unity
 				if (progressPanel != null)
 					progressPanel.SetProgressVisible(true);
 
-				if (MissionTitle == null)
-					return;
+				if (MissionTitle != null)
+					MissionTitle.text = "Progress Nodes:";
 
-				MissionTitle.text = "Progress Nodes:";
+				if (MainPanelTooltip != null)
+					MainPanelTooltip.SetNewText("Go To Contracts");
 			}
 			else
 			{
@@ -297,10 +321,11 @@ namespace ContractsWindow.Unity.Unity
 				if (currentMission != null)
 					currentMission.SetMissionVisible(true);
 
-				if (MissionTitle == null || currentMission == null)
-					return;
+				if (MissionTitle != null && currentMission != null)
+					MissionTitle.text = currentMission.MissionTitle + ":";
 
-				MissionTitle.text = currentMission.MissionTitle + ":";
+				if (MainPanelTooltip != null)
+					MainPanelTooltip.SetNewText("Go To Progress Records");
 			}
 		}
 
@@ -357,6 +382,9 @@ namespace ContractsWindow.Unity.Unity
 			currentMission.MissionInterface.ShowHidden = isOn;
 
 			currentMission.ToggleContracts(isOn);
+
+			if (EyesTooltip != null)
+				EyesTooltip.SetNewText(isOn ? "Show Active Contracts" : "Show Hidden Contracts");
 		}
 
 		public void showSelector()
@@ -621,7 +649,7 @@ namespace ContractsWindow.Unity.Unity
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 
-			windowInterface.SetWindowPosition(new Rect(rect.position.x, rect.position.y, rect.sizeDelta.x, rect.sizeDelta.y));
+			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
 		}
 
 		public void OnBeginDrag(PointerEventData eventData)
@@ -650,7 +678,7 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-			windowInterface.SetWindowPosition(new Rect(rect.position.x, rect.position.y, rect.sizeDelta.x, rect.sizeDelta.y));
+			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
 		}
 
 		public void OnPointerEnter(PointerEventData eventData)
@@ -669,7 +697,12 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-			rect.position = new Vector3(r.x, r.y, 0);
+			Vector3 pos = new Vector3();
+
+			if (r == null)
+				pos = new Vector3(50, -80, 0);
+
+			rect.anchoredPosition = new Vector3(r.x, r.y > 0 ? r.y * -1 : r.y, 0);
 
 			rect.sizeDelta = new Vector2(r.width, r.height);
 
@@ -714,17 +747,22 @@ namespace ContractsWindow.Unity.Unity
 
 		public void FadeIn()
 		{
-			Fade(1, true, false);
+			Fade(1, true);
+		}
+
+		public void ScaleAndFadeIn()
+		{
+			Fade(1, true);
 		}
 
 		public void FadeOut()
 		{
-			Fade(0.6f, false, false);
+			Fade(0.8f, false);
 		}
 
 		public void Close()
 		{
-			Fade(0, true, true, false, Hide);
+			Fade(0, true, Hide);
 		}
 
 		private void Hide()
@@ -732,16 +770,12 @@ namespace ContractsWindow.Unity.Unity
 			gameObject.SetActive(false);
 		}
 
-		public void DestroyChild(GameObject obj)
+		public void OnScroll(PointerEventData eventData)
 		{
-			popupOpen = false;
-
-			if (obj == null)
+			if (Scroller == null)
 				return;
 
-			obj.SetActive(false);
-
-			Destroy(obj);
+			Scroller.OnScroll(eventData);
 		}
 
 		public void OnPointerDown(PointerEventData eventData)
@@ -750,9 +784,7 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			var popups = GetComponentsInChildren<CW_Popup>();
-
-			print("[CW_UI] Found " + popups.Length + " Popups");
-
+			
 			for (int i = popups.Length - 1; i >= 0; i--)
 			{
 				CW_Popup popup = popups[i];
@@ -762,7 +794,7 @@ namespace ContractsWindow.Unity.Unity
 
 				if (!popup.gameObject.activeSelf)
 				{
-					DestroyPopup(popup);
+					FadePopup(popup);
 					continue;
 				}
 
@@ -774,32 +806,17 @@ namespace ContractsWindow.Unity.Unity
 				if (RectTransformUtility.RectangleContainsScreenPoint(r, eventData.position, eventData.pressEventCamera))
 					continue;
 
-				DestroyPopup(popup);
+				FadePopup(popup);
 
 				popupOpen = false;
 			}
 		}
 
-		public void DestroyPopup(CW_Popup p)
+		public void FadePopup(CW_Popup p)
 		{
-			p.gameObject.SetActive(false);
+			popupOpen = false;
 
-			Destroy(p);
-
-			var popups = GetComponentsInChildren<CW_Popup>();
-
-			for (int i = popups.Length - 1; i >= 0; i--)
-			{
-				CW_Popup popup = popups[i];
-
-				if (popup == null)
-					continue;
-
-				popup.gameObject.SetActive(false);
-
-				Destroy(popup);
-			}
+			p.FadeOut(p.ClosePopup);
 		}
-
 	}
 }
