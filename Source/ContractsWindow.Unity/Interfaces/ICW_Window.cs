@@ -22,9 +22,11 @@ namespace ContractsWindow.Unity.Interfaces
 
 		float Scale { get; set; }
 
-		float MasterScale { get; set; }
+		float MasterScale { get; }
 
 		string Version { get; }
+
+		Canvas MainCanvas { get; }
 
 		IList<IMissionSection> GetMissions { get; }
 
