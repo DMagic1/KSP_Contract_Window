@@ -35,22 +35,16 @@ namespace ContractsWindow.Unity
 	public class CanvasFader : MonoBehaviour
 	{
 		[SerializeField]
-		private float YShrinkScale = 1;
-		[SerializeField]
-		private float XShrinkScale = 1;
-		[SerializeField]
 		private float SlowRate = 0.9f;
 		[SerializeField]
 		private float FastRate = 0.3f;
 
 		private CanvasGroup canvas;
-		private RectTransform rect;
 		private IEnumerator fader;
 
 		protected virtual void Awake()
 		{
 			canvas = GetComponent<CanvasGroup>();
-			rect = GetComponent<RectTransform>();
 		}
 
 		public bool Fading
@@ -58,26 +52,12 @@ namespace ContractsWindow.Unity
 			get { return fader != null; }
 		}
 
-		protected void Fade(float to, bool fast, bool scale, bool grow = false, Action call = null)
+		protected void Fade(float to, bool fast, Action call = null)
 		{
 			if (canvas == null)
 				return;
 
-			float xTo = 1;
-			float yTo = 1;
-			float xFrom = 1;
-			float yFrom = 1;
-
-			if (scale)
-			{
-				xTo = grow ? 1 : XShrinkScale;
-				yTo = grow ? 1 : YShrinkScale;
-
-				xFrom = rect.localScale.x;
-				yFrom = rect.localScale.y;
-			}
-
-			Fade(canvas.alpha, to, fast ? FastRate : SlowRate, call, xTo, yTo, xFrom, yFrom);
+			Fade(canvas.alpha, to, fast ? FastRate : SlowRate, call);
 		}
 
 		protected void Alpha(float to)
@@ -89,27 +69,16 @@ namespace ContractsWindow.Unity
 			canvas.alpha = to;
 		}
 
-		private void Scale(float toX, float toY)
-		{
-			if (rect == null)
-				return;
-
-			toX = Mathf.Clamp01(toX);
-			toY = Mathf.Clamp01(toY);
-
-			rect.localScale = new Vector3(toX, toY, 1);
-		}
-
-		private void Fade(float from, float to, float duration, Action call, float scaleToX, float scaleToY, float scaleFromX, float scaleFromY)
+		private void Fade(float from, float to, float duration, Action call)
 		{
 			if (fader != null)
 				StopCoroutine(fader);
 
-			fader = FadeRoutine(from, to, duration, call, scaleToX, scaleToY, scaleFromX, scaleFromY);
+			fader = FadeRoutine(from, to, duration, call);
 			StartCoroutine(fader);
 		}
 
-		private IEnumerator FadeRoutine(float from, float to, float duration, Action call, float scaleToX, float scaleToY, float scaleFromX, float scaleFromY)
+		private IEnumerator FadeRoutine(float from, float to, float duration, Action call)
 		{
 			yield return new WaitForEndOfFrame();
 
@@ -119,7 +88,6 @@ namespace ContractsWindow.Unity
 			{
 				f += Time.deltaTime / duration;
 				Alpha(Mathf.Lerp(from, to, f));
-				Scale(Mathf.Lerp(scaleFromX, scaleToX, duration), Mathf.Lerp(scaleFromY, scaleToY, duration));
 				yield return null;
 			}
 
