@@ -6,6 +6,18 @@ namespace ContractsWindow.Unity
 {
 	public abstract class CW_Popup : CanvasFader
 	{
+		protected void FadeIn()
+		{
+			Alpha(0);
 
+			Fade(1, true);
+		}
+
+		public void FadeOut(Action call)
+		{
+			Fade(0, false, call);
+		}
+
+		public abstract void ClosePopup();
 	}
 }
