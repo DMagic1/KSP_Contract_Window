@@ -8,10 +8,8 @@ using UnityEngine.EventSystems;
 namespace ContractsWindow.Unity
 {
 
-	public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+	public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IScrollHandler
 	{
-		[SerializeField]
-		private GameObject TooltipPrefab = null;
 		[SerializeField, TextArea(2, 10)]
 		private string Text = "";
 
@@ -20,25 +18,34 @@ namespace ContractsWindow.Unity
 
 		private void Start()
 		{
-			if (TooltipPrefab == null)
+			if (CW_Window.Window == null)
+				return;
+
+			if (CW_Window.Window.Tooltip == null)
+				return;
+
+			if (CW_Window.Window.Interface == null)
+				return;
+
+			if (CW_Window.Window.Interface.MainCanvas == null)
 				return;
 
 			if (string.IsNullOrEmpty(Text))
 				return;
 
-			GameObject obj = Instantiate(TooltipPrefab);
+			GameObject obj = Instantiate(CW_Window.Window.Tooltip);
 
 			if (obj == null)
 				return;
 
-			obj.transform.SetParent(transform);
+			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform);
 
 			tooltip = obj.GetComponent<ToolTip>();
+		}
 
-			if (tooltip == null)
-				return;
-
-			tooltip.gameObject.SetActive(false);
+		public void SetNewText(string s)
+		{
+			Text = s;
 		}
 
 		public bool IsActive
@@ -48,6 +55,8 @@ namespace ContractsWindow.Unity
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
+			print("[CW_UI] Activate Tooltip: " + Text);
+
 			if (tooltip == null)
 				return;
 
@@ -59,10 +68,23 @@ namespace ContractsWindow.Unity
 
 		public void OnPointerExit(PointerEventData eventData)
 		{
+			print("[CW_UI] Deactivate Tooltip: " + Text);
+
 			if (tooltip == null)
 				return;
 
 			tooltip.HideTooltip();
+		}
+
+		public void OnScroll(PointerEventData eventData)
+		{
+			if (CW_Window.Window == null)
+				return;
+
+			if (CW_Window.Window.Scroll == null)
+				return;
+
+			CW_Window.Window.Scroll.OnScroll(eventData);
 		}
 	}
 }
