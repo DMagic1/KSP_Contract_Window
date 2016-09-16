@@ -70,6 +70,7 @@ namespace ContractsWindow.Unity.Unity
 
 		private ICW_Window windowInterface;
 		private bool loaded;
+		private bool showingContracts = true;
 
 		private bool popupOpen;
 
@@ -78,6 +79,11 @@ namespace ContractsWindow.Unity.Unity
 		public static CW_Window Window
 		{
 			get { return window; }
+		}
+
+		public bool ShowingContracts
+		{
+			get { return showingContracts; }
 		}
 
 		public ICW_Window Interface
@@ -123,7 +129,7 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateMissionSections(window.GetMissions);
 
-			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
+			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
 			UpdateFontSize(gameObject, window.LargeFont ? 1 : 0);
 
@@ -142,6 +148,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			CreateProgressSection(panel);
+
+			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
 			UpdateFontSize(progressPanel.gameObject, windowInterface.LargeFont ? 1 : 0);
 		}
@@ -327,6 +335,8 @@ namespace ContractsWindow.Unity.Unity
 				if (MainPanelTooltip != null)
 					MainPanelTooltip.SetNewText("Go To Progress Records");
 			}
+
+			showingContracts = !showProgress;
 		}
 
 		public void ShowSort()
@@ -624,15 +634,17 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			if (rect.sizeDelta.y < 200 * windowInterface.Scale)
-				numY = (int)(200 * windowInterface.Scale);
-			else if (rect.sizeDelta.y > Screen.height)
-				numY = Screen.height;
+			float f = windowInterface.IgnoreScale ? 1 * windowInterface.Scale : windowInterface.MasterScale * windowInterface.Scale;
 
-			if (rect.sizeDelta.x < 250 * windowInterface.Scale)
-				numX = (int)(250 * windowInterface.Scale);
-			else if (rect.sizeDelta.x > 540 * windowInterface.Scale)
-				numX = (int)(510 * windowInterface.Scale);
+			if (rect.sizeDelta.y < 280)
+				numY = 280;
+			else if (rect.sizeDelta.y > Screen.height / f)
+				numY = (int)(Screen.height / f);
+
+			if (rect.sizeDelta.x < 250)
+				numX = 250;
+			else if (rect.sizeDelta.x > 540)
+				numX = 510;
 
 			rect.sizeDelta = new Vector2(numX, numY);
 		}
@@ -669,6 +681,24 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			rect.position = windowStart + (Vector3)(eventData.position - mouseStart);
+
+			rect.position = clamp(rect, new RectOffset(100, 100, 200, 200));
+		}
+
+		private Vector3 clamp(RectTransform r, RectOffset offset)
+		{
+			Vector3 pos = new Vector3();
+
+			float f = 1;
+
+			if (windowInterface != null)
+				f = windowInterface.IgnoreScale ? 1 * windowInterface.Scale : windowInterface.MasterScale * windowInterface.Scale;
+
+			pos.x = Mathf.Clamp(r.position.x, (-1 * (f * r.sizeDelta.x - offset.left)) - (Screen.width / 2), (Screen.width / 2) - offset.right);
+			pos.y = Mathf.Clamp(r.position.y, offset.bottom - (Screen.height / 2), (Screen.height / 2) + (f * r.sizeDelta.y - offset.top));
+			pos.z = 1;
+
+			return pos;
 		}
 
 		public void OnEndDrag(PointerEventData eventData)
@@ -727,7 +757,12 @@ namespace ContractsWindow.Unity.Unity
 
 		public void UpdateTooltips()
 		{
-			tooltips = GetComponentsInChildren<TooltipHandler>().ToList();
+			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
+
+			if (windowInterface == null)
+				return;
+
+			ToggleTooltips(windowInterface.HideTooltips);
 		}
 
 		public void UpdateFontSize(GameObject obj, int s)
@@ -743,6 +778,14 @@ namespace ContractsWindow.Unity.Unity
 
 				t.fontSize += s;
 			}
+		}
+
+		public void RefreshProgress()
+		{
+			if (progressPanel == null)
+				return;
+
+			progressPanel.Refresh();
 		}
 
 		public void FadeIn()
