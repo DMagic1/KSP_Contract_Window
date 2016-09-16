@@ -493,8 +493,16 @@ namespace ContractsWindow.PanelInterfaces
 
 		protected override void RepeatingWorker()
 		{
-			if (cList.Count > 0)
-				refreshContracts(cList, false);
+			if (UIWindow == null)
+				return;
+
+			if (UIWindow.ShowingContracts)
+			{
+				if (cList.Count > 0)
+					refreshContracts(cList, false);
+			}
+			else
+				UIWindow.RefreshProgress();
 		}
 
 		public void Open()
