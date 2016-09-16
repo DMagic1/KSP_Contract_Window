@@ -176,6 +176,26 @@ namespace ContractsWindow.Unity.Unity
 			parameters.Clear();
 
 			CreateParameterSections(contractInterface.GetParameters);
+
+			for (int i = parameters.Count - 1; i >= 0; i--)
+			{
+				CW_ParameterSection p = parameters[i];
+
+				if (p == null)
+					continue;
+
+				var texts = p.GetComponentsInChildren<Text>();
+
+				for (int j = texts.Length - 1; j >= 0; j--)
+				{
+					Text t = texts[j];
+
+					if (t == null)
+						continue;
+
+					t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
+				}
+			}
 		}
 
 		public void ShowAgent()
@@ -337,11 +357,11 @@ namespace ContractsWindow.Unity.Unity
 		{
 			switch (stars)
 			{
-				case 1:
+				case 0:
 					return Stars_One;
-				case 2:
+				case 1:
 					return Stars_Two;
-				case 3:
+				case 2:
 					return Stars_Three;
 				default:
 					return Stars_One;
