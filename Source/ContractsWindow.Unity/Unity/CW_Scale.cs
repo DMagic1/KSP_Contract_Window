@@ -103,8 +103,6 @@ namespace ContractsWindow.Unity.Unity
 
 			float f = SliderScale.value / 10;
 
-			print(string.Format("[CW_UI] Local Scale: X = {0:N3} Y = {1:N3} Z = {2:N3}", CW_Window.Window.transform.localScale.x, CW_Window.Window.transform.localScale.y, CW_Window.Window.transform.localScale.z));
-
 			CW_Window.Window.Interface.Scale = f;
 
 			Vector3 scale = new Vector3(1, 1, 1);

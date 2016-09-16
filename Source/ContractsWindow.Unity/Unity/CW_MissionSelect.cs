@@ -81,8 +81,6 @@ namespace ContractsWindow.Unity.Unity
 
 		public override void ClosePopup()
 		{
-			print("[CW_UI] Closing Mission Popup");
-
 			gameObject.SetActive(false);
 
 			Destroy(gameObject);
