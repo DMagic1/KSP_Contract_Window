@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 namespace ContractsWindow.Unity
 {
 
-	public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IScrollHandler
+	public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IScrollHandler
 	{
 		[SerializeField, TextArea(2, 10)]
 		private string Text = "";
@@ -38,7 +38,7 @@ namespace ContractsWindow.Unity
 			if (obj == null)
 				return;
 
-			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform);
+			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform, false);
 
 			tooltip = obj.GetComponent<ToolTip>();
 		}
@@ -55,8 +55,6 @@ namespace ContractsWindow.Unity
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			print("[CW_UI] Activate Tooltip: " + Text);
-
 			if (tooltip == null)
 				return;
 
@@ -68,8 +66,14 @@ namespace ContractsWindow.Unity
 
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			print("[CW_UI] Deactivate Tooltip: " + Text);
+			if (tooltip == null)
+				return;
 
+			tooltip.HideTooltip();
+		}
+
+		public void OnPointerClick(PointerEventData eventData)
+		{
 			if (tooltip == null)
 				return;
 
