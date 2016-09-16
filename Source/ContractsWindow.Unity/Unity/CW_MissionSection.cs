@@ -46,6 +46,8 @@ namespace ContractsWindow.Unity.Unity
 			missionTitle = missionInterface.MissionTitle;
 
 			CreateContractSections(section.GetContracts);
+
+			section.SetParent(this);
 		}
 
 		private void CreateContractSections(IList<IContractSection> contracts)
@@ -138,6 +140,7 @@ namespace ContractsWindow.Unity.Unity
 				t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
 			}
 
+			CW_Window.Window.UpdateTooltips();
 		}
 
 		private CW_ContractSection GetContract(Guid id)
@@ -225,6 +228,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			c.RefreshParameters();
+
+			CW_Window.Window.UpdateTooltips();
 		}
 
 		public void RemoveContract(Guid id)
