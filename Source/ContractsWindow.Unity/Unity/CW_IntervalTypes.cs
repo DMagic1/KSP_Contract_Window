@@ -14,6 +14,8 @@ namespace ContractsWindow.Unity.Unity
 		private GameObject IntervalPrefab = null;
 		[SerializeField]
 		private Transform IntervalTransform = null;
+		[SerializeField]
+		private Toggle IntervalToggle = null;
 
 		private List<CW_IntervalNode> nodes = new List<CW_IntervalNode>();
 		private IIntervalNode intervalInterface;
@@ -36,6 +38,12 @@ namespace ContractsWindow.Unity.Unity
 			CreateIntervalNodes(node);
 		}
 
+		public void Refresh()
+		{
+			if (IntervalToggle != null && IntervalToggle.isOn)
+				NodesOn(true);
+		}
+
 		public void NodesOn(bool isOn)
 		{
 			if (intervalInterface == null)
@@ -53,7 +61,7 @@ namespace ContractsWindow.Unity.Unity
 
 				node.UpdateText();
 
-				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval >= i - 1);
+				node.gameObject.SetActive(isOn && intervalInterface.NodeInterval > i + 1);
 			}
 		}
 
