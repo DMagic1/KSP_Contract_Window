@@ -105,6 +105,8 @@ namespace ContractsWindow.PanelInterfaces
 
 				paramList.Add(new parameterUIObject(pC));
 			}
+
+			UpdateContractUI();
 		}
 
 		private void UpdateContractUI()
