@@ -78,8 +78,6 @@ namespace ContractsWindow.Unity.Unity
 		//Call this function externally to set the text of the template and activate the tooltip
 		public void SetTooltip(string text)
 		{
-			print("[CW_UI] Tooltip Checking...");
-
 			if (_guiMode == RenderMode.ScreenSpaceCamera)
 			{
 				//set the text and fit the tooltip panel to the text size
@@ -116,7 +114,6 @@ namespace ContractsWindow.Unity.Unity
 		//main tooltip edge of screen guard and movement
 		public void OnScreenSpaceCamera()
 		{
-			print("[CW_UI] Positioning...");
 			Vector3 newPos = _guiCamera.ScreenToViewportPoint(Input.mousePosition - new Vector3(xShift, YShift, 0f));
 			Vector3 newPosWVP = _guiCamera.ViewportToWorldPoint(newPos);
 
@@ -165,8 +162,7 @@ namespace ContractsWindow.Unity.Unity
 				Vector3 newWorldPos = new Vector3(newPos.x, newPosWVP.y + shifter.y, 0f);
 				newPos.y = _guiCamera.WorldToViewportPoint(newWorldPos).y;
 			}
-			print(string.Format("[CW_UI] Tooltip Position: X = {0:N3} Y = {1:N3}", newPosWVP.x, newPosWVP.y));
-			this.transform.position = new Vector3(newPosWVP.x, newPosWVP.y, 0f);
+			this.transform.position = new Vector3(newPosWVP.x, newPosWVP.y, 1f);
 			this.gameObject.SetActive(true);
 			_inside = true;
 		}
