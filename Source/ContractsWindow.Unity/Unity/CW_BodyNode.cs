@@ -42,24 +42,12 @@ namespace ContractsWindow.Unity.Unity
 
 			if (CW_ProgressPanel.Instance.PanelInterface == null)
 				return;
-
-			if (BodyToggle != null)
-				BodyToggle.gameObject.SetActive(CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(body));
 		}
 
-		private void Update()
+		public void Refresh()
 		{
-			if (CW_ProgressPanel.Instance == null)
-				return;
-
-			if (CW_ProgressPanel.Instance.PanelInterface == null)
-				return;
-
-			if (!CW_ProgressPanel.Instance.PanelInterface.IsVisible)
-				return;
-
-			if (BodyToggle != null)
-				BodyToggle.gameObject.SetActive(CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName));
+			if (BodyToggle != null && BodyToggle.isOn)
+				NodesOn(true);
 		}
 
 		public void NodesOn(bool isOn)

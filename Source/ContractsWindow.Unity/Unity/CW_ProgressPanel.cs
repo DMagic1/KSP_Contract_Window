@@ -83,27 +83,6 @@ namespace ContractsWindow.Unity.Unity
 				BodyToggle.gameObject.SetActive(panel.AnyBody);
 		}
 
-		private void Update()
-		{
-			if (panelInterface == null)
-				return;
-
-			if (!panelInterface.IsVisible)
-				return;
-
-			if (IntervalToggle != null)
-				IntervalToggle.gameObject.SetActive(panelInterface.AnyInterval);
-
-			if (StandardToggle != null)
-				StandardToggle.gameObject.SetActive(panelInterface.AnyStandard);
-
-			if (POIToggle != null)
-				POIToggle.gameObject.SetActive(panelInterface.AnyPOI);
-
-			if (BodyToggle != null)
-				BodyToggle.gameObject.SetActive(panelInterface.AnyBody);
-		}
-
 		public void SetProgressVisible(bool isOn)
 		{
 			if (panelInterface == null)
@@ -112,6 +91,81 @@ namespace ContractsWindow.Unity.Unity
 			panelInterface.IsVisible = isOn;
 
 			gameObject.SetActive(isOn);
+
+			if (isOn)
+				Refresh();
+		}
+
+		public void Refresh()
+		{
+			if (panelInterface == null)
+				return;
+
+			if (POIToggle != null)
+			{
+				POIToggle.gameObject.SetActive(panelInterface.AnyPOI);
+
+				if (POIToggle.isOn)
+					TogglePOIs(true);
+			}
+
+			if (StandardToggle != null)
+			{
+				StandardToggle.gameObject.SetActive(panelInterface.AnyStandard);
+
+				if (StandardToggle.isOn)
+					ToggleStandards(true);
+			}
+
+			if (IntervalToggle != null)
+			{
+				IntervalToggle.gameObject.SetActive(panelInterface.AnyInterval);
+
+				if (IntervalToggle.isOn)
+				{
+					for (int i = intervalTypes.Count - 1; i >= 0; i--)
+					{
+						CW_IntervalTypes type = intervalTypes[i];
+
+						if (type == null)
+							continue;
+
+						if (type.IntervalInterface == null)
+							continue;
+
+						if (!type.IntervalInterface.IsReached)
+							continue;
+
+						type.gameObject.SetActive(true);
+
+						type.Refresh();
+					}
+				}
+			}
+
+			if (BodyToggle != null)
+			{
+				BodyToggle.gameObject.SetActive(panelInterface.AnyBody);
+
+				if (BodyToggle.isOn)
+				{
+					for (int i = bodyNodes.Count - 1; i >= 0; i--)
+					{
+						CW_BodyNode body = bodyNodes[i];
+
+						if (body == null)
+							continue;
+
+						if (!panelInterface.AnyBodyNode(body.BodyName))
+							continue;
+
+						body.gameObject.SetActive(true);
+
+						body.Refresh();
+					}
+				}
+			}
+
 		}
 
 		public void ToggleIntervals(bool isOn)
@@ -219,35 +273,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.gameObject.SetActive(false);
 		}
 
-		//public void AddIntervalType(string t, List<IIntervalNode> n)
-		//{
-		//	if (n.Count <= 0)
-		//		return;
-
-		//	CreateIntervalType(t, n);
-		//}
-
-		//public void AddIntervalNode(string t, IIntervalNode n)
-		//{
-		//	if (n == null)
-		//		return;
-
-		//	for (int i = intervalTypes.Count - 1; i >= 0; i--)
-		//	{
-		//		CW_IntervalTypes type = intervalTypes[i];
-
-		//		if (type == null)
-		//			continue;
-
-		//		if (type.Title != t)
-		//			continue;
-
-		//		type.AddIntervalNode(n);
-
-		//		break;
-		//	}
-		//}
-
 		private void CreatePOINodes(IList<IStandardNode> nodes)
 		{
 			if (nodes == null)
@@ -288,14 +313,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.gameObject.SetActive(false);
 		}
 
-		//public void AddPOINode(IStandardNode node)
-		//{
-		//	if (node == null)
-		//		return;
-
-		//	CreatePOINode(node);
-		//}
-
 		private void CreateStandardNodes(IList<IStandardNode> nodes)
 		{
 			if (nodes == null)
@@ -335,14 +352,6 @@ namespace ContractsWindow.Unity.Unity
 
 			nodeObject.gameObject.SetActive(false);
 		}
-
-		//public void AddStandardNode(IStandardNode node)
-		//{
-		//	if (node == null)
-		//		return;
-
-		//	CreateStandardNode(node);
-		//}
 
 		private void CreateBodies(Dictionary<string, List<IStandardNode>> bodies)
 		{
@@ -385,35 +394,6 @@ namespace ContractsWindow.Unity.Unity
 
 			nodeObject.gameObject.SetActive(false);
 		}
-
-		//public void AddBody(string body, List<IStandardNode> nodes)
-		//{
-		//	if (nodes.Count <= 0)
-		//		return;
-
-		//	CreateBody(body, nodes);
-		//}
-
-		//public void AddBodyNode(string b, IStandardNode n)
-		//{
-		//	if (n == null)
-		//		return;
-
-		//	for (int i = bodyNodes.Count - 1; i >= 0; i--)
-		//	{
-		//		CW_BodyNode body = bodyNodes[i];
-
-		//		if (body == null)
-		//			continue;
-
-		//		if (body.BodyName != b)
-		//			continue;
-
-		//		body.AddBodyNode(n);
-
-		//		break;
-		//	}
-		//}
 
 	}
 }
