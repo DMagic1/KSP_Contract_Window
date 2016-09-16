@@ -70,7 +70,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (body == null)
 					continue;
 
-				if (bodies.ContainsKey(body.Body.bodyName))
+				if (bodies.ContainsKey(body.Body.theName))
 					continue;
 
 				List<progressStandard> bodySubNodes = body.getAllNodes;
@@ -87,7 +87,7 @@ namespace ContractsWindow.PanelInterfaces
 					newNodes.Add(node);
 				}
 
-				bodies.Add(body.Body.bodyName, newNodes);
+				bodies.Add(body.Body.theName, newNodes);
 			}
 		}
 
