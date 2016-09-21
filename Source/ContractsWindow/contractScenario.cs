@@ -75,7 +75,7 @@ namespace ContractsWindow
 		private static contractScenario instance;
 
 		//Primary mission storage
-		private Dictionary<string, contractMission> missionList = new Dictionary<string,contractMission>();
+		private DictionaryValueList<string, contractMission> missionList = new DictionaryValueList<string, contractMission>();
 
 		//A specific contractMission is assigned to hold all contracts; contracts can't be removed from this
 		private contractMission masterMission = new contractMission("MasterMission");
@@ -110,13 +110,6 @@ namespace ContractsWindow
 		public string InfoVersion
 		{
 			get { return infoVersion; }
-		}
-
-		private static Texture stockIcon;
-
-		public static Texture StockIcon
-		{
-			get { return stockIcon; }
 		}
 
 		//A count of all active contracts as determined by manually checking the Game config node
@@ -167,69 +160,63 @@ namespace ContractsWindow
 					}
 				}
 
-				//The next step is checking the current version number and comparing it to the saved value;
-				//if a newer version number is detected the rest of the load process is skipped;
-				//this resets all values for version updates
-				//if (version == contractAssembly.Version)
-				//{
-					ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
-					if (scenes != null)
+				ConfigNode scenes = node.GetNode("Contracts_Window_Parameters");
+				if (scenes != null)
+				{
+					windowPos = stringSplit(scenes.GetValue("WindowPosition"));
+					windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
+					int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
+
+					//All saved contract missions are loaded here
+					//Each mission has a separate contract list
+					foreach (ConfigNode m in scenes.GetNodes("Contracts_Window_Mission"))
 					{
-						windowPos = stringSplit(scenes.GetValue("WindowPosition"));
-						windowVisible = stringSplitBool(scenes.GetValue("WindowVisible"));
-						int[] winPos = new int[4] { windowPos[4 * currentScene(HighLogic.LoadedScene)], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 1], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 2], windowPos[(4 * currentScene(HighLogic.LoadedScene)) + 3] };
+						if (m == null)
+							continue;
 
-						//All saved contract missions are loaded here
-						//Each mission has a separate contract list
-						foreach (ConfigNode m in scenes.GetNodes("Contracts_Window_Mission"))
+						string name;
+						string activeString = "";
+						string hiddenString = "";
+						string vesselString = "";
+						bool ascending, showActive;
+						int sortMode;
+						bool master = false;
+
+						if (m.HasValue("MissionName"))
+							name = m.GetValue("MissionName");
+						else
+							continue;
+
+						if (name == "MasterMission")
+							master = true;
+
+						if (m.HasValue("ActiveListID"))
+							activeString = m.GetValue("ActiveListID");
+						if (m.HasValue("HiddenListID"))
+							hiddenString = m.GetValue("HiddenListID");
+						if (m.HasValue("VesselIDs"))
+							vesselString = m.GetValue("VesselIDs");
+
+						if (!bool.TryParse(m.GetValue("AscendingSort"), out ascending))
+							ascending = true;
+						if (!bool.TryParse(m.GetValue("ShowActiveList"), out showActive))
+							showActive = true;
+						if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
+							sortMode = 0;
+
+						contractMission mission = new contractMission(name, activeString, hiddenString, vesselString, ascending, showActive, sortMode, master);
+
+						if (master)
 						{
-							if (m == null)
-								continue;
-
-							string name;
-							string activeString = "";
-							string hiddenString = "";
-							string vesselString = "";
-							bool ascending, showActive;
-							int sortMode;
-							bool master = false;
-
-							if (m.HasValue("MissionName"))
-								name = m.GetValue("MissionName");
-							else
-								continue;
-
-							if (name == "MasterMission")
-								master = true;
-
-							if (m.HasValue("ActiveListID"))
-								activeString = m.GetValue("ActiveListID");
-							if (m.HasValue("HiddenListID"))
-								hiddenString = m.GetValue("HiddenListID");
-							if (m.HasValue("VesselIDs"))
-								vesselString = m.GetValue("VesselIDs");
-
-							if (!bool.TryParse(m.GetValue("AscendingSort"), out ascending))
-								ascending = true;
-							if (!bool.TryParse(m.GetValue("ShowActiveList"), out showActive))
-								showActive = true;
-							if (!int.TryParse(m.GetValue("SortMode"), out sortMode))
-								sortMode = 0;
-
-							contractMission mission = new contractMission(name, activeString, hiddenString, vesselString, ascending, showActive, sortMode, master);
-
-							if (master)
-							{
-								masterMission = mission;
-								DMC_MBE.LogFormatted_DebugOnly("Setting Master Mission During Load");
-							}
-
-							if (!missionList.ContainsKey(name))
-								missionList.Add(name, mission);
+							masterMission = mission;
+							DMC_MBE.LogFormatted_DebugOnly("Setting Master Mission During Load");
 						}
-						loadWindow(winPos);
+
+						if (!missionList.Contains(name))
+							missionList.Add(name, mission);
 					}
-				//}
+					loadWindow(winPos);
+				}
 
 				version = contractAssembly.Version;
 			}
@@ -251,8 +238,14 @@ namespace ContractsWindow
 				scenes.AddValue("WindowPosition", stringConcat(windowPos, windowPos.Length));
 				scenes.AddValue("WindowVisible", stringConcat(windowVisible, windowVisible.Length));
 
-				foreach (contractMission m in missionList.Values)
+
+				for (int i = missionList.Count - 1; i >= 0; i--)
 				{
+					contractMission m = missionList.At(i);
+
+					if (m == null)
+						continue;
+
 					ConfigNode missionNode = new ConfigNode("Contracts_Window_Mission");
 
 					missionNode.AddValue("MissionName", m.InternalName);
@@ -319,8 +312,6 @@ namespace ContractsWindow
 
 			if (_cWin != null)
 				Destroy(_cWin);
-			//if (cWin != null)
-			//	Destroy(cWin);
 			if (appLauncherButton != null)
 				Destroy(appLauncherButton);
 			if (blizzyToolbarButton != null)
@@ -478,7 +469,7 @@ namespace ContractsWindow
 
 		internal bool addMissionList(string name)
 		{
-			if (!missionList.ContainsKey(name))
+			if (!missionList.Contains(name))
 			{
 				contractMission mission = new contractMission(name);
 				missionList.Add(name, mission);
@@ -492,7 +483,7 @@ namespace ContractsWindow
 
 		internal bool addMissionList(contractMission mission)
 		{
-			if (!missionList.ContainsKey(mission.MissionTitle))
+			if (!missionList.Contains(mission.MissionTitle))
 			{
 				missionList.Add(mission.MissionTitle, mission);
 				return true;
@@ -508,7 +499,7 @@ namespace ContractsWindow
 		{
 			string s = "MasterMission";
 
-			if (missionList.ContainsKey(s))
+			if (missionList.Contains(s))
 				removeMissionList(s);
 
 			if (addMissionList(s))
@@ -522,17 +513,43 @@ namespace ContractsWindow
 		//Adds all contracts to the master mission
 		private void addAllContractsToMaster()
 		{
-			contractMission Master = missionList.FirstOrDefault(a => a.Value.MasterMission).Value;
+			contractMission Master = null;
+			
+			for (int i = missionList.Count - 1; i >= 0 ; i--)
+			{
+				contractMission m = missionList.At(i);
+
+				if (m == null)
+					continue;
+
+				if (!m.MasterMission)
+					continue;
+
+				Master = m;
+				break;
+			}
+
 			if (Master != null)
 			{
-				foreach (contractContainer c in contractParser.getActiveContracts)
+				List<contractContainer> active = contractParser.getActiveContracts;
+
+				int l = active.Count;
+
+				for (int j = 0; j < l; j++)
+				{
+					contractContainer c = active[j];
+
+					if (c == null)
+						continue;
+
 					Master.addContract(c, true, true);
+				}
 			}
 		}
 
 		internal void removeMissionList(string name, bool delete = true)
 		{
-			if (missionList.ContainsKey(name))
+			if (missionList.Contains(name))
 			{
 				if (delete)
 				{
@@ -552,7 +569,7 @@ namespace ContractsWindow
 
 		internal contractMission getMissionList(string name, bool warn = false)
 		{
-			if (missionList.ContainsKey(name))
+			if (missionList.Contains(name))
 				return missionList[name];
 			else if (warn)
 				DMC_MBE.LogFormatted("No Mission Of Name [{0}] Found In Primary Mission List", name);
@@ -579,8 +596,13 @@ namespace ContractsWindow
 			if (v == null)
 				return masterMission;
 
-			foreach (contractMission m in missionList.Values)
+			for (int i = 0; i < missionList.Count; i++)
 			{
+				contractMission m = missionList.At(i);
+
+				if (m == null)
+					continue;
+
 				if (m.ContainsVessel(v))
 					return m;
 			}
@@ -599,8 +621,13 @@ namespace ContractsWindow
 			List<contractMission> mList = new List<contractMission>();
 			List<contractMission> tempList = new List<contractMission>();
 
-			foreach (contractMission m in missionList.Values)
+			for (int i = 0; i < missionList.Count; i++ )
 			{
+				contractMission m = missionList.At(i);
+
+				if (m == null)
+					continue;
+
 				if (m.MasterMission)
 					mList.Add(m);
 				else
@@ -624,20 +651,36 @@ namespace ContractsWindow
 		//Initializes all missions that were added during the loading process
 		internal void loadAllMissionLists()
 		{
-			foreach (contractMission m in missionList.Values)
+			for (int i = 0; i < missionList.Count; i++)
 			{
-				if (m != null)
+				contractMission m = missionList.At(i);
+
+				if (m == null)
+					continue;
+
+				if (m.MasterMission)
 				{
-					if (m.MasterMission)
+					m.buildMissionList();
+
+					List<contractContainer> active = contractParser.getActiveContracts;
+
+					int l = active.Count;
+
+					for (int j = 0; j < l; j++)
 					{
-						m.buildMissionList();
-						foreach (contractContainer c in contractParser.getActiveContracts)
-							m.addContract(c, true, false);
-						masterMission = m;
+						contractContainer c = active[j];
+
+						if (c == null)
+							continue;
+
+						m.addContract(c, true, false);
 					}
-					else
-						m.buildMissionList();
+
+					masterMission = m;
 				}
+				else
+					m.buildMissionList();
+
 			}
 		}
 
