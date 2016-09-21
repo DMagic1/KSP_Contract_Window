@@ -15,7 +15,7 @@ namespace ContractsWindow.Unity
 
 		public void FadeOut(Action call)
 		{
-			Fade(0, false, call);
+			Fade(0, false, call, false);
 		}
 
 		public abstract void ClosePopup();
