@@ -67,8 +67,8 @@ namespace ContractsWindow.Unity.Unity
 			// screenWidth = Screen.width;
 			// screenHeight = Screen.height;
 
-			xShift = 0f;
-			YShift = -30f;
+			xShift = 5f;
+			YShift = -35f;
 
 			// _xShifted = _yShifted = false;
 
