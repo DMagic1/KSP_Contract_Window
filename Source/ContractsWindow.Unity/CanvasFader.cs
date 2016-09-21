@@ -41,6 +41,7 @@ namespace ContractsWindow.Unity
 
 		private CanvasGroup canvas;
 		private IEnumerator fader;
+		private bool allowInterrupt = true;
 
 		protected virtual void Awake()
 		{
@@ -71,15 +72,20 @@ namespace ContractsWindow.Unity
 
 		private void Fade(float from, float to, float duration, Action call, bool interrupt)
 		{
-			if (fader != null && interrupt)
+			if (!allowInterrupt)
+				return;
+
+			if (fader != null)
 				StopCoroutine(fader);
 
-			fader = FadeRoutine(from, to, duration, call);
+			fader = FadeRoutine(from, to, duration, call, interrupt);
 			StartCoroutine(fader);
 		}
 
-		private IEnumerator FadeRoutine(float from, float to, float duration, Action call)
+		private IEnumerator FadeRoutine(float from, float to, float duration, Action call, bool interrupt)
 		{
+			allowInterrupt = interrupt;
+
 			yield return new WaitForEndOfFrame();
 
 			float f = 0;
@@ -93,6 +99,8 @@ namespace ContractsWindow.Unity
 
 			if (call != null)
 				call.Invoke();
+
+			allowInterrupt = true;
 
 			fader = null;
 		}
