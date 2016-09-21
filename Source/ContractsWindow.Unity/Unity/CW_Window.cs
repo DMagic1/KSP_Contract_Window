@@ -63,7 +63,6 @@ namespace ContractsWindow.Unity.Unity
 
 		private Dictionary<string, CW_MissionSection> missions = new Dictionary<string, CW_MissionSection>();
 		private CW_MissionSection currentMission;
-		private CW_MissionSection masterMission;
 		private CW_ProgressPanel progressPanel;
 
 		private List<TooltipHandler> tooltips = new List<TooltipHandler>();
@@ -130,6 +129,8 @@ namespace ContractsWindow.Unity.Unity
 			CreateMissionSections(window.GetMissions);
 
 			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
+
+			ToggleTooltips(window.HideTooltips);
 
 			UpdateFontSize(gameObject, window.LargeFont ? 1 : 0);
 
@@ -614,6 +615,19 @@ namespace ContractsWindow.Unity.Unity
 			popupOpen = true;
 		}
 
+		public void onStartResize(BaseEventData eventData)
+		{
+			if (!(eventData is PointerEventData))
+				return;
+
+			resizing = true;
+
+			if (windowInterface == null || windowInterface.MainCanvas == null)
+				return;
+
+			windowInterface.MainCanvas.pixelPerfect = false;
+		}
+
 		public void onResize(BaseEventData eventData)
 		{
 			if (rect == null)
@@ -621,8 +635,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (!(eventData is PointerEventData))
 				return;
-
-			resizing = true;
 
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x + ((PointerEventData)eventData).delta.x , rect.sizeDelta.y - ((PointerEventData)eventData).delta.y);
 
@@ -662,6 +674,11 @@ namespace ContractsWindow.Unity.Unity
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 
 			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
+
+			if (windowInterface.MainCanvas == null)
+				return;
+
+			windowInterface.MainCanvas.pixelPerfect = true;
 		}
 
 		public void OnBeginDrag(PointerEventData eventData)
@@ -805,7 +822,7 @@ namespace ContractsWindow.Unity.Unity
 
 		public void Close()
 		{
-			Fade(0, true, Hide);
+			Fade(0, true, Hide, false);
 		}
 
 		private void Hide()
