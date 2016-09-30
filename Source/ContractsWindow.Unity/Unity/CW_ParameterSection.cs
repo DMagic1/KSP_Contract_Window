@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+CW_ParameterSection - Controls contract parameter UI elements
+
+Copyright (c) 2016 DMagic
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,11 +35,11 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_ParameterSection : MonoBehaviour
 	{
 		[SerializeField]
-		private Text ParameterText = null;
+		private TextHandler ParameterText = null;
 		[SerializeField]
-		private Text ParameterRewardText = null;
+		private TextHandler ParameterRewardText = null;
 		[SerializeField]
-		private Text ParameterPenaltyText = null;
+		private TextHandler ParameterPenaltyText = null;
 		[SerializeField]
 		private Toggle NoteToggle = null;
 		[SerializeField]
@@ -62,11 +88,11 @@ namespace ContractsWindow.Unity.Unity
 			ParameterLayout.minWidth -= parameterInterface.ParamLayer * 5;
 			ParameterLayout.preferredWidth = ParameterLayout.minWidth;
 
-			ParameterText.text = parameterInterface.TitleText;
+			ParameterText.OnTextUpdate.Invoke(parameterInterface.TitleText);
 
-			ParameterRewardText.text = parameterInterface.RewardText;
+			ParameterRewardText.OnTextUpdate.Invoke(parameterInterface.RewardText);
 
-			ParameterPenaltyText.text = parameterInterface.PenaltyText;
+			ParameterPenaltyText.OnTextUpdate.Invoke(parameterInterface.PenaltyText);
 
 			oldState = parameterInterface.ParameterState;
 
@@ -100,11 +126,11 @@ namespace ContractsWindow.Unity.Unity
 			if (ParameterText == null || ParameterRewardText == null || ParameterPenaltyText == null)
 				return;
 
-			ParameterText.text = parameterInterface.TitleText;
+			ParameterText.OnTextUpdate.Invoke(parameterInterface.TitleText);
 
-			ParameterRewardText.text = parameterInterface.RewardText;
+			ParameterRewardText.OnTextUpdate.Invoke(parameterInterface.RewardText);
 
-			ParameterPenaltyText.text = parameterInterface.PenaltyText;
+			ParameterPenaltyText.OnTextUpdate.Invoke(parameterInterface.PenaltyText);
 		}
 
 		public void ToggleSubParams(bool isOn)
@@ -144,7 +170,7 @@ namespace ContractsWindow.Unity.Unity
 			}
 			
 			if (ParameterText != null)
-				ParameterText.color = stateColor(oldState);
+				ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
 		}
 
 		public void ToggleNote(bool isOn)
@@ -173,6 +199,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
+
+			parameterInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(NoteTransform, false);
 
@@ -238,6 +266,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
+
+			parameterInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(SubParamTransform, false);
 

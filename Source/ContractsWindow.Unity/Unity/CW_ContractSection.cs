@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+CW_ContractSection - Controls the contract UI element
+
+Copyright (c) 2016 DMagic
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,15 +35,15 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_ContractSection : MonoBehaviour
 	{
 		[SerializeField]
-		private Text ContractTitle = null;
+		private TextHandler ContractTitle = null;
 		[SerializeField]
 		private Image Stars = null;
 		[SerializeField]
-		private Text TimeRemaining = null;
+		private TextHandler TimeRemaining = null;
 		[SerializeField]
-		private Text ContractRewardText = null;
+		private TextHandler ContractRewardText = null;
 		[SerializeField]
-		private Text ContractPenaltyText = null;
+		private TextHandler ContractPenaltyText = null;
 		[SerializeField]
 		private GameObject ContractNotePrefab = null;
 		[SerializeField]
@@ -85,16 +111,16 @@ namespace ContractsWindow.Unity.Unity
 
 			contractInterface = contract;
 
-			ContractTitle.text = contract.ContractTitle;
+			ContractTitle.OnTextUpdate.Invoke(contract.ContractTitle);
 
 			if (CW_Window.Window != null && CW_Window.Window.Scroll != null && Highlighter != null)
 				Highlighter.setScroller(CW_Window.Window.Scroll);
 
 			handleColors(stateColor(contract.ContractState));
 
-			ContractRewardText.text = contract.RewardText;
+			ContractRewardText.OnTextUpdate.Invoke(contract.RewardText);
 
-			ContractPenaltyText.text = contract.PenaltyText;
+			ContractPenaltyText.OnTextUpdate.Invoke(contract.PenaltyText);
 
 			prepareHeader();
 
@@ -124,11 +150,11 @@ namespace ContractsWindow.Unity.Unity
 			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
 				return;
 
-			ContractTitle.text = contractInterface.ContractTitle;
+			ContractTitle.OnTextUpdate.Invoke(contractInterface.ContractTitle);
 
-			ContractRewardText.text = contractInterface.RewardText;
+			ContractRewardText.OnTextUpdate.Invoke(contractInterface.RewardText);
 
-			ContractPenaltyText.text = contractInterface.PenaltyText;
+			ContractPenaltyText.OnTextUpdate.Invoke(contractInterface.PenaltyText);
 		}
 
 		private void Update()
@@ -150,9 +176,9 @@ namespace ContractsWindow.Unity.Unity
 
 			if (TimeRemaining != null)
 			{
-				TimeRemaining.text = contractInterface.TimeRemaining;
+				TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
 
-				TimeRemaining.color = timeColor(contractInterface.TimeState);
+				TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
 			}
 		}
 
@@ -184,16 +210,20 @@ namespace ContractsWindow.Unity.Unity
 				if (p == null)
 					continue;
 
-				var texts = p.GetComponentsInChildren<Text>();
+				var texts = p.GetComponentsInChildren<TextHandler>(true);
 
 				for (int j = texts.Length - 1; j >= 0; j--)
 				{
-					Text t = texts[j];
+					TextHandler t = texts[j];
 
 					if (t == null)
 						continue;
 
-					t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
+					int f = CW_Window.Window.Interface.LargeFont ? 1 : 0;
+
+					t.OnFontChange.Invoke(f);
+
+					//t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
 				}
 			}
 		}
@@ -300,8 +330,6 @@ namespace ContractsWindow.Unity.Unity
 
 			contractInterface.ShowParams = isOn;
 
-			var p = GetComponentsInChildren<CW_ParameterSection>();
-
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
@@ -322,9 +350,9 @@ namespace ContractsWindow.Unity.Unity
 
 			if (TimeRemaining != null)
 			{
-				TimeRemaining.text = contractInterface.TimeRemaining;
+				TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
 
-				TimeRemaining.color = timeColor(contractInterface.TimeState);
+				TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
 			}
 
 			if (EyesToggle != null)
@@ -347,7 +375,7 @@ namespace ContractsWindow.Unity.Unity
 
 		private void handleColors(Color c)
 		{
-			ContractTitle.color = c;
+			ContractTitle.OnColorUpdate.Invoke(c);
 
 			if (Highlighter != null)
 				Highlighter.setNormalColor(c);
@@ -380,6 +408,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
+
+			contractInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(ContractNoteTransform, false);
 
@@ -421,6 +451,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
+
+			contractInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(ParameterSectionTransform, false);
 
