@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+CW_Window - Controls the main UI window
+
+Copyright (c) 2016 DMagic
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ContractsWindow.Unity.Interfaces;
@@ -12,9 +38,9 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_Window : CanvasFader, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IScrollHandler
 	{
 		[SerializeField]
-		private Text VersionText = null;
+		private TextHandler VersionText = null;
 		[SerializeField]
-		private Text MissionTitle = null;
+		private TextHandler MissionTitle = null;
 		[SerializeField]
 		private Button MissionEdit = null;
 		[SerializeField]
@@ -124,7 +150,7 @@ namespace ContractsWindow.Unity.Unity
 			windowInterface = window;
 
 			if (VersionText != null)
-				VersionText.text = window.Version;
+				VersionText.OnTextUpdate.Invoke(window.Version);
 
 			CreateMissionSections(window.GetMissions);
 
@@ -152,6 +178,8 @@ namespace ContractsWindow.Unity.Unity
 
 			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
+			ToggleTooltips(windowInterface.HideTooltips);
+
 			UpdateFontSize(progressPanel.gameObject, windowInterface.LargeFont ? 1 : 0);
 		}
 
@@ -168,6 +196,8 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
+			progress.ProcessStyles(obj);
+
 			obj.transform.SetParent(MissionSectionTransform, false);
 
 			progressPanel = obj.GetComponent<CW_ProgressPanel>();
@@ -182,6 +212,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateMissionSections(IList<IMissionSection> sections)
 		{
+			if (windowInterface == null)
+				return;
+
 			if (sections == null)
 				return;
 
@@ -210,6 +243,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			obj.transform.SetParent(MissionSectionTransform, false);
+
+			windowInterface.ProcessStyles(obj);
 
 			CW_MissionSection missionObject = obj.GetComponent<CW_MissionSection>();
 
@@ -278,7 +313,7 @@ namespace ContractsWindow.Unity.Unity
 			currentMission.SetMissionVisible(true);
 
 			if (MissionTitle != null)
-				MissionTitle.text = currentMission.MissionTitle + ":";
+				MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
 
 			if (MissionEdit != null)
 			{
@@ -317,7 +352,7 @@ namespace ContractsWindow.Unity.Unity
 					progressPanel.SetProgressVisible(true);
 
 				if (MissionTitle != null)
-					MissionTitle.text = "Progress Nodes:";
+					MissionTitle.OnTextUpdate.Invoke("Progress Nodes:");
 
 				if (MainPanelTooltip != null)
 					MainPanelTooltip.SetNewText("Go To Contracts");
@@ -331,7 +366,7 @@ namespace ContractsWindow.Unity.Unity
 					currentMission.SetMissionVisible(true);
 
 				if (MissionTitle != null && currentMission != null)
-					MissionTitle.text = currentMission.MissionTitle + ":";
+					MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
 
 				if (MainPanelTooltip != null)
 					MainPanelTooltip.SetNewText("Go To Progress Records");
@@ -345,6 +380,9 @@ namespace ContractsWindow.Unity.Unity
 			if (popupOpen)
 				return;
 
+			if (windowInterface == null)
+				return;
+
 			if (SortPrefab == null)
 				return;
 
@@ -352,6 +390,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			GameObject obj = Instantiate(SortPrefab);
+
+			windowInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(transform, false);
 
@@ -361,6 +401,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			sortObject.setSort(currentMission.MissionInterface);
+
+			UpdateFontSize(sortObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -413,6 +455,8 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(transform, false);
 
+			windowInterface.ProcessStyles(obj);
+
 			CW_MissionSelect selectorObject = obj.GetComponent<CW_MissionSelect>();
 
 			if (selectorObject == null)
@@ -420,14 +464,13 @@ namespace ContractsWindow.Unity.Unity
 
 			selectorObject.setMission(windowInterface.GetMissions);
 
+			UpdateFontSize(selectorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
+
 			popupOpen = true;
 		}
 
 		public void showCreator(IContractSection contract)
 		{
-			if (popupOpen)
-				return;
-
 			if (MissionCreatePrefab == null)
 				return;
 
@@ -439,6 +482,8 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(MissionCreatePrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
 
 			CW_MissionCreate creatorObject = obj.GetComponent<CW_MissionCreate>();
@@ -447,6 +492,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			creatorObject.setPanel(contract);
+
+			UpdateFontSize(creatorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -469,12 +516,16 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(transform, false);
 
+			windowInterface.ProcessStyles(obj);
+
 			CW_MissionEdit editorObject = obj.GetComponent<CW_MissionEdit>();
 
 			if (editorObject == null)
 				return;
 
 			editorObject.setMission(currentMission.MissionInterface);
+
+			UpdateFontSize(editorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -510,7 +561,11 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(RebuildPrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
+
+			UpdateFontSize(obj, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -528,6 +583,8 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(ScalarPrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
 
 			CW_Scale scalarObject = obj.GetComponent<CW_Scale>();
@@ -536,6 +593,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			scalarObject.setScalar();
+
+			UpdateFontSize(scalarObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -553,6 +612,8 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(ToolbarPrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
 
 			CW_Toolbar toolbarObject = obj.GetComponent<CW_Toolbar>();
@@ -561,6 +622,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			toolbarObject.setToolbar();
+
+			UpdateFontSize(toolbarObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -578,6 +641,8 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(AgencyPrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
 
 			CW_AgencyPanel agencyObject = obj.GetComponent<CW_AgencyPanel>();
@@ -586,6 +651,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			agencyObject.setAgent(contract.AgencyName, contract.AgencyLogo);
+
+			UpdateFontSize(agencyObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -603,6 +670,8 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(MissionAddPrefab);
 
+			windowInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(transform, false);
 
 			CW_MissionAdd adderObject = obj.GetComponent<CW_MissionAdd>();
@@ -611,6 +680,8 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			adderObject.setMission(windowInterface.GetMissions, contract);
+
+			UpdateFontSize(adderObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -784,16 +855,16 @@ namespace ContractsWindow.Unity.Unity
 
 		public void UpdateFontSize(GameObject obj, int s)
 		{
-			var texts = obj.GetComponentsInChildren<Text>();
+			var texts = obj.GetComponentsInChildren<TextHandler>(true);
 
 			for (int i = texts.Length - 1; i >= 0; i--)
 			{
-				Text t = texts[i];
+				TextHandler t = texts[i];
 
 				if (t == null)
 					continue;
 
-				t.fontSize += s;
+				t.OnFontChange.Invoke(s);
 			}
 		}
 
