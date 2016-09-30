@@ -77,6 +77,7 @@
     <Compile Include="Unity\CW_SortMenu.cs" />
     <Compile Include="Unity\CW_StandardNode.cs" />
     <Compile Include="Unity\CW_Style.cs" />
+    <Compile Include="TextHandler.cs" />
     <Compile Include="Unity\CW_Toolbar.cs" />
     <Compile Include="Unity\CW_Window.cs" />
     <Compile Include="Unity\Tooltip.cs" />

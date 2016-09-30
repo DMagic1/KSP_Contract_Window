@@ -65,6 +65,7 @@
     <Compile Include="contractAssembly.cs" />
     <Compile Include="contractLoader.cs" />
     <Compile Include="contractSortClass.cs" />
+    <Compile Include="CWTextMeshProHolder.cs" />
     <Compile Include="PanelInterfaces\contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractSkins.cs" />
