@@ -84,6 +84,8 @@ namespace ContractsWindow.PanelInterfaces
 				if (contractWindow.Instance == null)
 					return;
 
+				contractWindow.Instance.switchLists(value);
+
 				contractWindow.Instance.RefreshContracts();
 			}
 		}
@@ -256,6 +258,11 @@ namespace ContractsWindow.PanelInterfaces
 			UIParent.RefreshContract(contract);
 		}
 
+		public void ProcessStyles(GameObject obj)
+		{
+			contractUtils.processComponents(obj);
+		}
+
 		internal contractMission(string n, string active, string hidden, string vessels, bool asc, bool showActive, int sMode, bool Master)
 		{
 			_missionTitle = n;
@@ -336,6 +343,7 @@ namespace ContractsWindow.PanelInterfaces
 						if (cUI == null)
 							continue;
 
+						cUI.SetHidden(!Active);
 						cUI.Order = stringIntParse(sB[1]);
 						cUI.ShowParams = stringBoolParse(sB[2]);
 					}
