@@ -42,7 +42,9 @@ namespace ContractsWindow.Unity.Unity
 			Label,
 			VertScroll,
 			Slider,
-			SliderBackground
+			SliderBackground,
+			Text,
+			TextUpdated
 		}
 
 		[SerializeField]
