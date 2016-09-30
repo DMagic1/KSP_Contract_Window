@@ -176,6 +176,11 @@ namespace ContractsWindow.PanelInterfaces
 			get { return _difficulty; }
 		}
 
+		public void SetHidden(bool isHidden)
+		{
+			_hidden = isHidden;
+		}
+
 		public bool IsHidden
 		{
 			get { return _hidden; }
@@ -330,6 +335,11 @@ namespace ContractsWindow.PanelInterfaces
 
 				m.RemoveContract(this);
 			}
+		}
+
+		public void ProcessStyles(GameObject obj)
+		{
+			contractUtils.processComponents(obj);
 		}
 
 		public contractContainer Container
