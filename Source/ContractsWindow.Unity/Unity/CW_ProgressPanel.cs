@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region license
+/*The MIT License (MIT)
+CW_ProgressPanel - Controls the main progress node panel UI element
+
+Copyright (c) 2016 DMagic
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ContractsWindow.Unity.Interfaces;
@@ -238,6 +264,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateIntervalTypes(IList<IIntervalNode> nodes)
 		{
+			if (panelInterface == null)
+				return;
+
 			if (nodes.Count <= 0)
 				return;
 
@@ -261,6 +290,8 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(IntervalTransform, false);
 
+			panelInterface.ProcessStyles(obj);
+
 			CW_IntervalTypes nodeObject = obj.GetComponent<CW_IntervalTypes>();
 
 			if (nodeObject == null)
@@ -275,6 +306,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreatePOINodes(IList<IStandardNode> nodes)
 		{
+			if (panelInterface == null)
+				return;
+
 			if (nodes == null)
 				return;
 
@@ -299,6 +333,8 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
+			panelInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(POITransform, false);
 
 			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
@@ -315,6 +351,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateStandardNodes(IList<IStandardNode> nodes)
 		{
+			if (panelInterface == null)
+				return;
+
 			if (nodes == null)
 				return;
 
@@ -339,6 +378,8 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
+			panelInterface.ProcessStyles(obj);
+
 			obj.transform.SetParent(StandardTransform, false);
 
 			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
@@ -355,6 +396,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateBodies(Dictionary<string, List<IStandardNode>> bodies)
 		{
+			if (panelInterface == null)
+				return;
+
 			if (bodies.Count <= 0)
 				return;
 
@@ -380,6 +424,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
+
+			panelInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(BodyTransform, false);
 
