@@ -29,8 +29,13 @@ THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Contracts;
+using ContractsWindow.PanelInterfaces;
+using ContractsWindow.Unity;
+using ContractsWindow.Unity.Unity;
 using UnityEngine;
+using UnityEngine.UI;
 using ContractParser;
 
 namespace ContractsWindow
@@ -233,5 +238,131 @@ namespace ContractsWindow
 				Debug.LogWarning("[Contracts +] Error while updating parameter values: " + e);
 			}
 		}
+
+		public static void processComponents(GameObject obj)
+		{
+			if (obj == null)
+				return;
+
+			TextHandler[] handlers = obj.GetComponentsInChildren<TextHandler>(true);
+
+			if (handlers == null)
+				return;
+
+			for (int i = 0; i < handlers.Length; i++)
+				TMProFromText(handlers[i]);
+		}
+
+		private static void TMProFromText(TextHandler handler)
+		{
+			if (handler == null)
+				return;
+
+			Text text = handler.GetComponent<Text>();
+
+			if (text == null)
+				return;
+
+			string t = text.text;
+			Color c = text.color;
+			int i = text.fontSize;
+			bool r = text.raycastTarget;
+
+			FontStyles sty = getStyle(text.fontStyle);
+			TextAlignmentOptions align = getAnchor(text.alignment);
+
+			float spacing = text.lineSpacing;
+
+			GameObject obj = text.gameObject;
+
+			MonoBehaviour.DestroyImmediate(text);
+
+			CWTextMeshProHolder tmp = obj.AddComponent<CWTextMeshProHolder>();
+
+			tmp.text = t;
+			tmp.color = c;
+			tmp.fontSize = i;
+			tmp.raycastTarget = r;
+
+			tmp.alignment = align;
+			tmp.fontStyle = sty;
+			tmp.lineSpacing = spacing;
+
+			tmp.font = Resources.Load("Fonts/Calibri SDF", typeof(TMP_FontAsset)) as TMP_FontAsset;
+			tmp.fontSharedMaterial = Resources.Load("Fonts/Materials/Calibri Dropshadow", typeof(Material)) as Material;
+
+			tmp.enableWordWrapping = true;
+			tmp.isOverlay = false;
+			tmp.richText = true;
+
+			tmp.Setup(handler);
+		}
+
+		private static FontStyles getStyle(FontStyle style)
+		{
+			switch(style)
+			{
+				case FontStyle.Normal:
+					return FontStyles.Normal;
+				case FontStyle.Bold:
+					return FontStyles.Bold;
+				case FontStyle.Italic:
+					return FontStyles.Italic;
+				case FontStyle.BoldAndItalic:
+					return FontStyles.Bold;
+				default:
+					return FontStyles.Normal;
+			}
+		}
+
+		private static TextAlignmentOptions getAnchor(TextAnchor anchor)
+		{
+			switch (anchor)
+			{
+				case TextAnchor.UpperLeft:
+					return TextAlignmentOptions.TopLeft;
+				case TextAnchor.UpperCenter:
+					return TextAlignmentOptions.Top;
+				case TextAnchor.UpperRight:
+					return TextAlignmentOptions.TopRight;
+				case TextAnchor.MiddleLeft:
+					return TextAlignmentOptions.MidlineLeft;
+				case TextAnchor.MiddleCenter:
+					return TextAlignmentOptions.Midline;
+				case TextAnchor.MiddleRight:
+					return TextAlignmentOptions.MidlineRight;
+				case TextAnchor.LowerLeft:
+					return TextAlignmentOptions.BottomLeft;
+				case TextAnchor.LowerCenter:
+					return TextAlignmentOptions.Bottom;
+				case TextAnchor.LowerRight:
+					return TextAlignmentOptions.BottomRight;
+				default:
+					return TextAlignmentOptions.Center;
+			}
+		}
+
+		//private static void processCompenents(CW_Style style)
+		//{
+		//	if (style == null)
+		//		return;
+
+		//	UISkinDef skin = UISkinManager.defaultSkin;
+
+		//	if (skin == null)
+		//		return;
+
+		//	switch (style.ElementType)
+		//	{
+		//		case CW_Style.ElementTypes.Text:
+		//			ProcessTMPro(style, false);
+		//			break;
+		//		case CW_Style.ElementTypes.TextUpdated:
+		//			ProcessTMPro(style, true);
+		//			break;
+		//		default:
+		//			break;
+		//	}
+		//}
 	}
 }
