@@ -1,10 +1,8 @@
 ﻿#region license
 /*The MIT License (MIT)
-Contract Assembly - Monobehaviour To Check For Other Addons And Their Methods
+StandardNodeUI - Storage class for information about standard progress nodes
 
-Copyright (c) 2014 DMagic
-
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+Copyright (c) 2016 DMagic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,12 +79,12 @@ namespace ContractsWindow.PanelInterfaces
 			}
 		}
 
-		private string coloredText(string s, char c, string color)
+		private string coloredText(string s, string sprite, string color)
 		{
 			if (string.IsNullOrEmpty(s))
 				return "";
 
-			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
+			return string.Format("<color={0}>{1}{2}</color>  ", color, sprite, s);
 		}
 
 		public string RewardText
@@ -96,13 +94,8 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return string.Format("{0}{1}{2}", coloredText(node.FundsRewardString, '£', "#69D84FFF"), coloredText(node.SciRewardString, '©', "#02D8E9FF"), coloredText(node.RepRewardString, '¡', "#C9B003FF"));
+				return string.Format("{0}{1}{2}", coloredText(node.FundsRewardString, "<sprite=2 tint=1>", "#69D84FFF"), coloredText(node.SciRewardString, "<sprite=1 tint=1>", "#02D8E9FF"), coloredText(node.RepRewardString, "<sprite=0 tint=1>", "#C9B003FF"));
 			}
-		}
-
-		public void ProcessStyles(GameObject obj)
-		{
-			contractUtils.processComponents(obj);
 		}
 	}
 }
