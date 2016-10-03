@@ -67,6 +67,9 @@ namespace ContractsWindow.Unity
 			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform, false);
 
 			tooltip = obj.GetComponent<ToolTip>();
+
+			tooltip.SetTooltip(Text);
+			tooltip.HideTooltip();
 		}
 
 		public void SetNewText(string s)
