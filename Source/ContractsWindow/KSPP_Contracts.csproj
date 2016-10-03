@@ -76,7 +76,6 @@
     </Compile>
     <Compile Include="Framework\ExtensionsUnity.cs" />
     <Compile Include="Framework\MonoBehaviourExtended.cs" />
-    <Compile Include="Framework\MonoBehaviourWindow.cs" />
     <Compile Include="PanelInterfaces\contractWindow.cs" />
     <Compile Include="PanelInterfaces\IntervalNodeUI.cs" />
     <Compile Include="PanelInterfaces\parameterUIObject.cs" />
