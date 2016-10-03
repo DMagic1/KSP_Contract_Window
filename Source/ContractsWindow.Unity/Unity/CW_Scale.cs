@@ -83,7 +83,22 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_Window.Window.Interface.LargeFont = isOn;
 
-			CW_Window.Window.UpdateFontSize(CW_Window.Window.gameObject, isOn ? 1 : -1);
+			ApplyFontSize(isOn ? 1 : -1);
+		}
+
+		private void ApplyFontSize(int s)
+		{
+			var texts = CW_Window.Window.gameObject.GetComponentsInChildren<TextHandler>(true);
+
+			for (int i = texts.Length - 1; i >= 0; i--)
+			{
+				TextHandler t = texts[i];
+
+				if (t == null)
+					continue;
+
+				t.OnFontChange.Invoke(s);
+			}
 		}
 
 		public void IgnoreScale(bool isOn)
