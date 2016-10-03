@@ -75,8 +75,6 @@ namespace ContractsWindow.Unity
 			_hover = true;
 
 			_attachedText.OnColorUpdate.Invoke(HighlightColor);
-
-			//eventData.Reset();
 		}
 
 		public void OnPointerExit(PointerEventData eventData)
