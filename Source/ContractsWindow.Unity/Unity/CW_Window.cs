@@ -158,8 +158,6 @@ namespace ContractsWindow.Unity.Unity
 
 			ToggleTooltips(window.HideTooltips);
 
-			UpdateFontSize(gameObject, window.LargeFont ? 1 : 0);
-
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
 
@@ -179,8 +177,6 @@ namespace ContractsWindow.Unity.Unity
 			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
 			ToggleTooltips(windowInterface.HideTooltips);
-
-			UpdateFontSize(progressPanel.gameObject, windowInterface.LargeFont ? 1 : 0);
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -195,8 +191,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			progress.ProcessStyles(obj);
 
 			obj.transform.SetParent(MissionSectionTransform, false);
 
@@ -243,8 +237,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			obj.transform.SetParent(MissionSectionTransform, false);
-
-			windowInterface.ProcessStyles(obj);
 
 			CW_MissionSection missionObject = obj.GetComponent<CW_MissionSection>();
 
@@ -391,8 +383,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(SortPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_SortMenu sortObject = obj.GetComponent<CW_SortMenu>();
@@ -401,8 +391,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			sortObject.setSort(currentMission.MissionInterface);
-
-			UpdateFontSize(sortObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -455,16 +443,12 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(transform, false);
 
-			windowInterface.ProcessStyles(obj);
-
 			CW_MissionSelect selectorObject = obj.GetComponent<CW_MissionSelect>();
 
 			if (selectorObject == null)
 				return;
 
 			selectorObject.setMission(windowInterface.GetMissions);
-
-			UpdateFontSize(selectorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -482,8 +466,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(MissionCreatePrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_MissionCreate creatorObject = obj.GetComponent<CW_MissionCreate>();
@@ -492,8 +474,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			creatorObject.setPanel(contract);
-
-			UpdateFontSize(creatorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -516,16 +496,12 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(transform, false);
 
-			windowInterface.ProcessStyles(obj);
-
 			CW_MissionEdit editorObject = obj.GetComponent<CW_MissionEdit>();
 
 			if (editorObject == null)
 				return;
 
 			editorObject.setMission(currentMission.MissionInterface);
-
-			UpdateFontSize(editorObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -561,11 +537,7 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(RebuildPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
-
-			UpdateFontSize(obj, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -583,8 +555,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(ScalarPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_Scale scalarObject = obj.GetComponent<CW_Scale>();
@@ -593,8 +563,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			scalarObject.setScalar();
-
-			UpdateFontSize(scalarObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -612,8 +580,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(ToolbarPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_Toolbar toolbarObject = obj.GetComponent<CW_Toolbar>();
@@ -622,8 +588,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			toolbarObject.setToolbar();
-
-			UpdateFontSize(toolbarObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -641,8 +605,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(AgencyPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_AgencyPanel agencyObject = obj.GetComponent<CW_AgencyPanel>();
@@ -651,8 +613,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			agencyObject.setAgent(contract.AgencyName, contract.AgencyLogo);
-
-			UpdateFontSize(agencyObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -670,8 +630,6 @@ namespace ContractsWindow.Unity.Unity
 
 			GameObject obj = Instantiate(MissionAddPrefab);
 
-			windowInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(transform, false);
 
 			CW_MissionAdd adderObject = obj.GetComponent<CW_MissionAdd>();
@@ -680,8 +638,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			adderObject.setMission(windowInterface.GetMissions, contract);
-
-			UpdateFontSize(adderObject.gameObject, windowInterface.LargeFont ? 1 : 0);
 
 			popupOpen = true;
 		}
@@ -851,21 +807,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			ToggleTooltips(windowInterface.HideTooltips);
-		}
-
-		public void UpdateFontSize(GameObject obj, int s)
-		{
-			var texts = obj.GetComponentsInChildren<TextHandler>(true);
-
-			for (int i = texts.Length - 1; i >= 0; i--)
-			{
-				TextHandler t = texts[i];
-
-				if (t == null)
-					continue;
-
-				t.OnFontChange.Invoke(s);
-			}
 		}
 
 		public void RefreshProgress()
