@@ -249,12 +249,12 @@ namespace ContractsWindow.PanelInterfaces
 			set { _order = value; }
 		}
 
-		private string coloredText(string s, char c, string color)
+		private string coloredText(string s, string sprite, string color)
 		{
 			if (string.IsNullOrEmpty(s))
 				return "";
 
-			return string.Format("<color={0}>{1}{2}</color>  ", color, c, s);
+			return string.Format("<color={0}>{1}{2}</color>  ", color, sprite, s);
 		}
 
 		public string RewardText
@@ -264,7 +264,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, '£', "#69D84FFF"), coloredText(container.SciRewString, '©', "#02D8E9FF"), coloredText(container.RepRewString, '¡', "#C9B003FF"));
+				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, "<sprite=2 tint=1>", "#69D84FFF"),  coloredText(container.SciRewString, "<sprite=1 tint=1>", "#02D8E9FF"), coloredText(container.RepRewString, "<sprite=0 tint=1>", "#C9B003FF"));
 			}
 		}
 
@@ -275,7 +275,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("{0}{1}", coloredText(container.FundsPenString, '£', "#FA4224FF"), coloredText(container.RepPenString, '¡', "#FA4224FF"));
+				return string.Format("{0}{1}", coloredText(container.FundsPenString, "<sprite=2 tint=1>", "#FA4224FF"), coloredText(container.RepPenString, "<sprite=0 tint=1>", "#FA4224FF"));
 			}
 		}
 
@@ -335,11 +335,6 @@ namespace ContractsWindow.PanelInterfaces
 
 				m.RemoveContract(this);
 			}
-		}
-
-		public void ProcessStyles(GameObject obj)
-		{
-			contractUtils.processComponents(obj);
 		}
 
 		public contractContainer Container
