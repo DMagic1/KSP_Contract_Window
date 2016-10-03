@@ -36,6 +36,20 @@ namespace ContractsWindow
 	{
 		private TextHandler _handler;
 
+		new private void Awake()
+		{
+			base.Awake();
+
+			_handler = GetComponent<TextHandler>();
+
+			if (_handler == null)
+				return;
+
+			_handler.OnColorUpdate.AddListener(new UnityAction<Color>(UpdateColor));
+			_handler.OnTextUpdate.AddListener(new UnityAction<string>(UpdateText));
+			_handler.OnFontChange.AddListener(new UnityAction<int>(UpdateFontSize));
+		}
+
 		public void Setup(TextHandler h)
 		{
 			_handler = h;
@@ -53,6 +67,8 @@ namespace ContractsWindow
 		private void UpdateText(string t)
 		{
 			text = t;
+
+			_handler.PreferredSize = new Vector2(preferredWidth, preferredHeight);
 		}
 
 		private void UpdateFontSize(int i)
