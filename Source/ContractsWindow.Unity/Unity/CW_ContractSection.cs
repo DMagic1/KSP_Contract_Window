@@ -202,30 +202,6 @@ namespace ContractsWindow.Unity.Unity
 			parameters.Clear();
 
 			CreateParameterSections(contractInterface.GetParameters);
-
-			for (int i = parameters.Count - 1; i >= 0; i--)
-			{
-				CW_ParameterSection p = parameters[i];
-
-				if (p == null)
-					continue;
-
-				var texts = p.GetComponentsInChildren<TextHandler>(true);
-
-				for (int j = texts.Length - 1; j >= 0; j--)
-				{
-					TextHandler t = texts[j];
-
-					if (t == null)
-						continue;
-
-					int f = CW_Window.Window.Interface.LargeFont ? 1 : 0;
-
-					t.OnFontChange.Invoke(f);
-
-					//t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
-				}
-			}
 		}
 
 		public void ShowAgent()
@@ -409,8 +385,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			contractInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(ContractNoteTransform, false);
 
 			note = obj.GetComponent<CW_Note>();
@@ -451,8 +425,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			contractInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(ParameterSectionTransform, false);
 

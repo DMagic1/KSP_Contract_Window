@@ -115,8 +115,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			intervalInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(IntervalTransform, false);
 
 			CW_IntervalNode nodeObject = obj.GetComponent<CW_IntervalNode>();

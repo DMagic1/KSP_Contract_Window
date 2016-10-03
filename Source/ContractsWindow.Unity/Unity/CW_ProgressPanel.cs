@@ -290,8 +290,6 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(IntervalTransform, false);
 
-			panelInterface.ProcessStyles(obj);
-
 			CW_IntervalTypes nodeObject = obj.GetComponent<CW_IntervalTypes>();
 
 			if (nodeObject == null)
@@ -332,8 +330,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			panelInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(POITransform, false);
 
@@ -377,8 +373,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			panelInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(StandardTransform, false);
 
@@ -424,8 +418,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (obj == null)
 				return;
-
-			panelInterface.ProcessStyles(obj);
 
 			obj.transform.SetParent(BodyTransform, false);
 

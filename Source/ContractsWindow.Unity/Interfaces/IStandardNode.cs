@@ -1,10 +1,8 @@
 ﻿#region license
 /*The MIT License (MIT)
-Contract Assembly - Monobehaviour To Check For Other Addons And Their Methods
+IStandardNode - Interface for transferring information on standard progress nodes
 
-Copyright (c) 2014 DMagic
-
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+Copyright (c) 2016 DMagic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +39,5 @@ namespace ContractsWindow.Unity.Interfaces
 		string RewardText { get; }
 
 		string GetNote { get; }
-
-		void ProcessStyles(GameObject obj);
 	}
 }

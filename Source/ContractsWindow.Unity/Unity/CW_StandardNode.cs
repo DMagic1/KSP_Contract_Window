@@ -99,8 +99,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			standardInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(NoteTransform, false);
 
 			note = obj.GetComponent<CW_Note>();

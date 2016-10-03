@@ -1,10 +1,8 @@
 ﻿#region license
 /*The MIT License (MIT)
-Contract Assembly - Monobehaviour To Check For Other Addons And Their Methods
+IParameterSection - Interface for transferring information on contract parameters
 
-Copyright (c) 2014 DMagic
-
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+Copyright (c) 2016 DMagic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +46,5 @@ namespace ContractsWindow.Unity.Interfaces
 		string GetNote { get; }
 
 		IList<IParameterSection> GetSubParams { get; }
-
-		void ProcessStyles(GameObject obj);
 	}
 }

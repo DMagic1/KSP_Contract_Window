@@ -135,8 +135,6 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			CW_ProgressPanel.Instance.PanelInterface.ProcessStyles(obj);
-
 			obj.transform.SetParent(StandardTransform, false);
 
 			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();

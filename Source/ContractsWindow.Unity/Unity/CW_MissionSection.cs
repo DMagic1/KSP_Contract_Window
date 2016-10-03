@@ -113,8 +113,6 @@ namespace ContractsWindow.Unity.Unity
 
 			obj.transform.SetParent(ContractSectionTransform, false);
 
-			missionInterface.ProcessStyles(obj);
-
 			CW_ContractSection contractObject = obj.GetComponent<CW_ContractSection>();
 
 			if (contractObject == null)
@@ -155,22 +153,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (section == null)
 				return;
-
-			var texts = section.GetComponentsInChildren<TextHandler>(true);
-
-			for (int i = texts.Length - 1; i >= 0; i--)
-			{
-				TextHandler t = texts[i];
-
-				if (t == null)
-					continue;
-
-				int f = CW_Window.Window.Interface.LargeFont ? 1 : 0;
-
-				t.OnFontChange.Invoke(f);
-
-				//t.fontSize += CW_Window.Window.Interface.LargeFont ? 1 : 0;
-			}
 
 			CW_Window.Window.UpdateTooltips();
 		}
