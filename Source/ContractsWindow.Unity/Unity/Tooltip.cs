@@ -29,7 +29,8 @@ namespace ContractsWindow.Unity.Unity
 	public class ToolTip : MonoBehaviour
 	{
 		//text of the tooltip
-		private Text _text;
+		//private Text _text;
+		private TextHandler _handler;
 		private RectTransform _rectTransform;
 
 		//if the tooltip is inside a UI element
@@ -59,7 +60,8 @@ namespace ContractsWindow.Unity.Unity
 			_guiMode = _canvas.renderMode;
 			_rectTransform = GetComponent<RectTransform>();
 
-			_text = GetComponentInChildren<Text>();
+			//_text = GetComponentInChildren<Text>();
+			_handler = GetComponentInChildren<TextHandler>();
 
 			_inside = false;
 
@@ -81,9 +83,10 @@ namespace ContractsWindow.Unity.Unity
 			if (_guiMode == RenderMode.ScreenSpaceCamera)
 			{
 				//set the text and fit the tooltip panel to the text size
-				_text.text = text;
+				//_text.text = text;
+				_handler.OnTextUpdate.Invoke(text);
 
-				_rectTransform.sizeDelta = new Vector2(_text.preferredWidth + 40f, _text.preferredHeight + 25f);
+				_rectTransform.sizeDelta = new Vector2(_handler.PreferredSize.x + 10f, _handler.PreferredSize.y + 0f);
 
 				OnScreenSpaceCamera();
 			}
