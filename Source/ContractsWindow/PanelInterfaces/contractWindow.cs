@@ -59,7 +59,6 @@ namespace ContractsWindow.PanelInterfaces
 
 		private List<contractUIObject> sortList = new List<contractUIObject>();
 
-		private static GameObject windowPrefab;
 		private static contractWindow instance;
 
 		public static contractWindow Instance
@@ -87,7 +86,12 @@ namespace ContractsWindow.PanelInterfaces
 		public bool LargeFont
 		{
 			get { return !contractScenario.Instance.fontSmall; }
-			set { contractScenario.Instance.fontSmall = !value; }
+			set
+			{
+				contractScenario.Instance.fontSmall = !value;
+
+				contractLoader.UpdateFontSize(value ? 1 : -1);
+			}
 		}
 
 		public float MasterScale
@@ -229,11 +233,6 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			if (cList.Count > 0)
 				refreshContracts(cList, true);
-		}
-
-		public void ProcessStyles(GameObject obj)
-		{
-			contractUtils.processComponents(obj);
 		}
 
 		private void refreshContracts(List<Guid> list, bool sort = true)
@@ -469,11 +468,6 @@ namespace ContractsWindow.PanelInterfaces
 
 			instance = this;
 
-			if (windowPrefab == null)
-				windowPrefab = contractLoader.Prefabs.LoadAsset<GameObject>("cw_plus");
-
-			LogFormatted("Window Prefab is {0}", windowPrefab == null ? "null" : "loaded");
-
 			RepeatingWorkerInitialWait = 10;
 
 			StopRepeatingWorker();
@@ -484,6 +478,8 @@ namespace ContractsWindow.PanelInterfaces
 			base.Start();
 
 			sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+
+			contractLoader.UpdateFontSize(LargeFont ? 1 : 0);
 
 			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
@@ -568,16 +564,14 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void GenerateWindow()
 		{
-			if (windowPrefab == null || UIWindow != null)
+			if (contractLoader.WindowPrefab == null || UIWindow != null)
 				return;
 
-			GameObject obj = Instantiate(windowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
+			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
 			_canvas = MainCanvasUtil.MainCanvas;
 
 			obj.transform.SetParent(_canvas.transform, false);
-
-			contractUtils.processComponents(obj);
 
 			UIWindow = obj.GetComponent<CW_Window>();
 
