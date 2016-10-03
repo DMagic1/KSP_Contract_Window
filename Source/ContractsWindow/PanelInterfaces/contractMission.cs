@@ -344,7 +344,7 @@ namespace ContractsWindow.PanelInterfaces
 					}
 					catch (Exception e)
 					{
-						DMC_MBW.LogFormatted("Guid invalid: {0}", e);
+						DMC_MBE.LogFormatted("Guid invalid: {0}", e);
 						continue;
 					}
 				}
