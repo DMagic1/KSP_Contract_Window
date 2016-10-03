@@ -258,11 +258,6 @@ namespace ContractsWindow.PanelInterfaces
 			UIParent.RefreshContract(contract);
 		}
 
-		public void ProcessStyles(GameObject obj)
-		{
-			contractUtils.processComponents(obj);
-		}
-
 		internal contractMission(string n, string active, string hidden, string vessels, bool asc, bool showActive, int sMode, bool Master)
 		{
 			_missionTitle = n;
