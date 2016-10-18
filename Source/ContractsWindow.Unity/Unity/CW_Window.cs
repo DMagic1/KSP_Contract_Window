@@ -87,7 +87,6 @@ namespace ContractsWindow.Unity.Unity
 		private bool dragging;
 		private bool resizing;
 
-		private Dictionary<string, CW_MissionSection> missions = new Dictionary<string, CW_MissionSection>();
 		private CW_MissionSection currentMission;
 		private CW_ProgressPanel progressPanel;
 
@@ -152,7 +151,7 @@ namespace ContractsWindow.Unity.Unity
 			if (VersionText != null)
 				VersionText.OnTextUpdate.Invoke(window.Version);
 
-			CreateMissionSections(window.GetMissions);
+			SelectMission(window.GetCurrentMission);
 
 			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
@@ -200,109 +199,52 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			progressPanel.setPanel(progress);
-
-			progressPanel.gameObject.SetActive(false);
 		}
 
-		private void CreateMissionSections(IList<IMissionSection> sections)
-		{
-			if (windowInterface == null)
-				return;
-
-			if (sections == null)
-				return;
-
-			for (int i = sections.Count - 1; i >= 0; i--)
-			{
-				IMissionSection mission = sections[i];
-
-				if (mission == null)
-					continue;
-
-				if (missions.ContainsKey(mission.MissionTitle))
-					continue;
-
-				CreateMissionSection(mission);
-			}
-		}
-
-		private void CreateMissionSection(IMissionSection mission)
+		private CW_MissionSection CreateMissionSection(IMissionSection mission)
 		{
 			if (MissionSectionPrefab == null || MissionSectionTransform == null)
-				return;
+				return null;
 
 			GameObject obj = Instantiate(MissionSectionPrefab);
 
 			if (obj == null)
-				return;
+				return null;
 
 			obj.transform.SetParent(MissionSectionTransform, false);
 
 			CW_MissionSection missionObject = obj.GetComponent<CW_MissionSection>();
 
 			if (missionObject == null)
-				return;
+				return null;
 
 			missionObject.setMission(mission);
 
-			missions.Add(mission.MissionTitle, missionObject);
-
-			missionObject.gameObject.SetActive(false);
-		}
-
-		public void AddMissionSection(IMissionSection mission)
-		{
-			if (mission == null)
-				return;
-
-			if (missions.ContainsKey(mission.MissionTitle))
-				return;
-
-			CreateMissionSection(mission);
-		}
-
-		public void RemoveMissionSection(IMissionSection mission)
-		{
-			if (mission == null)
-				return;
-
-			if (!missions.ContainsKey(mission.MissionTitle))
-				return;
-
-			CW_MissionSection section = missions[mission.MissionTitle];
-
-			section.gameObject.SetActive(false);
-
-			Destroy(section);
-
-			missions.Remove(mission.MissionTitle);
+			return missionObject;
 		}
 
 		public void SelectMission(IMissionSection mission)
 		{
-			SelectMission(mission.MissionTitle);
-		}
+			if (currentMission != null)
+			{
+				if (currentMission.MissionTitle != mission.MissionTitle)
+				{
+					currentMission.SetMissionVisible(false);
 
-		public void SelectMission(string mission)
-		{
-			if (!missions.ContainsKey(mission))
+					DestroyImmediate(currentMission.gameObject);
+				}
+				else
+					return;
+			}
+
+			currentMission = CreateMissionSection(mission);
+
+			if (currentMission == null)
 				return;
-
-			CW_MissionSection section = missions[mission];
-
-			if (section == null)
-				return;
-
-			if (currentMission != null && currentMission.MissionTitle != section.MissionTitle)
-				currentMission.SetMissionVisible(false);
-
-			currentMission = section;
 
 			loaded = false;
 
 			prepareTopBar();
-
-			currentMission.SetMissionVisible(true);
 
 			if (MissionTitle != null)
 				MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
@@ -335,13 +277,19 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ToggleMainWindow(bool showProgress)
 		{
+			if (windowInterface == null)
+				return;
+
 			if (showProgress)
 			{
 				if (currentMission != null)
+				{
 					currentMission.SetMissionVisible(false);
 
-				if (progressPanel != null)
-					progressPanel.SetProgressVisible(true);
+					DestroyImmediate(currentMission.gameObject);
+				}
+
+				setupProgressPanel(windowInterface.GetProgressPanel);
 
 				if (MissionTitle != null)
 					MissionTitle.OnTextUpdate.Invoke("Progress Nodes:");
@@ -352,10 +300,13 @@ namespace ContractsWindow.Unity.Unity
 			else
 			{
 				if (progressPanel != null)
+				{
 					progressPanel.SetProgressVisible(false);
 
-				if (currentMission != null)
-					currentMission.SetMissionVisible(true);
+					DestroyImmediate(progressPanel.gameObject);
+				}
+
+				SelectMission(windowInterface.GetCurrentMission);
 
 				if (MissionTitle != null && currentMission != null)
 					MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
@@ -757,7 +708,7 @@ namespace ContractsWindow.Unity.Unity
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			FadeIn();
+			FadeIn(false);
 		}
 
 		public void OnPointerExit(PointerEventData eventData)
@@ -817,9 +768,9 @@ namespace ContractsWindow.Unity.Unity
 			progressPanel.Refresh();
 		}
 
-		public void FadeIn()
+		public void FadeIn(bool overrule)
 		{
-			Fade(1, true);
+			Fade(1, true, null, true, overrule);
 		}
 
 		public void ScaleAndFadeIn()
