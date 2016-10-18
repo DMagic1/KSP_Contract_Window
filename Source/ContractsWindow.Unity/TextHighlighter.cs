@@ -52,11 +52,6 @@ namespace ContractsWindow.Unity
 			_attachedText = GetComponent<TextHandler>();
 		}
 
-		private void SetColor(Color c)
-		{
-
-		}
-
 		public void setScroller(ScrollRect s)
 		{
 			scroller = s;

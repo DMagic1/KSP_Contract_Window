@@ -175,8 +175,6 @@ namespace ContractsWindow.PanelInterfaces
 		public void SetMission()
 		{
 			contractScenario.Instance.setCurrentMission(_missionTitle);
-
-			contractWindow.Instance.setMission(this);
 		}
 
 		public void SetParent(CW_MissionSection m)
