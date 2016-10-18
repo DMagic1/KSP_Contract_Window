@@ -67,7 +67,6 @@
     <Compile Include="Unity\CW_MissionSection.cs" />
     <Compile Include="Unity\CW_MissionSelect.cs" />
     <Compile Include="Unity\CW_MissionSelectObject.cs" />
-    <Compile Include="Unity\CW_Note.cs" />
     <Compile Include="Unity\CW_ParameterSection.cs" />
     <Compile Include="Unity\CW_ProgressPanel.cs" />
     <Compile Include="Unity\CW_Rebuild.cs" />
