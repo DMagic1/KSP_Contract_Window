@@ -577,18 +577,17 @@ namespace ContractsWindow
 			return null;
 		}
 
-		internal contractMission setCurrentMission(string s)
+		internal void setCurrentMission(string s)
 		{
 			contractMission m = getMissionList(s, true);
 
 			if (m != null)
-			{
 				currentMission = m;
-				return currentMission;
-			}
+			else
+				currentMission = masterMission;
 
-			currentMission = masterMission;
-			return currentMission;
+
+			contractWindow.Instance.setMission(currentMission);
 		}
 
 		internal contractMission setLoadedMission(Vessel v)
