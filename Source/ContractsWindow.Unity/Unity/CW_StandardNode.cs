@@ -41,14 +41,15 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle NoteToggle = null;
 		[SerializeField]
-		private GameObject NotePrefab = null;
+		private GameObject NoteContainer = null;
 		[SerializeField]
-		private Transform NoteTransform = null;
+		private TextHandler NoteText = null;
 		[SerializeField]
 		private TooltipHandler NoteTooltip = null;
+		[SerializeField]
+		private LayoutElement NodeLayout = null;
 
 		private IStandardNode standardInterface;
-		private CW_Note note;
 
 		public IStandardNode StandardInterface
 		{
@@ -68,10 +69,7 @@ namespace ContractsWindow.Unity.Unity
 			if (Reward != null)
 				Reward.OnTextUpdate.Invoke(node.RewardText);
 
-			if (!string.IsNullOrEmpty(node.GetNote))
-				setNote();
-			else if (NoteToggle != null)
-				NoteToggle.gameObject.SetActive(false);
+			setNote();
 		}
 
 		public void UpdateText()
@@ -91,38 +89,42 @@ namespace ContractsWindow.Unity.Unity
 			if (standardInterface == null)
 				return;
 
-			if (NotePrefab == null || NoteTransform == null)
+			if (NoteContainer == null || NoteText == null)
 				return;
 
-			GameObject obj = Instantiate(NotePrefab);
+			if (string.IsNullOrEmpty(standardInterface.GetNote))
+			{
+				NoteContainer.gameObject.SetActive(false);
 
-			if (obj == null)
+				if (NoteToggle != null)
+					NoteToggle.gameObject.SetActive(false);
+
+				return;
+			}
+
+			NoteText.OnTextUpdate.Invoke(standardInterface.GetNote);
+
+			NoteContainer.gameObject.SetActive(false);
+
+			if (NodeLayout == null)
 				return;
 
-			obj.transform.SetParent(NoteTransform, false);
-
-			note = obj.GetComponent<CW_Note>();
-
-			if (note == null)
-				return;
-
-			note.setNote(standardInterface.GetNote);
-
-			note.gameObject.SetActive(false);
+			NodeLayout.minWidth -= 12;
+			NodeLayout.preferredWidth -= 12;
 		}
 
 		public void NoteOn(bool isOn)
 		{
 			if (standardInterface == null)
 				return;
-			
-			if (note == null)
+
+			if (NoteContainer == null || NoteText == null)
 				return;
 
 			if (isOn)
-				note.setNote(standardInterface.GetNote);
+				NoteText.OnTextUpdate.Invoke(standardInterface.GetNote);
 
-			note.gameObject.SetActive(isOn);
+			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
 				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Note");

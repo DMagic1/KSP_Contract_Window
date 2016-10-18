@@ -45,9 +45,9 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private TextHandler ContractPenaltyText = null;
 		[SerializeField]
-		private GameObject ContractNotePrefab = null;
+		private GameObject NoteContainer = null;
 		[SerializeField]
-		private Transform ContractNoteTransform = null;
+		private TextHandler NoteText = null;
 		[SerializeField]
 		private GameObject ParameterSectionPrefab = null;
 		[SerializeField]
@@ -82,7 +82,6 @@ namespace ContractsWindow.Unity.Unity
 
 		private IContractSection contractInterface;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
-		private CW_Note note;
 		private CW_MissionSection parent;
 		private bool loaded;
 
@@ -290,10 +289,10 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (note == null)
+			if (NoteContainer == null)
 				return;
 
-			note.gameObject.SetActive(isOn);
+			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
 				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Contract Note");
@@ -343,10 +342,7 @@ namespace ContractsWindow.Unity.Unity
 			if (PinTooltip != null)
 				PinTooltip.SetNewText(contractInterface.Order != null ? "Un-Pin Contract" : "Pin Contract");
 				
-			if (!string.IsNullOrEmpty(contractInterface.GetNote))
-				setNote();
-			else if (ContractNoteToggle != null)
-				ContractNoteToggle.gameObject.SetActive(false);
+			setNote();
 		}
 
 		private void handleColors(Color c)
@@ -377,24 +373,22 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (ContractNotePrefab == null || ContractNoteTransform == null)
+			if (NoteContainer == null || NoteText == null)
 				return;
 
-			GameObject obj = Instantiate(ContractNotePrefab);
+			if (string.IsNullOrEmpty(contractInterface.GetNote))
+			{
+				NoteContainer.gameObject.SetActive(false);
 
-			if (obj == null)
+				if (ContractNoteToggle != null)
+					ContractNoteToggle.gameObject.SetActive(false);
+
 				return;
+			}
 
-			obj.transform.SetParent(ContractNoteTransform, false);
+			NoteText.OnTextUpdate.Invoke(contractInterface.GetNote);
 
-			note = obj.GetComponent<CW_Note>();
-
-			if (note == null)
-				return;
-
-			note.setNote(contractInterface.GetNote);
-
-			note.gameObject.SetActive(false);
+			NoteContainer.gameObject.SetActive(false);
 		}
 
 		private void CreateParameterSections(IList<IParameterSection> sections)

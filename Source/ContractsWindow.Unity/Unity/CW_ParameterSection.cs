@@ -43,9 +43,9 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle NoteToggle = null;
 		[SerializeField]
-		private GameObject NotePrefab = null;
+		private GameObject NoteContainer = null;
 		[SerializeField]
-		private Transform NoteTransform = null;
+		private TextHandler NoteText = null;
 		[SerializeField]
 		private Transform SubParamTransform = null;
 		[SerializeField]
@@ -61,7 +61,6 @@ namespace ContractsWindow.Unity.Unity
 		private Color subColor = new Color(0.8470588f, 0.8627451f, 0.8392157f, 1f);
 		private ContractState oldState;
 		private IParameterSection parameterInterface;
-		private CW_Note note;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
 		private CW_ContractSection root;
 
@@ -96,10 +95,7 @@ namespace ContractsWindow.Unity.Unity
 
 			oldState = parameterInterface.ParameterState;
 
-			if (!string.IsNullOrEmpty(parameterInterface.GetNote))
-				setNote();
-			else if (NoteToggle != null)
-				NoteToggle.gameObject.SetActive(false);
+			setNote();
 
 			if (parameterInterface.ParamLayer < 4)
 				CreateSubParameters(parameterInterface.GetSubParams);
@@ -178,10 +174,10 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (note == null)
+			if (NoteContainer == null)
 				return;
 
-			note.gameObject.SetActive(isOn);
+			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
 				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Parameter Note");
@@ -192,30 +188,28 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (NotePrefab == null || NoteTransform == null)
+			if (NoteContainer == null || NoteText == null)
 				return;
 
-			GameObject obj = Instantiate(NotePrefab);
+			if (string.IsNullOrEmpty(parameterInterface.GetNote))
+			{
+				NoteContainer.gameObject.SetActive(false);
 
-			if (obj == null)
+				if (NoteToggle != null)
+					NoteToggle.gameObject.SetActive(false);
+
 				return;
-			
-			obj.transform.SetParent(NoteTransform, false);
+			}
 
-			note = obj.GetComponent<CW_Note>();
+			NoteText.OnTextUpdate.Invoke(parameterInterface.GetNote);
 
-			if (note == null)
-				return;
-
-			note.setNote(parameterInterface.GetNote);
-
-			note.gameObject.SetActive(false);
+			NoteContainer.gameObject.SetActive(false);
 
 			if (ParameterLayout == null)
 				return;
 
-			ParameterLayout.minWidth -= 10;
-			ParameterLayout.preferredWidth -= 10;
+			ParameterLayout.minWidth -= 12;
+			ParameterLayout.preferredWidth -= 12;
 		}
 
 		private Color stateColor(ContractState state)
