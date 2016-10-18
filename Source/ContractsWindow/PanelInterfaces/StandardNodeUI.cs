@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using KSPAchievements;
 using ContractsWindow.Unity.Interfaces;
 using ProgressParser;
 using UnityEngine;
@@ -73,7 +74,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				string body = node.Body == null ? "" : node.Body.theName;
+				string body = node.Body == null ? (node.PType == FinePrint.Utilities.ProgressType.POINTOFINTEREST ? node.BodyName : "") : node.Body.theName;
 
 				return string.Format(node.Descriptor, body);
 			}
