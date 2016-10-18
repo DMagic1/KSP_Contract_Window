@@ -53,12 +53,12 @@ namespace ContractsWindow.Unity
 			get { return fader != null; }
 		}
 
-		protected void Fade(float to, bool fast, Action call = null, bool interrupt = true)
+		protected void Fade(float to, bool fast, Action call = null, bool interrupt = true, bool overrule = false)
 		{
 			if (canvas == null)
 				return;
 
-			Fade(canvas.alpha, to, fast ? FastRate : SlowRate, call, interrupt);
+			Fade(canvas.alpha, to, fast ? FastRate : SlowRate, call, interrupt, overrule);
 		}
 
 		protected void Alpha(float to)
@@ -70,9 +70,9 @@ namespace ContractsWindow.Unity
 			canvas.alpha = to;
 		}
 
-		private void Fade(float from, float to, float duration, Action call, bool interrupt)
+		private void Fade(float from, float to, float duration, Action call, bool interrupt, bool overrule)
 		{
-			if (!allowInterrupt)
+			if (!allowInterrupt && !overrule)
 				return;
 
 			if (fader != null)
