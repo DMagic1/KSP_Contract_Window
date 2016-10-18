@@ -153,6 +153,11 @@ namespace ContractsWindow.PanelInterfaces
 			get { return currentMission; }
 		}
 
+		public IProgressPanel GetProgressPanel
+		{
+			get { return progressPanel; }
+		}
+
 		public void NewMission(string title, Guid id)
 		{
 			if (string.IsNullOrEmpty(title))
@@ -547,7 +552,7 @@ namespace ContractsWindow.PanelInterfaces
 
 			UIWindow.gameObject.SetActive(true);
 
-			UIWindow.FadeIn();
+			UIWindow.FadeIn(true);
 		}
 
 		public void Close()
@@ -621,9 +626,19 @@ namespace ContractsWindow.PanelInterfaces
 
 			//Load ordering lists and contract settings after primary contract dictionary has been loaded
 
+			if (currentMission != null)
+			{
+				if (currentMission.ShowActiveMissions)
+					cList = currentMission.ActiveMissionList;
+				else
+					cList = currentMission.HiddenMissionList;
+
+				pinnedList = currentMission.loadPinnedContracts(cList);
+			}
+
 			GenerateWindow();
 
-			setMission();
+			refreshContracts(cList);
 
 			if (contractScenario.Instance.windowVisible[sceneInt])
 			{
@@ -632,11 +647,6 @@ namespace ContractsWindow.PanelInterfaces
 				if (StockToolbar)
 					SetAppState(true);
 			}
-
-			//if (cList.Count > 0)
-			//	refreshContracts(cList);
-			//else
-			//	rebuildList();
 		}
 
 		private void setMission()
@@ -698,11 +708,6 @@ namespace ContractsWindow.PanelInterfaces
 		private void loadProgressLists()
 		{
 			progressPanel = new progressUIPanel();
-
-			if (UIWindow == null)
-				return;
-
-			UIWindow.setupProgressPanel(progressPanel);
 		}
 
 		private void contractAccepted(Contract c)
