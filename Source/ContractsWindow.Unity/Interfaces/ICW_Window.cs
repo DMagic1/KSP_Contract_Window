@@ -58,6 +58,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		IMissionSection GetCurrentMission { get; }
 
+		IProgressPanel GetProgressPanel { get; }
+
 		void Rebuild();
 
 		void NewMission(string title, Guid id);
