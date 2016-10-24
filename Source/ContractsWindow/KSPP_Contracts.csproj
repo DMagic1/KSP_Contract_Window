@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IntermediateOutputPath>..\Bin and Obj Backup\Contracts</IntermediateOutputPath>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D0AE6C48-BEFA-4051-B76D-A8A299D9F223}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ContractsWindow</RootNamespace>
+    <AssemblyName>ContractsWindow</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Output\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Output\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ContractParser">
+      <HintPath>..\..\ContractParser\ContractParser\Output\ContractParser.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ContractsWindow.Unity">
+      <HintPath>ContractsWindow.Unity\Output\ContractsWindow.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ProgressParser">
+      <HintPath>..\..\Progress Parser\Progress Parser\Output\ProgressParser.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="contractAssembly.cs" />
+    <Compile Include="contractLoader.cs" />
+    <Compile Include="contractSettings.cs" />
+    <Compile Include="contractSortClass.cs" />
+    <Compile Include="CWTextMeshProHolder.cs" />
+    <Compile Include="Framework\ConfigNodeStorage.cs" />
+    <Compile Include="PanelInterfaces\contractMission.cs" />
+    <Compile Include="contractScenario.cs" />
+    <Compile Include="contractMainMenu.cs" />
+    <Compile Include="PanelInterfaces\contractUIObject.cs" />
+    <Compile Include="contractUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Framework\ExtensionsUnity.cs" />
+    <Compile Include="Framework\MonoBehaviourExtended.cs" />
+    <Compile Include="PanelInterfaces\contractWindow.cs" />
+    <Compile Include="PanelInterfaces\IntervalNodeUI.cs" />
+    <Compile Include="PanelInterfaces\parameterUIObject.cs" />
+    <Compile Include="PanelInterfaces\progressUIPanel.cs" />
+    <Compile Include="PanelInterfaces\StandardNodeUI.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Toolbar\contractStockToolbar.cs" />
+    <Compile Include="Toolbar\contractToolbar.cs" />
+    <Compile Include="Toolbar\contractToolbarWrapper.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
