@@ -114,10 +114,16 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_Window.Window.Interface.IgnoreScale = isOn;
 
+			float f = CW_Window.Window.Interface.Scale;
+
+			Vector3 scale = Vector3.one;
+
 			if (isOn)
-				CW_Window.Window.transform.localScale /= CW_Window.Window.Interface.MasterScale;
+				scale /= CW_Window.Window.Interface.MasterScale;
 			else
-				CW_Window.Window.transform.localScale *= CW_Window.Window.Interface.MasterScale;
+				scale *= CW_Window.Window.Interface.MasterScale;
+
+			CW_Window.Window.transform.localScale = scale * f;
 		}
 
 		public void SliderValueChange(float value)
@@ -146,10 +152,12 @@ namespace ContractsWindow.Unity.Unity
 
 			CW_Window.Window.Interface.Scale = f;
 
-			Vector3 scale = new Vector3(1, 1, 1);
+			Vector3 scale = Vector3.one;
 
 			if (CW_Window.Window.Interface.IgnoreScale)
 				scale /= CW_Window.Window.Interface.MasterScale;
+			else
+				scale *= CW_Window.Window.Interface.MasterScale;
 
 			CW_Window.Window.transform.localScale = scale * f;
 		}
