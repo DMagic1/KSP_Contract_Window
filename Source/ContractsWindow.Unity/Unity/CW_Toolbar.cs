@@ -40,6 +40,8 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle StockReplace = null;
 
+		private bool loaded;
+
 		public void setToolbar()
 		{
 			if (CW_Window.Window == null)
@@ -48,17 +50,32 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			if (StockToggle == null && !CW_Window.Window.Interface.BlizzyAvailable)
-				StockToggle.gameObject.SetActive(false);
+			if (StockToggle != null)
+			{
+				StockToggle.isOn = CW_Window.Window.Interface.StockToolbar;
 
-			if (StockReplace == null && !CW_Window.Window.Interface.StockToolbar)
-				StockReplace.gameObject.SetActive(false);
+				if (!CW_Window.Window.Interface.BlizzyAvailable)
+					StockToggle.gameObject.SetActive(false);
+			}
+
+			if (StockReplace != null)
+			{
+				StockReplace.isOn = CW_Window.Window.Interface.ReplaceToolbar;
+
+				if (!CW_Window.Window.Interface.StockToolbar)
+					StockReplace.gameObject.SetActive(false);
+			}
+
+			loaded = true;
 
 			FadeIn();
 		}
 
 		public void UseStockToolbar(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (CW_Window.Window == null)
 				return;
 
@@ -79,6 +96,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ReplaceStockToolbar(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (CW_Window.Window == null)
 				return;
 
