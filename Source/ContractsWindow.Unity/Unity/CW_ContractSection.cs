@@ -195,7 +195,7 @@ namespace ContractsWindow.Unity.Unity
 
 				p.gameObject.SetActive(false);
 
-				Destroy(p);
+				Destroy(p.gameObject);
 			}
 
 			parameters.Clear();

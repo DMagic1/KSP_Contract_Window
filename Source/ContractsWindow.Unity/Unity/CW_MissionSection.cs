@@ -263,7 +263,7 @@ namespace ContractsWindow.Unity.Unity
 			if (masterList.ContainsKey(id))
 			{
 				masterList[id].gameObject.SetActive(false);
-				Destroy(masterList[id]);
+				Destroy(masterList[id].gameObject);
 				masterList.Remove(id);
 			}
 		}
