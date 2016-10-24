@@ -40,26 +40,26 @@ namespace ContractsWindow
     /// </example>
     public abstract class DMC_MBE : MonoBehaviour
     {
-        #region Constructor
-        ///// <summary>
-        ///// This is marked private so you have to use the Factory Method to create any new instance. The Factory Method will add the new instance to a gameObject which is a requirement for Unity events to occur on the object
-        ///// </summary>
-        //private MonoBehaviourExtended()
-        //{
+		//#region Constructor
+		/////// <summary>
+		/////// This is marked private so you have to use the Factory Method to create any new instance. The Factory Method will add the new instance to a gameObject which is a requirement for Unity events to occur on the object
+		/////// </summary>
+		////private MonoBehaviourExtended()
+		////{
 
-        //}
+		////}
 
-        //internal static MonoBehaviourExtended CreateComponent(GameObject AttachTo)
-        //{
-        //    MonoBehaviourExtended monoReturn;
-        //    monoReturn = AttachTo.AddComponent<MonoBehaviourExtended>();
-        //    return monoReturn;
-        //}
-        static DMC_MBE()
-        {
-            UnityEngine.Random.seed = (int)(DateTime.Now - DateTime.Now.Date).TotalSeconds;
-        }
-        #endregion
+		////internal static MonoBehaviourExtended CreateComponent(GameObject AttachTo)
+		////{
+		////    MonoBehaviourExtended monoReturn;
+		////    monoReturn = AttachTo.AddComponent<MonoBehaviourExtended>();
+		////    return monoReturn;
+		////}
+		//static DMC_MBE()
+		//{
+		//	UnityEngine.Random.seed = (int)(DateTime.Now - DateTime.Now.Date).TotalSeconds;
+		//}
+		//#endregion
 
         internal T AddComponent<T>() where T : UnityEngine.Component
         {
@@ -264,10 +264,10 @@ namespace ContractsWindow
         /// Trigger: Override this for initialization Code - this is before the Start Event
         ///          See this for info on order of execuction: http://docs.unity3d.com/Documentation/Manual/ExecutionOrder.html
         /// </summary>
-        protected virtual void Awake()
-        {
-            LogFormatted_DebugOnly("New MBExtended Awakened");
-        }
+		protected virtual void Awake()
+		{
+			LogFormatted_DebugOnly("MBE Awakened");
+		}
 
         /// <summary>
         /// Unity: Start is called on the frame when a script is enabled just before any of the Update methods is called the first time.
@@ -337,9 +337,6 @@ namespace ContractsWindow
             {
                 //set theflag so this only runs once
                 _OnGUIOnceOnlyHasRun = true;
-                //set up the skins library
-                if (!DMC_SkinsLibrary._Initialized)
-                    DMC_SkinsLibrary.InitSkinList();
 
                 //then pass it on to the downstream derivatives
                 OnGUIOnceOnly();
@@ -408,7 +405,7 @@ namespace ContractsWindow
         internal static void LogFormatted(String Message, params object[] strParams)
         {
             Message = String.Format(Message, strParams);                  // This fills the params into the message
-            String strMessageLine = String.Format("{0},{2},{1}",
+            String strMessageLine = String.Format("{0},[{2}],{1}",
                 DateTime.Now, Message,
                 _AssemblyName);                                           // This adds our standardised wrapper to each line
             UnityEngine.Debug.Log(strMessageLine);                        // And this puts it in the log
