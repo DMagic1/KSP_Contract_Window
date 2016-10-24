@@ -50,28 +50,7 @@ namespace ContractsWindow
 		{
 			get { return instance; }
 		}
-
-		//Use this to reset settings on updates
-		[KSPField(isPersistant = true)]
-		public string version = "1.0.5.2";
-
-		[KSPField(isPersistant = true)]
-		public bool stockToolbar = true;
-		[KSPField(isPersistant = true)]
-		public bool replaceStockToolbar = false;
-		[KSPField(isPersistant = true)]
-		public bool replaceStockWarned = false;
-		[KSPField(isPersistant = true)]
-		public bool toolTips = true;
-		[KSPField(isPersistant = true)]
-		public bool fontSmall = true;
-		[KSPField(isPersistant = true)]
-		public int windowSize = 0;
-		[KSPField(isPersistant = true)]
-		public float windowScale = 1;
-		[KSPField(isPersistant = true)]
-		public bool ignoreScale = false;
-
+		
 		private static contractScenario instance;
 
 		//Primary mission storage
@@ -95,9 +74,7 @@ namespace ContractsWindow
 
 		internal contractStockToolbar appLauncherButton = null;
 		internal contractToolbar blizzyToolbarButton = null;
-
-		//internal contractsWindow cWin;
-
+		
 		private contractWindow _cWin;
 
 		public contractWindow CWin
@@ -217,8 +194,6 @@ namespace ContractsWindow
 					}
 					loadWindow(winPos);
 				}
-
-				version = contractAssembly.Version;
 			}
 			catch (Exception e)
 			{
@@ -230,6 +205,9 @@ namespace ContractsWindow
 		{
 			try
 			{
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.Save();
+
 				saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
 				ConfigNode scenes = new ConfigNode("Contracts_Window_Parameters");
@@ -289,17 +267,28 @@ namespace ContractsWindow
 				DMC_MBE.LogFormatted("Contracts Windows Cannot Be Started: {0}", e);
 			}
 
+			bool stockToolbar = true;
+
+			if (contractMainMenu.Settings != null)
+				stockToolbar = contractMainMenu.Settings.useStockToolbar;
+
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
+				{
 					Destroy(blizzyToolbarButton);
+					blizzyToolbarButton = null;
+				}
 			}
 			else if (ToolbarManager.ToolbarAvailable && !stockToolbar)
 			{
 				blizzyToolbarButton = gameObject.AddComponent<contractToolbar>();
 				if (appLauncherButton != null)
+				{
 					Destroy(appLauncherButton);
+					appLauncherButton = null;
+				}
 			}
 
 			contractParser.onParameterAdded.Add(onParameterAdded);
@@ -324,6 +313,11 @@ namespace ContractsWindow
 
 		internal void toggleToolbars()
 		{
+			bool stockToolbar = true;
+
+			if (contractMainMenu.Settings != null)
+				stockToolbar = contractMainMenu.Settings.useStockToolbar;
+
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{
 				if (blizzyToolbarButton != null)
@@ -650,36 +644,42 @@ namespace ContractsWindow
 		//Initializes all missions that were added during the loading process
 		internal void loadAllMissionLists()
 		{
-			for (int i = 0; i < missionList.Count; i++)
+			if (missionList.Count <= 0)
 			{
-				contractMission m = missionList.At(i);
-
-				if (m == null)
-					continue;
-
-				if (m.MasterMission)
+				addFullMissionList();
+			}
+			else
+			{
+				for (int i = 0; i < missionList.Count; i++)
 				{
-					m.buildMissionList();
+					contractMission m = missionList.At(i);
 
-					List<contractContainer> active = contractParser.getActiveContracts;
+					if (m == null)
+						continue;
 
-					int l = active.Count;
-
-					for (int j = 0; j < l; j++)
+					if (m.MasterMission)
 					{
-						contractContainer c = active[j];
+						m.buildMissionList();
 
-						if (c == null)
-							continue;
+						List<contractContainer> active = contractParser.getActiveContracts;
 
-						m.addContract(c, true, false);
+						int l = active.Count;
+
+						for (int j = 0; j < l; j++)
+						{
+							contractContainer c = active[j];
+
+							if (c == null)
+								continue;
+
+							m.addContract(c, true, false);
+						}
+
+						masterMission = m;
 					}
-
-					masterMission = m;
+					else
+						m.buildMissionList();
 				}
-				else
-					m.buildMissionList();
-
 			}
 		}
 
