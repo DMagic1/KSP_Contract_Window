@@ -71,7 +71,6 @@
     <Compile Include="PanelInterfaces\contractMission.cs" />
     <Compile Include="contractScenario.cs" />
     <Compile Include="contractMainMenu.cs" />
-    <Compile Include="contractsWindow.cs" />
     <Compile Include="PanelInterfaces\contractUIObject.cs" />
     <Compile Include="contractUtils.cs">
       <SubType>Code</SubType>
