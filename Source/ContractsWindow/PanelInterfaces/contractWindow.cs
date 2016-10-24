@@ -39,6 +39,7 @@ using ContractsWindow.Toolbar;
 using ContractsWindow.Unity.Interfaces;
 using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity;
+using KSP.UI;
 
 namespace ContractsWindow.PanelInterfaces
 {
@@ -68,14 +69,34 @@ namespace ContractsWindow.PanelInterfaces
 
 		public bool HideTooltips
 		{
-			get { return contractScenario.Instance.toolTips; }
-			set { contractScenario.Instance.toolTips = value; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return false;
+
+				return !contractMainMenu.Settings.tooltips;
+			}
+			set
+			{
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.tooltips = !value;
+			}
 		}
 
 		public bool IgnoreScale
 		{
-			get { return contractScenario.Instance.ignoreScale; }
-			set { contractScenario.Instance.ignoreScale = value; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return false;
+
+				return contractMainMenu.Settings.ignoreKSPScale;
+			}
+			set
+			{
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.ignoreKSPScale = value;
+			}
 		}
 
 		public bool IsVisible
@@ -85,10 +106,17 @@ namespace ContractsWindow.PanelInterfaces
 
 		public bool LargeFont
 		{
-			get { return !contractScenario.Instance.fontSmall; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return false;
+
+				return contractMainMenu.Settings.largeFont;
+			}
 			set
 			{
-				contractScenario.Instance.fontSmall = !value;
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.largeFont = value;
 
 				contractLoader.UpdateFontSize(value ? 1 : -1);
 			}
@@ -101,8 +129,18 @@ namespace ContractsWindow.PanelInterfaces
 
 		public float Scale
 		{
-			get { return contractScenario.Instance.windowScale; }
-			set { contractScenario.Instance.windowScale = value; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return 1;
+
+				return contractMainMenu.Settings.windowScale;
+			}
+			set
+			{
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.windowScale = value;
+			}
 		}
 
 		public bool BlizzyAvailable
@@ -112,10 +150,17 @@ namespace ContractsWindow.PanelInterfaces
 
 		public bool ReplaceToolbar
 		{
-			get { return contractScenario.Instance.replaceStockToolbar; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return false;
+
+				return contractMainMenu.Settings.replaceStockApp;
+			}
 			set
 			{
-				contractScenario.Instance.replaceStockToolbar = value;
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.replaceStockApp = value;
 
 				if (value && contractStockToolbar.Instance != null)
 					contractStockToolbar.Instance.replaceStockApp();
@@ -124,10 +169,17 @@ namespace ContractsWindow.PanelInterfaces
 
 		public bool StockToolbar
 		{
-			get { return contractScenario.Instance.stockToolbar; }
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return true;
+
+				return contractMainMenu.Settings.useStockToolbar;
+			}
 			set
 			{
-				contractScenario.Instance.stockToolbar = value;
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.useStockToolbar = value;
 
 				contractScenario.Instance.toggleToolbars();
 			}
@@ -469,8 +521,6 @@ namespace ContractsWindow.PanelInterfaces
 
 		protected override void Awake()
 		{
-			base.Awake();
-
 			instance = this;
 
 			RepeatingWorkerInitialWait = 10;
@@ -486,6 +536,7 @@ namespace ContractsWindow.PanelInterfaces
 
 			contractLoader.UpdateFontSize(LargeFont ? 1 : 0);
 
+			GameEvents.OnGameSettingsApplied.Add(onSettingsApplied);
 			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
@@ -499,9 +550,13 @@ namespace ContractsWindow.PanelInterfaces
 			{
 				UIWindow.gameObject.SetActive(false);
 
-				Destroy(UIWindow);
+				Destroy(UIWindow.gameObject);
 			}
 
+			if (_canvas != null)
+				Destroy(_canvas.gameObject);
+
+			GameEvents.OnGameSettingsApplied.Remove(onSettingsApplied);
 			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
@@ -525,6 +580,18 @@ namespace ContractsWindow.PanelInterfaces
 				loadLists();
 				contractsLoaded = true;
 			}
+		}
+
+		private void onSettingsApplied()
+		{
+			//if (_canvas != null)
+			//	_canvas.scaleFactor = MasterScale;
+
+			if (IgnoreScale)
+				return;
+
+			if (UIWindow != null)
+				UIWindow.setScale();
 		}
 
 		protected override void RepeatingWorker()
@@ -572,9 +639,18 @@ namespace ContractsWindow.PanelInterfaces
 			if (contractLoader.WindowPrefab == null || UIWindow != null)
 				return;
 
+			if (contractLoader.CanvasPrefab == null)
+				return;
+
+			_canvas = GameObject.Instantiate<Canvas>(contractLoader.CanvasPrefab);
+			_canvas.gameObject.name = "ContractWindowPlusCanvas";
+
 			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
-			_canvas = MainCanvasUtil.MainCanvas;
+			_canvas.worldCamera = UIMasterController.Instance.uiCamera;
+			//_canvas.scaleFactor = MasterScale;
+
+			UIMasterController.Instance.AddCanvas(_canvas, true);
 
 			obj.transform.SetParent(_canvas.transform, false);
 
