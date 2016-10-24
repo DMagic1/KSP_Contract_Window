@@ -72,6 +72,8 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle ShowHideToggle = null;
 		[SerializeField]
+		private Toggle TooltipToggle = null;
+		[SerializeField]
 		private ScrollRect Scroller = null;
 		[SerializeField]
 		private TooltipHandler EyesTooltip = null;
@@ -151,16 +153,34 @@ namespace ContractsWindow.Unity.Unity
 			if (VersionText != null)
 				VersionText.OnTextUpdate.Invoke(window.Version);
 
+			if (TooltipToggle != null)
+				TooltipToggle.isOn = window.HideTooltips;
+
 			SelectMission(window.GetCurrentMission);
 
-			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
-
-			ToggleTooltips(window.HideTooltips);
+			UpdateTooltips();
 
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
+			else
+				transform.localScale *= window.MasterScale;
 
 			transform.localScale *= window.Scale;
+		}
+
+		public void setScale()
+		{
+			if (windowInterface == null)
+				return;
+
+			Vector3 scale = Vector3.one;
+
+			if (windowInterface.IgnoreScale)
+				scale /= windowInterface.MasterScale;
+			else
+				scale *= windowInterface.MasterScale;
+
+			transform.localScale = scale * windowInterface.Scale;
 		}
 
 		public void setupProgressPanel(IProgressPanel panel)
@@ -173,9 +193,7 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateProgressSection(panel);
 
-			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
-
-			ToggleTooltips(windowInterface.HideTooltips);
+			UpdateTooltips();
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -245,7 +263,7 @@ namespace ContractsWindow.Unity.Unity
 			loaded = false;
 
 			prepareTopBar();
-
+			
 			if (MissionTitle != null)
 				MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
 
@@ -256,6 +274,8 @@ namespace ContractsWindow.Unity.Unity
 				else
 					MissionEdit.gameObject.SetActive(true);
 			}
+
+			UpdateTooltips();
 		}
 
 		private void prepareTopBar()
@@ -459,20 +479,17 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ToggleTooltips(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (windowInterface == null)
 				return;
 
 			windowInterface.HideTooltips = isOn;
 
-			for (int i = tooltips.Count - 1; i >= 0; i--)
-			{
-				TooltipHandler t = tooltips[i];
+			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
 
-				if (t == null)
-					continue;
-
-				t.IsActive = isOn;
-			}
+			SwitchTooltips(!isOn);
 		}
 
 		public void showRefresh()
@@ -757,7 +774,20 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			ToggleTooltips(windowInterface.HideTooltips);
+			SwitchTooltips(!windowInterface.HideTooltips);
+		}
+
+		private void SwitchTooltips(bool isOn)
+		{
+			for (int i = tooltips.Count - 1; i >= 0; i--)
+			{
+				TooltipHandler t = tooltips[i];
+
+				if (t == null)
+					continue;
+
+				t.IsActive = isOn;
+			}
 		}
 
 		public void RefreshProgress()
