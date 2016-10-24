@@ -45,14 +45,15 @@ namespace ContractsWindow.Toolbar
 
 		private void setupToolbar()
 		{
-			if (!ToolbarManager.ToolbarAvailable) return;
+			if (!ToolbarManager.ToolbarAvailable)
+				return;
 
 			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
 
 			contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractWindowPlus");
 
-			if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/DMagicUtilities/ContractsWindow/Textures/ContractsIcon.png").Replace("\\", "/")))
-				contractButton.TexturePath = "DMagicUtilities/ContractsWindow/Textures/ContractsIcon";
+			if (File.Exists(Path.Combine(new DirectoryInfo(KSPUtil.ApplicationRootPath).FullName, "GameData/DMagicUtilities/ContractsWindow/Resources/ContractsIcon.png").Replace("\\", "/")))
+				contractButton.TexturePath = "DMagicUtilities/ContractsWindow/Resources/ContractsIcon";
 			else
 				contractButton.TexturePath = "000_Toolbar/resize-cursor";
 
@@ -81,7 +82,6 @@ namespace ContractsWindow.Toolbar
 
 		protected override void OnDestroy()
 		{
-			if (!ToolbarManager.ToolbarAvailable) return;
 			if (contractButton != null)
 				contractButton.Destroy();
 		}

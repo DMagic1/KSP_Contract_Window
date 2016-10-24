@@ -49,7 +49,7 @@ namespace ContractsWindow.Toolbar
 		{
 			get
 			{
-				if (contractScenario.Instance.replaceStockToolbar)
+				if (contractMainMenu.Settings != null && contractMainMenu.Settings.replaceStockApp)
 					return stockAppButton;
 
 				return toolbarButton;
@@ -68,10 +68,10 @@ namespace ContractsWindow.Toolbar
 
 		private void setupToolbar()
 		{
-			if (!contractScenario.Instance.replaceStockToolbar)
-				StartCoroutine(addButton());
-			else
+			if (contractMainMenu.Settings != null && contractMainMenu.Settings.replaceStockApp)
 				StartCoroutine(replaceStockContractApp());
+			else
+				StartCoroutine(addButton());
 		}
 
 		private void OnDestroy()
@@ -87,7 +87,7 @@ namespace ContractsWindow.Toolbar
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
-			toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+			toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractMainMenu.ToolbarIcon);
 
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
 		}
@@ -114,7 +114,7 @@ namespace ContractsWindow.Toolbar
 			if (toolbarButton == null)
 			{
 				DMC_MBE.LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
-				toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractSkins.toolbarIcon);
+				toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractMainMenu.ToolbarIcon);
 			}
 
 			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
