@@ -30,15 +30,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ContractsWindow.Unity;
+using KSP.UI;
 
 namespace ContractsWindow
 {
 	[KSPAddon(KSPAddon.Startup.Instantly, true)]
-	public class contractLoader : DMC_MBE
+	public class contractLoader : MonoBehaviour
 	{
 		private static AssetBundle prefabs;
 		private static GameObject[] loadedPrefabs;
 		private static GameObject windowPrefab;
+		private static Canvas canvasPrefab;
 		private static int currentFontAdjustment;
 
 		public static AssetBundle Prefabs
@@ -51,11 +53,16 @@ namespace ContractsWindow
 			get { return windowPrefab; }
 		}
 
-		protected override void Awake()
+		public static Canvas CanvasPrefab
+		{
+			get { return canvasPrefab; }
+		}
+
+		private void Awake()
 		{
 			string path = KSPUtil.ApplicationRootPath + "GameData/DMagicUtilities/ContractsWindow/Resources";
 
-			prefabs = AssetBundle.LoadFromFile(path + "/contracts_window_prefabs.ksp");
+			prefabs = AssetBundle.LoadFromFile(path + "/contracts_window_prefabs");
 
 			if (prefabs != null)
 				loadedPrefabs = prefabs.LoadAllAssets<GameObject>();
@@ -115,6 +122,13 @@ namespace ContractsWindow
 
 				if (o.name == "CW_Plus")
 					windowPrefab = o;
+				else if (o.name == "Canvas_Prefab")
+				{
+					Canvas c = o.GetComponent<Canvas>();
+
+					if (c != null)
+						canvasPrefab = c;
+				}
 
 				if (o != null)
 					processPrefab(o);
