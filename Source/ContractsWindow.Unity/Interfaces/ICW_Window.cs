@@ -42,6 +42,8 @@ namespace ContractsWindow.Unity.Interfaces
 
 		bool ReplaceToolbar { get; set; }
 
+		bool PixelPerfect { get; set; }
+
 		bool LargeFont { get; set; }
 
 		bool IgnoreScale { get; set; }

@@ -104,6 +104,25 @@ namespace ContractsWindow.PanelInterfaces
 			get { return _isVisible; }
 		}
 
+		public bool PixelPerfect
+		{
+			get
+			{
+				if (contractMainMenu.Settings == null)
+					return false;
+
+				return contractMainMenu.Settings.pixelPerfect;
+			}
+			set
+			{
+				if (contractMainMenu.Settings != null)
+					contractMainMenu.Settings.pixelPerfect = value;
+
+				if (_canvas != null)
+					_canvas.pixelPerfect = value;
+			}
+		}
+
 		public bool LargeFont
 		{
 			get
@@ -648,7 +667,7 @@ namespace ContractsWindow.PanelInterfaces
 			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
 			_canvas.worldCamera = UIMasterController.Instance.uiCamera;
-			//_canvas.scaleFactor = MasterScale;
+			_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
 
 			UIMasterController.Instance.AddCanvas(_canvas, true);
 

@@ -38,6 +38,8 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Slider SliderScale = null;
 		[SerializeField]
+		private Toggle PixelToggle = null;
+		[SerializeField]
 		private Toggle FontToggle = null;
 		[SerializeField]
 		private Toggle ScaleToggle = null;
@@ -57,17 +59,38 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
+			if (PixelToggle != null)
+				PixelToggle.isOn = CW_Window.Window.Interface.PixelPerfect;
 
-			ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
+			if (FontToggle != null)
+				FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
 
-			SliderValue.OnTextUpdate.Invoke(CW_Window.Window.Interface.Scale.ToString("P0"));
+			if (ScaleToggle != null)
+				ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
 
-			SliderScale.value = CW_Window.Window.Interface.Scale * 10;
+			if (SliderValue != null)
+				SliderValue.OnTextUpdate.Invoke(CW_Window.Window.Interface.Scale.ToString("P0"));
+
+			if (SliderScale != null)
+				SliderScale.value = CW_Window.Window.Interface.Scale * 10;
 
 			FadeIn();
 
 			loaded = true;
+		}
+
+		public void SetPixelPerfect(bool isOn)
+		{
+			if (!loaded)
+				return;
+
+			if (CW_Window.Window == null)
+				return;
+
+			if (CW_Window.Window.Interface == null)
+				return;
+
+			CW_Window.Window.Interface.PixelPerfect = isOn;
 		}
 
 		public void SetLargeFont(bool isOn)
