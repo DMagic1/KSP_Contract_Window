@@ -33,6 +33,8 @@ namespace ContractsWindow
 		[Persistent]
 		public bool tooltips = true;
 		[Persistent]
+		public bool pixelPerfect = false;
+		[Persistent]
 		public bool largeFont = false;
 		[Persistent]
 		public bool ignoreKSPScale = false;

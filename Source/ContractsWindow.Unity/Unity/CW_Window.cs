@@ -673,7 +673,8 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface.MainCanvas == null)
 				return;
 
-			windowInterface.MainCanvas.pixelPerfect = true;
+			if (windowInterface.PixelPerfect)
+				windowInterface.MainCanvas.pixelPerfect = true;
 		}
 
 		public void OnBeginDrag(PointerEventData eventData)
