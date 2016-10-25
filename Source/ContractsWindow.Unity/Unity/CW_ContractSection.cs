@@ -69,6 +69,8 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle PinToggle = null;
 		[SerializeField]
+		private Toggle ParamToggle = null;
+		[SerializeField]
 		private TooltipHandler EyesTooltip = null;
 		[SerializeField]
 		private TooltipHandler PinTooltip = null;
@@ -103,7 +105,7 @@ namespace ContractsWindow.Unity.Unity
 			if (mission == null)
 				return;
 
-			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
+			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null || ParamToggle == null)
 				return;
 
 			parent = mission;
@@ -120,6 +122,8 @@ namespace ContractsWindow.Unity.Unity
 			ContractRewardText.OnTextUpdate.Invoke(contract.RewardText);
 
 			ContractPenaltyText.OnTextUpdate.Invoke(contract.PenaltyText);
+
+			ParamToggle.isOn = contract.ShowParams;
 
 			prepareHeader();
 
@@ -300,6 +304,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowParameters(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (contractInterface == null)
 				return;
 
@@ -430,6 +437,8 @@ namespace ContractsWindow.Unity.Unity
 			paramObject.setParameter(section, this);
 
 			parameters.Add(paramObject);
+
+			paramObject.gameObject.SetActive(contractInterface.ShowParams);
 		}
 
 		public void AddParameter(IParameterSection section)
