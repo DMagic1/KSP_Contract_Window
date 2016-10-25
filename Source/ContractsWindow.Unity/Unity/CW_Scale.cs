@@ -50,7 +50,7 @@ namespace ContractsWindow.Unity.Unity
 
 		public void setScalar()
 		{
-			if (SliderScale == null || FontToggle == null || ScaleToggle == null || SliderValue == null)
+			if (SliderScale == null || FontToggle == null || ScaleToggle == null || SliderValue == null || PixelToggle == null)
 				return;
 
 			if (CW_Window.Window == null)
@@ -59,20 +59,15 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			if (PixelToggle != null)
-				PixelToggle.isOn = CW_Window.Window.Interface.PixelPerfect;
+			PixelToggle.isOn = CW_Window.Window.Interface.PixelPerfect;
 
-			if (FontToggle != null)
-				FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
+			FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
 
-			if (ScaleToggle != null)
-				ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
+			ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
 
-			if (SliderValue != null)
-				SliderValue.OnTextUpdate.Invoke(CW_Window.Window.Interface.Scale.ToString("P0"));
+			SliderValue.OnTextUpdate.Invoke(CW_Window.Window.Interface.Scale.ToString("P0"));
 
-			if (SliderScale != null)
-				SliderScale.value = CW_Window.Window.Interface.Scale * 10;
+			SliderScale.value = CW_Window.Window.Interface.Scale * 10;
 
 			FadeIn();
 
