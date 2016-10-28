@@ -129,6 +129,9 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateParameterSections(contract.GetParameters);
 
+			if (!contract.ShowParams && ParameterSectionTransform != null)
+				ParameterSectionTransform.gameObject.SetActive(false);
+
 			loaded = true;
 		}
 
@@ -256,9 +259,8 @@ namespace ContractsWindow.Unity.Unity
 
 			parent.SwitchContract(contractInterface.ID, isOn);
 
-			ShowParameters(!isOn);
-
-			gameObject.SetActive(false);
+			if (ParamToggle != null)
+				ParamToggle.isOn = !isOn;
 
 			contractInterface.IsHidden = isOn;
 		}
@@ -320,9 +322,10 @@ namespace ContractsWindow.Unity.Unity
 					continue;
 
 				parameter.ToggleSubParams(isOn);
-
-				parameter.gameObject.SetActive(isOn);
 			}
+
+			if (ParameterSectionTransform != null)
+				ParameterSectionTransform.gameObject.SetActive(isOn);
 		}
 
 		private void prepareHeader()
@@ -384,14 +387,10 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (string.IsNullOrEmpty(contractInterface.GetNote))
-			{
-				NoteContainer.gameObject.SetActive(false);
-
-				if (ContractNoteToggle != null)
-					ContractNoteToggle.gameObject.SetActive(false);
-
 				return;
-			}
+
+			if (ContractNoteToggle != null)
+				ContractNoteToggle.gameObject.SetActive(true);
 
 			NoteText.OnTextUpdate.Invoke(contractInterface.GetNote);
 
@@ -437,8 +436,6 @@ namespace ContractsWindow.Unity.Unity
 			paramObject.setParameter(section, this);
 
 			parameters.Add(paramObject);
-
-			paramObject.gameObject.SetActive(contractInterface.ShowParams);
 		}
 
 		public void AddParameter(IParameterSection section)
