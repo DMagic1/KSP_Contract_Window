@@ -158,8 +158,6 @@ namespace ContractsWindow.Unity.Unity
 
 			SelectMission(window.GetCurrentMission);
 
-			UpdateTooltips();
-
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
 			else
@@ -181,19 +179,6 @@ namespace ContractsWindow.Unity.Unity
 				scale *= windowInterface.MasterScale;
 
 			transform.localScale = scale * windowInterface.Scale;
-		}
-
-		public void setupProgressPanel(IProgressPanel panel)
-		{
-			if (windowInterface == null)
-				return;
-
-			if (panel == null)
-				return;
-
-			CreateProgressSection(panel);
-
-			UpdateTooltips();
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -246,11 +231,7 @@ namespace ContractsWindow.Unity.Unity
 			if (currentMission != null)
 			{
 				if (currentMission.MissionTitle != mission.MissionTitle)
-				{
-					currentMission.SetMissionVisible(false);
-
 					DestroyImmediate(currentMission.gameObject);
-				}
 				else
 					return;
 			}
@@ -274,8 +255,6 @@ namespace ContractsWindow.Unity.Unity
 				else
 					MissionEdit.gameObject.SetActive(true);
 			}
-
-			UpdateTooltips();
 		}
 
 		private void prepareTopBar()
@@ -303,13 +282,9 @@ namespace ContractsWindow.Unity.Unity
 			if (showProgress)
 			{
 				if (currentMission != null)
-				{
-					currentMission.SetMissionVisible(false);
-
 					DestroyImmediate(currentMission.gameObject);
-				}
 
-				setupProgressPanel(windowInterface.GetProgressPanel);
+				CreateProgressSection(windowInterface.GetProgressPanel);
 
 				if (MissionTitle != null)
 					MissionTitle.OnTextUpdate.Invoke("Progress Nodes:");
@@ -320,11 +295,7 @@ namespace ContractsWindow.Unity.Unity
 			else
 			{
 				if (progressPanel != null)
-				{
-					progressPanel.SetProgressVisible(false);
-
 					DestroyImmediate(progressPanel.gameObject);
-				}
 
 				SelectMission(windowInterface.GetCurrentMission);
 
@@ -766,16 +737,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			currentMission.UpdateChildren();
-		}
-
-		public void UpdateTooltips()
-		{
-			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
-
-			if (windowInterface == null)
-				return;
-
-			SwitchTooltips(!windowInterface.HideTooltips);
 		}
 
 		private void SwitchTooltips(bool isOn)
