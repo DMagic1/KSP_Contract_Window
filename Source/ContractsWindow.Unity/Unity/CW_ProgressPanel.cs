@@ -97,29 +97,44 @@ namespace ContractsWindow.Unity.Unity
 			CreateBodies(panel.GetBodies);
 
 			if (IntervalToggle != null)
+			{
 				IntervalToggle.gameObject.SetActive(panel.AnyInterval);
 
+				if (panel.IntervalVisible)
+					IntervalToggle.isOn = true;
+				else
+					ToggleIntervals(false);
+			}
+
 			if (StandardToggle != null)
+			{
 				StandardToggle.gameObject.SetActive(panel.AnyStandard);
 
+				if (panel.StandardVisible)
+					StandardToggle.isOn = true;
+				else
+					ToggleStandards(false);
+			}
+
 			if (POIToggle != null)
+			{
 				POIToggle.gameObject.SetActive(panel.AnyPOI);
 
+				if (panel.POIVisible)
+					POIToggle.isOn = true;
+				else
+					TogglePOIs(false);
+			}
+
 			if (BodyToggle != null)
+			{
 				BodyToggle.gameObject.SetActive(panel.AnyBody);
-		}
 
-		public void SetProgressVisible(bool isOn)
-		{
-			if (panelInterface == null)
-				return;
-
-			panelInterface.IsVisible = isOn;
-
-			gameObject.SetActive(isOn);
-
-			if (isOn)
-				Refresh();
+				if (panel.BodyVisible)
+					BodyToggle.isOn = true;
+				else
+					ToggleBodies(false);
+			}
 		}
 
 		public void Refresh()
@@ -191,11 +206,20 @@ namespace ContractsWindow.Unity.Unity
 					}
 				}
 			}
-
 		}
 
 		public void ToggleIntervals(bool isOn)
 		{
+			if (IntervalTransform == null || panelInterface == null)
+				return;
+
+			panelInterface.IntervalVisible = isOn;
+
+			IntervalTransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
+				return;
+
 			for (int i = intervalTypes.Count - 1; i >= 0; i--)
 			{
 				CW_IntervalTypes node = intervalTypes[i];
@@ -206,12 +230,22 @@ namespace ContractsWindow.Unity.Unity
 				if (node.IntervalInterface == null)
 					continue;
 
-				node.gameObject.SetActive(isOn && node.IntervalInterface.IsReached);
+				node.gameObject.SetActive(node.IntervalInterface.IsReached);
 			}
 		}
 
 		public void TogglePOIs(bool isOn)
 		{
+			if (POITransform == null || panelInterface == null)
+				return;
+
+			panelInterface.POIVisible = isOn;
+
+			POITransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
+				return;
+
 			for (int i = poiNodes.Count - 1; i >= 0; i--)
 			{
 				CW_StandardNode node = poiNodes[i];
@@ -224,12 +258,22 @@ namespace ContractsWindow.Unity.Unity
 
 				node.UpdateText();
 
-				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
+				node.gameObject.SetActive(node.StandardInterface.IsComplete);
 			}
 		}
 
 		public void ToggleStandards(bool isOn)
 		{
+			if (StandardTransform == null || panelInterface == null)
+				return;
+
+			panelInterface.StandardVisible = isOn;
+
+			StandardTransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
+				return;
+
 			for (int i = standardNodes.Count - 1; i >= 0; i--)
 			{
 				CW_StandardNode node = standardNodes[i];
@@ -242,13 +286,20 @@ namespace ContractsWindow.Unity.Unity
 
 				node.UpdateText();
 
-				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
+				node.gameObject.SetActive(node.StandardInterface.IsComplete);
 			}
 		}
 
 		public void ToggleBodies(bool isOn)
 		{
-			if (panelInterface == null)
+			if (BodyTransform == null || panelInterface == null)
+				return;
+
+			panelInterface.BodyVisible = isOn;
+
+			BodyTransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
 				return;
 
 			for (int i = bodyNodes.Count - 1; i >= 0; i--)
@@ -258,7 +309,7 @@ namespace ContractsWindow.Unity.Unity
 				if (node == null)
 					continue;
 
-				node.gameObject.SetActive(isOn && panelInterface.AnyBodyNode(node.BodyName));
+				node.gameObject.SetActive(panelInterface.AnyBodyNode(node.BodyName));
 			}
 		}
 
@@ -298,8 +349,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setIntervalType(n);
 
 			intervalTypes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 
 		private void CreatePOINodes(IList<IStandardNode> nodes)
@@ -341,8 +390,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setNode(node);
 
 			poiNodes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 
 		private void CreateStandardNodes(IList<IStandardNode> nodes)
@@ -384,8 +431,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setNode(node);
 
 			standardNodes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 
 		private void CreateBodies(Dictionary<string, List<IStandardNode>> bodies)
@@ -429,8 +474,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setBodyType(b, n);
 
 			bodyNodes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 
 	}

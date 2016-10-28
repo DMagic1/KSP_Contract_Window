@@ -62,6 +62,9 @@ namespace ContractsWindow.Unity.Unity
 				IntervalType.OnTextUpdate.Invoke(node.NodeTitle);
 
 			CreateIntervalNodes(node);
+
+			if (IntervalTransform != null)
+				IntervalTransform.gameObject.SetActive(false);
 		}
 
 		public void Refresh()
@@ -76,6 +79,14 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (!intervalInterface.IsReached)
+				return;
+
+			if (IntervalTransform == null)
+				return;
+
+			IntervalTransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
 				return;
 
 			for (int i = nodes.Count - 1; i >= 0; i--)
@@ -125,8 +136,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setNode(node, i);
 
 			nodes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 	}
 }
