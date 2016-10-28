@@ -38,7 +38,9 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private GameObject ContractSectionPrefab = null;
 		[SerializeField]
-		private Transform ContractSectionTransform = null;
+		private Transform ActiveTransform = null;
+		[SerializeField]
+		private Transform HiddenTransform = null;
 
 		private string missionTitle;
 		private IMissionSection missionInterface;
@@ -74,6 +76,12 @@ namespace ContractsWindow.Unity.Unity
 			CreateContractSections(section.GetContracts);
 
 			section.SetParent(this);
+
+			if (section.ShowHidden)
+			{
+				ActiveTransform.gameObject.SetActive(false);
+				HiddenTransform.gameObject.SetActive(true);
+			}
 		}
 
 		private void CreateContractSections(IList<IContractSection> contracts)
@@ -81,7 +89,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contracts == null)
 				return;
 
-			if (ContractSectionPrefab == null || ContractSectionTransform == null)
+			if (ContractSectionPrefab == null || ActiveTransform == null || HiddenTransform == null)
 				return;
 
 			if (CW_Window.Window == null)
@@ -111,7 +119,7 @@ namespace ContractsWindow.Unity.Unity
 			if (obj == null)
 				return;
 
-			obj.transform.SetParent(ContractSectionTransform, false);
+			obj.transform.SetParent(contract.IsHidden ? HiddenTransform : ActiveTransform, false);
 
 			CW_ContractSection contractObject = obj.GetComponent<CW_ContractSection>();
 
@@ -126,8 +134,6 @@ namespace ContractsWindow.Unity.Unity
 				activeContracts.Add(contract.ID);
 
 			masterList.Add(contract.ID, contractObject);
-
-			contractObject.gameObject.SetActive(contract.IsHidden && missionInterface.ShowHidden || !contract.IsHidden && !missionInterface.ShowHidden);
 		}
 
 		public void AddContract(IContractSection contract)
@@ -153,8 +159,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (section == null)
 				return;
-
-			CW_Window.Window.UpdateTooltips();
 		}
 
 		private CW_ContractSection GetContract(Guid id)
@@ -173,15 +177,20 @@ namespace ContractsWindow.Unity.Unity
 			if (!masterList.ContainsKey(id))
 				return;
 
+			if (ActiveTransform == null || HiddenTransform == null)
+				return;
+
 			if (hidden)
 			{
 				ListRemove(activeContracts, id);
 				hiddenContracts.Add(id);
+				masterList[id].transform.SetParent(HiddenTransform);
 			}
 			else
 			{
 				ListRemove(hiddenContracts, id);
 				activeContracts.Add(id);
+				masterList[id].transform.SetParent(ActiveTransform);
 			}
 		}
 
@@ -190,7 +199,7 @@ namespace ContractsWindow.Unity.Unity
 			if (missionInterface == null)
 				return;
 
-			if (ContractSectionTransform == null)
+			if (ActiveTransform == null || HiddenTransform == null)
 				return;
 
 			int l = sortedList.Count;
@@ -216,7 +225,7 @@ namespace ContractsWindow.Unity.Unity
 				if (c == null)
 					continue;
 
-				c.transform.SetParent(ContractSectionTransform);
+				c.transform.SetParent(c.Interface.IsHidden ? HiddenTransform : ActiveTransform);
 			}
 		}
 
@@ -242,8 +251,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			c.RefreshParameters();
-
-			CW_Window.Window.UpdateTooltips();
 		}
 
 		public void RemoveContract(Guid id)
@@ -253,9 +260,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (ListRemove(activeContracts, id) || ListRemove(hiddenContracts, id))
 				RemoveFromMasterList(id);
-			
-			if (CW_Window.Window != null)
-				CW_Window.Window.UpdateTooltips();
 		}
 
 		private void RemoveFromMasterList(Guid id)
@@ -291,31 +295,12 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ToggleContracts(bool showHidden)
 		{
-			for (int i = activeContracts.Count - 1; i >= 0; i--)
-			{
-				Guid id = activeContracts[i];
+			if (ActiveTransform == null || HiddenTransform == null)
+				return;
 
-				if (id == null)
-					continue; ;
+			ActiveTransform.gameObject.SetActive(!showHidden);
 
-				if (!masterList.ContainsKey(id))
-					continue;
-
-				masterList[id].gameObject.SetActive(!showHidden);
-			}
-
-			for (int i = hiddenContracts.Count - 1; i >= 0; i--)
-			{
-				Guid id = hiddenContracts[i];
-
-				if (id == null)
-					continue; ;
-
-				if (!masterList.ContainsKey(id))
-					continue;
-
-				masterList[id].gameObject.SetActive(showHidden);
-			}
+			HiddenTransform.gameObject.SetActive(showHidden);
 		}
 
 		public string MissionTitle
