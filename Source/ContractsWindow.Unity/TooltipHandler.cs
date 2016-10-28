@@ -38,12 +38,23 @@ namespace ContractsWindow.Unity
 	{
 		[SerializeField, TextArea(2, 10)]
 		private string Text = "";
-
+		[SerializeField]
 		private bool isActive = true;
+
 		private ToolTip tooltip;
 
 		private void Start()
 		{
+			if (string.IsNullOrEmpty(Text))
+				return;
+
+			GameObject obj = Instantiate(CW_Window.Window.Tooltip);
+
+			if (obj == null)
+				return;
+
+			tooltip = obj.GetComponent<ToolTip>();
+
 			if (CW_Window.Window == null)
 				return;
 
@@ -56,20 +67,8 @@ namespace ContractsWindow.Unity
 			if (CW_Window.Window.Interface.MainCanvas == null)
 				return;
 
-			if (string.IsNullOrEmpty(Text))
-				return;
-
-			GameObject obj = Instantiate(CW_Window.Window.Tooltip);
-
-			if (obj == null)
-				return;
-
 			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform, false);
-
-			tooltip = obj.GetComponent<ToolTip>();
-
-			tooltip.SetTooltip(Text);
-			tooltip.HideTooltip();
+			obj.transform.SetAsLastSibling();
 		}
 
 		public void SetNewText(string s)
