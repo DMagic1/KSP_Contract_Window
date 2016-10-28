@@ -56,6 +56,9 @@ namespace ContractsWindow
 			if (settings == null)
 				settings = new contractSettings(filePath);
 
+			if (settings != null)
+				contractLoader.UpdateTooltips(settings.tooltips);
+
 			Destroy(gameObject);
 		}
 	}
