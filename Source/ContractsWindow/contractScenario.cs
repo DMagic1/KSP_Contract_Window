@@ -272,7 +272,7 @@ namespace ContractsWindow
 			if (contractMainMenu.Settings != null)
 				stockToolbar = contractMainMenu.Settings.useStockToolbar;
 
-			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
+			if (stockToolbar || !ToolbarManager.ToolbarAvailable || contractMainMenu.Settings.replaceStockApp)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
@@ -413,8 +413,6 @@ namespace ContractsWindow
 
 		private void onParameterAdded(Contract c, ContractParameter cP)
 		{
-			DMC_MBE.LogFormatted("Firing On Parameter Added: {0}", cP.Title);
-
 			contractContainer cc = contractParser.getActiveContract(c.ContractGuid);
 
 			if (cc == null)
