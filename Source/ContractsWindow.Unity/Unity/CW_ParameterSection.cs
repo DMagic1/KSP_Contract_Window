@@ -97,8 +97,18 @@ namespace ContractsWindow.Unity.Unity
 
 			setNote();
 
-			if (parameterInterface.ParamLayer < 4)
-				CreateSubParameters(parameterInterface.GetSubParams);
+			var subParams = parameterInterface.GetSubParams;
+
+			if (parameterInterface.ParamLayer < 4 && subParams.Count > 0)
+			{
+				CreateSubParameters(subParams);
+
+				if (c.Interface.ShowParams)
+				{
+					if (SubParamTransform != null && parameterInterface.ParameterState != ContractState.Complete)
+						SubParamTransform.gameObject.SetActive(true);
+				}
+			}
 		}
 
 		public void UpdateParameter()
@@ -137,6 +147,9 @@ namespace ContractsWindow.Unity.Unity
 			if (isOn && parameterInterface.ParameterState == ContractState.Complete)
 				return;
 
+			if (SubParamTransform != null)
+				SubParamTransform.gameObject.SetActive(isOn);
+
 			for (int i = parameters.Count - 1; i >= 0; i--)
 			{
 				CW_ParameterSection parameter = parameters[i];
@@ -145,8 +158,6 @@ namespace ContractsWindow.Unity.Unity
 					continue;
 
 				parameter.ToggleSubParams(isOn);
-
-				parameter.gameObject.SetActive(isOn);
 			}
 		}
 
@@ -192,14 +203,10 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (string.IsNullOrEmpty(parameterInterface.GetNote))
-			{
-				NoteContainer.gameObject.SetActive(false);
-
-				if (NoteToggle != null)
-					NoteToggle.gameObject.SetActive(false);
-
 				return;
-			}
+
+			if (NoteToggle != null)
+				NoteToggle.gameObject.SetActive(true);
 
 			NoteText.OnTextUpdate.Invoke(parameterInterface.GetNote);
 
@@ -269,8 +276,6 @@ namespace ContractsWindow.Unity.Unity
 			paramObject.setParameter(section, root);
 
 			parameters.Add(paramObject);
-
-			paramObject.gameObject.SetActive(parameterInterface.ParameterState != ContractState.Complete);
 		}
 	}
 }
