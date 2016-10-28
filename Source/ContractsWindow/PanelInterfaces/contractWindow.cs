@@ -46,6 +46,7 @@ namespace ContractsWindow.PanelInterfaces
 	public class contractWindow : DMC_MBE, ICW_Window
 	{
 		private bool _isVisible;
+		private bool windowGenerated;
 		private bool progressLoaded, contractsLoaded;
 		private int timer;
 		private int sceneInt;
@@ -80,6 +81,8 @@ namespace ContractsWindow.PanelInterfaces
 			{
 				if (contractMainMenu.Settings != null)
 					contractMainMenu.Settings.tooltips = !value;
+
+				contractLoader.UpdateTooltips(!value);
 			}
 		}
 
@@ -276,7 +279,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void SetAppState(bool on)
 		{
-			if (!StockToolbar)
+			if (!StockToolbar && !ReplaceToolbar)
 				return;
 
 			if (contractStockToolbar.Instance == null)
@@ -556,6 +559,7 @@ namespace ContractsWindow.PanelInterfaces
 			contractLoader.UpdateFontSize(LargeFont ? 1 : 0);
 
 			GameEvents.OnGameSettingsApplied.Add(onSettingsApplied);
+			GameEvents.onGameSceneLoadRequested.Add(onSceneChange);
 			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
@@ -576,6 +580,7 @@ namespace ContractsWindow.PanelInterfaces
 				Destroy(_canvas.gameObject);
 
 			GameEvents.OnGameSettingsApplied.Remove(onSettingsApplied);
+			GameEvents.onGameSceneLoadRequested.Remove(onSceneChange);
 			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
@@ -629,6 +634,9 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void Open()
 		{
+			if (!windowGenerated)
+				GenerateWindow();
+
 			if (UIWindow == null)
 				return;
 
@@ -653,6 +661,14 @@ namespace ContractsWindow.PanelInterfaces
 			UIWindow.Close();
 		}
 
+		private void onSceneChange(GameScenes scene)
+		{
+			if (_canvas == null)
+				return;
+
+			Destroy(_canvas);
+		}
+
 		private void GenerateWindow()
 		{
 			if (contractLoader.WindowPrefab == null || UIWindow != null)
@@ -661,15 +677,22 @@ namespace ContractsWindow.PanelInterfaces
 			if (contractLoader.CanvasPrefab == null)
 				return;
 
-			_canvas = GameObject.Instantiate<Canvas>(contractLoader.CanvasPrefab);
-			_canvas.gameObject.name = "ContractWindowPlusCanvas";
-
 			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
-			_canvas.worldCamera = UIMasterController.Instance.uiCamera;
-			_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
+			//if (HighLogic.LoadedSceneIsEditor)
+			//	_canvas.worldCamera = EditorLogic.fetch.editorCamera;
+			//else
+				//_canvas.worldCamera = UIMasterController.Instance.uiCamera;
 
-			UIMasterController.Instance.AddCanvas(_canvas, true);
+			_canvas = GameObject.Instantiate<Canvas>(contractLoader.CanvasPrefab);
+			_canvas.gameObject.name = "CWPlusCanvas";
+			_canvas.overridePixelPerfect = true;
+			_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
+			_canvas.transform.SetParent(UIMasterController.Instance.mainCanvas.transform, false);
+			_canvas.transform.SetAsLastSibling();
+			//UIMasterController.Instance.mainCanvas.overridePixelPerfect = true;
+
+			//UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
 
 			obj.transform.SetParent(_canvas.transform, false);
 
@@ -681,7 +704,7 @@ namespace ContractsWindow.PanelInterfaces
 
 			UIWindow.SetPosition(windowPos);
 
-			UIWindow.gameObject.SetActive(false);
+			windowGenerated = true;
 		}
 
 		private void onContractsLoaded()
@@ -712,6 +735,12 @@ namespace ContractsWindow.PanelInterfaces
 				yield break;
 			}
 
+			if (i < 20)
+			{
+				i++;
+				yield return null;
+			}
+
 			loadLists();
 		}
 
@@ -731,15 +760,13 @@ namespace ContractsWindow.PanelInterfaces
 				pinnedList = currentMission.loadPinnedContracts(cList);
 			}
 
-			GenerateWindow();
-
-			refreshContracts(cList);
-
 			if (contractScenario.Instance.windowVisible[sceneInt])
 			{
 				Open();
 
-				if (StockToolbar)
+				refreshContracts(cList);
+
+				if (StockToolbar || ReplaceToolbar)
 					SetAppState(true);
 			}
 		}
