@@ -62,7 +62,7 @@ namespace ContractsWindow
 		{
 			string path = KSPUtil.ApplicationRootPath + "GameData/DMagicUtilities/ContractsWindow/Resources";
 
-			prefabs = AssetBundle.LoadFromFile(path + "/contracts_window_prefabs.ksp");
+			prefabs = AssetBundle.LoadFromFile(path + "/contracts_window_prefabs");
 
 			if (prefabs != null)
 				loadedPrefabs = prefabs.LoadAllAssets<GameObject>();
