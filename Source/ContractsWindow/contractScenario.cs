@@ -69,8 +69,8 @@ namespace ContractsWindow
 
 		//initialize data for each gamescene
 		internal bool[] windowVisible = new bool[4];
-		internal Rect[] windowRects = new Rect[4] { new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300), new Rect(50, 80, 250, 300) };
-		private int[] windowPos = new int[16] { 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300, 50, 80, 250, 300 };
+		internal Rect[] windowRects = new Rect[4] { new Rect(50, -80, 250, 300), new Rect(50, -80, 250, 300), new Rect(50, -80, 250, 300), new Rect(50, -80, 250, 300) };
+		private int[] windowPos = new int[16] { 50, -80, 250, 300, 50, -80, 250, 300, 50, -80, 250, 300, 50, -80, 250, 300 };
 
 		internal contractStockToolbar appLauncherButton = null;
 		internal contractToolbar blizzyToolbarButton = null;
