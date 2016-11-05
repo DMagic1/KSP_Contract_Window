@@ -559,7 +559,6 @@ namespace ContractsWindow.PanelInterfaces
 			contractLoader.UpdateFontSize(LargeFont ? 1 : 0);
 
 			GameEvents.OnGameSettingsApplied.Add(onSettingsApplied);
-			GameEvents.onGameSceneLoadRequested.Add(onSceneChange);
 			contractParser.onContractStateChange.Add(contractAccepted);
 			contractParser.onContractsParsed.Add(onContractsLoaded);
 			progressParser.onProgressParsed.Add(onProgressLoaded);
@@ -580,7 +579,6 @@ namespace ContractsWindow.PanelInterfaces
 				Destroy(_canvas.gameObject);
 
 			GameEvents.OnGameSettingsApplied.Remove(onSettingsApplied);
-			GameEvents.onGameSceneLoadRequested.Remove(onSceneChange);
 			contractParser.onContractStateChange.Remove(contractAccepted);
 			contractParser.onContractsParsed.Remove(onContractsLoaded);
 			progressParser.onProgressParsed.Remove(onProgressLoaded);
@@ -608,14 +606,11 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void onSettingsApplied()
 		{
-			//if (_canvas != null)
-			//	_canvas.scaleFactor = MasterScale;
-
-			if (IgnoreScale)
-				return;
-
 			if (UIWindow != null)
+			{
 				UIWindow.setScale();
+				UIWindow.SetPosition(windowPos);
+			}
 		}
 
 		protected override void RepeatingWorker()
@@ -661,14 +656,6 @@ namespace ContractsWindow.PanelInterfaces
 			UIWindow.Close();
 		}
 
-		private void onSceneChange(GameScenes scene)
-		{
-			if (_canvas == null)
-				return;
-
-			Destroy(_canvas);
-		}
-
 		private void GenerateWindow()
 		{
 			if (contractLoader.WindowPrefab == null || UIWindow != null)
@@ -679,20 +666,25 @@ namespace ContractsWindow.PanelInterfaces
 
 			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
-			//if (HighLogic.LoadedSceneIsEditor)
-			//	_canvas.worldCamera = EditorLogic.fetch.editorCamera;
-			//else
-				//_canvas.worldCamera = UIMasterController.Instance.uiCamera;
+			UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
 
-			_canvas = GameObject.Instantiate<Canvas>(contractLoader.CanvasPrefab);
-			_canvas.gameObject.name = "CWPlusCanvas";
-			_canvas.overridePixelPerfect = true;
-			_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
-			_canvas.transform.SetParent(UIMasterController.Instance.mainCanvas.transform, false);
-			_canvas.transform.SetAsLastSibling();
-			//UIMasterController.Instance.mainCanvas.overridePixelPerfect = true;
+			var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
 
-			//UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
+			for (int i = canvi.Length - 1; i >= 0; i--)
+			{
+				Canvas c = canvi[i];
+
+				if (c == null)
+					continue;
+
+				if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
+					continue;
+
+				_canvas = c;
+				_canvas.overridePixelPerfect = true;
+				_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
+				break;
+			}
 
 			obj.transform.SetParent(_canvas.transform, false);
 
