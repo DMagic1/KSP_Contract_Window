@@ -148,7 +148,7 @@ namespace ContractsWindow
 
 				if (o.name == "CW_Plus")
 					windowPrefab = o;
-				else if (o.name == "Canvas_Prefab")
+				else if (o.name == "CW_Canvas_Prefab")
 				{
 					Canvas c = o.GetComponent<Canvas>();
 
