@@ -138,8 +138,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (isOn)
 				scale /= CW_Window.Window.Interface.MasterScale;
-			else
-				scale *= CW_Window.Window.Interface.MasterScale;
 
 			CW_Window.Window.transform.localScale = scale * f;
 		}
@@ -174,8 +172,6 @@ namespace ContractsWindow.Unity.Unity
 
 			if (CW_Window.Window.Interface.IgnoreScale)
 				scale /= CW_Window.Window.Interface.MasterScale;
-			else
-				scale *= CW_Window.Window.Interface.MasterScale;
 
 			CW_Window.Window.transform.localScale = scale * f;
 		}
