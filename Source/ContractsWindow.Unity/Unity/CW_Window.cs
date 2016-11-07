@@ -727,6 +727,8 @@ namespace ContractsWindow.Unity.Unity
 
 			rect.sizeDelta = new Vector2(r.width, r.height);
 
+			rect.position = new Vector3(rect.position.x, rect.position.y, 1);
+
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 		}
 
