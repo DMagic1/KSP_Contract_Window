@@ -93,14 +93,10 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (string.IsNullOrEmpty(standardInterface.GetNote))
-			{
-				NoteContainer.gameObject.SetActive(false);
-
-				if (NoteToggle != null)
-					NoteToggle.gameObject.SetActive(false);
-
 				return;
-			}
+
+			if (NoteToggle != null)
+				NoteToggle.gameObject.SetActive(true);
 
 			NoteText.OnTextUpdate.Invoke(standardInterface.GetNote);
 

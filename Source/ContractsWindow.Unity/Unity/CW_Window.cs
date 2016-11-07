@@ -158,12 +158,8 @@ namespace ContractsWindow.Unity.Unity
 
 			SelectMission(window.GetCurrentMission);
 
-			UpdateTooltips();
-
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
-			else
-				transform.localScale *= window.MasterScale;
 
 			transform.localScale *= window.Scale;
 		}
@@ -177,23 +173,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (windowInterface.IgnoreScale)
 				scale /= windowInterface.MasterScale;
-			else
-				scale *= windowInterface.MasterScale;
 
 			transform.localScale = scale * windowInterface.Scale;
-		}
-
-		public void setupProgressPanel(IProgressPanel panel)
-		{
-			if (windowInterface == null)
-				return;
-
-			if (panel == null)
-				return;
-
-			CreateProgressSection(panel);
-
-			UpdateTooltips();
 		}
 
 		private void CreateProgressSection(IProgressPanel progress)
@@ -246,11 +227,7 @@ namespace ContractsWindow.Unity.Unity
 			if (currentMission != null)
 			{
 				if (currentMission.MissionTitle != mission.MissionTitle)
-				{
-					currentMission.SetMissionVisible(false);
-
 					DestroyImmediate(currentMission.gameObject);
-				}
 				else
 					return;
 			}
@@ -274,8 +251,6 @@ namespace ContractsWindow.Unity.Unity
 				else
 					MissionEdit.gameObject.SetActive(true);
 			}
-
-			UpdateTooltips();
 		}
 
 		private void prepareTopBar()
@@ -303,13 +278,9 @@ namespace ContractsWindow.Unity.Unity
 			if (showProgress)
 			{
 				if (currentMission != null)
-				{
-					currentMission.SetMissionVisible(false);
-
 					DestroyImmediate(currentMission.gameObject);
-				}
 
-				setupProgressPanel(windowInterface.GetProgressPanel);
+				CreateProgressSection(windowInterface.GetProgressPanel);
 
 				if (MissionTitle != null)
 					MissionTitle.OnTextUpdate.Invoke("Progress Nodes:");
@@ -320,11 +291,7 @@ namespace ContractsWindow.Unity.Unity
 			else
 			{
 				if (progressPanel != null)
-				{
-					progressPanel.SetProgressVisible(false);
-
 					DestroyImmediate(progressPanel.gameObject);
-				}
 
 				SelectMission(windowInterface.GetCurrentMission);
 
@@ -641,7 +608,7 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			float f = windowInterface.IgnoreScale ? 1 * windowInterface.Scale : windowInterface.MasterScale * windowInterface.Scale;
+			float f = windowInterface.IgnoreScale ? windowInterface.Scale : windowInterface.MasterScale * windowInterface.Scale;
 
 			if (rect.sizeDelta.y < 280)
 				numY = 280;
@@ -668,7 +635,11 @@ namespace ContractsWindow.Unity.Unity
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 
-			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
+			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+
+			float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+
+			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
 
 			if (windowInterface.MainCanvas == null)
 				return;
@@ -721,7 +692,11 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
+			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+
+			float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+
+			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
 		}
 
 		public void OnPointerEnter(PointerEventData eventData)
@@ -739,15 +714,20 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (rect == null)
 				return;
+						
+			r.x /= windowInterface.MasterScale;
 
-			Vector3 pos = new Vector3();
+			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
 
-			if (r == null)
-				pos = new Vector3(50, -80, 0);
+			float derp = diff - (((-1f * r.y) / Screen.height) * diff);
 
-			rect.anchoredPosition = new Vector3(r.x, r.y > 0 ? r.y * -1 : r.y, 0);
+			r.y += derp;
+
+			rect.anchoredPosition = new Vector3(r.x, r.y, 0);
 
 			rect.sizeDelta = new Vector2(r.width, r.height);
+
+			rect.position = new Vector3(rect.position.x, rect.position.y, 1);
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 		}
@@ -766,16 +746,6 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			currentMission.UpdateChildren();
-		}
-
-		public void UpdateTooltips()
-		{
-			tooltips = GetComponentsInChildren<TooltipHandler>(true).ToList();
-
-			if (windowInterface == null)
-				return;
-
-			SwitchTooltips(!windowInterface.HideTooltips);
 		}
 
 		private void SwitchTooltips(bool isOn)

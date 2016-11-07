@@ -71,6 +71,32 @@ namespace ContractsWindow
 				processPrefabs();
 		}
 
+		public static void UpdateTooltips(bool isOn)
+		{
+			if (loadedPrefabs == null)
+				return;
+
+			for (int i = loadedPrefabs.Length - 1; i >= 0; i--)
+			{
+				GameObject obj = loadedPrefabs[i];
+
+				if (obj == null)
+					continue;
+
+				var tooltips = obj.GetComponentsInChildren<TooltipHandler>(true);
+
+				for (int j = tooltips.Length - 1; j >= 0; j--)
+				{
+					TooltipHandler t = tooltips[j];
+
+					if (t == null)
+						continue;
+
+					t.IsActive = isOn;
+				}
+			}
+		}
+
 		public static void UpdateFontSize(int i)
 		{
 			if (loadedPrefabs == null)
@@ -122,7 +148,7 @@ namespace ContractsWindow
 
 				if (o.name == "CW_Plus")
 					windowPrefab = o;
-				else if (o.name == "Canvas_Prefab")
+				else if (o.name == "CW_Canvas_Prefab")
 				{
 					Canvas c = o.GetComponent<Canvas>();
 

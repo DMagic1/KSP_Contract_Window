@@ -35,7 +35,10 @@ namespace ContractsWindow.PanelInterfaces
 {
 	public class progressUIPanel : IProgressPanel
 	{
-		private bool _isVisible;
+		private bool _intervalVisible;
+		private bool _poiVisible;
+		private bool _standardVisible;
+		private bool _bodyVisible;
 		private Dictionary<string, List<IStandardNode>> bodies = new Dictionary<string, List<IStandardNode>>();
 		private List<IIntervalNode> intervals = new List<IIntervalNode>();
 		private List<IStandardNode> pois = new List<IStandardNode>();
@@ -118,10 +121,28 @@ namespace ContractsWindow.PanelInterfaces
 			}
 		}
 
-		public bool IsVisible
+		public bool IntervalVisible
 		{
-			get { return _isVisible; }
-			set { _isVisible = value; }
+			get { return _intervalVisible; }
+			set { _intervalVisible = value; }
+		}
+
+		public bool POIVisible
+		{
+			get { return _poiVisible; }
+			set { _poiVisible = value; }
+		}
+
+		public bool StandardVisible
+		{
+			get { return _standardVisible; }
+			set { _standardVisible = value; }
+		}
+
+		public bool BodyVisible
+		{
+			get { return _bodyVisible; }
+			set { _bodyVisible = value; }
 		}
 
 		public bool AnyInterval

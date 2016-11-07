@@ -29,18 +29,14 @@ namespace ContractsWindow.Unity.Unity
 	public class ToolTip : MonoBehaviour
 	{
 		//text of the tooltip
-		//private Text _text;
 		private TextHandler _handler;
 		private RectTransform _rectTransform;
 
 		//if the tooltip is inside a UI element
 		private bool _inside;
+		
+		private float width, height;
 
-		// private bool _xShifted, _yShifted = false;
-
-		private float width, height;//, canvasWidth, canvasHeight;
-
-		// private int screenWidth, screenHeight;
 
 		private float YShift, xShift;
 
@@ -48,42 +44,42 @@ namespace ContractsWindow.Unity.Unity
 
 		private Camera _guiCamera;
 
+		private bool waken;
+
 		// Use this for initialization
-		public void Awake()
+		public void WakeUp()
 		{
 			if (CW_Window.Window == null || CW_Window.Window.Interface == null || CW_Window.Window.Interface.MainCanvas == null)
 				return;
 
+			this.gameObject.SetActive(true);
+
 			var _canvas = CW_Window.Window.Interface.MainCanvas;
-			//var _canvas = GetComponentInParent<Canvas>();
 			_guiCamera = _canvas.worldCamera;
 			_guiMode = _canvas.renderMode;
 			_rectTransform = GetComponent<RectTransform>();
 
-			//_text = GetComponentInChildren<Text>();
 			_handler = GetComponentInChildren<TextHandler>();
 
 			_inside = false;
 
-			//size of the screen
-			// screenWidth = Screen.width;
-			// screenHeight = Screen.height;
-
 			xShift = 5f;
 			YShift = -35f;
 
-			// _xShifted = _yShifted = false;
-
-			this.gameObject.SetActive(false);
+			waken = true;
 		}
 
 		//Call this function externally to set the text of the template and activate the tooltip
 		public void SetTooltip(string text)
 		{
+			if (!waken)
+				WakeUp();
+
 			if (_guiMode == RenderMode.ScreenSpaceCamera)
 			{
 				//set the text and fit the tooltip panel to the text size
-				//_text.text = text;
+				this.gameObject.SetActive(true);
+
 				_handler.OnTextUpdate.Invoke(text);
 
 				_rectTransform.sizeDelta = new Vector2(_handler.PreferredSize.x + 10f, _handler.PreferredSize.y + 0f);
@@ -166,7 +162,7 @@ namespace ContractsWindow.Unity.Unity
 				newPos.y = _guiCamera.WorldToViewportPoint(newWorldPos).y;
 			}
 			this.transform.position = new Vector3(newPosWVP.x, newPosWVP.y, 1f);
-			this.gameObject.SetActive(true);
+			//this.gameObject.SetActive(true);
 			_inside = true;
 		}
 	}

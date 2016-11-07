@@ -43,10 +43,6 @@
       <HintPath>..\..\ContractParser\ContractParser\Output\ContractParser.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ContractsWindow.Unity">
-      <HintPath>ContractsWindow.Unity\Output\ContractsWindow.Unity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="ProgressParser">
       <HintPath>..\..\Progress Parser\Progress Parser\Output\ProgressParser.dll</HintPath>
       <Private>False</Private>
@@ -86,6 +82,12 @@
     <Compile Include="Toolbar\contractStockToolbar.cs" />
     <Compile Include="Toolbar\contractToolbar.cs" />
     <Compile Include="Toolbar\contractToolbarWrapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="ContractsWindow.Unity\ContractsWindow.Unity.csproj">
+      <Project>{c6135cf5-6802-4286-8bda-d62a41a2b1cd}</Project>
+      <Name>ContractsWindow.Unity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

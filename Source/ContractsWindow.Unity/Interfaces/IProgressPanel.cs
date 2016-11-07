@@ -32,7 +32,13 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface IProgressPanel
 	{
-		bool IsVisible { get; set; }
+		bool IntervalVisible { get; set; }
+
+		bool POIVisible { get; set; }
+
+		bool StandardVisible { get; set; }
+
+		bool BodyVisible { get; set; }
 
 		bool AnyInterval { get; }
 

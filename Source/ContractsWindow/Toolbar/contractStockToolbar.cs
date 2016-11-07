@@ -83,7 +83,6 @@ namespace ContractsWindow.Toolbar
 		
 		private IEnumerator addButton()
 		{
-
 			while (!ApplicationLauncher.Ready)
 				yield return null;
 
@@ -108,7 +107,7 @@ namespace ContractsWindow.Toolbar
 
 		private IEnumerator replaceStockContractApp()
 		{
-			while (ContractsApp.Instance.appLauncherButton == null || !ApplicationLauncher.Ready)
+			while (!ApplicationLauncher.Ready || ContractsApp.Instance == null || ContractsApp.Instance.appLauncherButton == null)
 				yield return null;
 
 			if (toolbarButton == null)
@@ -117,20 +116,20 @@ namespace ContractsWindow.Toolbar
 				toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractMainMenu.ToolbarIcon);
 			}
 
-			ApplicationLauncherButton stockContracts = ContractsApp.Instance.appLauncherButton;
+			stockAppButton = ContractsApp.Instance.appLauncherButton;
 
-			if (stockContracts != null)
+			if (stockAppButton != null)
 			{
-				stockContracts.onDisable();
+				stockAppButton.onDisable();
 
-				stockContracts.onTrue = toolbarButton.onTrue;
-				stockContracts.onFalse = toolbarButton.onFalse;
-				stockContracts.onHover = toolbarButton.onHover;
-				stockContracts.onHoverOut = toolbarButton.onHoverOut;
-				stockContracts.onEnable = toolbarButton.onEnable;
-				stockContracts.onDisable = toolbarButton.onDisable;
+				stockAppButton.onTrue = toolbarButton.onTrue;
+				stockAppButton.onFalse = toolbarButton.onFalse;
+				stockAppButton.onHover = toolbarButton.onHover;
+				stockAppButton.onHoverOut = toolbarButton.onHoverOut;
+				stockAppButton.onEnable = toolbarButton.onEnable;
+				stockAppButton.onDisable = toolbarButton.onDisable;
 
-				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockContracts);
+				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockAppButton);
 
 				DMC_MBE.LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 

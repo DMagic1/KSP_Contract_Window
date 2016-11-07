@@ -63,11 +63,8 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateBodyNodes(nodes);
 
-			if (CW_ProgressPanel.Instance == null)
-				return;
-
-			if (CW_ProgressPanel.Instance.PanelInterface == null)
-				return;
+			if (StandardTransform != null)
+				StandardTransform.gameObject.SetActive(false);
 		}
 
 		public void Refresh()
@@ -86,7 +83,15 @@ namespace ContractsWindow.Unity.Unity
 
 			if (!CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName))
 				return;
-			
+
+			if (StandardTransform == null)
+				return;
+
+			StandardTransform.gameObject.SetActive(isOn);
+
+			if (!isOn)
+				return;
+
 			for (int i = nodes.Count - 1; i >= 0; i--)
 			{
 				CW_StandardNode node = nodes[i];
@@ -145,8 +150,6 @@ namespace ContractsWindow.Unity.Unity
 			nodeObject.setNode(node);
 
 			nodes.Add(nodeObject);
-
-			nodeObject.gameObject.SetActive(false);
 		}
 
 		public void AddBodyNode(IStandardNode node)

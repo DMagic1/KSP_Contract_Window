@@ -46,6 +46,7 @@ namespace ContractsWindow.PanelInterfaces
 	public class contractWindow : DMC_MBE, ICW_Window
 	{
 		private bool _isVisible;
+		private bool windowGenerated;
 		private bool progressLoaded, contractsLoaded;
 		private int timer;
 		private int sceneInt;
@@ -80,6 +81,8 @@ namespace ContractsWindow.PanelInterfaces
 			{
 				if (contractMainMenu.Settings != null)
 					contractMainMenu.Settings.tooltips = !value;
+
+				contractLoader.UpdateTooltips(!value);
 			}
 		}
 
@@ -276,7 +279,7 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void SetAppState(bool on)
 		{
-			if (!StockToolbar)
+			if (!StockToolbar && !ReplaceToolbar)
 				return;
 
 			if (contractStockToolbar.Instance == null)
@@ -603,14 +606,11 @@ namespace ContractsWindow.PanelInterfaces
 
 		private void onSettingsApplied()
 		{
-			//if (_canvas != null)
-			//	_canvas.scaleFactor = MasterScale;
-
-			if (IgnoreScale)
-				return;
-
 			if (UIWindow != null)
+			{
 				UIWindow.setScale();
+				UIWindow.SetPosition(windowPos);
+			}
 		}
 
 		protected override void RepeatingWorker()
@@ -629,6 +629,9 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void Open()
 		{
+			if (!windowGenerated)
+				GenerateWindow();
+
 			if (UIWindow == null)
 				return;
 
@@ -661,15 +664,27 @@ namespace ContractsWindow.PanelInterfaces
 			if (contractLoader.CanvasPrefab == null)
 				return;
 
-			_canvas = GameObject.Instantiate<Canvas>(contractLoader.CanvasPrefab);
-			_canvas.gameObject.name = "ContractWindowPlusCanvas";
-
 			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
 
-			_canvas.worldCamera = UIMasterController.Instance.uiCamera;
-			_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
+			UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
 
-			UIMasterController.Instance.AddCanvas(_canvas, true);
+			var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
+
+			for (int i = canvi.Length - 1; i >= 0; i--)
+			{
+				Canvas c = canvi[i];
+
+				if (c == null)
+					continue;
+
+				if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
+					continue;
+
+				_canvas = c;
+				_canvas.overridePixelPerfect = true;
+				_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
+				break;
+			}
 
 			obj.transform.SetParent(_canvas.transform, false);
 
@@ -681,7 +696,7 @@ namespace ContractsWindow.PanelInterfaces
 
 			UIWindow.SetPosition(windowPos);
 
-			UIWindow.gameObject.SetActive(false);
+			windowGenerated = true;
 		}
 
 		private void onContractsLoaded()
@@ -712,6 +727,12 @@ namespace ContractsWindow.PanelInterfaces
 				yield break;
 			}
 
+			if (i < 20)
+			{
+				i++;
+				yield return null;
+			}
+
 			loadLists();
 		}
 
@@ -731,15 +752,13 @@ namespace ContractsWindow.PanelInterfaces
 				pinnedList = currentMission.loadPinnedContracts(cList);
 			}
 
-			GenerateWindow();
-
-			refreshContracts(cList);
-
 			if (contractScenario.Instance.windowVisible[sceneInt])
 			{
 				Open();
 
-				if (StockToolbar)
+				refreshContracts(cList);
+
+				if (StockToolbar || ReplaceToolbar)
 					SetAppState(true);
 			}
 		}

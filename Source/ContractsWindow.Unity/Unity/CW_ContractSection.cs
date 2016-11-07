@@ -69,6 +69,8 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle PinToggle = null;
 		[SerializeField]
+		private Toggle ParamToggle = null;
+		[SerializeField]
 		private TooltipHandler EyesTooltip = null;
 		[SerializeField]
 		private TooltipHandler PinTooltip = null;
@@ -103,7 +105,7 @@ namespace ContractsWindow.Unity.Unity
 			if (mission == null)
 				return;
 
-			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
+			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null || ParamToggle == null)
 				return;
 
 			parent = mission;
@@ -121,9 +123,14 @@ namespace ContractsWindow.Unity.Unity
 
 			ContractPenaltyText.OnTextUpdate.Invoke(contract.PenaltyText);
 
+			ParamToggle.isOn = contract.ShowParams;
+
 			prepareHeader();
 
 			CreateParameterSections(contract.GetParameters);
+
+			if (!contract.ShowParams && ParameterSectionTransform != null)
+				ParameterSectionTransform.gameObject.SetActive(false);
 
 			loaded = true;
 		}
@@ -252,9 +259,8 @@ namespace ContractsWindow.Unity.Unity
 
 			parent.SwitchContract(contractInterface.ID, isOn);
 
-			ShowParameters(!isOn);
-
-			gameObject.SetActive(false);
+			if (ParamToggle != null)
+				ParamToggle.isOn = !isOn;
 
 			contractInterface.IsHidden = isOn;
 		}
@@ -300,6 +306,9 @@ namespace ContractsWindow.Unity.Unity
 
 		public void ShowParameters(bool isOn)
 		{
+			if (!loaded)
+				return;
+
 			if (contractInterface == null)
 				return;
 
@@ -313,9 +322,10 @@ namespace ContractsWindow.Unity.Unity
 					continue;
 
 				parameter.ToggleSubParams(isOn);
-
-				parameter.gameObject.SetActive(isOn);
 			}
+
+			if (ParameterSectionTransform != null)
+				ParameterSectionTransform.gameObject.SetActive(isOn);
 		}
 
 		private void prepareHeader()
@@ -377,14 +387,10 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (string.IsNullOrEmpty(contractInterface.GetNote))
-			{
-				NoteContainer.gameObject.SetActive(false);
-
-				if (ContractNoteToggle != null)
-					ContractNoteToggle.gameObject.SetActive(false);
-
 				return;
-			}
+
+			if (ContractNoteToggle != null)
+				ContractNoteToggle.gameObject.SetActive(true);
 
 			NoteText.OnTextUpdate.Invoke(contractInterface.GetNote);
 
