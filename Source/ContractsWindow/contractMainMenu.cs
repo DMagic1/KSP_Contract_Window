@@ -34,7 +34,6 @@ namespace ContractsWindow
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	class contractMainMenu: DMC_MBE
 	{
-		private const string filePath = "PluginData/Settings";
 		private static Texture2D toolbarIcon;
 		private static contractSettings settings;
 
@@ -54,7 +53,7 @@ namespace ContractsWindow
 				toolbarIcon = GameDatabase.Instance.GetTexture("DMagicUtilities/ContractsWindow/Resources/ContractsIconApp", false);
 
 			if (settings == null)
-				settings = new contractSettings(filePath);
+				settings = new contractSettings();
 
 			if (settings != null)
 				contractLoader.UpdateTooltips(settings.tooltips);

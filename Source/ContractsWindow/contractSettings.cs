@@ -26,9 +26,13 @@ THE SOFTWARE.
 */
 #endregion
 
+using System;
+using System.IO;
+using System.Reflection;
+
 namespace ContractsWindow
 {
-	public class contractSettings : ConfigNodeStorage
+	public class contractSettings
 	{
 		[Persistent]
 		public bool tooltips = true;
@@ -45,12 +49,72 @@ namespace ContractsWindow
 		[Persistent]
 		public bool replaceStockApp = false;
 
-		public contractSettings(string file)
+		private const string fileName = "PluginData/Settings.cfg";
+		private string fullPath;
+
+		public contractSettings()
 		{
-			FilePath = file;
+			fullPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName).Replace("\\", "/");
 
 			if (!Load())
-				LogFormatted("Failed to load settings file");
+				DMC_MBE.LogFormatted("Failed to load settings file");
+		}
+
+		public bool Load()
+		{
+			try
+			{
+				if (File.Exists(fullPath))
+				{
+					ConfigNode node = ConfigNode.Load(fullPath);
+					ConfigNode unwrapped = node.GetNode(GetType().Name);
+					ConfigNode.LoadObjectFromConfig(this, unwrapped);
+					return true;
+				}
+				else
+				{
+				 	DMC_MBE.LogFormatted("Settings file could not be found [{0}]", fullPath);
+					return false;
+				}
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error while loading settings file from [{0}]\n{1}", fullPath, e);
+				return false;
+			}
+		}
+
+		public bool Save()
+		{
+			try
+			{
+				ConfigNode node = AsConfigNode();
+				ConfigNode wrapper = new ConfigNode(GetType().Name);
+				wrapper.AddNode(node);
+				wrapper.Save(fullPath);
+				return true;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Error while saving settings file at [{0}]\n{1}", fullPath, e);
+				return false;
+			}
+		}
+
+		private ConfigNode AsConfigNode()
+		{
+			try
+			{
+				ConfigNode node = new ConfigNode(GetType().Name);
+
+				node = ConfigNode.CreateConfigFromObject(this, node);
+				return node;
+			}
+			catch (Exception e)
+			{
+				DMC_MBE.LogFormatted("Failed to generate settings file node...\n{0}", e);
+				return new ConfigNode(GetType().Name);
+			}
 		}
 	}
 }
