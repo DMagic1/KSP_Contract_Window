@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace ContractsWindow.Unity.Unity
 {
@@ -36,10 +37,22 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_MissionEdit : CW_Popup
 	{
 		[SerializeField]
-		private Text NewMissionName = null;
+		private InputHandler m_MissionInput = null;
 
 		private IMissionSection missionInterface;
 
+		private void Update()
+		{
+			if (CW_Window.Window == null || CW_Window.Window.Interface == null)
+				return;
+
+			if (CW_Window.Window.Interface.LockInput)
+			{
+				if (m_MissionInput != null && !m_MissionInput.IsFocused)
+					CW_Window.Window.Interface.LockInput = false;
+			}
+		}
+	
 		public void setMission(IMissionSection mission)
 		{
 			if (mission == null)
@@ -50,25 +63,34 @@ namespace ContractsWindow.Unity.Unity
 			FadeIn();
 		}
 
+		public void OnInputClick(BaseEventData eventData)
+		{
+			if (!(eventData is PointerEventData) || CW_Window.Window == null || CW_Window.Window.Interface == null)
+				return;
+
+			if (((PointerEventData)eventData).button != PointerEventData.InputButton.Left)
+				return;
+
+			CW_Window.Window.Interface.LockInput = true;
+		}
+
 		public void ChangeName()
 		{
 			if (missionInterface == null)
 				return;
 
-			if (NewMissionName == null)
+			if (m_MissionInput == null)
 				return;
 
-			missionInterface.MissionTitle = NewMissionName.text;
+			missionInterface.MissionTitle = m_MissionInput.Text;
 
 			if (CW_Window.Window == null)
 				return;
 
+			if (CW_Window.Window.Interface != null)
+				CW_Window.Window.Interface.LockInput = false;
+
 			CW_Window.Window.FadePopup(this);
-		}
-
-		public void TextUpdate()
-		{
-
 		}
 
 		public void DeleteMission()
@@ -80,6 +102,9 @@ namespace ContractsWindow.Unity.Unity
 
 			if (CW_Window.Window == null)
 				return;
+
+			if (CW_Window.Window.Interface != null)
+				CW_Window.Window.Interface.LockInput = false;
 
 			CW_Window.Window.FadePopup(this);
 		}
