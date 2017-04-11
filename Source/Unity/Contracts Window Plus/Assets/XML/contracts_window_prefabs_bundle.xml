@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<KSPBundleDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" UrlName="contracts_window_prefabs" Name="contracts_window_prefabs" CreatedTime="-8587198697166407867">
+<KSPBundleDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" UrlName="contracts_window_prefabs" Name="contracts_window_prefabs" CreatedTime="-8587108922389007914">
   <Author />
   <Info />
   <Assets>
@@ -7,6 +7,7 @@
     <Asset Name="Body_Object" Path="Assets/Prefabs/Body_Object.prefab" Type="GameObject" Url="Prefabs/Body_Object" AutoLoad="false" />
     <Asset Name="CW_Canvas_Prefab" Path="Assets/Prefabs/CW_Canvas_Prefab.prefab" Type="GameObject" Url="Prefabs/CW_Canvas_Prefab" AutoLoad="false" />
     <Asset Name="CW_Plus" Path="Assets/Prefabs/CW_Plus.prefab" Type="GameObject" Url="Prefabs/CW_Plus" AutoLoad="false" />
+    <Asset Name="CW_Tooltip" Path="Assets/Prefabs/CW_Tooltip.prefab" Type="GameObject" Url="Prefabs/CW_Tooltip" AutoLoad="false" />
     <Asset Name="Contract_Panel" Path="Assets/Prefabs/Contract_Panel.prefab" Type="GameObject" Url="Prefabs/Contract_Panel" AutoLoad="false" />
     <Asset Name="Interval_Node" Path="Assets/Prefabs/Interval_Node.prefab" Type="GameObject" Url="Prefabs/Interval_Node" AutoLoad="false" />
     <Asset Name="Interval_Types" Path="Assets/Prefabs/Interval_Types.prefab" Type="GameObject" Url="Prefabs/Interval_Types" AutoLoad="false" />
@@ -24,7 +25,8 @@
     <Asset Name="SortMenu_Panel" Path="Assets/Prefabs/SortMenu_Panel.prefab" Type="GameObject" Url="Prefabs/SortMenu_Panel" AutoLoad="false" />
     <Asset Name="Standard_Node" Path="Assets/Prefabs/Standard_Node.prefab" Type="GameObject" Url="Prefabs/Standard_Node" AutoLoad="false" />
     <Asset Name="Toolbar_Panel" Path="Assets/Prefabs/Toolbar_Panel.prefab" Type="GameObject" Url="Prefabs/Toolbar_Panel" AutoLoad="false" />
-    <Asset Name="Tooltip" Path="Assets/Prefabs/Tooltip.prefab" Type="GameObject" Url="Prefabs/Tooltip" AutoLoad="false" />
   </Assets>
-  <Dependencies />
+  <Dependencies>
+    <Dependency>unity_skin</Dependency>
+  </Dependencies>
 </KSPBundleDefinition>
