@@ -34,7 +34,7 @@ namespace ContractsWindow.Unity.Interfaces
 {
 	public interface ICW_Window
 	{
-		bool HideTooltips { get; set; }
+		bool TooltipsOn { get; set; }
 
 		bool BlizzyAvailable { get; }
 
@@ -48,13 +48,23 @@ namespace ContractsWindow.Unity.Interfaces
 
 		bool IgnoreScale { get; set; }
 
+		bool StockUIStyle { get; set; }
+
+		bool LockInput { get; set; }
+
 		float Scale { get; set; }
 
 		float MasterScale { get; }
 
 		string Version { get; }
 
+		string AllMissionTitle { get; }
+
+		string ProgressTitle { get; }
+
 		Canvas MainCanvas { get; }
+
+		Canvas TooltipCanvas { get; }
 
 		IList<IMissionSection> GetMissions { get; }
 
@@ -67,5 +77,7 @@ namespace ContractsWindow.Unity.Interfaces
 		void NewMission(string title, Guid id);
 
 		void SetWindowPosition(Rect r);
+
+		void SetAsLastSibling();
 	}
 }
