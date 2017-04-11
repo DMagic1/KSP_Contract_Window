@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using ProgressParser;
 using UnityEngine;
+using KSP.Localization;
 
 namespace ContractsWindow.PanelInterfaces
 {
@@ -84,16 +85,16 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return node.Descriptor;
+				return node.Title;
 			}
 		}
 
-		public string NodeValue(int i)
+		public string NodeDescriptor(int index)
 		{
-			if (node == null)
-				return "";
+				if (node == null)
+					return "";
 
-			return node.getRecord(i).ToString();
+				return Localization.Format(node.Descriptor, string.Format("{0}{1}", node.getRecord(index), node.Units));
 		}
 
 		private string coloredText(string s, string sprite, string color)
@@ -109,7 +110,7 @@ namespace ContractsWindow.PanelInterfaces
 			if (node == null)
 				return "";
 
-			return string.Format("{0}{1}{2}", coloredText(node.getFundsString(i), "<sprite=2 tint=1>", "#69D84FFF"), coloredText(node.getScienceString(i), "<sprite=1 tint=1>", "#02D8E9FF"), coloredText(node.getRepString(i), "<sprite=0 tint=1>", "#C9B003FF"));
+			return string.Format("{0}{1}{2}", coloredText(node.getFundsString(i), "<sprite=\"CurrencySpriteAsset\" name=\"Funds\" tint=1>", "#69D84FFF"), coloredText(node.getScienceString(i), "<sprite=\"CurrencySpriteAsset\" name=\"Science\" tint=1>", "#02D8E9FF"), coloredText(node.getRepString(i), "<sprite=\"CurrencySpriteAsset\" name=\"Reputation\" tint=1>", "#C9B003FF"));
 		}
 
 	}

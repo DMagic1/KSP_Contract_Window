@@ -30,6 +30,7 @@ using KSPAchievements;
 using ContractsWindow.Unity.Interfaces;
 using ProgressParser;
 using UnityEngine;
+using KSP.Localization;
 
 namespace ContractsWindow.PanelInterfaces
 {
@@ -63,7 +64,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return string.Format(node.Note, node.NoteReference, node.KSPDateString);
+				return Localization.Format(node.Note, node.NoteReference, node.KSPDateString);
 			}
 		}
 		
@@ -74,9 +75,16 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				string body = node.Body == null ? (node.PType == FinePrint.Utilities.ProgressType.POINTOFINTEREST ? node.BodyName : "") : node.Body.theName;
-
-				return string.Format(node.Descriptor, body);
+				switch(node.PType)
+				{
+					case FinePrint.Utilities.ProgressType.POINTOFINTEREST:
+						return Localization.Format("#autoLOC_296494", node.Descriptor, node.BodyName);
+					default:
+						if (node.Body == null)
+							return Localization.Format(node.Descriptor);
+						else
+							return Localization.Format(node.Descriptor, node.Body.displayName);
+				}
 			}
 		}
 
@@ -95,7 +103,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return string.Format("{0}{1}{2}", coloredText(node.FundsRewardString, "<sprite=2 tint=1>", "#69D84FFF"), coloredText(node.SciRewardString, "<sprite=1 tint=1>", "#02D8E9FF"), coloredText(node.RepRewardString, "<sprite=0 tint=1>", "#C9B003FF"));
+				return string.Format("{0}{1}{2}", coloredText(node.FundsRewardString, "<sprite=\"CurrencySpriteAsset\" name=\"Funds\" tint=1>", "#69D84FFF"), coloredText(node.SciRewardString, "<sprite=\"CurrencySpriteAsset\" name=\"Science\" tint=1>", "#02D8E9FF"), coloredText(node.RepRewardString, "<sprite=\"CurrencySpriteAsset\" name=\"Reputation\" tint=1>", "#C9B003FF"));
 			}
 		}
 	}
