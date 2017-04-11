@@ -149,16 +149,8 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateContractSection(contract);
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_ContractSection section = GetContract(contract.ID);
-
-			if (section == null)
-				return;
+			if (CW_Window.Window != null)
+				CW_Window.Window.ProcessTooltips();
 		}
 
 		private CW_ContractSection GetContract(Guid id)
@@ -251,6 +243,9 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			c.RefreshParameters();
+
+			if (CW_Window.Window != null)
+				CW_Window.Window.ProcessTooltips();
 		}
 
 		public void RemoveContract(Guid id)
