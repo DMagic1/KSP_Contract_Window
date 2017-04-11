@@ -32,12 +32,14 @@ using TMPro;
 
 namespace ContractsWindow
 {
-	public class CWTextMeshProHolder : TextMeshProUGUI
+	public class CWTextMeshPro : TextMeshProUGUI
 	{
 		private TextHandler _handler;
 
 		new private void Awake()
 		{
+			m_isAlignmentEnumConverted = true;
+
 			base.Awake();
 
 			_handler = GetComponent<TextHandler>();
