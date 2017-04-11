@@ -37,65 +37,57 @@ namespace ContractsWindow.Unity.Unity
 		
 		private float width, height;
 
-
 		private float YShift, xShift;
 
 		private RenderMode _guiMode;
 
 		private Camera _guiCamera;
 
-		private bool waken;
+		private static ToolTip instance;
+
+		private void Awake()
+		{
+			_rectTransform = GetComponent<RectTransform>();
+			_handler = GetComponentInChildren<TextHandler>();
+		}
 
 		// Use this for initialization
-		public void WakeUp()
+		public void Setup(Canvas c, string t, float f)
 		{
-			if (CW_Window.Window == null || CW_Window.Window.Interface == null || CW_Window.Window.Interface.MainCanvas == null)
+			if (instance != null)
+			{
+				instance.gameObject.SetActive(false);
+				DestroyImmediate(instance.gameObject);
+				instance = null;
+			}
+
+			if (c == null || string.IsNullOrEmpty(t) || _rectTransform == null || _handler == null)
 				return;
 
-			this.gameObject.SetActive(true);
-
-			var _canvas = CW_Window.Window.Interface.MainCanvas;
+			var _canvas = c;
 			_guiCamera = _canvas.worldCamera;
 			_guiMode = _canvas.renderMode;
-			_rectTransform = GetComponent<RectTransform>();
-
-			_handler = GetComponentInChildren<TextHandler>();
-
-			_inside = false;
 
 			xShift = 5f;
-			YShift = -35f;
+			YShift = -5f;
 
-			waken = true;
+			_handler.OnTextUpdate.Invoke(t);
+
+			_rectTransform.sizeDelta = new Vector2(_handler.PreferredSize.x + 10f, _handler.PreferredSize.y + 0f);
+
+			_rectTransform.localScale = Vector3.one * f;
+
+			OnScreenSpaceCamera();
+
+			_inside = true;
+
+			instance = this;
 		}
 
-		//Call this function externally to set the text of the template and activate the tooltip
-		public void SetTooltip(string text)
+		public void UpdateText(string text)
 		{
-			if (!waken)
-				WakeUp();
-
-			if (_guiMode == RenderMode.ScreenSpaceCamera)
-			{
-				//set the text and fit the tooltip panel to the text size
-				this.gameObject.SetActive(true);
-
+			if (_handler != null)
 				_handler.OnTextUpdate.Invoke(text);
-
-				_rectTransform.sizeDelta = new Vector2(_handler.PreferredSize.x + 10f, _handler.PreferredSize.y + 0f);
-
-				OnScreenSpaceCamera();
-			}
-		}
-
-		//call this function on mouse exit to deactivate the template
-		public void HideTooltip()
-		{
-			if (_guiMode == RenderMode.ScreenSpaceCamera)
-			{
-				this.gameObject.SetActive(false);
-				_inside = false;
-			}
 		}
 
 		// Update is called once per frame
@@ -104,9 +96,7 @@ namespace ContractsWindow.Unity.Unity
 			if (_inside)
 			{
 				if (_guiMode == RenderMode.ScreenSpaceCamera)
-				{
 					OnScreenSpaceCamera();
-				}
 			}
 		}
 
@@ -130,7 +120,7 @@ namespace ContractsWindow.Unity.Unity
 			if (val > upperRight.x)
 			{
 				Vector3 shifter = new Vector3(val - upperRight.x, 0f, 0f);
-				Vector3 newWorldPos = new Vector3(newPosWVP.x - shifter.x, newPos.y, 0f);
+				Vector3 newWorldPos = new Vector3(newPosWVP.x - shifter.x, newPosWVP.y, 0f);
 				newPos.x = _guiCamera.WorldToViewportPoint(newWorldPos).x;
 			}
 			//check for left edge of screen
@@ -138,7 +128,7 @@ namespace ContractsWindow.Unity.Unity
 			if (val < lowerLeft.x)
 			{
 				Vector3 shifter = new Vector3(lowerLeft.x - val, 0f, 0f);
-				Vector3 newWorldPos = new Vector3(newPosWVP.x + shifter.x, newPos.y, 0f);
+				Vector3 newWorldPos = new Vector3(newPosWVP.x + shifter.x, newPosWVP.y, 0f);
 				newPos.x = _guiCamera.WorldToViewportPoint(newWorldPos).x;
 			}
 
@@ -149,7 +139,7 @@ namespace ContractsWindow.Unity.Unity
 			if (val > upperRight.y)
 			{
 				Vector3 shifter = new Vector3(0f, 35f + height / 2, 0f);
-				Vector3 newWorldPos = new Vector3(newPos.x, newPosWVP.y - shifter.y, 0f);
+				Vector3 newWorldPos = new Vector3(newPosWVP.x, newPosWVP.y - shifter.y, 0f);
 				newPos.y = _guiCamera.WorldToViewportPoint(newWorldPos).y;
 			}
 
@@ -158,11 +148,11 @@ namespace ContractsWindow.Unity.Unity
 			if (val < lowerLeft.y)
 			{
 				Vector3 shifter = new Vector3(0f, 35f + height / 2, 0f);
-				Vector3 newWorldPos = new Vector3(newPos.x, newPosWVP.y + shifter.y, 0f);
+				Vector3 newWorldPos = new Vector3(newPosWVP.x, lowerLeft.y + shifter.y, 0f);
 				newPos.y = _guiCamera.WorldToViewportPoint(newWorldPos).y;
 			}
+			newPosWVP = _guiCamera.ViewportToWorldPoint(newPos);
 			this.transform.position = new Vector3(newPosWVP.x, newPosWVP.y, 1f);
-			//this.gameObject.SetActive(true);
 			_inside = true;
 		}
 	}
