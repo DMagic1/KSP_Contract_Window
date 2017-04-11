@@ -40,12 +40,15 @@ using ContractsWindow.Unity.Interfaces;
 using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity;
 using KSP.UI;
+using KSP.Localization;
 
 namespace ContractsWindow.PanelInterfaces
 {
 	public class contractWindow : DMC_MBE, ICW_Window
 	{
+		private const string controlLock = "CWInputLock";
 		private bool _isVisible;
+		private bool _inputLock;
 		private bool windowGenerated;
 		private bool progressLoaded, contractsLoaded;
 		private int timer;
@@ -68,21 +71,21 @@ namespace ContractsWindow.PanelInterfaces
 			get { return instance; }
 		}
 
-		public bool HideTooltips
+		public bool TooltipsOn
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
-					return false;
+				if (contractLoader.Settings == null)
+					return true;
 
-				return !contractMainMenu.Settings.tooltips;
+				return contractLoader.Settings.tooltips;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.tooltips = !value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.tooltips = value;
 
-				contractLoader.UpdateTooltips(!value);
+				contractLoader.ToggleTooltips(value);
 			}
 		}
 
@@ -90,15 +93,15 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return false;
 
-				return contractMainMenu.Settings.ignoreKSPScale;
+				return contractLoader.Settings.ignoreKSPScale;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.ignoreKSPScale = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.ignoreKSPScale = value;
 			}
 		}
 
@@ -111,15 +114,15 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return false;
 
-				return contractMainMenu.Settings.pixelPerfect;
+				return contractLoader.Settings.pixelPerfect;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.pixelPerfect = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.pixelPerfect = value;
 
 				if (_canvas != null)
 					_canvas.pixelPerfect = value;
@@ -130,15 +133,15 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return false;
 
-				return contractMainMenu.Settings.largeFont;
+				return contractLoader.Settings.largeFont;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.largeFont = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.largeFont = value;
 
 				contractLoader.UpdateFontSize(value ? 1 : -1);
 			}
@@ -153,15 +156,15 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return 1;
 
-				return contractMainMenu.Settings.windowScale;
+				return contractLoader.Settings.windowScale;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.windowScale = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.windowScale = value;
 			}
 		}
 
@@ -174,15 +177,15 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return false;
 
-				return contractMainMenu.Settings.replaceStockApp;
+				return contractLoader.Settings.replaceStockApp;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.replaceStockApp = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.replaceStockApp = value;
 
 				if (value && contractStockToolbar.Instance != null)
 					contractStockToolbar.Instance.replaceStockApp();
@@ -193,18 +196,74 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get
 			{
-				if (contractMainMenu.Settings == null)
+				if (contractLoader.Settings == null)
 					return true;
 
-				return contractMainMenu.Settings.useStockToolbar;
+				return contractLoader.Settings.useStockToolbar;
 			}
 			set
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.useStockToolbar = value;
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.useStockToolbar = value;
 
 				contractScenario.Instance.toggleToolbars();
 			}
+		}
+
+		public bool StockUIStyle
+		{
+			get
+			{
+				if (contractLoader.Settings == null)
+					return false;
+
+				return contractLoader.Settings.stockUIStyle;
+			}
+			set
+			{
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.stockUIStyle = value;
+
+				contractLoader.ResetUIStyle();
+
+				if (_isVisible)
+				{
+					if (UIWindow != null)
+					{
+						UIWindow.gameObject.SetActive(false);
+
+						DestroyImmediate(UIWindow.gameObject);
+					}
+
+					windowGenerated = false;
+
+					Open();
+				}
+			}
+		}
+
+		public bool LockInput
+		{
+			get { return _inputLock; }
+			set
+			{
+				_inputLock = value;
+
+				if (_inputLock)
+					InputLockManager.SetControlLock(controlLock);
+				else
+					InputLockManager.RemoveControlLock(controlLock);
+			}
+		}
+
+		public string AllMissionTitle
+		{
+			get { return Localization.Format("#autoLOC_textAllMissionTitle"); }
+		}
+
+		public string ProgressTitle
+		{
+			get { return Localization.Format("#autoLOC_textProgressTitle"); }
 		}
 
 		public string Version
@@ -215,6 +274,11 @@ namespace ContractsWindow.PanelInterfaces
 		public Canvas MainCanvas
 		{
 			get { return _canvas; }
+		}
+
+		public Canvas TooltipCanvas
+		{
+			get { return UIMasterController.Instance.tooltipCanvas; }
 		}
 
 		public IList<IMissionSection> GetMissions
@@ -299,6 +363,12 @@ namespace ContractsWindow.PanelInterfaces
 			windowPos = r;
 
 			contractScenario.Instance.windowRects[sceneInt] = windowPos;
+		}
+
+		public void SetAsLastSibling()
+		{
+			if (_canvas != null)
+				_canvas.transform.SetAsLastSibling();
 		}
 
 		public void setMission(contractMission mission)
@@ -664,31 +734,40 @@ namespace ContractsWindow.PanelInterfaces
 			if (contractLoader.CanvasPrefab == null)
 				return;
 
-			GameObject obj = Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject;
+			UIWindow = (Instantiate(contractLoader.WindowPrefab, new Vector3(50, -80, 0), Quaternion.identity) as GameObject).GetComponent<CW_Window>();
 
-			UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
+			if (UIWindow == null)
+				return;
 
-			var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
-
-			for (int i = canvi.Length - 1; i >= 0; i--)
+			if (_canvas == null)
 			{
-				Canvas c = canvi[i];
+				UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
 
-				if (c == null)
-					continue;
+				var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
 
-				if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
-					continue;
+				for (int i = canvi.Length - 1; i >= 0; i--)
+				{
+					Canvas c = canvi[i];
 
-				_canvas = c;
-				_canvas.overridePixelPerfect = true;
-				_canvas.pixelPerfect = contractMainMenu.Settings == null ? false : contractMainMenu.Settings.pixelPerfect;
-				break;
+					if (c == null)
+						continue;
+
+					if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
+						continue;
+
+					_canvas = c;
+					_canvas.overridePixelPerfect = true;
+					_canvas.pixelPerfect = contractLoader.Settings == null ? false : contractLoader.Settings.pixelPerfect;
+
+					RectTransform cRect = c.GetComponent<RectTransform>();
+
+					cRect.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
+					cRect.SetAsLastSibling();
+					break;
+				}
 			}
 
-			obj.transform.SetParent(_canvas.transform, false);
-
-			UIWindow = obj.GetComponent<CW_Window>();
+			UIWindow.transform.SetParent(_canvas.transform, false);
 
 			UIWindow.setWindow(this);
 
