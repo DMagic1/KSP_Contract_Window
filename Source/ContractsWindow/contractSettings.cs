@@ -37,6 +37,8 @@ namespace ContractsWindow
 		[Persistent]
 		public bool tooltips = true;
 		[Persistent]
+		public bool stockUIStyle = false;
+		[Persistent]
 		public bool pixelPerfect = false;
 		[Persistent]
 		public bool largeFont = false;
@@ -56,8 +58,13 @@ namespace ContractsWindow
 		{
 			fullPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName).Replace("\\", "/");
 
-			if (!Load())
-				DMC_MBE.LogFormatted("Failed to load settings file");
+			if (Load())
+				DMC_MBE.LogFormatted("Settings File Loaded");
+			else
+			{
+				if (Save())
+					DMC_MBE.LogFormatted("New Contracts Window + Settings file saved to:\n{0}", fullPath);
+			}
 		}
 
 		public bool Load()
