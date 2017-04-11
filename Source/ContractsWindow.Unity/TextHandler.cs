@@ -34,6 +34,11 @@ namespace ContractsWindow.Unity
 {
 	public class TextHandler : MonoBehaviour
 	{
+		[SerializeField]
+		private bool m_LocalizedText = false;
+		[SerializeField]
+		private string m_LocalizedName = "";
+
 		public class OnTextEvent : UnityEvent<string> { }
 
 		public class OnColorEvent : UnityEvent<Color> { }
@@ -45,6 +50,24 @@ namespace ContractsWindow.Unity
 		private OnFontEvent _onFontChange = new OnFontEvent();
 
 		private Vector2 _preferredSize = new Vector2();
+
+		public bool LocalizedText
+		{
+			get { return m_LocalizedText; }
+		}
+
+		public string LocalizedName
+		{
+			get { return m_LocalizedName; }
+		}
+
+		public void SetLocalText(string text)
+		{
+			Text t = GetComponent<Text>();
+
+			if (t != null)
+				t.text = text;
+		}
 
 		public Vector2 PreferredSize
 		{
