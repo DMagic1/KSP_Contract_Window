@@ -229,7 +229,7 @@ namespace ContractsWindow.Unity.Unity
 			EyesHandler.SetAlternate();
 
 			if (EyesTooltip != null)
-				EyesTooltip.SetNewText("Remove Contract");
+				EyesTooltip.TooltipIndex = 2;
 		}
 
 		public void ToggleHidden(bool isOn)
@@ -255,7 +255,7 @@ namespace ContractsWindow.Unity.Unity
 			}
 
 			if (EyesTooltip != null)
-				EyesTooltip.SetNewText(isOn ? "Show Contract" : "Hide Contract");
+				EyesTooltip.TooltipIndex = isOn ? 1 : 0;
 
 			parent.SwitchContract(contractInterface.ID, isOn);
 
@@ -276,7 +276,7 @@ namespace ContractsWindow.Unity.Unity
 			contractInterface.IsPinned = isOn;
 
 			if (PinTooltip != null)
-				PinTooltip.SetNewText(isOn ? "Un-Pin Contract" : "Pin Contract");
+				PinTooltip.TooltipIndex = isOn ? 1 : 0;
 		}
 
 		public void AddMission()
@@ -301,7 +301,7 @@ namespace ContractsWindow.Unity.Unity
 			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
-				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Contract Note");
+				NoteTooltip.TooltipIndex = isOn ? 1 : 0;
 		}
 
 		public void ShowParameters(bool isOn)
@@ -344,13 +344,13 @@ namespace ContractsWindow.Unity.Unity
 				EyesToggle.isOn = contractInterface.IsHidden;
 
 			if (EyesTooltip != null)
-				EyesTooltip.SetNewText(contractInterface.IsHidden ? "Show Contract" : "Hide Contract");
+				EyesTooltip.TooltipIndex = contractInterface.IsHidden ? 1 : 0;
 
 			if (PinToggle != null)
 				PinToggle.isOn = contractInterface.Order != null;
 
 			if (PinTooltip != null)
-				PinTooltip.SetNewText(contractInterface.Order != null ? "Un-Pin Contract" : "Pin Contract");
+				PinTooltip.TooltipIndex = contractInterface.Order != null ? 1 : 0;
 				
 			setNote();
 		}

@@ -191,7 +191,7 @@ namespace ContractsWindow.Unity.Unity
 			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
-				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Parameter Note");
+				NoteTooltip.TooltipIndex = isOn ? 1 : 0;
 		}
 
 		private void setNote()
