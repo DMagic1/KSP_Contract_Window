@@ -39,8 +39,8 @@ namespace ContractsWindow
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	public class contractLoader : MonoBehaviour
 	{
-		private const string prefabAssetName = "/contracts_window_prefabs.ksp";
-		private const string unitySkinAssetName = "/unity_skin.ksp";
+		private const string prefabAssetName = "/contracts_window_prefabs";
+		private const string unitySkinAssetName = "/unity_skin";
 
 		private static AssetBundle prefabs;
 		private static GameObject[] loadedPrefabs;
@@ -405,7 +405,7 @@ namespace ContractsWindow
 
 		private static string GetStringWithName(string loc)
 		{
-			return Localization.Format("#autoLOC_" + loc);
+			return Localizer.Format("#autoLOC_" + loc);
 		}
 
 		private void TMProFromText(TextHandler handler)
