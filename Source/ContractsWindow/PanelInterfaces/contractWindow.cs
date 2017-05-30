@@ -258,12 +258,12 @@ namespace ContractsWindow.PanelInterfaces
 
 		public string AllMissionTitle
 		{
-			get { return Localization.Format("#autoLOC_textAllMissionTitle"); }
+			get { return Localizer.Format("#autoLOC_textAllMissionTitle"); }
 		}
 
 		public string ProgressTitle
 		{
-			get { return Localization.Format("#autoLOC_textProgressTitle"); }
+			get { return Localizer.Format("#autoLOC_textProgressTitle"); }
 		}
 
 		public string Version

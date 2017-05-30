@@ -64,7 +64,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return Localization.Format(node.Note, node.NoteReference, node.KSPDateString);
+				return Localizer.Format(node.Note, node.NoteReference, node.KSPDateString);
 			}
 		}
 		
@@ -78,12 +78,12 @@ namespace ContractsWindow.PanelInterfaces
 				switch(node.PType)
 				{
 					case FinePrint.Utilities.ProgressType.POINTOFINTEREST:
-						return Localization.Format("#autoLOC_296494", node.Descriptor, node.BodyName);
+						return Localizer.Format("#autoLOC_296494", node.Descriptor, node.BodyName);
 					default:
 						if (node.Body == null)
-							return Localization.Format(node.Descriptor);
+							return Localizer.Format(node.Descriptor);
 						else
-							return Localization.Format(node.Descriptor, node.Body.displayName);
+							return Localizer.Format(node.Descriptor, node.Body.displayName);
 				}
 			}
 		}

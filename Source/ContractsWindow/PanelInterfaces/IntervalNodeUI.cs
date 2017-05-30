@@ -94,7 +94,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (node == null)
 					return "";
 
-				return Localization.Format(node.Descriptor, string.Format("{0}{1}", node.getRecord(index), node.Units));
+				return Localizer.Format(node.Descriptor, string.Format("{0}{1}", node.getRecord(index), node.Units));
 		}
 
 		private string coloredText(string s, string sprite, string color)
