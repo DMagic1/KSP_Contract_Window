@@ -38,9 +38,16 @@ namespace ContractsWindow
             set
             {
                 //Combine the Location of the assembly and the provided string. This means we can use relative or absolute paths
-				_FilePath = System.IO.Path.Combine(_AssemblyFolder, value + ".cfg").Replace("\\", "/");
+				_FilePath = System.IO.Path.Combine(KSPUtil.ApplicationRootPath, "GameData/" + value + ".cfg").Replace("\\", "/");
             }
         }
+
+		private string topNodeName;
+		public string TopNodeName
+		{
+			get { return topNodeName; }
+			internal set { topNodeName = value; }
+		}
 
         /// <summary>
         /// Gets the filename portion of the FullPath
@@ -110,10 +117,8 @@ namespace ContractsWindow
                 if (FileExists)
                 {
                     //Load the file into a config node
-					ConfigNode cnToLoad = ConfigNode.Load(fileFullName);
-					ConfigNode cnUnwrapped = cnToLoad.GetNode(this.GetType().Name);
-                    //plug it in to the object
-					ConfigNode.LoadObjectFromConfig(this, cnUnwrapped);
+					ConfigNode cnToLoad = GameDatabase.Instance.GetConfigNode(topNodeName);
+					ConfigNode.LoadObjectFromConfig(this, cnToLoad);
                     blnReturn = true;
                 }
                 else
@@ -131,6 +136,30 @@ namespace ContractsWindow
             }
             return blnReturn;
         }
+
+		public bool LoadSavedCopy()
+		{
+			try
+			{
+				if (FileExists)
+				{
+					ConfigNode cnToLoad = ConfigNode.Load(FilePath);
+					ConfigNode cnUnwrapped = cnToLoad.GetNode(this.GetType().Name);
+					ConfigNode.LoadObjectFromConfig(this, cnUnwrapped);
+					return true;
+				}
+				else
+				{
+					LogFormatted("File could not be found to load after saving new copy ({0})", FilePath);
+					return false;
+				}
+			}
+			catch (Exception ex)
+			{
+				LogFormatted("Failed to Load ConfigNode from file after saving ({0}) - Error:{1}", FilePath, ex.Message);
+				return false;
+			}
+		}
 
         /// <summary>
         /// Saves the object to a ConfigNode structure in the previously supplied file
@@ -199,18 +228,6 @@ namespace ContractsWindow
         /// </summary>
         internal static String _AssemblyName
         { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Name; } }
-
-        /// <summary>
-        /// Full Path of the executing Assembly
-        /// </summary>
-        internal static String _AssemblyLocation
-        { get { return System.Reflection.Assembly.GetExecutingAssembly().Location; } }
-
-        /// <summary>
-        /// Folder containing the executing Assembly
-        /// </summary>
-        internal static String _AssemblyFolder
-        { get { return System.IO.Path.GetDirectoryName(_AssemblyLocation); } }
 
         #endregion  
 

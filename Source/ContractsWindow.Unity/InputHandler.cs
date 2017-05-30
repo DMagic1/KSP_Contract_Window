@@ -1,6 +1,6 @@
 ﻿#region license
 /*The MIT License (MIT)
-CWTextMeshProHolder - An extension of TextMeshProUGUI for updating certain elements of the text
+InputHandler - Script for handling Input field object replacement with Text Mesh Pro
 
 Copyright (c) 2016 DMagic
 
@@ -24,56 +24,47 @@ THE SOFTWARE.
 */
 #endregion
 
-using ContractsWindow.Unity;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
-using TMPro;
+using UnityEngine.EventSystems;
 
-namespace ContractsWindow
+namespace ContractsWindow.Unity
 {
-	public class CWTextMeshProHolder : TextMeshProUGUI
+	public class InputHandler : MonoBehaviour
 	{
-		private TextHandler _handler;
+		private string _text;
+		private bool _isFocused;
 
-		new private void Awake()
+		public class OnTextEvent : UnityEvent<string> { }
+		public class OnValueChanged : UnityEvent<string> { }
+
+		private OnTextEvent _onTextUpdate = new OnTextEvent();
+		private OnValueChanged _onValueChanged = new OnValueChanged();
+
+		public string Text
 		{
-			base.Awake();
-
-			_handler = GetComponent<TextHandler>();
-
-			if (_handler == null)
-				return;
-
-			_handler.OnColorUpdate.AddListener(new UnityAction<Color>(UpdateColor));
-			_handler.OnTextUpdate.AddListener(new UnityAction<string>(UpdateText));
-			_handler.OnFontChange.AddListener(new UnityAction<int>(UpdateFontSize));
+			get { return _text; }
+			set { _text = value; }
 		}
 
-		public void Setup(TextHandler h)
+		public bool IsFocused
 		{
-			_handler = h;
-
-			_handler.OnColorUpdate.AddListener(new UnityAction<Color>(UpdateColor));
-			_handler.OnTextUpdate.AddListener(new UnityAction<string>(UpdateText));
-			_handler.OnFontChange.AddListener(new UnityAction<int>(UpdateFontSize));
+			get { return _isFocused; }
+			set { _isFocused = value; }
 		}
 
-		private void UpdateColor(Color c)
+		public UnityEvent<string> OnTextUpdate
 		{
-			color = c;
+			get { return _onTextUpdate; }
 		}
 
-		private void UpdateText(string t)
+		public UnityEvent<string> OnValueChange
 		{
-			text = t;
-
-			_handler.PreferredSize = new Vector2(preferredWidth, preferredHeight);
+			get { return _onValueChanged; }
 		}
 
-		private void UpdateFontSize(int i)
-		{
-			fontSize += i;
-		}
 	}
 }

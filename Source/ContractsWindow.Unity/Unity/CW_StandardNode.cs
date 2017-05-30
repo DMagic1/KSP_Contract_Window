@@ -123,7 +123,7 @@ namespace ContractsWindow.Unity.Unity
 			NoteContainer.gameObject.SetActive(isOn);
 
 			if (NoteTooltip != null)
-				NoteTooltip.SetNewText(isOn ? "Hide Note" : "Show Note");
+				NoteTooltip.TooltipIndex = isOn ? 1 : 0;
 		}
 	}
 }

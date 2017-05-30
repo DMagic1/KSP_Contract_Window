@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ContractParser">
@@ -49,11 +49,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -62,11 +62,11 @@
     <Compile Include="contractLoader.cs" />
     <Compile Include="contractSettings.cs" />
     <Compile Include="contractSortClass.cs" />
-    <Compile Include="CWTextMeshProHolder.cs" />
+    <Compile Include="CWTextMeshPro.cs" />
+    <Compile Include="CWTextMeshProInput.cs" />
     <Compile Include="Framework\ConfigNodeStorage.cs" />
     <Compile Include="PanelInterfaces\contractMission.cs" />
     <Compile Include="contractScenario.cs" />
-    <Compile Include="contractMainMenu.cs" />
     <Compile Include="PanelInterfaces\contractUIObject.cs" />
     <Compile Include="contractUtils.cs">
       <SubType>Code</SubType>
@@ -87,6 +87,7 @@
     <ProjectReference Include="ContractsWindow.Unity\ContractsWindow.Unity.csproj">
       <Project>{c6135cf5-6802-4286-8bda-d62a41a2b1cd}</Project>
       <Name>ContractsWindow.Unity</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

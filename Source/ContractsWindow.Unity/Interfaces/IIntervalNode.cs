@@ -40,7 +40,7 @@ namespace ContractsWindow.Unity.Interfaces
 
 		string NodeTitle { get; }
 
-		string NodeValue(int i);
+		string NodeDescriptor(int i);
 
 		string RewardText(int i);
 	}

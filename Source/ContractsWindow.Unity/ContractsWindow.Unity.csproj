@@ -33,11 +33,11 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\KSP Dev\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -45,6 +45,7 @@
     <Compile Include="CanvasFader.cs" />
     <Compile Include="ContractState.cs" />
     <Compile Include="CW_Popup.cs" />
+    <Compile Include="InputHandler.cs" />
     <Compile Include="Interfaces\IContractSection.cs" />
     <Compile Include="Interfaces\ICW_Window.cs" />
     <Compile Include="Interfaces\IIntervalNode.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Unity\CW_SortMenu.cs" />
     <Compile Include="Unity\CW_StandardNode.cs" />
     <Compile Include="TextHandler.cs" />
+    <Compile Include="Unity\CW_Style.cs" />
     <Compile Include="Unity\CW_Toolbar.cs" />
     <Compile Include="Unity\CW_Window.cs" />
     <Compile Include="Unity\Tooltip.cs" />

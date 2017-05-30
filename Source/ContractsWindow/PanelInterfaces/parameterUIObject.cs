@@ -118,7 +118,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, "<sprite=2 tint=1>", "#69D84FFF"), coloredText(container.SciRewString, "<sprite=1 tint=1>", "#02D8E9FF"), coloredText(container.RepRewString, "<sprite=0 tint=1>", "#C9B003FF"));
+				return string.Format("{0}{1}{2}", coloredText(container.FundsRewString, "<sprite=\"CurrencySpriteAsset\" name=\"Funds\" tint=1>", "#69D84FFF"), coloredText(container.SciRewString, "<sprite=\"CurrencySpriteAsset\" name=\"Science\" tint=1>", "#02D8E9FF"), coloredText(container.RepRewString, "<sprite=\"CurrencySpriteAsset\" name=\"Reputation\" tint=1>", "#C9B003FF"));
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return string.Format("{0}{1}", coloredText(container.FundsPenString, "<sprite=2 tint=1>", "#FA4224FF"), coloredText(container.RepPenString, "<sprite=0 tint=1>", "#FA4224FF"));
+				return string.Format("{0}{1}", coloredText(container.FundsPenString, "<sprite=\"CurrencySpriteAsset\" name=\"Funds\" tint=1>", "#FA4224FF"), coloredText(container.RepPenString, "<sprite=\"CurrencySpriteAsset\" name=\"Reputation\" tint=1>", "#FA4224FF"));
 			}
 		}
 

@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace ContractsWindow.Unity.Unity
 {
@@ -36,16 +37,39 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_MissionCreate : CW_Popup
 	{
 		[SerializeField]
-		private Text NewMission = null;
+		private InputHandler MissionInput = null;
 
 		private IContractSection contract;
 
-		public void setPanel(IContractSection c)
+		private void Update()
 		{
-			if (c == null)
+			if (CW_Window.Window == null || CW_Window.Window.Interface == null)
 				return;
 
+			if (CW_Window.Window.Interface.LockInput)
+			{
+				if (MissionInput != null && !MissionInput.IsFocused)
+					CW_Window.Window.Interface.LockInput = false;
+			}
+		}
+	
+		public void setPanel(IContractSection c)
+		{
+			if (c == null || MissionInput == null)
+				return;
+			
 			contract = c;
+		}
+
+		public void OnInputClick(BaseEventData eventData)
+		{
+			if (!(eventData is PointerEventData) || CW_Window.Window == null || CW_Window.Window.Interface == null)
+				return;
+
+			if (((PointerEventData)eventData).button != PointerEventData.InputButton.Left)
+				return;
+
+			CW_Window.Window.Interface.LockInput = true;
 		}
 
 		public void CreateMission()
@@ -53,14 +77,18 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-
 			if (CW_Window.Window.Interface == null)
 				return;
 
-			if (NewMission == null)
+			if (MissionInput == null)
 				return;
 
-			CW_Window.Window.Interface.NewMission(NewMission.text, contract.ID);
+			if (string.IsNullOrEmpty(MissionInput.Text))
+				return;
+
+			CW_Window.Window.Interface.NewMission(MissionInput.Text, contract.ID);
+
+			CW_Window.Window.Interface.LockInput = false;
 
 			DestroyPanel();
 		}

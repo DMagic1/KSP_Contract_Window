@@ -39,6 +39,8 @@ namespace ContractsWindow.Unity.Unity
 		private Toggle StockToggle = null;
 		[SerializeField]
 		private Toggle StockReplace = null;
+		[SerializeField]
+		private Toggle StockUIStyle = null;
 
 		private bool loaded;
 
@@ -65,6 +67,9 @@ namespace ContractsWindow.Unity.Unity
 				if (!CW_Window.Window.Interface.StockToolbar)
 					StockReplace.gameObject.SetActive(false);
 			}
+
+			if (StockUIStyle != null)
+				StockUIStyle.isOn = CW_Window.Window.Interface.StockUIStyle;
 
 			loaded = true;
 
@@ -106,6 +111,20 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			CW_Window.Window.Interface.ReplaceToolbar = isOn;
+		}
+
+		public void ToggleUIStyle(bool isOn)
+		{
+			if (!loaded)
+				return;
+
+			if (CW_Window.Window == null)
+				return;
+
+			if (CW_Window.Window.Interface == null)
+				return;
+
+			CW_Window.Window.Interface.StockUIStyle = isOn;
 		}
 
 		public void Close()

@@ -36,76 +36,101 @@ namespace ContractsWindow.Unity
 
 	public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IScrollHandler
 	{
-		[SerializeField, TextArea(2, 10)]
-		private string Text = "";
 		[SerializeField]
-		private bool isActive = true;
+		private string[] m_TooltipNames = new string[1] { "" };
+		[SerializeField]
+		private string[] _tooltipText = new string[1] { "" };
+		[SerializeField]
+		private GameObject _prefab = null;
+		[SerializeField]
+		private bool m_IsActive = true;
 
-		private ToolTip tooltip;
+		private int _tooltipIndex;
 
-		private void Start()
+		private Canvas _canvas;
+		private ToolTip _tooltip;
+		private float _scale;
+
+		public int TooltipCount
 		{
-			if (string.IsNullOrEmpty(Text))
-				return;
+			get
+			{
+				if (m_TooltipNames == null)
+					return 0;
 
-			GameObject obj = Instantiate(CW_Window.Window.Tooltip);
-
-			if (obj == null)
-				return;
-
-			tooltip = obj.GetComponent<ToolTip>();
-
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Tooltip == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			if (CW_Window.Window.Interface.MainCanvas == null)
-				return;
-
-			obj.transform.SetParent(CW_Window.Window.Interface.MainCanvas.transform, false);
-			obj.transform.SetAsLastSibling();
+				return m_TooltipNames.Length;
+			}
 		}
 
-		public void SetNewText(string s)
+		public string TooltipNames(int index)
 		{
-			Text = s;
+			if (m_TooltipNames == null)
+				return "";
+
+			if (index >= m_TooltipNames.Length)
+				return "";
+
+			if (index < 0)
+				return "";
+
+			return m_TooltipNames[index];
+		}
+
+		public string[] TooltipText
+		{
+			set { _tooltipText = value; }
+		}
+
+		public int TooltipIndex
+		{
+			set
+			{
+				if (value < 0 || value >= TooltipCount)
+					value = 0;
+
+				_tooltipIndex = value;
+			}
+		}
+
+		public Canvas _Canvas
+		{
+			set { _canvas = value; }
+		}
+
+		public GameObject Prefab
+		{
+			set { _prefab = value; }
+		}
+
+		public float Scale
+		{
+			set { _scale = value; }
 		}
 
 		public bool IsActive
 		{
-			set { isActive = value; }
+			set { m_IsActive = value; }
 		}
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (tooltip == null)
+			if (!m_IsActive)
 				return;
 
-			if (!isActive)
-				return;
-
-			tooltip.SetTooltip(Text);
+			OpenTooltip();
 		}
 
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			if (tooltip == null)
+			if (!m_IsActive)
 				return;
 
-			tooltip.HideTooltip();
+			CloseTooltip();
 		}
 
 		public void OnPointerClick(PointerEventData eventData)
 		{
-			if (tooltip == null)
-				return;
-
-			tooltip.HideTooltip();
+			CloseTooltip();
 		}
 
 		public void OnScroll(PointerEventData eventData)
@@ -117,6 +142,32 @@ namespace ContractsWindow.Unity
 				return;
 
 			CW_Window.Window.Scroll.OnScroll(eventData);
+		}
+
+		private void OpenTooltip()
+		{
+			if (_prefab == null || _canvas == null || _tooltipText == null || _tooltipText.Length <= 0)
+				return;
+
+			_tooltip = Instantiate(_prefab).GetComponent<ToolTip>();
+
+			if (_tooltip == null)
+				return;
+
+			_tooltip.transform.SetParent(_canvas.transform, false);
+			_tooltip.transform.SetAsLastSibling();
+
+			_tooltip.Setup(_canvas, _tooltipText[_tooltipIndex], _scale);
+		}
+
+		private void CloseTooltip()
+		{
+			if (_tooltip == null)
+				return;
+
+			_tooltip.gameObject.SetActive(false);
+			Destroy(_tooltip.gameObject);
+			_tooltip = null;
 		}
 	}
 }

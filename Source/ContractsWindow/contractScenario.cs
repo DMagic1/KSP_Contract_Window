@@ -205,8 +205,8 @@ namespace ContractsWindow
 		{
 			try
 			{
-				if (contractMainMenu.Settings != null)
-					contractMainMenu.Settings.Save();
+				if (contractLoader.Settings != null)
+					contractLoader.Settings.Save();
 
 				saveWindow(windowRects[currentScene(HighLogic.LoadedScene)]);
 
@@ -269,10 +269,10 @@ namespace ContractsWindow
 
 			bool stockToolbar = true;
 
-			if (contractMainMenu.Settings != null)
-				stockToolbar = contractMainMenu.Settings.useStockToolbar;
+			if (contractLoader.Settings != null)
+				stockToolbar = contractLoader.Settings.useStockToolbar;
 
-			if (stockToolbar || !ToolbarManager.ToolbarAvailable || contractMainMenu.Settings.replaceStockApp)
+			if (stockToolbar || !ToolbarManager.ToolbarAvailable || contractLoader.Settings.replaceStockApp)
 			{
 				appLauncherButton = gameObject.AddComponent<contractStockToolbar>();
 				if (blizzyToolbarButton != null)
@@ -315,8 +315,8 @@ namespace ContractsWindow
 		{
 			bool stockToolbar = true;
 
-			if (contractMainMenu.Settings != null)
-				stockToolbar = contractMainMenu.Settings.useStockToolbar;
+			if (contractLoader.Settings != null)
+				stockToolbar = contractLoader.Settings.useStockToolbar;
 
 			if (stockToolbar || !ToolbarManager.ToolbarAvailable)
 			{

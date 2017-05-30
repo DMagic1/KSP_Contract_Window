@@ -52,7 +52,7 @@ namespace ContractsWindow.Unity.Unity
 			interval = i;
 
 			if (Title != null)
-				Title.OnTextUpdate.Invoke(getTitle());
+				Title.OnTextUpdate.Invoke(intervalInterface.NodeDescriptor(interval));
 
 			if (Reward != null)
 				Reward.OnTextUpdate.Invoke(node.RewardText(i));
@@ -64,18 +64,11 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			if (Title != null)
-				Title.OnTextUpdate.Invoke(getTitle());
+				Title.OnTextUpdate.Invoke(intervalInterface.NodeDescriptor(interval));
 
 			if (Reward != null)
 				Reward.OnTextUpdate.Invoke(intervalInterface.RewardText(interval));
 		}
 
-		private string getTitle()
-		{
-			if (intervalInterface == null)
-				return "";
-
-			return string.Format("{0} Record {1}: {2}", intervalInterface.NodeTitle, interval, intervalInterface.NodeValue(interval));
-		}
 	}
 }

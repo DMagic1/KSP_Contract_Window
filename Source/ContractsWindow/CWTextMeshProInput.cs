@@ -1,10 +1,8 @@
 ﻿#region license
 /*The MIT License (MIT)
-Contract Main Menu - Addon to initialize settings and textures
+CWTextMeshProInputHolder - An extension of TMP_InputField for updating certain elements of the input field
 
-Copyright (c) 2014 DMagic
-
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
+Copyright (c) 2016 DMagic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +24,49 @@ THE SOFTWARE.
 */
 #endregion
 
-using ContractsWindow.Toolbar;
+using ContractsWindow.Unity;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+using TMPro;
 
 namespace ContractsWindow
 {
-	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
-	class contractMainMenu: DMC_MBE
+	public class CWTextMeshProInput : TMP_InputField
 	{
-		private static Texture2D toolbarIcon;
-		private static contractSettings settings;
+		private InputHandler _handler;
 
-		public static Texture2D ToolbarIcon
+		new private void Awake()
 		{
-			get { return toolbarIcon; }
+			base.Awake();
+
+			_handler = GetComponent<InputHandler>();
+
+			onValueChanged.AddListener(new UnityAction<string>(valueChanged));
+
+			_handler.OnTextUpdate.AddListener(new UnityAction<string>(UpdateText));
 		}
 
-		public static contractSettings Settings
+		private void Update()
 		{
-			get { return settings; }
+			if (_handler != null)
+				_handler.IsFocused = isFocused;
 		}
 
-		protected override void Start()
+		private void valueChanged(string s)
 		{
-			if (toolbarIcon == null)
-				toolbarIcon = GameDatabase.Instance.GetTexture("DMagicUtilities/ContractsWindow/Resources/ContractsIconApp", false);
+			if (_handler == null)
+				return;
 
-			if (settings == null)
-				settings = new contractSettings();
+			_handler.Text = s;
 
-			if (settings != null)
-				contractLoader.UpdateTooltips(settings.tooltips);
-
-			Destroy(gameObject);
+			_handler.OnValueChange.Invoke(s);
 		}
+
+		private void UpdateText(string t)
+		{
+			text = t;
+		}
+
 	}
 }

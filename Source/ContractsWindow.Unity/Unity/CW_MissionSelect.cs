@@ -97,7 +97,7 @@ namespace ContractsWindow.Unity.Unity
 			if (CW_Window.Window == null)
 				return;
 
-			CW_Window.Window.ToggleMainWindow(false);
+			CW_Window.Window.TitleToggle.isOn = false;
 		}
 
 		public void DestroyPanel()
