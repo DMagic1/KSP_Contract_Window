@@ -251,7 +251,7 @@ namespace ContractsWindow.Unity.Unity
 			prepareTopBar();
 			
 			if (MissionTitle != null)
-				MissionTitle.OnTextUpdate.Invoke(currentMission.MissionTitle + ":");
+				MissionTitle.OnTextUpdate.Invoke(currentMission.MasterMission ? windowInterface.AllMissionTitle : currentMission.MissionTitle + ":");
 
 			if (MissionEdit != null)
 			{
