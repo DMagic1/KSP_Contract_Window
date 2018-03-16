@@ -31,6 +31,7 @@ using ContractParser;
 using ContractsWindow.Unity.Interfaces;
 using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity;
+using SentinelMission;
 
 namespace ContractsWindow.PanelInterfaces
 {
@@ -140,7 +141,7 @@ namespace ContractsWindow.PanelInterfaces
 				if (container == null)
 					return "";
 
-				return container.Notes(HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsEditor);
+				return container.Notes(HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsEditor || container.CParamType == typeof(SentinelParameter));
 			}
 		}
 
