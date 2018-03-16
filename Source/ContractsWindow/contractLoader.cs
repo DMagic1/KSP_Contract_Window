@@ -39,14 +39,14 @@ namespace ContractsWindow
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	public class contractLoader : MonoBehaviour
 	{
-		private const string prefabAssetName = "/contracts_window_prefabs";
-		private const string unitySkinAssetName = "/unity_skin";
+		private const string prefabAssetName = "/contracts_window_prefabs.cwp";
+		private const string unitySkinAssetName = "/unity_skin.cwp";
 
 		private static AssetBundle prefabs;
 		private static GameObject[] loadedPrefabs;
 		private static GameObject _windowPrefab;
 		private static GameObject _tooltipPrefab;
-		private static Canvas canvasPrefab;
+		private static Canvas _canvasPrefab;
 		private static int currentFontAdjustment;
 		private static string path;
 
@@ -97,7 +97,7 @@ namespace ContractsWindow
 
 		public static Canvas CanvasPrefab
 		{
-			get { return canvasPrefab; }
+			get { return _canvasPrefab; }
 		}
 
 		public static void ToggleTooltips(bool isOn)
@@ -187,8 +187,11 @@ namespace ContractsWindow
 			if (!prefabsLoaded)
 				LoadPrefabs();
 
-			if (prefabsLoaded && skinLoaded)
-				loaded = true;
+            if (prefabsLoaded && skinLoaded)
+            {
+                loaded = true;
+                DMC_MBE.LogFormatted("UI Loaded and Processed");
+            }
 
 			if (toolbarIcon == null)
 				toolbarIcon = GameDatabase.Instance.GetTexture("DMagicUtilities/ContractsWindow/Resources/ContractsIconApp", false);
@@ -369,7 +372,7 @@ namespace ContractsWindow
 					Canvas c = o.GetComponent<Canvas>();
 
 					if (c != null)
-						canvasPrefab = c;
+						_canvasPrefab = c;
 				}
 				else if (o.name == "CW_Tooltip")
 					_tooltipPrefab = o;
@@ -443,6 +446,10 @@ namespace ContractsWindow
 			tmp.fontSharedMaterial = Resources.Load("Fonts/Materials/Calibri Dropshadow", typeof(Material)) as Material;
 
 			tmp.enableWordWrapping = true;
+
+            if (handler.CutoffText)
+                tmp.overflowMode = TextOverflowModes.Ellipsis;
+
 			tmp.isOverlay = false;
 			tmp.richText = true;
 

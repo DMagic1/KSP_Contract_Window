@@ -38,6 +38,8 @@ namespace ContractsWindow.Unity
 		private bool m_LocalizedText = false;
 		[SerializeField]
 		private string m_LocalizedName = "";
+        [SerializeField]
+        private bool m_CutoffText = false;
 
 		public class OnTextEvent : UnityEvent<string> { }
 
@@ -56,7 +58,12 @@ namespace ContractsWindow.Unity
 			get { return m_LocalizedText; }
 		}
 
-		public string LocalizedName
+        public bool CutoffText
+        {
+            get { return m_CutoffText; }
+        }
+
+        public string LocalizedName
 		{
 			get { return m_LocalizedName; }
 		}
