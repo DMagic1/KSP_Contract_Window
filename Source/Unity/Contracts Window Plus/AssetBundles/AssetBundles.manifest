@@ -1,0 +1,14 @@
+ManifestFileVersion: 0
+CRC: 237249084
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: squadcore
+      Dependencies: {}
+    Info_1:
+      Name: contracts_window_prefabs
+      Dependencies:
+        Dependency_0: unity_skin
+    Info_2:
+      Name: unity_skin
+      Dependencies: {}
