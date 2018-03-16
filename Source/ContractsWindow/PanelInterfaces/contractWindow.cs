@@ -367,8 +367,8 @@ namespace ContractsWindow.PanelInterfaces
 
 		public void SetAsLastSibling()
 		{
-			if (_canvas != null)
-				_canvas.transform.SetAsLastSibling();
+			//if (_canvas != null)
+			//	_canvas.transform.SetAsLastSibling();
 		}
 
 		public void setMission(contractMission mission)
@@ -741,31 +741,44 @@ namespace ContractsWindow.PanelInterfaces
 
 			if (_canvas == null)
 			{
-				UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
+                _canvas = Instantiate(contractLoader.CanvasPrefab);
+                
+                _canvas.overridePixelPerfect = true;
+                _canvas.pixelPerfect = contractLoader.Settings == null ? false : contractLoader.Settings.pixelPerfect;
 
-				var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
+                _canvas.transform.SetParent(null, false);
 
-				for (int i = canvi.Length - 1; i >= 0; i--)
-				{
-					Canvas c = canvi[i];
+                _canvas.worldCamera = UIMainCamera.Camera;
 
-					if (c == null)
-						continue;
+                //RectTransform cRect = _canvas.GetComponent<RectTransform>();
 
-					if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
-						continue;
+                //cRect.anchoredPosition3D = new Vector3(0, 0, 375);
 
-					_canvas = c;
-					_canvas.overridePixelPerfect = true;
-					_canvas.pixelPerfect = contractLoader.Settings == null ? false : contractLoader.Settings.pixelPerfect;
+                //            UIMasterController.Instance.AddCanvas(contractLoader.CanvasPrefab, true);
 
-					RectTransform cRect = c.GetComponent<RectTransform>();
+                //var canvi = UIMasterController.Instance.mainCanvas.GetComponentsInChildren<Canvas>(true);
 
-					cRect.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
-					cRect.SetAsLastSibling();
-					break;
-				}
-			}
+                //for (int i = canvi.Length - 1; i >= 0; i--)
+                //{
+                //	Canvas c = canvi[i];
+
+                //	if (c == null)
+                //		continue;
+
+                //	if (!c.gameObject.name.StartsWith("CW_Canvas_Prefab"))
+                //		continue;
+
+                //	_canvas = c;
+                //	_canvas.overridePixelPerfect = true;
+                //	_canvas.pixelPerfect = contractLoader.Settings == null ? false : contractLoader.Settings.pixelPerfect;
+
+                //	RectTransform cRect = c.GetComponent<RectTransform>();
+
+                //	cRect.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
+                //	cRect.SetAsLastSibling();
+                //	break;
+                //}
+            }
 
 			UIWindow.transform.SetParent(_canvas.transform, false);
 
