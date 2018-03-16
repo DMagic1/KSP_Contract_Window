@@ -1,0 +1,40 @@
+ManifestFileVersion: 0
+CRC: 4041412580
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3c2439e452827431f02e4d0d1561b4ce
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fccb50b60b19417926df6e17eaf38a1b
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 49
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/Builtin skin/Sources/window.png
+- Assets/Builtin skin/Sources/button hover.png
+- Assets/Builtin skin/Sources/toggle.png
+- Assets/Builtin skin/Sources/textfield on.png
+- Assets/Builtin skin/Sources/vertical scrollbar thumb.png
+- Assets/Builtin skin/Sources/textfield hover.png
+- Assets/Images/tooltip.png
+- Assets/Builtin skin/Sources/slider thumb active.png
+- Assets/Builtin skin/Sources/slider thumb.png
+- Assets/Builtin skin/Sources/textfield.png
+- Assets/Builtin skin/Sources/toggle on.png
+- Assets/Builtin skin/Sources/toggle hover.png
+- Assets/Builtin skin/Sources/vertical scrollbar.png
+- Assets/Builtin skin/Sources/button.png
+- Assets/Images/KSP_Tooltip.png
+- Assets/XML/unity_skin_bundle.xml
+- Assets/Builtin skin/Sources/toggle active.png
+- Assets/Builtin skin/Sources/box.png
+- Assets/Builtin skin/Sources/horizontalslider.png
+- Assets/Builtin skin/Sources/button on.png
+- Assets/Builtin skin/Sources/slidert humb hover.png
+Dependencies: []

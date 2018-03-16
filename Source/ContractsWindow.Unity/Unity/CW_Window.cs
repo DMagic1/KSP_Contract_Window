@@ -667,11 +667,13 @@ namespace ContractsWindow.Unity.Unity
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 
-			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+            windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
 
-			float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+   //         float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
 
-			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
+			//float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+
+			//windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
 
 			if (windowInterface.MainCanvas == null)
 				return;
@@ -724,11 +726,13 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+            windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
 
-			float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+			//float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
 
-			windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
+			//float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
+
+			//windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
 		}
 
 		public void OnPointerEnter(PointerEventData eventData)
@@ -746,23 +750,27 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (rect == null)
 				return;
+
+
 						
-			r.x /= windowInterface.MasterScale;
+		       //r.x /= windowInterface.MasterScale;
 
-			float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+			//float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
 
-			float derp = diff - (((-1f * r.y) / Screen.height) * diff);
+			//float derp = diff - (((-1f * r.y) / Screen.height) * diff);
 
-			r.y += derp;
+			//r.y += derp;
 
-			rect.anchoredPosition = new Vector3(r.x, r.y, 0);
+			rect.anchoredPosition3D = new Vector3(r.x, r.y, 0);
 
 			rect.sizeDelta = new Vector2(r.width, r.height);
 
-			rect.position = new Vector3(rect.position.x, rect.position.y, 1);
+			//rect.position = new Vector3(rect.position.x, rect.position.y, 1);
 
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
-		}
+
+            clamp(rect, new RectOffset(100, 100, 200, 200));
+        }
 
 		public void SortMissionChildren(List<Guid> sorted)
 		{
