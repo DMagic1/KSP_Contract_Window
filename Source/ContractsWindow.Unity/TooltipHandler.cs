@@ -51,6 +51,8 @@ namespace ContractsWindow.Unity
 		private ToolTip _tooltip;
 		private float _scale;
 
+        private ScrollRect _windowScroll;
+
 		public int TooltipCount
 		{
 			get
@@ -102,6 +104,11 @@ namespace ContractsWindow.Unity
 			set { _prefab = value; }
 		}
 
+        public ScrollRect WindowScroll
+        {
+            set { _windowScroll = value; }
+        }
+
 		public float Scale
 		{
 			set { _scale = value; }
@@ -135,13 +142,8 @@ namespace ContractsWindow.Unity
 
 		public void OnScroll(PointerEventData eventData)
 		{
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Scroll == null)
-				return;
-
-			CW_Window.Window.Scroll.OnScroll(eventData);
+            if (_windowScroll != null)
+                _windowScroll.OnScroll(eventData);
 		}
 
 		private void OpenTooltip()
@@ -149,12 +151,8 @@ namespace ContractsWindow.Unity
 			if (_prefab == null || _canvas == null || _tooltipText == null || _tooltipText.Length <= 0)
 				return;
 
-			_tooltip = Instantiate(_prefab).GetComponent<ToolTip>();
-
-			if (_tooltip == null)
-				return;
-
-			_tooltip.transform.SetParent(_canvas.transform, false);
+			_tooltip = Instantiate(_prefab, _canvas.transform, false).GetComponent<ToolTip>();
+            
 			_tooltip.transform.SetAsLastSibling();
 
 			_tooltip.Setup(_canvas, _tooltipText[_tooltipIndex], _scale);
