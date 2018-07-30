@@ -24,7 +24,6 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
@@ -37,7 +36,7 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private TextHandler IntervalType = null;
 		[SerializeField]
-		private GameObject IntervalPrefab = null;
+		private CW_IntervalNode IntervalPrefab = null;
 		[SerializeField]
 		private Transform IntervalTransform = null;
 		[SerializeField]
@@ -46,9 +45,15 @@ namespace ContractsWindow.Unity.Unity
 		private List<CW_IntervalNode> nodes = new List<CW_IntervalNode>();
 		private IIntervalNode intervalInterface;
 
-		public IIntervalNode IntervalInterface
+		public bool IsReached
 		{
-			get { return intervalInterface; }
+			get
+            {
+                if (intervalInterface == null)
+                    return false;
+
+                return intervalInterface.IsReached;
+            }
 		}
 
 		public void setIntervalType(IIntervalNode node)
@@ -111,9 +116,7 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			for (int i = 1; i <= node.Intervals; i++)
-			{
 				CreateIntervalNode(node, i);
-			}
 		}
 
 		private void CreateIntervalNode(IIntervalNode node, int i)
@@ -121,18 +124,8 @@ namespace ContractsWindow.Unity.Unity
 			if (IntervalTransform == null || IntervalPrefab == null)
 				return;
 
-			GameObject obj = Instantiate(IntervalPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(IntervalTransform, false);
-
-			CW_IntervalNode nodeObject = obj.GetComponent<CW_IntervalNode>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_IntervalNode nodeObject = Instantiate(IntervalPrefab, IntervalTransform, false);
+            
 			nodeObject.setNode(node, i);
 
 			nodes.Add(nodeObject);

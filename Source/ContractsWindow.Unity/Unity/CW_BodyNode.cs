@@ -24,7 +24,6 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
@@ -37,7 +36,7 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private TextHandler BodyTitle = null;
 		[SerializeField]
-		private GameObject StandardPrefab = null;
+		private CW_StandardNode StandardPrefab = null;
 		[SerializeField]
 		private Transform StandardTransform = null;
 		[SerializeField]
@@ -75,14 +74,14 @@ namespace ContractsWindow.Unity.Unity
 
 		public void NodesOn(bool isOn)
 		{
-			if (CW_ProgressPanel.Instance == null)
-				return;
+			//if (CW_ProgressPanel.Instance == null)
+			//	return;
 
-			if (CW_ProgressPanel.Instance.PanelInterface == null)
-				return;
+			//if (CW_ProgressPanel.Instance.PanelInterface == null)
+			//	return;
 
-			if (!CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName))
-				return;
+			//if (!CW_ProgressPanel.Instance.PanelInterface.AnyBodyNode(bodyName))
+			//	return;
 
 			if (StandardTransform == null)
 				return;
@@ -98,24 +97,15 @@ namespace ContractsWindow.Unity.Unity
 
 				if (node == null)
 					continue;
-
-				if (node.StandardInterface == null)
-					continue;
-
+                
 				node.UpdateText();
 
-				node.gameObject.SetActive(isOn && node.StandardInterface.IsComplete);
+				node.gameObject.SetActive(isOn && node.IsComplete);
 			}
 		}
 
 		private void CreateBodyNodes(IList<IStandardNode> nodes)
 		{
-			if (CW_ProgressPanel.Instance == null)
-				return;
-
-			if (CW_ProgressPanel.Instance.PanelInterface == null)
-				return;
-
 			if (nodes == null)
 				return;
 
@@ -135,18 +125,8 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateBodyNode(IStandardNode node)
 		{
-			GameObject obj = Instantiate(StandardPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(StandardTransform, false);
-
-			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_StandardNode nodeObject = Instantiate(StandardPrefab, StandardTransform, false);
+            
 			nodeObject.setNode(node);
 
 			nodes.Add(nodeObject);

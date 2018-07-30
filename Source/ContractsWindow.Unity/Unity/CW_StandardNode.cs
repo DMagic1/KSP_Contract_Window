@@ -51,9 +51,15 @@ namespace ContractsWindow.Unity.Unity
 
 		private IStandardNode standardInterface;
 
-		public IStandardNode StandardInterface
+		public bool IsComplete
 		{
-			get { return standardInterface; }
+			get
+            {
+                if (standardInterface == null)
+                    return false;
+
+                return standardInterface.IsComplete;
+            }
 		}
 
 		public void setNode(IStandardNode node)

@@ -24,7 +24,7 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ContractsWindow.Unity.Interfaces;
@@ -36,17 +36,17 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_ProgressPanel : MonoBehaviour
 	{
 		[SerializeField]
-		private GameObject IntervalPrefab = null;
+		private CW_IntervalTypes IntervalPrefab = null;
 		[SerializeField]
 		private Transform IntervalTransform = null;
 		[SerializeField]
-		private GameObject StandardPrefab = null;
+		private CW_StandardNode StandardPrefab = null;
 		[SerializeField]
 		private Transform StandardTransform = null;
 		[SerializeField]
 		private Transform POITransform = null;
 		[SerializeField]
-		private GameObject BodyPrefab = null;
+		private CW_BodyNode BodyPrefab = null;
 		[SerializeField]
 		private Transform BodyTransform = null;
 		[SerializeField]
@@ -64,78 +64,128 @@ namespace ContractsWindow.Unity.Unity
 		private List<CW_StandardNode> standardNodes = new List<CW_StandardNode>();
 		private List<CW_BodyNode> bodyNodes = new List<CW_BodyNode>();
 
-		private static CW_ProgressPanel instance;
+        private Canvas panelCanvas;
 
-		public static CW_ProgressPanel Instance
-		{
-			get { return instance; }
-		}
+        private void Awake()
+        {
+            panelCanvas = GetComponent<Canvas>();
+        }
 
-		public IProgressPanel PanelInterface
-		{
-			get { return panelInterface; }
-		}
+        public IEnumerator GeneratePanel(IProgressPanel panel, bool active)
+        {
+            if (panel == null)
+                yield break;
 
-		private void Awake()
-		{
-			instance = this;
-		}
-		
-		public void setPanel(IProgressPanel panel)
-		{
-			if (panel == null)
-				return;
+            gameObject.SetActive(true);
 
-			panelInterface = panel;
+            panelCanvas.enabled = false;
 
-			CreateIntervalTypes(panel.GetIntervalNodes);
+            panelInterface = panel;
 
-			CreateStandardNodes(panel.GetStandardNodes);
+            if (panelInterface.GetIntervalNodes != null)
+            {
+                if (IntervalPrefab != null && IntervalTransform != null)
+                {
+                    for (int i = panelInterface.GetIntervalNodes.Count - 1; i >= 0; i--)
+                    {
+                        CreateIntervalType(panelInterface.GetIntervalNodes[i]);
 
-			CreatePOINodes(panel.GetPOINodes);
+                        yield return null;
+                    }
+                }
+            }
 
-			CreateBodies(panel.GetBodies);
+            if (panelInterface.GetStandardNodes != null)
+            {
+                if (StandardPrefab != null && StandardTransform != null)
+                {
+                    for (int i = panelInterface.GetStandardNodes.Count - 1; i >= 0; i--)
+                    {
+                        CreateStandardNode(panelInterface.GetStandardNodes[i]);
 
-			if (IntervalToggle != null)
-			{
-				IntervalToggle.gameObject.SetActive(panel.AnyInterval);
+                        yield return null;
+                    }
+                }
+            }
 
-				if (panel.IntervalVisible)
-					IntervalToggle.isOn = true;
-				else
-					ToggleIntervals(false);
-			}
+            if (panelInterface.GetPOINodes != null)
+            {
+                if (StandardPrefab != null && POITransform != null)
+                {
+                    for (int i = panelInterface.GetPOINodes.Count - 1; i >= 0; i--)
+                    {
+                        CreatePOINode(panelInterface.GetPOINodes[i]);
 
-			if (StandardToggle != null)
-			{
-				StandardToggle.gameObject.SetActive(panel.AnyStandard);
+                        yield return null;
+                    }
+                }
+            }
 
-				if (panel.StandardVisible)
-					StandardToggle.isOn = true;
-				else
-					ToggleStandards(false);
-			}
+            if (panelInterface.GetBodies != null)
+            {
+                if (BodyPrefab != null && BodyTransform != null)
+                {
+                    for (int i = panelInterface.GetBodies.Count - 1; i >= 0; i--)
+                    {
+                        string body = panelInterface.GetBodies.ElementAt(i).Key;
 
-			if (POIToggle != null)
-			{
-				POIToggle.gameObject.SetActive(panel.AnyPOI);
+                        CreateBody(body, panelInterface.GetBodies[body]);
 
-				if (panel.POIVisible)
-					POIToggle.isOn = true;
-				else
-					TogglePOIs(false);
-			}
+                        yield return null;
+                    }
+                }
+            }
 
-			if (BodyToggle != null)
-			{
-				BodyToggle.gameObject.SetActive(panel.AnyBody);
+            FinishPanel();
 
-				if (panel.BodyVisible)
-					BodyToggle.isOn = true;
-				else
-					ToggleBodies(false);
-			}
-		}
+            panelCanvas.enabled = true;
+
+            if (gameObject.activeSelf != active)
+                gameObject.SetActive(active);
+        }
+
+        private void FinishPanel()
+        {
+            if (IntervalToggle != null)
+            {
+                IntervalToggle.gameObject.SetActive(panelInterface.AnyInterval);
+
+                if (panelInterface.IntervalVisible)
+                    IntervalToggle.isOn = true;
+                else
+                    ToggleIntervals(false);
+            }
+
+            if (StandardToggle != null)
+            {
+                StandardToggle.gameObject.SetActive(panelInterface.AnyStandard);
+
+                if (panelInterface.StandardVisible)
+                    StandardToggle.isOn = true;
+                else
+                    ToggleStandards(false);
+            }
+
+            if (POIToggle != null)
+            {
+                POIToggle.gameObject.SetActive(panelInterface.AnyPOI);
+
+                if (panelInterface.POIVisible)
+                    POIToggle.isOn = true;
+                else
+                    TogglePOIs(false);
+            }
+
+            if (BodyToggle != null)
+            {
+                BodyToggle.gameObject.SetActive(panelInterface.AnyBody);
+
+                if (panelInterface.BodyVisible)
+                    BodyToggle.isOn = true;
+                else
+                    ToggleBodies(false);
+            }
+        }
 
 		public void Refresh()
 		{
@@ -170,11 +220,8 @@ namespace ContractsWindow.Unity.Unity
 
 						if (type == null)
 							continue;
-
-						if (type.IntervalInterface == null)
-							continue;
-
-						if (!type.IntervalInterface.IsReached)
+                        
+						if (!type.IsReached)
 							continue;
 
 						type.gameObject.SetActive(true);
@@ -226,11 +273,8 @@ namespace ContractsWindow.Unity.Unity
 
 				if (node == null)
 					continue;
-
-				if (node.IntervalInterface == null)
-					continue;
-
-				node.gameObject.SetActive(node.IntervalInterface.IsReached);
+                
+				node.gameObject.SetActive(node.IsReached);
 			}
 		}
 
@@ -252,13 +296,10 @@ namespace ContractsWindow.Unity.Unity
 
 				if (node == null)
 					continue;
-
-				if (node.StandardInterface == null)
-					continue;
-
+                
 				node.UpdateText();
 
-				node.gameObject.SetActive(node.StandardInterface.IsComplete);
+				node.gameObject.SetActive(node.IsComplete);
 			}
 		}
 
@@ -280,13 +321,10 @@ namespace ContractsWindow.Unity.Unity
 
 				if (node == null)
 					continue;
-
-				if (node.StandardInterface == null)
-					continue;
-
+                
 				node.UpdateText();
 
-				node.gameObject.SetActive(node.StandardInterface.IsComplete);
+				node.gameObject.SetActive(node.IsComplete);
 			}
 		}
 
@@ -312,165 +350,38 @@ namespace ContractsWindow.Unity.Unity
 				node.gameObject.SetActive(panelInterface.AnyBodyNode(node.BodyName));
 			}
 		}
-
-		private void CreateIntervalTypes(IList<IIntervalNode> nodes)
-		{
-			if (panelInterface == null)
-				return;
-
-			if (nodes.Count <= 0)
-				return;
-
-			if (IntervalPrefab == null || IntervalTransform == null)
-				return;
-
-			for (int i = nodes.Count - 1; i >= 0; i--)
-			{
-				IIntervalNode n = nodes[i];
-
-				CreateIntervalType(n);
-			}
-		}
-
+        
 		private void CreateIntervalType(IIntervalNode n)
 		{
-			GameObject obj = Instantiate(IntervalPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(IntervalTransform, false);
-
-			CW_IntervalTypes nodeObject = obj.GetComponent<CW_IntervalTypes>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_IntervalTypes nodeObject = Instantiate(IntervalPrefab, IntervalTransform, false);
+            
 			nodeObject.setIntervalType(n);
 
 			intervalTypes.Add(nodeObject);
 		}
-
-		private void CreatePOINodes(IList<IStandardNode> nodes)
-		{
-			if (panelInterface == null)
-				return;
-
-			if (nodes == null)
-				return;
-
-			if (StandardPrefab == null || POITransform == null)
-				return;
-
-			for (int i = nodes.Count - 1; i >= 0; i--)
-			{
-				IStandardNode node = nodes[i];
-
-				if (node == null)
-					continue;
-
-				CreatePOINode(node);
-			}
-		}
-
+        
 		private void CreatePOINode(IStandardNode node)
 		{
-			GameObject obj = Instantiate(StandardPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(POITransform, false);
-
-			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_StandardNode nodeObject = Instantiate(StandardPrefab, POITransform, false);
+            
 			nodeObject.setNode(node);
 
 			poiNodes.Add(nodeObject);
 		}
-
-		private void CreateStandardNodes(IList<IStandardNode> nodes)
-		{
-			if (panelInterface == null)
-				return;
-
-			if (nodes == null)
-				return;
-
-			if (StandardPrefab == null || StandardTransform == null)
-				return;
-
-			for (int i = nodes.Count - 1; i >= 0; i--)
-			{
-				IStandardNode node = nodes[i];
-
-				if (node == null)
-					continue;
-
-				CreateStandardNode(node);
-			}
-		}
-
+        
 		private void CreateStandardNode(IStandardNode node)
 		{
-			GameObject obj = Instantiate(StandardPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(StandardTransform, false);
-
-			CW_StandardNode nodeObject = obj.GetComponent<CW_StandardNode>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_StandardNode nodeObject = Instantiate(StandardPrefab, StandardTransform, false);
+            
 			nodeObject.setNode(node);
 
 			standardNodes.Add(nodeObject);
 		}
 
-		private void CreateBodies(Dictionary<string, List<IStandardNode>> bodies)
-		{
-			if (panelInterface == null)
-				return;
-
-			if (bodies.Count <= 0)
-				return;
-
-			if (BodyPrefab == null || BodyTransform == null)
-				return;
-
-			for (int i = bodies.Count - 1; i >= 0; i--)
-			{
-				string body = bodies.ElementAt(i).Key;
-
-				List<IStandardNode> nodes = bodies[body];
-
-				if (nodes.Count <= 0)
-					continue;
-
-				CreateBody(body, nodes);
-			}
-		}
-
 		private void CreateBody(string b, List<IStandardNode> n)
 		{
-			GameObject obj = Instantiate(BodyPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(BodyTransform, false);
-
-			CW_BodyNode nodeObject = obj.GetComponent<CW_BodyNode>();
-
-			if (nodeObject == null)
-				return;
-
+            CW_BodyNode nodeObject = Instantiate(BodyPrefab, BodyTransform, false);
+            
 			nodeObject.setBodyType(b, n);
 
 			bodyNodes.Add(nodeObject);
