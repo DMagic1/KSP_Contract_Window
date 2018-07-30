@@ -24,14 +24,11 @@ THE SOFTWARE.
 */
 #endregion
 
-using System.IO;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ContractsWindow.Unity;
 using ContractsWindow.Unity.Unity;
-using KSP.UI;
 using KSP.Localization;
 
 namespace ContractsWindow
@@ -46,7 +43,6 @@ namespace ContractsWindow
 		private static GameObject[] loadedPrefabs;
 		private static GameObject _windowPrefab;
 		private static GameObject _tooltipPrefab;
-		private static Canvas _canvasPrefab;
 		private static int currentFontAdjustment;
 		private static string path;
 
@@ -84,22 +80,12 @@ namespace ContractsWindow
 		{
 			get { return settings; }
 		}
-
-		public static AssetBundle Prefabs
-		{
-			get { return prefabs; }
-		}
-
+        
 		public static GameObject WindowPrefab
 		{
 			get { return _windowPrefab; }
 		}
-
-		public static Canvas CanvasPrefab
-		{
-			get { return _canvasPrefab; }
-		}
-
+        
 		public static void ToggleTooltips(bool isOn)
 		{
 			for (int i = loadedPrefabs.Length - 1; i >= 0; i--)
@@ -190,7 +176,7 @@ namespace ContractsWindow
             if (prefabsLoaded && skinLoaded)
             {
                 loaded = true;
-                DMC_MBE.LogFormatted("UI Loaded and Processed");
+                contractUtils.LogFormatted("UI Loaded and Processed");
             }
 
 			if (toolbarIcon == null)
@@ -349,9 +335,9 @@ namespace ContractsWindow
 				processUIPrefabs();
 
 			if (tmpProcessed && tooltipsProcessed && prefabsProcessed)
-				DMC_MBE.LogFormatted("UI prefab bundle loaded and processed");
+                contractUtils.LogFormatted("UI prefab bundle loaded and processed");
 			else
-				DMC_MBE.LogFormatted("Error in processing UI prefab bundle\nSome UI elements may be affected or non-functional");
+                contractUtils.LogFormatted("Error in processing UI prefab bundle\nSome UI elements may be affected or non-functional");
 
 			prefabsLoaded = true;
 		}
@@ -367,13 +353,6 @@ namespace ContractsWindow
 
 				if (o.name == "CW_Plus")
 					_windowPrefab = o;
-				else if (o.name == "CW_Canvas_Prefab")
-				{
-					Canvas c = o.GetComponent<Canvas>();
-
-					if (c != null)
-						_canvasPrefab = c;
-				}
 				else if (o.name == "CW_Tooltip")
 					_tooltipPrefab = o;
 
