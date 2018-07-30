@@ -24,12 +24,9 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using ContractParser;
 using ContractsWindow.Unity.Interfaces;
-using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity;
 using SentinelMission;
 
@@ -149,5 +146,10 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			get { return new List<IParameterSection>(subParams.ToArray()); }
 		}
+
+        public bool IsParameterEqual(IParameterSection paramater)
+        {
+            return ((parameterUIObject)paramater).container == container;
+        }
 	}
 }
