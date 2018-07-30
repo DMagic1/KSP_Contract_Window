@@ -4,8 +4,6 @@ Contract Utilities - Public utilities for accessing and altering internal inform
 
 Copyright (c) 2014 DMagic
 
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -27,15 +25,9 @@ THE SOFTWARE.
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using Contracts;
-using ContractsWindow.PanelInterfaces;
-using ContractsWindow.Unity;
-using ContractsWindow.Unity.Unity;
 using UnityEngine;
-using UnityEngine.UI;
 using ContractParser;
 
 namespace ContractsWindow
@@ -239,5 +231,76 @@ namespace ContractsWindow
 			}
 		}
 
-	}
+        internal static int currentScene(GameScenes s)
+        {
+            switch (s)
+            {
+                case GameScenes.FLIGHT:
+                    return 0;
+                case GameScenes.EDITOR:
+                    return 1;
+                case GameScenes.SPACECENTER:
+                    return 2;
+                case GameScenes.TRACKSTATION:
+                    return 3;
+                default:
+                    return 0;
+            }
+        }
+
+        //Convert array types into strings for storage
+        public static string stringConcat(int[] source, int i)
+        {
+            if (i == 0)
+                return "";
+            string[] s = new string[i];
+            for (int j = 0; j < i; j++)
+            {
+                s[j] = source[j].ToString();
+            }
+            return string.Join(",", s);
+        }
+
+        public static string stringConcat(bool[] source, int i)
+        {
+            if (i == 0)
+                return "";
+            string[] s = new string[i];
+            for (int j = 0; j < i; j++)
+            {
+                s[j] = source[j].ToString();
+            }
+            return string.Join(",", s);
+        }
+
+        //Convert strings into the appropriate arrays
+        public static int[] stringSplit(string source)
+        {
+            string[] s = source.Split(',');
+            int[] i = new int[s.Length];
+            for (int j = 0; j < s.Length; j++)
+            {
+                i[j] = int.Parse(s[j]);
+            }
+            return i;
+        }
+
+        public static bool[] stringSplitBool(string source)
+        {
+            string[] s = source.Split(',');
+            bool[] b = new bool[s.Length];
+            for (int j = 0; j < s.Length; j++)
+            {
+                b[j] = bool.Parse(s[j]);
+            }
+            return b;
+        }
+
+        public static void LogFormatted(String Message, params object[] strParams)
+        {
+            Message = String.Format(Message, strParams);
+            String strMessageLine = String.Format("[Contracts_Window_+] {0}, {1}", DateTime.Now, Message);
+            Debug.Log(strMessageLine);
+        }
+    }
 }
