@@ -25,10 +25,10 @@ THE SOFTWARE.
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using ContractsWindow.Unity.Interfaces;
 
 namespace ContractsWindow.Unity.Unity
@@ -36,11 +36,17 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_MissionSection : MonoBehaviour
 	{
 		[SerializeField]
-		private GameObject ContractSectionPrefab = null;
-		[SerializeField]
 		private Transform ActiveTransform = null;
 		[SerializeField]
 		private Transform HiddenTransform = null;
+
+        public delegate void ProcessTooltips();
+        public delegate void AddContractUI(IContractSection contract);
+
+        private ProcessTooltips OnProcessTooltips;
+        private AddContractUI OnAddContract;
+
+        private Transform ContractContainer;
 
 		private string missionTitle;
 		private IMissionSection missionInterface;
@@ -64,7 +70,14 @@ namespace ContractsWindow.Unity.Unity
 			get { return missionInterface; }
 		}
 
-		public void setMission(IMissionSection section)
+        public void Init(ProcessTooltips processTooltips, AddContractUI addContract, Transform container)
+        {
+            OnProcessTooltips = processTooltips;
+            OnAddContract = addContract;
+            ContractContainer = container;
+        }
+
+		public void setMission(IMissionSection section, Dictionary<Guid, CW_ContractSection> contracts)
 		{
 			if (section == null)
 				return;
@@ -73,8 +86,8 @@ namespace ContractsWindow.Unity.Unity
 
 			missionTitle = missionInterface.MissionTitle;
 
-			CreateContractSections(section.GetContracts);
-
+            AssignContracts(contracts, section.GetContracts);
+            
 			section.SetParent(this);
 
 			if (section.ShowHidden)
@@ -84,76 +97,93 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		private void CreateContractSections(IList<IContractSection> contracts)
-		{
-			if (contracts == null)
-				return;
+        private void AssignContracts(Dictionary<Guid, CW_ContractSection> contracts, IList<IContractSection> missionContracts)
+        {
+            if (ActiveTransform == null || HiddenTransform == null || contracts == null || missionContracts == null)
+                return;
 
-			if (ContractSectionPrefab == null || ActiveTransform == null || HiddenTransform == null)
-				return;
+            for (int i = missionContracts.Count - 1; i >= 0; i--)
+            {
+                IContractSection contract = missionContracts[i];
 
-			if (CW_Window.Window == null)
-				return;
+                if (masterList.ContainsKey(contract.ID))
+                    continue;
 
-			if (missionInterface == null)
-				return;
+                if (!contracts.ContainsKey(contract.ID))
+                    continue;
 
-			for (int i = contracts.Count - 1; i >= 0; i--)
-			{
-				IContractSection contract = contracts[i];
+                if (contract.IsHidden)
+                {
+                    contracts[contract.ID].transform.SetParent(HiddenTransform, false);
+                    contracts[contract.ID].UpdateContractState(contract);
+                    hiddenContracts.Add(contract.ID);
+                }
+                else
+                {
+                    contracts[contract.ID].transform.SetParent(ActiveTransform, false);
+                    contracts[contract.ID].UpdateContractState(contract);
+                    activeContracts.Add(contract.ID);
+                }
 
-				if (contract == null)
-					continue;
+                contracts[contract.ID].setMissionCallbacks(RemoveContract, SwitchContract);
 
-				if (masterList.ContainsKey(contract.ID))
-					continue;
+                masterList.Add(contract.ID, contracts[contract.ID]);
+            }
+        }
+        
+        public void ClearContracts()
+        {
+            for (int i = masterList.Count - 1; i >= 0; i--)
+                masterList.ElementAt(i).Value.transform.SetParent(ContractContainer, false);
 
-				CreateContractSection(contract);
-			}
-		}
+            masterList.Clear();
 
-		private void CreateContractSection(IContractSection contract)
-		{
-			GameObject obj = Instantiate(ContractSectionPrefab);
+            activeContracts.Clear();
+            hiddenContracts.Clear();
+        }
+        
+        public void AddContract(CW_ContractSection contract, IContractSection contractInterface)
+        {
+            if (contract == null)
+                return;
 
-			if (obj == null)
-				return;
+            if (missionInterface == null)
+                return;
 
-			obj.transform.SetParent(contract.IsHidden ? HiddenTransform : ActiveTransform, false);
+            if (masterList.ContainsKey(contractInterface.ID))
+                return;
 
-			CW_ContractSection contractObject = obj.GetComponent<CW_ContractSection>();
+            if (contractInterface.IsHidden)
+            {
+                contract.transform.SetParent(HiddenTransform, false);
+                hiddenContracts.Add(contractInterface.ID);
+            }
+            else
+            {
+                contract.transform.SetParent(ActiveTransform, false);
+                activeContracts.Add(contractInterface.ID);
+            }
 
-			if (contractObject == null)
-				return;
+            contract.setMissionCallbacks(RemoveContract, SwitchContract);
 
-			contractObject.setContract(contract, this);
+            masterList.Add(contractInterface.ID, contract);
+        }
 
-			if (contract.IsHidden)
-				hiddenContracts.Add(contract.ID);
-			else
-				activeContracts.Add(contract.ID);
+        public void AddContract(IContractSection contract)
+        {
+            if (contract == null)
+                return;
 
-			masterList.Add(contract.ID, contractObject);
-		}
+            if (missionInterface == null)
+                return;
 
-		public void AddContract(IContractSection contract)
-		{
-			if (contract == null)
-				return;
+            if (masterList.ContainsKey(contract.ID))
+                return;
 
-			if (missionInterface == null)
-				return;
+            OnAddContract.Invoke(contract);
+        }
 
-			if (masterList.ContainsKey(contract.ID))
-				return;
-
-			CreateContractSection(contract);
-
-			if (CW_Window.Window != null)
-				CW_Window.Window.ProcessTooltips();
-		}
-
-		private CW_ContractSection GetContract(Guid id)
+        private CW_ContractSection GetContract(Guid id)
 		{
 			if (masterList.ContainsKey(id))
 				return masterList[id];
@@ -161,7 +191,7 @@ namespace ContractsWindow.Unity.Unity
 			return null;
 		}
 
-		public void SwitchContract(Guid id, bool hidden)
+        public void SwitchContract(Guid id, bool hidden)
 		{
 			if (id == null)
 				return;
@@ -217,7 +247,7 @@ namespace ContractsWindow.Unity.Unity
 				if (c == null)
 					continue;
 
-				c.transform.SetParent(c.Interface.IsHidden ? HiddenTransform : ActiveTransform);
+				c.transform.SetParent(c.IsHidden ? HiddenTransform : ActiveTransform);
 			}
 		}
 
@@ -228,11 +258,41 @@ namespace ContractsWindow.Unity.Unity
 				if (contract == null)
 					continue;
 
-				contract.UpdateContract();
+				contract.RefreshContract();
 			}
 		}
 
-		public void RefreshContract(IContractSection contract)
+        private IEnumerator UpdateContracts()
+        {
+            if (missionInterface == null)
+                yield break;
+
+            WaitForSeconds wait = new WaitForSeconds(0.1f);
+
+            while(true)
+            {
+                if (missionInterface.ShowHidden)
+                {
+                    for (int i = hiddenContracts.Count - 1; i >= 0; i--)
+                    {
+                        if (masterList.ContainsKey(hiddenContracts[i]))
+                            masterList[hiddenContracts[i]].UpdateContract();
+                    }
+                }
+                else
+                {
+                    for (int i = activeContracts.Count - 1; i >= 0; i--)
+                    {
+                        if (masterList.ContainsKey(activeContracts[i]))
+                            masterList[activeContracts[i]].UpdateContract();
+                    }
+                }
+
+                yield return wait;
+            }
+        }
+        
+        public void RefreshContract(IContractSection contract)
 		{
 			if (contract == null)
 				return;
@@ -242,10 +302,11 @@ namespace ContractsWindow.Unity.Unity
 			if (c == null)
 				return;
 
+            c.RefreshContract(true);
+
 			c.RefreshParameters();
 
-			if (CW_Window.Window != null)
-				CW_Window.Window.ProcessTooltips();
+            OnProcessTooltips.Invoke();
 		}
 
 		public void RemoveContract(Guid id)
@@ -277,17 +338,7 @@ namespace ContractsWindow.Unity.Unity
 
 			return false;
 		}
-
-		public void SetMissionVisible(bool isOn)
-		{
-			if (missionInterface == null)
-				return;
-
-			missionInterface.IsVisible = isOn;
-			
-			gameObject.SetActive(isOn);
-		}
-
+        
 		public void ToggleContracts(bool showHidden)
 		{
 			if (ActiveTransform == null || HiddenTransform == null)
