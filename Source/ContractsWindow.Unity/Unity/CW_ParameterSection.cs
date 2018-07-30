@@ -24,7 +24,6 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,12 +58,13 @@ namespace ContractsWindow.Unity.Unity
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
 		private Color subColor = new Color(0.8470588f, 0.8627451f, 0.8392157f, 1f);
+
 		private ContractState oldState;
 		private IParameterSection parameterInterface;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
-		private CW_ContractSection root;
+        private CW_ParameterSection paramPrefab;
 
-		public void setParameter(IParameterSection section, CW_ContractSection c)
+		public void setParameter(IParameterSection section, CW_ParameterSection prefab, bool showParams)
 		{
 			if (section == null)
 				return;
@@ -74,11 +74,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (Spacer == null || ParameterLayout == null)
 				return;
-
-			if (c == null)
-				return;
-
-			root = c;
+            
+            paramPrefab = prefab;
 
 			parameterInterface = section;
 
@@ -101,17 +98,71 @@ namespace ContractsWindow.Unity.Unity
 
 			if (parameterInterface.ParamLayer < 4 && subParams.Count > 0)
 			{
-				CreateSubParameters(subParams);
+				CreateSubParameters(subParams, showParams);
 
-				if (c.Interface.ShowParams)
+				if (showParams && parameterInterface.ParameterState != ContractState.Complete)
 				{
-					if (SubParamTransform != null && parameterInterface.ParameterState != ContractState.Complete)
+					if (SubParamTransform != null)
 						SubParamTransform.gameObject.SetActive(true);
 				}
+                else
+                {
+                    if (SubParamTransform != null)
+                        SubParamTransform.gameObject.SetActive(false);
+                }
 			}
-		}
+            else
+            {
+                if (SubParamTransform != null)
+                    SubParamTransform.gameObject.SetActive(false);
+            }
+        }
 
-		public void UpdateParameter()
+        public void UpdateParameterState(IParameterSection section, bool showParams)
+        {
+            parameterInterface = section;
+
+            ParameterText.OnTextUpdate.Invoke(parameterInterface.TitleText);
+
+            ParameterRewardText.OnTextUpdate.Invoke(parameterInterface.RewardText);
+
+            ParameterPenaltyText.OnTextUpdate.Invoke(parameterInterface.PenaltyText);
+
+            oldState = parameterInterface.ParameterState;
+
+            if (section.ParamLayer < 4 && section.GetSubParams != null && parameters != null)
+            {
+                for (int i = parameters.Count - 1; i >= 0; i--)
+                {
+                    CW_ParameterSection uiParam = parameters[i];
+
+                    for (int j = section.GetSubParams.Count - 1; j >= 0; j--)
+                    {
+                        IParameterSection param = section.GetSubParams[j];
+
+                        if (uiParam.ParameterUIEqualTo(param))
+                        {
+                            uiParam.UpdateParameterState(param, showParams);
+
+                            break;
+                        }
+                    }
+                }
+
+                if (SubParamTransform != null && parameterInterface.ParameterState != ContractState.Complete)
+                    SubParamTransform.gameObject.SetActive(showParams);
+            }
+        }
+
+        public bool ParameterUIEqualTo(IParameterSection param)
+        {
+            if (param == null || parameterInterface == null)
+                return false;
+
+            return parameterInterface.IsParameterEqual(param);
+        }
+
+        public void RefreshParameter()
 		{
 			if (parameterInterface == null)
 				return;
@@ -125,14 +176,26 @@ namespace ContractsWindow.Unity.Unity
 					if (param == null)
 						return;
 
-					param.UpdateParameter();
+					param.RefreshParameter();
 				}
 			}
 
 			if (ParameterText == null || ParameterRewardText == null || ParameterPenaltyText == null)
 				return;
 
-			ParameterText.OnTextUpdate.Invoke(parameterInterface.TitleText);
+            if (oldState != parameterInterface.ParameterState)
+            {
+                oldState = parameterInterface.ParameterState;
+
+                if (oldState != ContractState.Active)
+                    ToggleSubParams(false);
+                else
+                    ToggleSubParams(true);
+            }
+
+            ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
+
+            ParameterText.OnTextUpdate.Invoke(parameterInterface.TitleText);
 
 			ParameterRewardText.OnTextUpdate.Invoke(parameterInterface.RewardText);
 
@@ -161,24 +224,43 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		private void Update()
-		{
-			if (parameterInterface == null)
-				return;
+        public void UpdateParameter()
+        {
+            if (parameterInterface == null)
+                return;
 
-			if (oldState != parameterInterface.ParameterState)
-			{
-				oldState = parameterInterface.ParameterState;
+            if (oldState != parameterInterface.ParameterState)
+            {
+                oldState = parameterInterface.ParameterState;
 
-				if (oldState != ContractState.Active)
-					ToggleSubParams(false);
-				else
-					ToggleSubParams(true);
-			}
+                if (oldState != ContractState.Active)
+                    ToggleSubParams(false);
+                else
+                    ToggleSubParams(true);
+            }
+
+            if (ParameterText != null)
+                ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
+        }
+
+		//private void Update()
+		//{
+		//	if (parameterInterface == null)
+		//		return;
+
+		//	if (oldState != parameterInterface.ParameterState)
+		//	{
+		//		oldState = parameterInterface.ParameterState;
+
+		//		if (oldState != ContractState.Active)
+		//			ToggleSubParams(false);
+		//		else
+		//			ToggleSubParams(true);
+		//	}
 			
-			if (ParameterText != null)
-				ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
-		}
+		//	if (ParameterText != null)
+		//		ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
+		//}
 
 		public void ToggleNote(bool isOn)
 		{
@@ -237,7 +319,7 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		private void CreateSubParameters(IList<IParameterSection> sections)
+		private void CreateSubParameters(IList<IParameterSection> sections, bool show)
 		{
 			if (sections == null)
 				return;
@@ -245,7 +327,7 @@ namespace ContractsWindow.Unity.Unity
 			if (parameterInterface == null)
 				return;
 
-			if (root == null || root.ParamPrefab == null || SubParamTransform == null)
+			if (paramPrefab == null || SubParamTransform == null)
 				return;
 
 			for (int i = 0; i < sections.Count; i++)
@@ -255,25 +337,15 @@ namespace ContractsWindow.Unity.Unity
 				if (section == null)
 					continue;
 
-				CreateSubParameter(section);
+				CreateSubParameter(section, show);
 			}
 		}
 
-		private void CreateSubParameter(IParameterSection section)
+		private void CreateSubParameter(IParameterSection section, bool show)
 		{
-			GameObject obj = Instantiate(root.ParamPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(SubParamTransform, false);
-
-			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
-
-			if (paramObject == null)
-				return;
-
-			paramObject.setParameter(section, root);
+            CW_ParameterSection paramObject = Instantiate(paramPrefab, SubParamTransform, false);
+            
+			paramObject.setParameter(section, paramPrefab, show);
 
 			parameters.Add(paramObject);
 		}

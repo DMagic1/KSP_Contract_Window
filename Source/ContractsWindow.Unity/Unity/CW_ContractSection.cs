@@ -32,90 +32,98 @@ using ContractsWindow.Unity.Interfaces;
 
 namespace ContractsWindow.Unity.Unity
 {
-	public class CW_ContractSection : MonoBehaviour
-	{
-		[SerializeField]
-		private TextHandler ContractTitle = null;
-		[SerializeField]
-		private Image Stars = null;
-		[SerializeField]
-		private TextHandler TimeRemaining = null;
-		[SerializeField]
-		private TextHandler ContractRewardText = null;
-		[SerializeField]
-		private TextHandler ContractPenaltyText = null;
-		[SerializeField]
-		private GameObject NoteContainer = null;
-		[SerializeField]
-		private TextHandler NoteText = null;
-		[SerializeField]
-		private GameObject ParameterSectionPrefab = null;
-		[SerializeField]
-		private Transform ParameterSectionTransform = null;
-		[SerializeField]
-		private Sprite Stars_One = null;
-		[SerializeField]
-		private Sprite Stars_Two = null;
-		[SerializeField]
-		private Sprite Stars_Three = null;
-		[SerializeField]
-		private TextHighlighter Highlighter = null;
-		[SerializeField]
-		private Toggle ContractNoteToggle = null;
-		[SerializeField]
-		private ToggleSpriteHandler EyesHandler = null;
-		[SerializeField]
-		private Toggle EyesToggle = null;
-		[SerializeField]
-		private Toggle PinToggle = null;
-		[SerializeField]
-		private Toggle ParamToggle = null;
-		[SerializeField]
-		private TooltipHandler EyesTooltip = null;
-		[SerializeField]
-		private TooltipHandler PinTooltip = null;
-		[SerializeField]
-		private TooltipHandler NoteTooltip = null;
+    public class CW_ContractSection : MonoBehaviour
+    {
+        [SerializeField]
+        private TextHandler ContractTitle = null;
+        [SerializeField]
+        private Image Stars = null;
+        [SerializeField]
+        private TextHandler TimeRemaining = null;
+        [SerializeField]
+        private TextHandler ContractRewardText = null;
+        [SerializeField]
+        private TextHandler ContractPenaltyText = null;
+        [SerializeField]
+        private GameObject NoteContainer = null;
+        [SerializeField]
+        private TextHandler NoteText = null;
+        [SerializeField]
+        private CW_ParameterSection ParameterSectionPrefab = null;
+        [SerializeField]
+        private Transform ParameterSectionTransform = null;
+        [SerializeField]
+        private Sprite Stars_One = null;
+        [SerializeField]
+        private Sprite Stars_Two = null;
+        [SerializeField]
+        private Sprite Stars_Three = null;
+        [SerializeField]
+        private TextHighlighter Highlighter = null;
+        [SerializeField]
+        private Toggle ContractNoteToggle = null;
+        [SerializeField]
+        private ToggleSpriteHandler EyesHandler = null;
+        [SerializeField]
+        private Toggle EyesToggle = null;
+        [SerializeField]
+        private Toggle PinToggle = null;
+        [SerializeField]
+        private Toggle ParamToggle = null;
+        [SerializeField]
+        private TooltipHandler EyesTooltip = null;
+        [SerializeField]
+        private TooltipHandler PinTooltip = null;
+        [SerializeField]
+        private TooltipHandler NoteTooltip = null;
 
-		private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
+        public delegate void ContractRemove(Guid id);
+        public delegate void ContractSwitch(Guid id, bool isOn);
+        public delegate void ShowAgency(IContractSection contract);
+        public delegate void ShowMissionAdd(IContractSection contract);
+
+        private ContractRemove OnContractRemove;
+        private ContractSwitch OnContractSwitch;
+        private ShowAgency OnShowAgency;
+        private ShowMissionAdd OnShowMissionAd;
+
+        private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
 		private Color timerWarningColor = new Color(0.7803922f, 0.7568628f, 0.04705882f, 1f);
 
 		private IContractSection contractInterface;
 		private List<CW_ParameterSection> parameters = new List<CW_ParameterSection>();
-		private CW_MissionSection parent;
 		private bool loaded;
 
-		public IContractSection Interface
+		public bool IsHidden
 		{
-			get { return contractInterface; }
-		}
+			get
+            {
+                if (contractInterface == null)
+                    return false;
 
-		public GameObject ParamPrefab
-		{
-			get { return ParameterSectionPrefab; }
+                return contractInterface.IsHidden;
+            }
 		}
-
-		public void setContract(IContractSection contract, CW_MissionSection mission)
+        
+		public void setContract(IContractSection contract, ShowAgency showAgency, ShowMissionAdd showMissionAdd, ScrollRect scroller)
 		{
 			if (contract == null)
 				return;
-
-			if (mission == null)
-				return;
-
+            
 			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null || ParamToggle == null)
 				return;
-
-			parent = mission;
-
+            
 			contractInterface = contract;
+
+            OnShowAgency = showAgency;
+            OnShowMissionAd = showMissionAdd;
 
 			ContractTitle.OnTextUpdate.Invoke(contract.ContractTitle);
 
-			if (CW_Window.Window != null && CW_Window.Window.Scroll != null && Highlighter != null)
-				Highlighter.setScroller(CW_Window.Window.Scroll);
+			if (Highlighter != null)
+				Highlighter.setScroller(scroller);
 
 			handleColors(stateColor(contract.ContractState));
 
@@ -135,58 +143,127 @@ namespace ContractsWindow.Unity.Unity
 			loaded = true;
 		}
 
-		public void UpdateContract()
+        public void UpdateContractState(IContractSection contract)
+        {
+            if (contract == null)
+                return;
+
+            loaded = false;
+
+            contractInterface = contract;
+
+            ContractTitle.OnTextUpdate.Invoke(contract.ContractTitle);
+
+            handleColors(stateColor(contract.ContractState));
+
+            ContractRewardText.OnTextUpdate.Invoke(contract.RewardText);
+
+            ContractPenaltyText.OnTextUpdate.Invoke(contract.PenaltyText);
+
+            ParamToggle.isOn = contract.ShowParams;
+
+            prepareHeader();
+
+            if (contract.GetParameters != null && parameters != null)
+            {
+                for (int i = parameters.Count - 1; i >= 0; i--)
+                {
+                    CW_ParameterSection uiParam = parameters[i];
+
+                    for (int j = contract.GetParameters.Count - 1; j >= 0; j--)
+                    {
+                        IParameterSection param = contract.GetParameters[j];
+
+                        if (uiParam.ParameterUIEqualTo(param))
+                        {
+                            uiParam.UpdateParameterState(param, contract.ShowParams);
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (ParameterSectionTransform != null)
+                ParameterSectionTransform.gameObject.SetActive(contract.ShowParams);
+
+            loaded = true;
+        }
+
+        public void setMissionCallbacks(ContractRemove onContractRemove, ContractSwitch onContractSwitch)
+        {
+            OnContractRemove = onContractRemove;
+            OnContractSwitch = onContractSwitch;
+        }
+
+        public void RefreshContract(bool contractOnly = false)
 		{
 			if (contractInterface == null)
 				return;
 
-			if (contractInterface.ShowParams)
-			{
-				for (int i = parameters.Count - 1; i >= 0; i--)
-				{
-					CW_ParameterSection param = parameters[i];
+            if (contractOnly)
+            {
+                if (contractInterface.ShowParams)
+                {
+                    for (int i = parameters.Count - 1; i >= 0; i--)
+                    {
+                        CW_ParameterSection param = parameters[i];
 
-					if (param == null)
-						return;
+                        if (param == null)
+                            return;
 
-					param.UpdateParameter();
-				}
-			}
+                        param.RefreshParameter();
+                    }
+                }
+            }
 
 			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
 				return;
 
-			ContractTitle.OnTextUpdate.Invoke(contractInterface.ContractTitle);
+            if (contractInterface.ContractState != ContractState.Active)
+                ToggleToClose();
+
+            if (Highlighter != null && !Highlighter.Hover)
+                handleColors(stateColor(contractInterface.ContractState));
+
+            if (TimeRemaining != null)
+            {
+                TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
+
+                TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
+            }
+
+            ContractTitle.OnTextUpdate.Invoke(contractInterface.ContractTitle);
 
 			ContractRewardText.OnTextUpdate.Invoke(contractInterface.RewardText);
 
 			ContractPenaltyText.OnTextUpdate.Invoke(contractInterface.PenaltyText);
 		}
+        
+        public void UpdateContract()
+        {
+            if (contractInterface == null)
+                return;
 
-		private void Update()
-		{
-			if (contractInterface == null)
-				return;
+            if (contractInterface.ContractState != ContractState.Active)
+                ToggleToClose();
 
-			if (parent == null)
-				return;
+            if (ContractTitle != null && Highlighter != null && !Highlighter.Hover)
+                handleColors(stateColor(contractInterface.ContractState));
 
-			if (contractInterface.IsHidden && !parent.MissionInterface.ShowHidden)
-				return;
+            if (TimeRemaining != null)
+            {
+                TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
 
-			if (contractInterface.ContractState != ContractState.Active)
-				ToggleToClose();
-
-			if (ContractTitle != null && Highlighter != null && !Highlighter.Hover)
-				handleColors(stateColor(contractInterface.ContractState));
-
-			if (TimeRemaining != null)
-			{
-				TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
-
-				TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
-			}
-		}
+                TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
+            }
+            
+            if (contractInterface.ShowParams)
+            {
+                for (int i = parameters.Count - 1; i >= 0; i--)
+                    parameters[i].UpdateParameter();
+            }
+        }
 
 		public void RefreshParameters()
 		{
@@ -209,16 +286,13 @@ namespace ContractsWindow.Unity.Unity
 
 			CreateParameterSections(contractInterface.GetParameters);
 		}
-
+        
 		public void ShowAgent()
 		{
 			if (contractInterface == null)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.ShowAgentWindow(contractInterface);
+            OnShowAgency.Invoke(contractInterface);
 		}
 
 		public void ToggleToClose()
@@ -239,17 +313,11 @@ namespace ContractsWindow.Unity.Unity
 
 			if (contractInterface == null)
 				return;
-
-			if (parent == null)
-				return;
-
+            
 			if (contractInterface.ContractState != ContractState.Active)
 			{
-				if (parent == null)
-					return;
-
-				parent.RemoveContract(contractInterface.ID);
-
+                OnContractRemove(contractInterface.ID);
+                
 				contractInterface.RemoveContractFromAll();
 				return;
 			}
@@ -257,7 +325,7 @@ namespace ContractsWindow.Unity.Unity
 			if (EyesTooltip != null)
 				EyesTooltip.TooltipIndex = isOn ? 1 : 0;
 
-			parent.SwitchContract(contractInterface.ID, isOn);
+            OnContractSwitch(contractInterface.ID, isOn);
 
 			if (ParamToggle != null)
 				ParamToggle.isOn = !isOn;
@@ -284,10 +352,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.ShowMissionAddWindow(contractInterface);
+            OnShowMissionAd.Invoke(contractInterface);
 		}
 
 		public void ShowNote(bool isOn)
@@ -421,19 +486,9 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateParameterSection(IParameterSection section)
 		{
-			GameObject obj = Instantiate(ParameterSectionPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(ParameterSectionTransform, false);
-
-			CW_ParameterSection paramObject = obj.GetComponent<CW_ParameterSection>();
-
-			if (paramObject == null)
-				return;
-
-			paramObject.setParameter(section, this);
+            CW_ParameterSection paramObject = Instantiate(ParameterSectionPrefab, ParameterSectionTransform, false);
+            
+			paramObject.setParameter(section, ParameterSectionPrefab, contractInterface.ShowParams);
 
 			parameters.Add(paramObject);
 		}
