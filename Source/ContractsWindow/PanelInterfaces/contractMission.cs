@@ -4,8 +4,6 @@ Contract Mission - Object to hold info about a mission list
 
 Copyright (c) 2014 DMagic
 
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -29,7 +27,6 @@ THE SOFTWARE.
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 using ContractParser;
 using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity.Interfaces;
@@ -137,9 +134,9 @@ namespace ContractsWindow.PanelInterfaces
 			addContract(((contractUIObject)contract).Container, !contract.IsHidden, false);
 		}
 		
-		public bool ContractContained(IContractSection contract)
+		public bool ContractContained(Guid contract)
 		{
-			return contractList.ContainsKey(contract.ID);
+			return contractList.ContainsKey(contract);
 		}
 		
 		public IList<IContractSection> GetContracts
@@ -245,6 +242,14 @@ namespace ContractsWindow.PanelInterfaces
 			return currentVessels.ContainsKey(v.id);
 		}
 
+        public void RefreshContract(Guid id)
+        {
+            IContractSection contract = getContract(id);
+
+            if (contract != null)
+                RefreshContract(contract);
+        }
+
 		public void RefreshContract(IContractSection contract)
 		{
 			if (contract == null)
@@ -286,6 +291,7 @@ namespace ContractsWindow.PanelInterfaces
 			if (contractList.ContainsKey(id))
 			{
 				contractUIObject c = contractList[id];
+
 				if (c.Container == null)
 					return null;
 				else
@@ -294,12 +300,7 @@ namespace ContractsWindow.PanelInterfaces
 			else
 				return null;
 		}
-
-		internal bool containsContract(Guid id)
-		{
-			return contractList.ContainsKey(id);
-		}
-
+        
 		internal void buildMissionList()
 		{
 			resetMasterList();
@@ -307,6 +308,7 @@ namespace ContractsWindow.PanelInterfaces
 			buildMissionList(activeString, true);
 			buildMissionList(hiddenString, false);
 			buildVesselList(vesselIDString);
+            contractUtils.LogFormatted("Processing Mission: {0}\nActive Contracts: {1} - Hidden Contracts: {2}", _missionTitle, activeMissionList.Count, hiddenMissionList.Count);
 		}
 
 		private void buildMissionList(string s, bool Active)
@@ -316,23 +318,30 @@ namespace ContractsWindow.PanelInterfaces
 			else
 			{
 				string[] sA = s.Split(',');
+
 				for (int i = 0; i < sA.Length; i++)
 				{
 					contractContainer c = null;
 					contractUIObject cUI = null;
+
 					string[] sB = sA[i].Split('|');
+
 					try
 					{
 						Guid g = new Guid(sB[0]);
+
 						if (g == null)
 							continue;
 
 						c = contractParser.getActiveContract(g);
+
 						if (c == null)
 							continue;
 
 						addContract(c, Active, true);
+
 						cUI = getContract(g);
+
 						if (cUI == null)
 							continue;
 
@@ -342,7 +351,7 @@ namespace ContractsWindow.PanelInterfaces
 					}
 					catch (Exception e)
 					{
-						DMC_MBE.LogFormatted("Guid invalid: {0}", e);
+                        contractUtils.LogFormatted("Guid invalid: {0}", e);
 						continue;
 					}
 				}
@@ -353,26 +362,31 @@ namespace ContractsWindow.PanelInterfaces
 		{
 			List<contractUIObject> temp = new List<contractUIObject>();
 			List<Guid> idTemp = new List<Guid>();
+
 			foreach (Guid id in gID)
 			{
 				contractUIObject c = getContract(id);
+
 				if (c != null)
 				{
 					if (c.Order != null)
 						temp.Add(c);
 				}
 			}
+
 			if (temp.Count > 0)
 			{
 				temp.Sort((a, b) =>
 				{
 					return Comparer<int?>.Default.Compare(a.Order, b.Order);
 				});
-				foreach (contractUIObject c in temp)
-				{
-					idTemp.Add(c.Container.Root.ContractGuid);
+
+                for (int i = 0; i < temp.Count; i++)
+                {
+                    idTemp.Add(temp[i].Container.Root.ContractGuid);
 				}
 			}
+
 			return idTemp;
 		}
 
@@ -404,7 +418,7 @@ namespace ContractsWindow.PanelInterfaces
 				}
 			}
 			else if (warn)
-				DMC_MBE.LogFormatted("Mission List Already Contains Contract: {0}", c.Title);
+                contractUtils.LogFormatted("Mission List Already Contains Contract: {0}", c.Title);
 		}
 
 		private bool addToMasterList(contractContainer c, bool add = false)
@@ -421,7 +435,7 @@ namespace ContractsWindow.PanelInterfaces
 				return true;
 			}
 			else
-				DMC_MBE.LogFormatted("Master Mission List For: [{0}] Already Contains Contract: [{1}]", _missionTitle, c.Title);
+                contractUtils.LogFormatted("Master Mission List For: [{0}] Already Contains Contract: [{1}]", _missionTitle, c.Title);
 
 			return false;
 		}
@@ -454,7 +468,7 @@ namespace ContractsWindow.PanelInterfaces
 			if (!currentVessels.ContainsKey(v.id))
 				currentVessels.Add(v.id, v);
 			else if (warn)
-				DMC_MBE.LogFormatted("Mission [{0}] Vessel List Already Contains A Vessel With ID: [{1}] And Title [{2}]", _missionTitle, v.id, v.vesselName);
+                contractUtils.LogFormatted("Mission [{0}] Vessel List Already Contains A Vessel With ID: [{1}] And Title [{2}]", _missionTitle, v.id, v.vesselName);
 		}
 
 		private void removeFromVessels(Vessel v, bool warn = true)
@@ -462,25 +476,32 @@ namespace ContractsWindow.PanelInterfaces
 			if (currentVessels.ContainsKey(v.id))
 				currentVessels.Remove(v.id);
 			else if (warn)
-				DMC_MBE.LogFormatted("Mission [{0}] Vessel List Does Not Contain A Vessel With ID: [{1}] And Title [{2}]", _missionTitle, v.id, v.vesselName);
+                contractUtils.LogFormatted("Mission [{0}] Vessel List Does Not Contain A Vessel With ID: [{1}] And Title [{2}]", _missionTitle, v.id, v.vesselName);
 		}
 
 		internal string stringConcat(List<Guid> source)
 		{
 			if (source.Count == 0)
 				return "";
+
 			List<string> s = new List<string>();
+
 			for (int j = 0; j < source.Count; j++)
 			{
 				contractUIObject c = getContract(source[j]);
+
 				if (c == null)
 					continue;
+
 				string i;
+
 				if (c.Order == null)
 					i = "N";
 				else
 					i = c.Order.ToString();
+
 				string id = string.Format("{0}|{1}|{2}", source[j], i, c.ShowParams);
+
 				s.Add(id);
 			}
 
@@ -513,9 +534,12 @@ namespace ContractsWindow.PanelInterfaces
 		private string vesselConcat(List<Vessel> v)
 		{
 			int i = v.Count;
+
 			if (i <= 0)
 				return "";
+
 			string[] s = new string[i];
+
 			for (int j = 0; j < i; j++)
 			{
 				if (v[j] != null)
@@ -549,7 +573,7 @@ namespace ContractsWindow.PanelInterfaces
 				}
 				catch (Exception e)
 				{
-					DMC_MBE.LogFormatted("Guid invalid: {0} for mission [{1}]", e, _missionTitle);
+                    contractUtils.LogFormatted("Guid invalid: {0} for mission [{1}]", e, _missionTitle);
 				}
 			}
 
