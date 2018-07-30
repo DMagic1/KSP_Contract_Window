@@ -24,12 +24,9 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
-using ContractsWindow.Unity.Unity;
 using ProgressParser;
-using UnityEngine;
 
 namespace ContractsWindow.PanelInterfaces
 {

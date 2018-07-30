@@ -24,9 +24,6 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-
 namespace ContractsWindow.Unity
 {
 	public enum ContractState

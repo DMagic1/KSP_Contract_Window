@@ -24,11 +24,8 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {

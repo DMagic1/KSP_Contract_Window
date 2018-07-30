@@ -4,8 +4,6 @@ Contract UI Object - Object used for contracts in different mission lists
 
 Copyright (c) 2014 DMagic
 
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,11 +26,9 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using ContractParser;
 using ContractsWindow.Unity.Interfaces;
-using ContractsWindow.Unity.Unity;
 using ContractsWindow.Unity;
 
 namespace ContractsWindow.PanelInterfaces

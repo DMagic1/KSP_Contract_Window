@@ -24,12 +24,8 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using KSPAchievements;
 using ContractsWindow.Unity.Interfaces;
 using ProgressParser;
-using UnityEngine;
 using KSP.Localization;
 
 namespace ContractsWindow.PanelInterfaces
