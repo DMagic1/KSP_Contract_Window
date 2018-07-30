@@ -26,9 +26,7 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using ContractsWindow.Unity.Unity;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Interfaces
 {
@@ -61,23 +59,25 @@ namespace ContractsWindow.Unity.Interfaces
 		string AllMissionTitle { get; }
 
 		string ProgressTitle { get; }
-
-		Canvas MainCanvas { get; }
-
+        
 		Canvas TooltipCanvas { get; }
 
 		IList<IMissionSection> GetMissions { get; }
 
-		IMissionSection GetCurrentMission { get; }
+        IList<IContractSection> GetAllContracts { get; }
+
+        IMissionSection GetCurrentMission { get; }
 
 		IProgressPanel GetProgressPanel { get; }
 
+        Transform ContractStorageContainer { get; }
+
 		void Rebuild();
+
+        void RefreshContracts();
 
 		void NewMission(string title, Guid id);
 
 		void SetWindowPosition(Rect r);
-
-		void SetAsLastSibling();
 	}
 }

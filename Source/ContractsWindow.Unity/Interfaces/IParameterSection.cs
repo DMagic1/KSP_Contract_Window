@@ -46,5 +46,7 @@ namespace ContractsWindow.Unity.Interfaces
 		string GetNote { get; }
 
 		IList<IParameterSection> GetSubParams { get; }
-	}
+
+        bool IsParameterEqual(IParameterSection parameter);
+    }
 }

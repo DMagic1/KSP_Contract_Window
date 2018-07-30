@@ -41,7 +41,7 @@ namespace ContractsWindow.Unity.Interfaces
 
 		bool MasterMission { get; }
 
-		bool ContractContained(IContractSection contract);
+		bool ContractContained(Guid contract);
 
 		bool DescendingOrder { get; set; }
 
