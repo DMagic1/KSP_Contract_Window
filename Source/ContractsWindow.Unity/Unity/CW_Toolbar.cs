@@ -42,34 +42,46 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Toggle StockUIStyle = null;
 
-		private bool loaded;
+        public delegate void StockToolbarToggle(bool isOn);
+        public delegate void ReplaceToolbarToggle(bool isOn);
+        public delegate void StockUIToggle(bool isOn);
 
-		public void setToolbar()
+        private StockToolbarToggle OnStockToolbarToggle;
+        private ReplaceToolbarToggle OnReplaceToolbarToggle;
+        private StockUIToggle OnStockUIToggle;
+
+        private bool loaded;
+        private bool _blizzyAvailable;
+
+		public void setToolbar(bool stockToolbar, bool blizzyAvailable, bool replaceStock, bool stockUI
+            , StockToolbarToggle stockToolbarToggle, ReplaceToolbarToggle replaceToolbarToggle, StockUIToggle stockUIToggle, PopupFade popupFade)
 		{
-			if (CW_Window.Window == null)
-				return;
+            OnStockToolbarToggle = stockToolbarToggle;
+            OnReplaceToolbarToggle = replaceToolbarToggle;
+            OnStockUIToggle = stockUIToggle;
+            OnPopupFade = popupFade;
 
-			if (CW_Window.Window.Interface == null)
-				return;
+            _blizzyAvailable = blizzyAvailable;
 
-			if (StockToggle != null)
+
+            if (StockToggle != null)
 			{
-				StockToggle.isOn = CW_Window.Window.Interface.StockToolbar;
+				StockToggle.isOn = stockToolbar;
 
-				if (!CW_Window.Window.Interface.BlizzyAvailable)
+				if (!blizzyAvailable)
 					StockToggle.gameObject.SetActive(false);
 			}
 
 			if (StockReplace != null)
 			{
-				StockReplace.isOn = CW_Window.Window.Interface.ReplaceToolbar;
+				StockReplace.isOn = replaceStock;
 
-				if (!CW_Window.Window.Interface.StockToolbar)
+				if (!stockToolbar)
 					StockReplace.gameObject.SetActive(false);
 			}
 
 			if (StockUIStyle != null)
-				StockUIStyle.isOn = CW_Window.Window.Interface.StockUIStyle;
+				StockUIStyle.isOn = stockUI;
 
 			loaded = true;
 
@@ -80,21 +92,15 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (!loaded)
 				return;
-
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			if (!CW_Window.Window.Interface.BlizzyAvailable)
+            
+			if (!_blizzyAvailable)
 			{
-				CW_Window.Window.Interface.StockToolbar = true;
-				return;
+                OnStockToolbarToggle.Invoke(true);
+                return;
 			}
 
-			CW_Window.Window.Interface.StockToolbar = isOn;
-
+            OnStockToolbarToggle.Invoke(isOn);
+            
 			if (StockReplace != null)
 				StockReplace.gameObject.SetActive(isOn);
 		}
@@ -104,13 +110,7 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_Window.Window.Interface.ReplaceToolbar = isOn;
+            OnReplaceToolbarToggle.Invoke(isOn);
 		}
 
 		public void ToggleUIStyle(bool isOn)
@@ -118,21 +118,12 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_Window.Window.Interface.StockUIStyle = isOn;
+            OnStockUIToggle.Invoke(isOn);
 		}
 
 		public void Close()
 		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.FadePopup(this);
+            OnPopupFade.Invoke(this);
 		}
 
 		public override void ClosePopup()
