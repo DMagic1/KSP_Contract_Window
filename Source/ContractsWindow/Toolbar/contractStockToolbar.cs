@@ -4,8 +4,6 @@ Contract Stock Toolbar- Addon for stock app launcher interface
 
 Copyright (c) 2014 DMagic
 
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -112,7 +110,7 @@ namespace ContractsWindow.Toolbar
 
 			if (toolbarButton == null)
 			{
-				DMC_MBE.LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
+				contractUtils.LogFormatted("Contracts Window + App Launcher Button Not Initialized; Starting It Now");
 				toolbarButton = ApplicationLauncher.Instance.AddModApplication(open, close, null, null, null, null, (ApplicationLauncher.AppScenes)63, contractLoader.ToolbarIcon);
 			}
 
@@ -131,7 +129,7 @@ namespace ContractsWindow.Toolbar
 
 				ApplicationLauncher.Instance.DisableMutuallyExclusive(stockAppButton);
 
-				DMC_MBE.LogFormatted("Stock Contracts App Replaced With Contracts Window +");
+				contractUtils.LogFormatted("Stock Contracts App Replaced With Contracts Window +");
 
 				try
 				{
@@ -139,12 +137,12 @@ namespace ContractsWindow.Toolbar
 				}
 				catch (Exception e)
 				{
-					DMC_MBE.LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
+					contractUtils.LogFormatted("Error In Removing Contracts Window + Toolbar App After Replacing Stock App: {0}", e);
 				}
 			}
 			else
 			{
-				DMC_MBE.LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
+				contractUtils.LogFormatted("Something went wrong while replacing the stock contract; attempting to add standard toolbar button");
 
 				if (toolbarButton != null)
 					GameEvents.onGUIApplicationLauncherUnreadifying.Add(removeButton);
@@ -158,7 +156,7 @@ namespace ContractsWindow.Toolbar
 			if (contractWindow.Instance == null || contractScenario.Instance == null)
 				return;
 
-			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+			int sceneInt = contractUtils.currentScene(HighLogic.LoadedScene);
 
 			contractWindow.Instance.Open();
 			contractScenario.Instance.windowVisible[sceneInt] = true;
@@ -169,7 +167,7 @@ namespace ContractsWindow.Toolbar
 			if (contractWindow.Instance == null || contractScenario.Instance == null)
 				return;
 
-			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+			int sceneInt = contractUtils.currentScene(HighLogic.LoadedScene);
 
 			contractWindow.Instance.Close();
 			contractScenario.Instance.windowVisible[sceneInt] = false;

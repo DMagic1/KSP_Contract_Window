@@ -4,8 +4,6 @@ Contract Toolbar- Addon for toolbar interface
 
 Copyright (c) 2014 DMagic
 
-KSP Plugin Framework by TriggerAu, 2014: http://forum.kerbalspaceprogram.com/threads/66503-KSP-Plugin-Framework
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -27,18 +25,16 @@ THE SOFTWARE.
 #endregion
 
 using System.IO;
-using System;
 using ContractsWindow.PanelInterfaces;
 using UnityEngine;
 
 namespace ContractsWindow.Toolbar
 {
-
-	class contractToolbar : DMC_MBE
+	class contractToolbar : MonoBehaviour
 	{
 		private IButton contractButton;
 
-		protected override void Start()
+		private void Start()
 		{
 			setupToolbar();
 		}
@@ -48,7 +44,7 @@ namespace ContractsWindow.Toolbar
 			if (!ToolbarManager.ToolbarAvailable)
 				return;
 
-			int sceneInt = contractScenario.currentScene(HighLogic.LoadedScene);
+			int sceneInt = contractUtils.currentScene(HighLogic.LoadedScene);
 
 			contractButton = ToolbarManager.Instance.add("ContractsWindow", "ContractWindowPlus");
 
@@ -61,9 +57,9 @@ namespace ContractsWindow.Toolbar
 			contractButton.OnClick += (e) =>
 				{
 					if (contractScenario.Instance == null)
-						DMC_MBE.LogFormatted("Contract Scenario Not Loaded...");
+                        contractUtils.LogFormatted("Contract Scenario Not Loaded...");
 					else if (contractWindow.Instance == null)
-						DMC_MBE.LogFormatted("Contract Window Not Loaded...");
+                        contractUtils.LogFormatted("Contract Window Not Loaded...");
 					else
 					{
 						if (contractWindow.Instance.IsVisible)
@@ -80,7 +76,7 @@ namespace ContractsWindow.Toolbar
 				};
 		}
 
-		protected override void OnDestroy()
+		private void OnDestroy()
 		{
 			if (contractButton != null)
 				contractButton.Destroy();

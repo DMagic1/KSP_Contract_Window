@@ -59,11 +59,11 @@ namespace ContractsWindow
 			fullPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName).Replace("\\", "/");
 
 			if (Load())
-				DMC_MBE.LogFormatted("Settings File Loaded");
+                contractUtils.LogFormatted("Settings File Loaded");
 			else
 			{
 				if (Save())
-					DMC_MBE.LogFormatted("New Contracts Window + Settings file saved to:\n{0}", fullPath);
+                    contractUtils.LogFormatted("New Contracts Window + Settings file saved to:\n{0}", fullPath);
 			}
 		}
 
@@ -80,13 +80,13 @@ namespace ContractsWindow
 				}
 				else
 				{
-				 	DMC_MBE.LogFormatted("Settings file could not be found [{0}]", fullPath);
+                    contractUtils.LogFormatted("Settings file could not be found [{0}]", fullPath);
 					return false;
 				}
 			}
 			catch (Exception e)
 			{
-				DMC_MBE.LogFormatted("Error while loading settings file from [{0}]\n{1}", fullPath, e);
+                contractUtils.LogFormatted("Error while loading settings file from [{0}]\n{1}", fullPath, e);
 				return false;
 			}
 		}
@@ -103,7 +103,7 @@ namespace ContractsWindow
 			}
 			catch (Exception e)
 			{
-				DMC_MBE.LogFormatted("Error while saving settings file at [{0}]\n{1}", fullPath, e);
+                contractUtils.LogFormatted("Error while saving settings file at [{0}]\n{1}", fullPath, e);
 				return false;
 			}
 		}
@@ -119,7 +119,7 @@ namespace ContractsWindow
 			}
 			catch (Exception e)
 			{
-				DMC_MBE.LogFormatted("Failed to generate settings file node...\n{0}", e);
+                contractUtils.LogFormatted("Failed to generate settings file node...\n{0}", e);
 				return new ConfigNode(GetType().Name);
 			}
 		}
