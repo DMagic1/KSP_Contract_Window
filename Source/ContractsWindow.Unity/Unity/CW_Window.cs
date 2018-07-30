@@ -25,8 +25,8 @@ THE SOFTWARE.
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -41,32 +41,32 @@ namespace ContractsWindow.Unity.Unity
 		private TextHandler VersionText = null;
 		[SerializeField]
 		private TextHandler MissionTitle = null;
-		[SerializeField]
+        [SerializeField]
+        private CW_MissionSection MissionSection = null;
+        [SerializeField]
+        private CW_ProgressPanel ProgressPanel = null;
+        [SerializeField]
+        private Transform ContentTransform = null;
+        [SerializeField]
 		private Button MissionEdit = null;
 		[SerializeField]
-		private GameObject MissionSectionPrefab = null;
+		private CW_AgencyPanel AgencyPrefab = null;
 		[SerializeField]
-		private Transform MissionSectionTransform = null;
+		private CW_SortMenu SortPrefab = null;
 		[SerializeField]
-		private GameObject ProgressPanelPrefab = null;
+		private CW_MissionSelect MissionSelectPrefab = null;
 		[SerializeField]
-		private GameObject AgencyPrefab = null;
+		private CW_MissionAdd MissionAddPrefab = null;
 		[SerializeField]
-		private GameObject SortPrefab = null;
+		private CW_MissionEdit MissionEditPrefab = null;
 		[SerializeField]
-		private GameObject MissionSelectPrefab = null;
+		private CW_MissionCreate MissionCreatePrefab = null;
 		[SerializeField]
-		private GameObject MissionAddPrefab = null;
+		private CW_Rebuild RebuildPrefab = null;
 		[SerializeField]
-		private GameObject MissionEditPrefab = null;
+		private CW_Toolbar ToolbarPrefab = null;
 		[SerializeField]
-		private GameObject MissionCreatePrefab = null;
-		[SerializeField]
-		private GameObject RebuildPrefab = null;
-		[SerializeField]
-		private GameObject ToolbarPrefab = null;
-		[SerializeField]
-		private GameObject ScalarPrefab = null;
+		private CW_Scale ScalarPrefab = null;
 		[SerializeField]
 		private Toggle SortOrderToggle = null;
 		[SerializeField]
@@ -81,18 +81,22 @@ namespace ContractsWindow.Unity.Unity
 		private TooltipHandler EyesTooltip = null;
 		[SerializeField]
 		private TooltipHandler MainPanelTooltip = null;
-		[SerializeField]
-		private GameObject TooltipPrefab = null;
-		 
-		private Vector2 mouseStart;
+        [SerializeField]
+        private Canvas ContractCanvas = null;
+        [SerializeField]
+        private Canvas ProgressCanvas = null;
+        [SerializeField]
+        private CW_ContractSection ContractSectionPrefab = null;
+
+        private Vector2 mouseStart;
 		private Vector3 windowStart;
 		private RectTransform rect;
+        private Canvas windowCanvas;
 
 		private bool dragging;
 		private bool resizing;
-
-		private CW_MissionSection currentMission;
-		private CW_ProgressPanel progressPanel;
+        
+        private Dictionary<Guid, CW_ContractSection> masterContractList = new Dictionary<Guid, CW_ContractSection>();
 
 		private List<TooltipHandler> tooltips = new List<TooltipHandler>();
 
@@ -101,47 +105,19 @@ namespace ContractsWindow.Unity.Unity
 		private bool showingContracts = true;
 
 		private bool popupOpen;
-
-		private static CW_Window window;
-
-		public static CW_Window Window
-		{
-			get { return window; }
-		}
-
+        
 		public bool ShowingContracts
 		{
 			get { return showingContracts; }
 		}
-
-		public ICW_Window Interface
-		{
-			get { return windowInterface; }
-		}
-
-		public GameObject Tooltip
-		{
-			get { return TooltipPrefab; }
-		}
-
-		public ScrollRect Scroll
-		{
-			get { return Scroller; }
-		}
-
-		public Toggle TitleToggle
-		{
-			get { return m_TitleToggle; }
-		}
-
+        
 		protected override void Awake()
 		{
 			base.Awake();
-
-			window = this;
-
+            
 			rect = GetComponent<RectTransform>();
-		}
+            windowCanvas = GetComponent<Canvas>();
+        }
 
 		private void Start()
 		{
@@ -154,108 +130,121 @@ namespace ContractsWindow.Unity.Unity
 		{
 			if (window == null)
 				return;
-
+            
 			windowInterface = window;
-
+            
 			if (VersionText != null)
 				VersionText.OnTextUpdate.Invoke(window.Version);
 
 			if (TooltipToggle != null)
 				TooltipToggle.isOn = window.TooltipsOn;
 
-			SelectMission(window.GetCurrentMission);
+            MissionSection.Init(ProcessTooltips, AddContract, windowInterface.ContractStorageContainer);
+
+            StartCoroutine(GenerateContracts(window.GetAllContracts));
 
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
 
 			transform.localScale *= window.Scale;
 
-			ProcessTooltips();
-		}
+            if (ContractCanvas != null)
+            {
+                ContractCanvas.overridePixelPerfect = !window.PixelPerfect;
+                ContractCanvas.pixelPerfect = window.PixelPerfect;
+            }
 
-		public void setScale()
-		{
-			if (windowInterface == null)
-				return;
+            if (ProgressCanvas != null)
+            {
+                ProgressCanvas.overridePixelPerfect = !window.PixelPerfect;
+                ProgressCanvas.pixelPerfect = window.PixelPerfect;
+            }
+        }
 
-			Vector3 scale = Vector3.one;
+        public void setScale()
+        {
+            if (windowInterface == null)
+                return;
 
-			if (windowInterface.IgnoreScale)
-				scale /= windowInterface.MasterScale;
+            Vector3 scale = Vector3.one;
 
-			transform.localScale = scale * windowInterface.Scale;
-		}
+            if (windowInterface.IgnoreScale)
+                scale /= windowInterface.MasterScale;
 
-		private void CreateProgressSection(IProgressPanel progress)
-		{
-			if (progress == null)
-				return;
+            transform.localScale = scale * windowInterface.Scale;
+        }
 
-			if (ProgressPanelPrefab == null || MissionSectionTransform == null)
-				return;
+        private IEnumerator GenerateContracts(IList<IContractSection> contracts)
+        {
+            if (contracts == null || ContractSectionPrefab == null)
+                yield break;
 
-			GameObject obj = Instantiate(ProgressPanelPrefab);
+            int count = contracts.Count;
 
-			if (obj == null)
-				return;
+            ProgressPanel.transform.SetParent(windowInterface.ContractStorageContainer, false);
 
-			obj.transform.SetParent(MissionSectionTransform, false);
+            MissionSection.gameObject.SetActive(true);
 
-			progressPanel = obj.GetComponent<CW_ProgressPanel>();
+            while (count > 0)
+            {
+                count--;
 
-			if (progressPanel == null)
-				return;
+                GenerateContract(contracts[count]);
 
-			progressPanel.setPanel(progress);
-		}
+                yield return null;
+            }
 
-		private CW_MissionSection CreateMissionSection(IMissionSection mission)
-		{
-			if (MissionSectionPrefab == null || MissionSectionTransform == null)
-				return null;
+            SelectMission(windowInterface.GetCurrentMission);
+            
+            windowInterface.RefreshContracts();
+            
+            if (ProgressPanel != null)
+                yield return StartCoroutine(ProgressPanel.GeneratePanel(windowInterface.GetProgressPanel, false));
 
-			GameObject obj = Instantiate(MissionSectionPrefab);
+            ProgressPanel.transform.SetParent(ContentTransform, false);
+        }
 
-			if (obj == null)
-				return null;
+        private CW_ContractSection GenerateContract(IContractSection contract)
+        {
+            CW_ContractSection con = Instantiate(ContractSectionPrefab, windowInterface.ContractStorageContainer, false);
+            
+            con.setContract(contract, ShowAgentWindow, ShowMissionAddWindow, Scroller);
 
-			obj.transform.SetParent(MissionSectionTransform, false);
+            if (!masterContractList.ContainsKey(contract.ID))
+                masterContractList.Add(contract.ID, con);
 
-			CW_MissionSection missionObject = obj.GetComponent<CW_MissionSection>();
+            return con;
+        }
 
-			if (missionObject == null)
-				return null;
+        public void AddContract(IContractSection contract)
+        {
+            if (contract == null)
+                return;
+            
+            if (masterContractList.ContainsKey(contract.ID))
+                return;
+            
+            MissionSection.AddContract(GenerateContract(contract), contract);
 
-			missionObject.setMission(mission);
-
-			return missionObject;
-		}
-
+            ProcessTooltips();
+        }
+        
 		public void SelectMission(IMissionSection mission)
 		{
-			if (currentMission != null)
-			{
-				if (currentMission.MissionTitle != mission.MissionTitle)
-					DestroyImmediate(currentMission.gameObject);
-				else
-					return;
-			}
+            MissionSection.ClearContracts();
 
-			currentMission = CreateMissionSection(mission);
-
-			if (currentMission == null)
-				return;
+            MissionSection.setMission(mission, masterContractList);
 
 			loaded = false;
 
 			prepareTopBar();
 			
 			if (MissionTitle != null)
-				MissionTitle.OnTextUpdate.Invoke(currentMission.MasterMission ? windowInterface.AllMissionTitle : currentMission.MissionTitle + ":");
+				MissionTitle.OnTextUpdate.Invoke(MissionSection.MasterMission ? windowInterface.AllMissionTitle : MissionSection.MissionTitle + ":");
 
 			if (MissionEdit != null)
 			{
-				if (currentMission.MasterMission)
+				if (MissionSection.MasterMission)
 					MissionEdit.gameObject.SetActive(false);
 				else
 					MissionEdit.gameObject.SetActive(true);
@@ -264,7 +253,7 @@ namespace ContractsWindow.Unity.Unity
 			ProcessTooltips();
 		}
 
-		public void ProcessTooltips()
+        private void ProcessTooltips()
 		{
 			if (windowInterface == null)
 				return;
@@ -275,10 +264,10 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
 			for (int j = 0; j < handlers.Length; j++)
-				ProcessTooltip(handlers[j], windowInterface.TooltipsOn, windowInterface.TooltipCanvas, windowInterface.Scale);
+				ProcessTooltip(handlers[j], windowInterface.TooltipsOn, windowInterface.TooltipCanvas, windowInterface.Scale, Scroller);
 		}
 
-		private void ProcessTooltip(TooltipHandler handler, bool isOn, Canvas c, float scale)
+		private void ProcessTooltip(TooltipHandler handler, bool isOn, Canvas c, float scale, ScrollRect scroll)
 		{
 			if (handler == null)
 				return;
@@ -286,21 +275,22 @@ namespace ContractsWindow.Unity.Unity
 			handler.IsActive = isOn;
 			handler._Canvas = c;
 			handler.Scale = scale;
+            handler.WindowScroll = scroll;
 		}
 
 		private void prepareTopBar()
 		{
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			if (currentMission.MissionInterface == null)
+			if (MissionSection.MissionInterface == null)
 				return;
 
 			if (SortOrderToggle != null)
-				SortOrderToggle.isOn = currentMission.MissionInterface.DescendingOrder;
+				SortOrderToggle.isOn = MissionSection.MissionInterface.DescendingOrder;
 
 			if (ShowHideToggle != null)
-				ShowHideToggle.isOn = currentMission.MissionInterface.ShowHidden;
+				ShowHideToggle.isOn = MissionSection.MissionInterface.ShowHidden;
 
 			loaded = true;
 		}
@@ -312,10 +302,13 @@ namespace ContractsWindow.Unity.Unity
 
 			if (showProgress)
 			{
-				if (currentMission != null)
-					DestroyImmediate(currentMission.gameObject);
+                if (MissionSection != null)
+                    MissionSection.gameObject.SetActive(false);
 
-				CreateProgressSection(windowInterface.GetProgressPanel);
+                if (ProgressPanel != null)
+                    ProgressPanel.gameObject.SetActive(true);
+                
+                RefreshProgress();
 
 				if (MissionTitle != null)
 					MissionTitle.OnTextUpdate.Invoke(windowInterface.ProgressTitle);
@@ -324,14 +317,15 @@ namespace ContractsWindow.Unity.Unity
 					MainPanelTooltip.TooltipIndex = 0;
 			}
 			else
-			{
-				if (progressPanel != null)
-					DestroyImmediate(progressPanel.gameObject);
+            {
+                if (ProgressPanel != null)
+                    ProgressPanel.gameObject.SetActive(false);
 
-				SelectMission(windowInterface.GetCurrentMission);
+                if (MissionSection != null)
+                    MissionSection.gameObject.SetActive(true);
 
-				if (MissionTitle != null && currentMission != null)
-					MissionTitle.OnTextUpdate.Invoke(currentMission.MasterMission ? windowInterface.AllMissionTitle : currentMission.MissionTitle + ":");
+                if (MissionTitle != null && MissionSection != null)
+					MissionTitle.OnTextUpdate.Invoke(MissionSection.MasterMission ? windowInterface.AllMissionTitle : MissionSection.MissionTitle + ":");
 
 				if (MainPanelTooltip != null)
 					MainPanelTooltip.TooltipIndex = 1;
@@ -363,19 +357,12 @@ namespace ContractsWindow.Unity.Unity
 			if (SortPrefab == null)
 				return;
 
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			GameObject obj = Instantiate(SortPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_SortMenu sortObject = obj.GetComponent<CW_SortMenu>();
-
-			if (sortObject == null)
-				return;
-
-			sortObject.setSort(currentMission.MissionInterface);
+            CW_SortMenu sortObject = Instantiate(SortPrefab, transform, false);
+            
+			sortObject.setSort(MissionSection.MissionInterface, FadePopup);
 
 			popupOpen = true;
 		}
@@ -385,13 +372,13 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			if (currentMission.MissionInterface == null)
+			if (MissionSection.MissionInterface == null)
 				return;
 
-			currentMission.MissionInterface.DescendingOrder = isOn;
+			MissionSection.MissionInterface.DescendingOrder = isOn;
 		}
 
 		public void ToggleShowHide(bool isOn)
@@ -402,15 +389,15 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			if (currentMission.MissionInterface == null)
+			if (MissionSection.MissionInterface == null)
 				return;
 
-			currentMission.MissionInterface.ShowHidden = isOn;
+			MissionSection.MissionInterface.ShowHidden = isOn;
 
-			currentMission.ToggleContracts(isOn);
+			MissionSection.ToggleContracts(isOn);
 		}
 
 		public void showSelector()
@@ -424,19 +411,18 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			GameObject obj = Instantiate(MissionSelectPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_MissionSelect selectorObject = obj.GetComponent<CW_MissionSelect>();
-
-			if (selectorObject == null)
-				return;
-
-			selectorObject.setMission(windowInterface.GetMissions);
+            CW_MissionSelect selectorObject = Instantiate(MissionSelectPrefab, transform, false);
+            
+			selectorObject.setMission(windowInterface.GetMissions, SetTitleToggle, FadePopup);
 
 			popupOpen = true;
 		}
+
+        private void SetTitleToggle(bool isOn)
+        {
+            if (m_TitleToggle != null)
+                m_TitleToggle.isOn = isOn;
+        }
 
 		public void showCreator(IContractSection contract)
 		{
@@ -449,21 +435,26 @@ namespace ContractsWindow.Unity.Unity
 			if (contract == null)
 				return;
 
-			GameObject obj = Instantiate(MissionCreatePrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_MissionCreate creatorObject = obj.GetComponent<CW_MissionCreate>();
-
-			if (creatorObject == null)
-				return;
-
-			creatorObject.setPanel(contract);
+            CW_MissionCreate creatorObject = Instantiate(MissionCreatePrefab, transform, false);
+            
+			creatorObject.setPanel(contract.ID, OnCreateMission, FadePopup, OnInputLock);
 
 			popupOpen = true;
 		}
 
-		public void showEditor()
+        private void OnInputLock(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.LockInput = isOn;
+        }
+
+        private void OnCreateMission(string title, Guid id)
+        {
+            if (windowInterface != null)
+                windowInterface.NewMission(title, id);
+        }
+
+        public void showEditor()
 		{
 			if (popupOpen)
 				return;
@@ -474,22 +465,31 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			GameObject obj = Instantiate(MissionEditPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_MissionEdit editorObject = obj.GetComponent<CW_MissionEdit>();
-
-			if (editorObject == null)
-				return;
-
-			editorObject.setMission(currentMission.MissionInterface);
+            CW_MissionEdit editorObject = Instantiate(MissionEditPrefab, transform, false);
+            
+			editorObject.setMission(OnMissionNameChange, OnMissionDelete, FadePopup, OnInputLock);
 
 			popupOpen = true;
 		}
+
+        private void OnMissionNameChange(string title)
+        {
+            if (MissionSection == null || MissionSection.MissionInterface == null)
+                return;
+
+            MissionSection.MissionInterface.MissionTitle = title;
+        }
+
+        private void OnMissionDelete()
+        {
+            if (MissionSection == null || MissionSection.MissionInterface == null)
+                return;
+
+            MissionSection.MissionInterface.RemoveMission();
+        }
 
 		public void showRefresh()
 		{
@@ -502,14 +502,20 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			GameObject obj = Instantiate(RebuildPrefab);
-
-			obj.transform.SetParent(transform, false);
+            CW_Rebuild rebuilder = Instantiate(RebuildPrefab, transform, false);
+            
+            rebuilder.setRebuilder(OnRebuild, FadePopup);
 
 			popupOpen = true;
 		}
 
-		public void showScale()
+        private void OnRebuild()
+        {
+            if (windowInterface != null)
+                windowInterface.Rebuild();
+        }
+
+        public void showScale()
 		{
 			if (popupOpen)
 				return;
@@ -520,46 +526,120 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface == null)
 				return;
 
-			GameObject obj = Instantiate(ScalarPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_Scale scalarObject = obj.GetComponent<CW_Scale>();
-
-			if (scalarObject == null)
-				return;
-
-			scalarObject.setScalar();
+            CW_Scale scalarObject = Instantiate(ScalarPrefab, transform, false);
+            
+			scalarObject.setScalar(windowInterface.PixelPerfect, windowInterface.LargeFont, windowInterface.IgnoreScale, windowInterface.Scale
+                , OnPixelPerfectToggle, OnLargeFontToggle, OnIgnoreScaleToggle, OnScaleChange, FadePopup);
 
 			popupOpen = true;
 		}
 
-		public void showToolbar()
-		{
-			if (popupOpen)
-				return;
+        private void OnPixelPerfectToggle(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.PixelPerfect = isOn;
 
-			if (ToolbarPrefab == null)
-				return;
+            if (ContractCanvas != null)
+            {
+                ContractCanvas.overridePixelPerfect = !isOn;
+                ContractCanvas.pixelPerfect = isOn;
+            }
 
-			if (windowInterface == null)
-				return;
+            if (ProgressCanvas != null)
+            {
+                ProgressCanvas.overridePixelPerfect = !isOn;
+                ProgressCanvas.pixelPerfect = isOn;
+            }
+        }
 
-			GameObject obj = Instantiate(ToolbarPrefab);
+        private void OnLargeFontToggle(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.LargeFont = isOn;
 
-			obj.transform.SetParent(transform, false);
+            var texts = gameObject.GetComponentsInChildren<TextHandler>(true);
 
-			CW_Toolbar toolbarObject = obj.GetComponent<CW_Toolbar>();
+            for (int i = texts.Length - 1; i >= 0; i--)
+            {
+                TextHandler t = texts[i];
 
-			if (toolbarObject == null)
-				return;
+                if (t == null)
+                    continue;
 
-			toolbarObject.setToolbar();
+                t.OnFontChange.Invoke(isOn ? 1 : -1);
+            }
+        }
 
-			popupOpen = true;
-		}
+        private void OnIgnoreScaleToggle(bool isOn)
+        {
+            if (windowInterface == null)
+                return;
 
-		public void ShowAgentWindow(IContractSection contract)
+            windowInterface.IgnoreScale = isOn;
+
+            float f = windowInterface.Scale;
+
+            Vector3 scale = Vector3.one;
+
+            if (isOn)
+                scale /= windowInterface.MasterScale;
+
+            transform.localScale = scale * f;
+        }
+
+        private void OnScaleChange(float scale)
+        {
+            if (windowInterface == null)
+                return;
+
+            windowInterface.Scale = scale;
+
+            Vector3 s = Vector3.one;
+
+            if (windowInterface.IgnoreScale)
+                s /= windowInterface.MasterScale;
+
+            transform.localScale = scale * s;
+        }
+
+        public void showToolbar()
+        {
+            if (popupOpen)
+                return;
+
+            if (ToolbarPrefab == null)
+                return;
+
+            if (windowInterface == null)
+                return;
+
+            CW_Toolbar toolbarObject = Instantiate(ToolbarPrefab, transform, false);
+            
+            toolbarObject.setToolbar(windowInterface.StockToolbar, windowInterface.BlizzyAvailable, windowInterface.ReplaceToolbar, windowInterface.StockUIStyle,
+               OnStockToolbarToggle, OnReplaceToolbarToggle, OnStockUIToggle, FadePopup);
+
+            popupOpen = true;
+        }
+
+        private void OnStockToolbarToggle(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.StockToolbar = isOn;
+        }
+
+        private void OnReplaceToolbarToggle(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.ReplaceToolbar = isOn;
+        }
+
+        private void OnStockUIToggle(bool isOn)
+        {
+            if (windowInterface != null)
+                windowInterface.StockUIStyle = isOn;
+        }
+
+        private void ShowAgentWindow(IContractSection contract)
 		{
 			if (popupOpen)
 				return;
@@ -570,21 +650,14 @@ namespace ContractsWindow.Unity.Unity
 			if (contract == null)
 				return;
 
-			GameObject obj = Instantiate(AgencyPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_AgencyPanel agencyObject = obj.GetComponent<CW_AgencyPanel>();
-
-			if (agencyObject == null)
-				return;
-
+            CW_AgencyPanel agencyObject = Instantiate(AgencyPrefab, transform, false);
+            
 			agencyObject.setAgent(contract.AgencyName, contract.AgencyLogo);
 
 			popupOpen = true;
 		}
 
-		public void ShowMissionAddWindow(IContractSection contract)
+        private void ShowMissionAddWindow(IContractSection contract)
 		{
 			if (popupOpen)
 				return;
@@ -595,16 +668,9 @@ namespace ContractsWindow.Unity.Unity
 			if (contract == null)
 				return;
 
-			GameObject obj = Instantiate(MissionAddPrefab);
-
-			obj.transform.SetParent(transform, false);
-
-			CW_MissionAdd adderObject = obj.GetComponent<CW_MissionAdd>();
-
-			if (adderObject == null)
-				return;
-
-			adderObject.setMission(windowInterface.GetMissions, contract);
+            CW_MissionAdd adderObject = Instantiate(MissionAddPrefab, transform, false);
+            
+			adderObject.setMission(windowInterface.GetMissions, contract, showCreator, FadePopup);
 
 			popupOpen = true;
 		}
@@ -616,11 +682,18 @@ namespace ContractsWindow.Unity.Unity
 
 			resizing = true;
 
-			if (windowInterface == null || windowInterface.MainCanvas == null)
-				return;
+            if (ContractCanvas != null)
+            {
+                ContractCanvas.overridePixelPerfect = true;
+                ContractCanvas.pixelPerfect = false;
+            }
 
-			windowInterface.MainCanvas.pixelPerfect = false;
-		}
+            if (ProgressCanvas != null)
+            {
+                ProgressCanvas.overridePixelPerfect = true;
+                ProgressCanvas.pixelPerfect = false;
+            }
+        }
 
 		public void onResize(BaseEventData eventData)
 		{
@@ -669,17 +742,20 @@ namespace ContractsWindow.Unity.Unity
 
             windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
 
-   //         float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
+            if (windowInterface.PixelPerfect)
+            {
+                if (ContractCanvas != null)
+                {
+                    ContractCanvas.overridePixelPerfect = false;
+                    ContractCanvas.pixelPerfect = true;
+                }
 
-			//float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
-
-			//windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
-
-			if (windowInterface.MainCanvas == null)
-				return;
-
-			if (windowInterface.PixelPerfect)
-				windowInterface.MainCanvas.pixelPerfect = true;
+                if (ProgressCanvas != null)
+                {
+                    ProgressCanvas.overridePixelPerfect = false;
+                    ProgressCanvas.pixelPerfect = true;
+                }
+            }
 		}
 
 		public void OnBeginDrag(PointerEventData eventData)
@@ -727,13 +803,7 @@ namespace ContractsWindow.Unity.Unity
 				return;
 
             windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
-
-			//float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
-
-			//float derp = ((rect.anchoredPosition.y * Screen.height) - (diff * Screen.height)) / (Screen.height + diff);
-
-			//windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x * windowInterface.MasterScale, derp, rect.sizeDelta.x, rect.sizeDelta.y));
-		}
+        }
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
@@ -751,22 +821,10 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-
-						
-		       //r.x /= windowInterface.MasterScale;
-
-			//float diff = (Screen.height / windowInterface.MasterScale) - Screen.height;
-
-			//float derp = diff - (((-1f * r.y) / Screen.height) * diff);
-
-			//r.y += derp;
-
 			rect.anchoredPosition3D = new Vector3(r.x, r.y, 0);
 
 			rect.sizeDelta = new Vector2(r.width, r.height);
-
-			//rect.position = new Vector3(rect.position.x, rect.position.y, 1);
-
+            
 			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
 
             clamp(rect, new RectOffset(100, 100, 200, 200));
@@ -774,38 +832,47 @@ namespace ContractsWindow.Unity.Unity
 
 		public void SortMissionChildren(List<Guid> sorted)
 		{
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			currentMission.SortChildren(sorted);
+			MissionSection.SortChildren(sorted);
 		}
 
 		public void UpdateMissionChildren()
 		{
-			if (currentMission == null)
+			if (MissionSection == null)
 				return;
 
-			currentMission.UpdateChildren();
+			MissionSection.UpdateChildren();
 		}
 
 		public void RefreshProgress()
 		{
-			if (progressPanel == null)
+			if (ProgressPanel == null)
 				return;
 
-			progressPanel.Refresh();
+			ProgressPanel.Refresh();
 		}
+
+        public void Open()
+        {
+            if (windowCanvas != null)
+                windowCanvas.enabled = true;
+
+            if (MissionSection != null)
+                MissionSection.gameObject.SetActive(showingContracts);
+
+            if (ProgressPanel != null)
+                ProgressPanel.gameObject.SetActive(!showingContracts);
+
+            FadeIn(true);
+        }
 
 		public void FadeIn(bool overrule)
 		{
 			Fade(1, true, null, true, overrule);
 		}
-
-		public void ScaleAndFadeIn()
-		{
-			Fade(1, true);
-		}
-
+        
 		public void FadeOut()
 		{
 			Fade(0.8f, false);
@@ -818,7 +885,14 @@ namespace ContractsWindow.Unity.Unity
 
 		private void Hide()
 		{
-			gameObject.SetActive(false);
+            if (windowCanvas != null)
+                windowCanvas.enabled = false;
+
+            if (MissionSection != null)
+                MissionSection.gameObject.SetActive(false);
+
+            if (ProgressPanel != null)
+                ProgressPanel.gameObject.SetActive(false);
 		}
 
 		public void OnScroll(PointerEventData eventData)
@@ -831,8 +905,8 @@ namespace ContractsWindow.Unity.Unity
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
-			if (windowInterface != null)
-				windowInterface.SetAsLastSibling();
+			if (rect != null)
+				rect.SetAsLastSibling();
 
 			if (!popupOpen)
 				return;
@@ -866,7 +940,7 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-		public void FadePopup(CW_Popup p)
+        private void FadePopup(CW_Popup p)
 		{
 			popupOpen = false;
 
