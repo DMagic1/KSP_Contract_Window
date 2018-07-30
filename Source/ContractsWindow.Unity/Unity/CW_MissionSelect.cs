@@ -24,12 +24,9 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
@@ -37,14 +34,21 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_MissionSelect : CW_Popup
 	{
 		[SerializeField]
-		private GameObject MissionObjectPrefab = null;
+		private CW_MissionSelectObject MissionObjectPrefab = null;
 		[SerializeField]
 		private Transform MissionObjectTransform = null;
 
-		public void setMission(IList<IMissionSection> missions)
+        public delegate void TitleToggle(bool isOn);
+
+        private TitleToggle OnTitleToggle;
+
+		public void setMission(IList<IMissionSection> missions, TitleToggle titleToggle, PopupFade popupFade)
 		{
 			if (missions == null)
 				return;
+
+            OnTitleToggle = titleToggle;
+            OnPopupFade = popupFade;
 
 			CreateMissionSections(missions);
 
@@ -75,38 +79,17 @@ namespace ContractsWindow.Unity.Unity
 			}			
 		}
 
-		private void CreateMissionSection(IMissionSection mission)
-		{
-			GameObject obj = Instantiate(MissionObjectPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(MissionObjectTransform, false);
-
-			CW_MissionSelectObject missionObject = obj.GetComponent<CW_MissionSelectObject>();
-
-			if (missionObject == null)
-				return;
-
-			missionObject.setMission(mission, this);
-		}
-
-		public void ToggleToContracts()
-		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.TitleToggle.isOn = false;
-		}
-
+        private void CreateMissionSection(IMissionSection mission)
+        {
+            CW_MissionSelectObject missionObject = Instantiate(MissionObjectPrefab, MissionObjectTransform, false);
+            
+            missionObject.setMission(mission, OnTitleToggle, DestroyPanel);
+        }
+        
 		public void DestroyPanel()
-		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.FadePopup(this);
-		}
+        {
+            OnPopupFade.Invoke(this);
+        }
 
 		public override void ClosePopup()
 		{

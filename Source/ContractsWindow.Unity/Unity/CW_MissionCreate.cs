@@ -25,10 +25,7 @@ THE SOFTWARE.
 #endregion
 
 using System;
-using System.Collections.Generic;
-using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace ContractsWindow.Unity.Unity
@@ -38,69 +35,65 @@ namespace ContractsWindow.Unity.Unity
 	{
 		[SerializeField]
 		private InputHandler MissionInput = null;
+        
+        public delegate void MissionCreate(string title, Guid id);
+        
+        private MissionCreate OnMissionCreate;
 
-		private IContractSection contract;
+        private Guid contractID;
 
-		private void Update()
+        private void Update()
 		{
-			if (CW_Window.Window == null || CW_Window.Window.Interface == null)
-				return;
-
-			if (CW_Window.Window.Interface.LockInput)
+			if (inputLock)
 			{
-				if (MissionInput != null && !MissionInput.IsFocused)
-					CW_Window.Window.Interface.LockInput = false;
+                if (MissionInput != null && !MissionInput.IsFocused)
+                {
+                    inputLock = false;
+                    OnPopupInputLock.Invoke(false);
+                }
 			}
 		}
-	
-		public void setPanel(IContractSection c)
-		{
-			if (c == null || MissionInput == null)
-				return;
-			
-			contract = c;
-		}
+
+        public void setPanel(Guid id, MissionCreate missionCreate, PopupFade popupFade, PopupInputLock popupInputLock)
+        {
+            contractID = id;
+
+            OnMissionCreate = missionCreate;
+
+            OnPopupFade = popupFade;
+            OnPopupInputLock = popupInputLock;
+
+            FadeIn();
+        }
 
 		public void OnInputClick(BaseEventData eventData)
 		{
-			if (!(eventData is PointerEventData) || CW_Window.Window == null || CW_Window.Window.Interface == null)
+			if (!(eventData is PointerEventData))
 				return;
 
 			if (((PointerEventData)eventData).button != PointerEventData.InputButton.Left)
 				return;
 
-			CW_Window.Window.Interface.LockInput = true;
-		}
+            inputLock = true;
+            OnPopupInputLock.Invoke(true);
+        }
 
 		public void CreateMission()
 		{
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
 			if (MissionInput == null)
 				return;
 
 			if (string.IsNullOrEmpty(MissionInput.Text))
 				return;
 
-			CW_Window.Window.Interface.NewMission(MissionInput.Text, contract.ID);
+            OnMissionCreate.Invoke(MissionInput.Text, contractID);
+            
+            inputLock = false;
+            OnPopupInputLock.Invoke(false);
 
-			CW_Window.Window.Interface.LockInput = false;
-
-			DestroyPanel();
-		}
-
-		public void DestroyPanel()
-		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.FadePopup(this);
-		}
-
+            OnPopupFade.Invoke(this);
+        }
+        
 		public override void ClosePopup()
 		{
 			gameObject.SetActive(false);

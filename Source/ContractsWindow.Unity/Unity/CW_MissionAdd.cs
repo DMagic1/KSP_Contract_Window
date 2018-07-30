@@ -37,18 +37,25 @@ namespace ContractsWindow.Unity.Unity
 	public class CW_MissionAdd : CW_Popup
 	{
 		[SerializeField]
-		private GameObject MissionObjectPrefab = null;
+		private CW_MissionAddObject MissionObjectPrefab = null;
 		[SerializeField]
 		private Transform MissionObjectTransform = null;
 
-		private IContractSection contractInterface;
+        public delegate void SpawnMissionCreator(IContractSection contract);
 
-		public void setMission(IList<IMissionSection> missions, IContractSection contract)
+        private SpawnMissionCreator OnSpawnMissionCreator; 
+
+		private IContractSection contractInterface;
+        
+		public void setMission(IList<IMissionSection> missions, IContractSection contract, SpawnMissionCreator spawnMissionCreator, PopupFade popupFade)
 		{
 			if (missions == null || contract == null)
 				return;
-			
-			contractInterface = contract;
+
+            OnSpawnMissionCreator = spawnMissionCreator;
+            OnPopupFade = popupFade;
+
+            contractInterface = contract;
 
 			CreateMissionSections(missions);
 
@@ -81,38 +88,22 @@ namespace ContractsWindow.Unity.Unity
 
 		private void CreateMissionSection(IMissionSection mission)
 		{
-			GameObject obj = Instantiate(MissionObjectPrefab);
-
-			if (obj == null)
-				return;
-
-			obj.transform.SetParent(MissionObjectTransform, false);
-
-			CW_MissionAddObject missionObject = obj.GetComponent<CW_MissionAddObject>();
-
-			if (missionObject == null)
-				return;
-
-			missionObject.setMission(mission, contractInterface, this);
+            CW_MissionAddObject missionObject = Instantiate(MissionObjectPrefab, MissionObjectTransform, false);
+            
+			missionObject.setMission(mission, contractInterface, DestroyPanel);
 		}
 
 		public void CreateNewMission()
 		{
-			if (CW_Window.Window == null)
-				return;
+            OnSpawnMissionCreator.Invoke(contractInterface);
 
-			DestroyPanel();
-			
-			CW_Window.Window.showCreator(contractInterface);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public void DestroyPanel()
-		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.FadePopup(this);
-		}
+        {
+            OnPopupFade.Invoke(this);
+        }
 
 		public override void ClosePopup()
 		{

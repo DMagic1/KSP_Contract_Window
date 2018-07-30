@@ -24,9 +24,6 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,28 +43,39 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private TextHandler SliderValue = null;
 
-		bool loaded;
+        public delegate void PixelPerfectToggle(bool isOn);
+        public delegate void LargeFontToggle(bool isOn);
+        public delegate void IgnoreScaleToggle(bool isOn);
+        public delegate void ScaleChange(float scale);
 
-		public void setScalar()
+        private PixelPerfectToggle OnPixelPerfectToggle;
+        private LargeFontToggle OnLargeFontToggle;
+        private IgnoreScaleToggle OnIgnoreScaleToggle;
+        private ScaleChange OnScaleChange;
+
+        bool loaded;
+
+		public void setScalar(bool pixelPerfect, bool largeFont, bool ignoreScale, float scale
+            , PixelPerfectToggle pixelPerfectToggle, LargeFontToggle largeFontToggle, IgnoreScaleToggle ignoreScaleToggle, ScaleChange scaleChange, PopupFade popupFade)
 		{
 			if (SliderScale == null || FontToggle == null || ScaleToggle == null || SliderValue == null || PixelToggle == null)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
+            OnPixelPerfectToggle = pixelPerfectToggle;
+            OnLargeFontToggle = largeFontToggle;
+            OnIgnoreScaleToggle = ignoreScaleToggle;
+            OnScaleChange = scaleChange;
+            OnPopupFade = popupFade;
 
-			if (CW_Window.Window.Interface == null)
-				return;
+			PixelToggle.isOn = pixelPerfect;
 
-			PixelToggle.isOn = CW_Window.Window.Interface.PixelPerfect;
+			FontToggle.isOn = largeFont;
 
-			FontToggle.isOn = CW_Window.Window.Interface.LargeFont;
+			ScaleToggle.isOn = ignoreScale;
 
-			ScaleToggle.isOn = CW_Window.Window.Interface.IgnoreScale;
+			SliderValue.OnTextUpdate.Invoke(scale.ToString("P0"));
 
-			SliderValue.OnTextUpdate.Invoke(CW_Window.Window.Interface.Scale.ToString("P0"));
-
-			SliderScale.value = CW_Window.Window.Interface.Scale * 10;
+			SliderScale.value = scale * 10;
 
 			FadeIn();
 
@@ -79,13 +87,7 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_Window.Window.Interface.PixelPerfect = isOn;
+            OnPixelPerfectToggle.Invoke(isOn);
 		}
 
 		public void SetLargeFont(bool isOn)
@@ -93,53 +95,15 @@ namespace ContractsWindow.Unity.Unity
 			if (!loaded)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_Window.Window.Interface.LargeFont = isOn;
-
-			ApplyFontSize(isOn ? 1 : -1);
+            OnLargeFontToggle.Invoke(isOn);
 		}
-
-		private void ApplyFontSize(int s)
-		{
-			var texts = CW_Window.Window.gameObject.GetComponentsInChildren<TextHandler>(true);
-
-			for (int i = texts.Length - 1; i >= 0; i--)
-			{
-				TextHandler t = texts[i];
-
-				if (t == null)
-					continue;
-
-				t.OnFontChange.Invoke(s);
-			}
-		}
-
+        
 		public void IgnoreScale(bool isOn)
 		{
 			if (!loaded)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
-			CW_Window.Window.Interface.IgnoreScale = isOn;
-
-			float f = CW_Window.Window.Interface.Scale;
-
-			Vector3 scale = Vector3.one;
-
-			if (isOn)
-				scale /= CW_Window.Window.Interface.MasterScale;
-
-			CW_Window.Window.transform.localScale = scale * f;
+            OnIgnoreScaleToggle.Invoke(isOn);
 		}
 
 		public void SliderValueChange(float value)
@@ -158,30 +122,14 @@ namespace ContractsWindow.Unity.Unity
 			if (SliderScale == null)
 				return;
 
-			if (CW_Window.Window == null)
-				return;
-
-			if (CW_Window.Window.Interface == null)
-				return;
-
 			float f = SliderScale.value / 10;
 
-			CW_Window.Window.Interface.Scale = f;
-
-			Vector3 scale = Vector3.one;
-
-			if (CW_Window.Window.Interface.IgnoreScale)
-				scale /= CW_Window.Window.Interface.MasterScale;
-
-			CW_Window.Window.transform.localScale = scale * f;
+            OnScaleChange.Invoke(f);
 		}
 
 		public void Close()
 		{
-			if (CW_Window.Window == null)
-				return;
-
-			CW_Window.Window.FadePopup(this);
+            OnPopupFade(this);
 		}
 
 		public override void ClosePopup()

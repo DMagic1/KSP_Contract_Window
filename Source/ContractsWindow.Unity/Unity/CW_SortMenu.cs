@@ -24,11 +24,8 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
@@ -37,10 +34,12 @@ namespace ContractsWindow.Unity.Unity
 	{
 		private IMissionSection missionInterface;
 
-		public void setSort(IMissionSection m)
+		public void setSort(IMissionSection m, PopupFade popupFade)
 		{
 			if (m == null)
 				return;
+
+            OnPopupFade = popupFade;
 
 			missionInterface = m;
 
@@ -49,81 +48,63 @@ namespace ContractsWindow.Unity.Unity
 
 		public void SortDifficulty()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(1);
 
-			CW_Window.Window.FadePopup(this);
+            OnPopupFade.Invoke(this);
 		}
 
 		public void SortExpiration()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(2);
 
-			CW_Window.Window.FadePopup(this);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public void SortAccept()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(3);
 
-			CW_Window.Window.FadePopup(this);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public void SortReward()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(4);
 
-			CW_Window.Window.FadePopup(this);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public void SortType()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(5);
 
-			CW_Window.Window.FadePopup(this);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public void SortPlanet()
 		{
-			if (CW_Window.Window == null)
-				return;
-
 			if (missionInterface == null)
 				return;
 
 			missionInterface.SetSort(6);
 
-			CW_Window.Window.FadePopup(this);
-		}
+            OnPopupFade.Invoke(this);
+        }
 
 		public override void ClosePopup()
 		{

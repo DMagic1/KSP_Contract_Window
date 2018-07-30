@@ -43,11 +43,14 @@ namespace ContractsWindow.Unity.Unity
 		[SerializeField]
 		private Button XMark = null;
 
-		private IMissionSection missionInterface;
-		private IContractSection contractInterface;
-		private CW_MissionAdd parent;
+        public delegate void PopupFader();
+        
+        private PopupFader OnPopupFade;
 
-		public void setMission(IMissionSection mission, IContractSection contract, CW_MissionAdd p)
+        private IMissionSection missionInterface;
+		private IContractSection contractInterface;
+
+		public void setMission(IMissionSection mission, IContractSection contract, PopupFader popupFade)
 		{
 			if (mission == null || contract == null)
 				return;
@@ -55,12 +58,9 @@ namespace ContractsWindow.Unity.Unity
 			if (MissionTitle == null || MissionNumber == null || Checkmark == null || XMark == null)
 				return;
 
-			if (p == null)
-				return;
+            OnPopupFade = popupFade;
 
-			parent = p;
-
-			missionInterface = mission;
+            missionInterface = mission;
 
 			contractInterface = contract;
 
@@ -71,7 +71,7 @@ namespace ContractsWindow.Unity.Unity
 			if (mission.MasterMission)
 				XMark.gameObject.SetActive(false);
 
-			if (!mission.ContractContained(contract))
+			if (!mission.ContractContained(contract.ID))
 			{
 				Checkmark.gameObject.SetActive(false);
 
@@ -86,11 +86,8 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.AddContract(contractInterface);
 
-			if (parent == null)
-				return;
-
-			parent.DestroyPanel();
-		}
+            OnPopupFade.Invoke();
+        }
 
 		public void RemoveContract()
 		{

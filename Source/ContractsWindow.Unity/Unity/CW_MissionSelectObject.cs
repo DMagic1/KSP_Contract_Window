@@ -24,11 +24,8 @@ THE SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using ContractsWindow.Unity.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ContractsWindow.Unity.Unity
 {
@@ -40,9 +37,13 @@ namespace ContractsWindow.Unity.Unity
 		private TextHandler MissionNumber = null;
 
 		private IMissionSection missionInterface;
-		private CW_MissionSelect parent;
 
-		public void setMission(IMissionSection mission, CW_MissionSelect p)
+        public delegate void PopupFader();
+
+        private CW_MissionSelect.TitleToggle OnTitleToggle;
+        private PopupFader OnPopupFade;
+
+        public void setMission(IMissionSection mission, CW_MissionSelect.TitleToggle titleToggle, PopupFader popupFade)
 		{
 			if (mission == null)
 				return;
@@ -50,12 +51,10 @@ namespace ContractsWindow.Unity.Unity
 			if (MissionTitle == null || MissionNumber == null)
 				return;
 
-			if (p == null)
-				return;
+            OnTitleToggle = titleToggle;
+            OnPopupFade = popupFade;
 
-			parent = p;
-
-			missionInterface = mission;
+            missionInterface = mission;
 
 			MissionTitle.OnTextUpdate.Invoke(mission.MissionTitle);
 
@@ -69,13 +68,9 @@ namespace ContractsWindow.Unity.Unity
 
 			missionInterface.SetMission();
 
-			if (parent == null)
-				return;
+            OnTitleToggle.Invoke(false);
 
-			parent.ToggleToContracts();
-
-			parent.DestroyPanel();
+            OnPopupFade.Invoke();
 		}
-
 	}
 }

@@ -25,13 +25,19 @@ THE SOFTWARE.
 #endregion
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace ContractsWindow.Unity
 {
 	public abstract class CW_Popup : CanvasFader
 	{
+        public delegate void PopupFade(CW_Popup popup);
+        public delegate void PopupInputLock(bool isOn);
+
+        protected PopupFade OnPopupFade;
+        protected PopupInputLock OnPopupInputLock;
+
+        protected bool inputLock;
+
 		protected void FadeIn()
 		{
 			Alpha(0);
