@@ -543,16 +543,12 @@ namespace ContractsWindow.PanelInterfaces
             {
                 list = sortContracts(list, currentMission.OrderMode, currentMission.DescendingOrder);
 
-                if (UIWindow == null)
-                    return;
-
-                UIWindow.SortMissionChildren(list);
+                if (UIWindow != null)
+                    UIWindow.SortMissionChildren(list);
             }
 
-            if (UIWindow == null)
-                return;
-
-            UIWindow.UpdateMissionChildren();
+            if (UIWindow != null)
+                UIWindow.UpdateMissionChildren();
         }
 
         private List<Guid> sortContracts(List<Guid> list, contractSortClass sortClass, bool dsc)
@@ -809,11 +805,11 @@ namespace ContractsWindow.PanelInterfaces
             while (!progressLoaded || !contractsLoaded)
                 yield return null;
 
-            if (_firstLoad)
-            {
-                yield return new WaitForSeconds(3);
-                _firstLoad = false;
-            }
+            //if (_firstLoad)
+            //{
+            //    yield return new WaitForSeconds(3);
+            //    _firstLoad = false;
+            //}
 
             if (!windowGenerated)
                 GenerateWindow();
