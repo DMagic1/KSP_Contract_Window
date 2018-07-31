@@ -174,6 +174,20 @@ namespace ContractsWindow.Unity.Unity
             transform.localScale = scale * windowInterface.Scale;
         }
 
+        public void SetPosition(Rect r)
+        {
+            if (rect == null)
+                return;
+
+            rect.anchoredPosition3D = new Vector3(r.x, r.y, 0);
+
+            rect.sizeDelta = new Vector2(r.width, r.height);
+
+            checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
+
+            rect.anchoredPosition = clamp(rect, new RectOffset(100, 100, 200, 200));
+        }
+
         private IEnumerator GenerateContracts(IList<IContractSection> contracts)
         {
             if (contracts == null || ContractSectionPrefab == null)
@@ -766,7 +780,7 @@ namespace ContractsWindow.Unity.Unity
 			dragging = true;
 
 			mouseStart = eventData.position;
-			windowStart = rect.position;
+			windowStart = rect.anchoredPosition;
 		}
 
 		public void OnDrag(PointerEventData eventData)
@@ -774,9 +788,9 @@ namespace ContractsWindow.Unity.Unity
 			if (rect == null)
 				return;
 
-			rect.position = windowStart + (Vector3)(eventData.position - mouseStart);
+			rect.anchoredPosition = windowStart + (Vector3)(eventData.position - mouseStart);
 
-			rect.position = clamp(rect, new RectOffset(100, 100, 200, 200));
+			rect.anchoredPosition = clamp(rect, new RectOffset(100, 100, 200, 200));
 		}
 
 		private Vector3 clamp(RectTransform r, RectOffset offset)
@@ -788,8 +802,8 @@ namespace ContractsWindow.Unity.Unity
 			if (windowInterface != null)
 				f = windowInterface.IgnoreScale ? 1 * windowInterface.Scale : windowInterface.MasterScale * windowInterface.Scale;
 
-			pos.x = Mathf.Clamp(r.position.x, (-1 * (f * r.sizeDelta.x - offset.left)) - (Screen.width / 2), (Screen.width / 2) - offset.right);
-			pos.y = Mathf.Clamp(r.position.y, offset.bottom - (Screen.height / 2), (Screen.height / 2) + (f * r.sizeDelta.y - offset.top));
+			pos.x = Mathf.Clamp(r.anchoredPosition.x, -1 * (f * r.sizeDelta.x - offset.left), Screen.width - offset.right);
+			pos.y = Mathf.Clamp(r.anchoredPosition.y, offset.bottom - Screen.height, f * r.sizeDelta.y - offset.top);
 			pos.z = 1;
 
 			return pos;
@@ -815,20 +829,6 @@ namespace ContractsWindow.Unity.Unity
 			if (!dragging && !resizing)
 				FadeOut();
 		}
-
-		public void SetPosition(Rect r)
-		{
-			if (rect == null)
-				return;
-
-			rect.anchoredPosition3D = new Vector3(r.x, r.y, 0);
-
-			rect.sizeDelta = new Vector2(r.width, r.height);
-            
-			checkMaxResize((int)rect.sizeDelta.y, (int)rect.sizeDelta.x);
-
-            clamp(rect, new RectOffset(100, 100, 200, 200));
-        }
 
 		public void SortMissionChildren(List<Guid> sorted)
 		{
