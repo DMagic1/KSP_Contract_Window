@@ -87,6 +87,8 @@ namespace ContractsWindow.Unity.Unity
         private ShowAgency OnShowAgency;
         private ShowMissionAdd OnShowMissionAd;
 
+        private ContractState oldState;
+
         private Color textColor = new Color(0.9411765f, 0.5137255f, 0.227451f, 1f);
 		private Color successColor = new Color(0.4117647f, 0.8470588f, 0.3098039f, 1f);
 		private Color failColor = new Color(0.8980392f, 0f, 0f, 1f);
@@ -201,7 +203,7 @@ namespace ContractsWindow.Unity.Unity
 			if (contractInterface == null)
 				return;
 
-            if (contractOnly)
+            if (!contractOnly)
             {
                 if (contractInterface.ShowParams)
                 {
@@ -219,34 +221,26 @@ namespace ContractsWindow.Unity.Unity
 
 			if (ContractTitle == null || ContractRewardText == null || ContractPenaltyText == null)
 				return;
-
-            if (contractInterface.ContractState != ContractState.Active)
-                ToggleToClose();
-
-            if (Highlighter != null && !Highlighter.Hover)
-                handleColors(stateColor(contractInterface.ContractState));
-
-            if (TimeRemaining != null)
-            {
-                TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
-
-                TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
-            }
-
+            
             ContractTitle.OnTextUpdate.Invoke(contractInterface.ContractTitle);
 
 			ContractRewardText.OnTextUpdate.Invoke(contractInterface.RewardText);
 
 			ContractPenaltyText.OnTextUpdate.Invoke(contractInterface.PenaltyText);
 		}
-        
-        public void UpdateContract()
+
+        private void Update()
         {
             if (contractInterface == null)
                 return;
+            
+            if (oldState != contractInterface.ContractState)
+            {
+                oldState = contractInterface.ContractState;
 
-            if (contractInterface.ContractState != ContractState.Active)
-                ToggleToClose();
+                if (oldState != ContractState.Active)
+                    ToggleToClose();
+            }            
 
             if (ContractTitle != null && Highlighter != null && !Highlighter.Hover)
                 handleColors(stateColor(contractInterface.ContractState));
@@ -257,13 +251,32 @@ namespace ContractsWindow.Unity.Unity
 
                 TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
             }
-            
-            if (contractInterface.ShowParams)
-            {
-                for (int i = parameters.Count - 1; i >= 0; i--)
-                    parameters[i].UpdateParameter();
-            }
         }
+
+        //public void UpdateContract()
+        //{
+        //    if (contractInterface == null)
+        //        return;
+
+        //    if (contractInterface.ContractState != ContractState.Active)
+        //        ToggleToClose();
+
+        //    if (ContractTitle != null && Highlighter != null && !Highlighter.Hover)
+        //        handleColors(stateColor(contractInterface.ContractState));
+
+        //    if (TimeRemaining != null)
+        //    {
+        //        TimeRemaining.OnTextUpdate.Invoke(contractInterface.TimeRemaining);
+
+        //        TimeRemaining.OnColorUpdate.Invoke(timeColor(contractInterface.TimeState));
+        //    }
+            
+        //    if (contractInterface.ShowParams)
+        //    {
+        //        for (int i = parameters.Count - 1; i >= 0; i--)
+        //            parameters[i].UpdateParameter();
+        //    }
+        //}
 
 		public void RefreshParameters()
 		{

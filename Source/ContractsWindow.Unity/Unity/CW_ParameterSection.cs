@@ -224,7 +224,26 @@ namespace ContractsWindow.Unity.Unity
 			}
 		}
 
-        public void UpdateParameter()
+        //public void UpdateParameter()
+        //{
+        //    if (parameterInterface == null)
+        //        return;
+
+        //    if (oldState != parameterInterface.ParameterState)
+        //    {
+        //        oldState = parameterInterface.ParameterState;
+
+        //        if (oldState != ContractState.Active)
+        //            ToggleSubParams(false);
+        //        else
+        //            ToggleSubParams(true);
+        //    }
+
+        //    if (ParameterText != null)
+        //        ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
+        //}
+
+        private void Update()
         {
             if (parameterInterface == null)
                 return;
@@ -243,26 +262,7 @@ namespace ContractsWindow.Unity.Unity
                 ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
         }
 
-		//private void Update()
-		//{
-		//	if (parameterInterface == null)
-		//		return;
-
-		//	if (oldState != parameterInterface.ParameterState)
-		//	{
-		//		oldState = parameterInterface.ParameterState;
-
-		//		if (oldState != ContractState.Active)
-		//			ToggleSubParams(false);
-		//		else
-		//			ToggleSubParams(true);
-		//	}
-			
-		//	if (ParameterText != null)
-		//		ParameterText.OnColorUpdate.Invoke(stateColor(oldState));
-		//}
-
-		public void ToggleNote(bool isOn)
+        public void ToggleNote(bool isOn)
 		{
 			if (parameterInterface == null)
 				return;

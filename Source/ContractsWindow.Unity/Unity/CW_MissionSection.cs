@@ -255,42 +255,40 @@ namespace ContractsWindow.Unity.Unity
 		{
 			foreach (CW_ContractSection contract in masterList.Values)
 			{
-				if (contract == null)
-					continue;
-
-				contract.RefreshContract();
+				if (contract != null)
+                    contract.RefreshContract();
 			}
 		}
 
-        private IEnumerator UpdateContracts()
-        {
-            if (missionInterface == null)
-                yield break;
+        //private IEnumerator UpdateContracts()
+        //{
+        //    if (missionInterface == null)
+        //        yield break;
 
-            WaitForSeconds wait = new WaitForSeconds(0.1f);
+        //    WaitForSeconds wait = new WaitForSeconds(0.1f);
 
-            while(true)
-            {
-                if (missionInterface.ShowHidden)
-                {
-                    for (int i = hiddenContracts.Count - 1; i >= 0; i--)
-                    {
-                        if (masterList.ContainsKey(hiddenContracts[i]))
-                            masterList[hiddenContracts[i]].UpdateContract();
-                    }
-                }
-                else
-                {
-                    for (int i = activeContracts.Count - 1; i >= 0; i--)
-                    {
-                        if (masterList.ContainsKey(activeContracts[i]))
-                            masterList[activeContracts[i]].UpdateContract();
-                    }
-                }
+        //    while(true)
+        //    {
+        //        if (missionInterface.ShowHidden)
+        //        {
+        //            for (int i = hiddenContracts.Count - 1; i >= 0; i--)
+        //            {
+        //                if (masterList.ContainsKey(hiddenContracts[i]))
+        //                    masterList[hiddenContracts[i]].UpdateContract();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            for (int i = activeContracts.Count - 1; i >= 0; i--)
+        //            {
+        //                if (masterList.ContainsKey(activeContracts[i]))
+        //                    masterList[activeContracts[i]].UpdateContract();
+        //            }
+        //        }
 
-                yield return wait;
-            }
-        }
+        //        yield return wait;
+        //    }
+        //}
         
         public void RefreshContract(IContractSection contract)
 		{
