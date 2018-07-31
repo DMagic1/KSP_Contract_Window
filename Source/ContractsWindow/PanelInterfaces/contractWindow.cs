@@ -832,7 +832,7 @@ namespace ContractsWindow.PanelInterfaces
             {
                 contractContainer cC = contractParser.getActiveContract(c.ContractGuid);
 
-                if (cC != null)
+                if (cC != null && currentMission != null)
                 {
                     currentMission.addContract(cC, true, true, true);
 
@@ -847,18 +847,18 @@ namespace ContractsWindow.PanelInterfaces
             {
                 contractContainer cC = contractParser.getCompletedContract(c.ContractGuid);
 
-                if (cC != null)
+                if (cC != null && currentMission != null)
                 {
                     if (currentMission.ContractContained(cC.ID))
                         currentMission.RefreshContract(cC.ID);
                 }
             }
-            else if (c.ContractState == Contract.State.Declined)
+            else if (c.ContractState == Contract.State.Declined && currentMission != null)
             {
                 if (currentMission.ContractContained(c.ContractGuid))
                     currentMission.RefreshContract(c.ContractGuid);
             }
-            else if (c.ContractState == Contract.State.Cancelled)
+            else if (c.ContractState == Contract.State.Cancelled && currentMission != null)
             {
                 if (currentMission.ContractContained(c.ContractGuid))
                     currentMission.RefreshContract(c.ContractGuid);
