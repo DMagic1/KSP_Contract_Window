@@ -195,7 +195,7 @@ namespace ContractsWindow.Unity.Unity
 
             int count = contracts.Count;
 
-            ProgressPanel.transform.SetParent(windowInterface.ContractStorageContainer, false);
+            ProgressPanel.transform.SetParent(windowInterface.ContractStorageContainer, true);
 
             MissionSection.gameObject.SetActive(true);
 
@@ -213,7 +213,7 @@ namespace ContractsWindow.Unity.Unity
             windowInterface.RefreshContracts();
             
             if (ProgressPanel != null)
-                yield return StartCoroutine(ProgressPanel.GeneratePanel(windowInterface.GetProgressPanel, false));
+                yield return StartCoroutine(ProgressPanel.GeneratePanel(windowInterface.GetProgressPanel));
 
             ProgressPanel.transform.SetParent(ContentTransform, false);
         }
@@ -309,46 +309,49 @@ namespace ContractsWindow.Unity.Unity
 			loaded = true;
 		}
 
-		public void ToggleMainWindow(bool showProgress)
-		{
-			if (windowInterface == null)
-				return;
+        public void ToggleMainWindow(bool showProgress)
+        {
+            if (windowInterface == null)
+                return;
 
-			if (showProgress)
-			{
+            if (!ProgressPanel.Loaded)
+                return;
+
+            if (showProgress)
+            {
                 if (MissionSection != null)
                     MissionSection.gameObject.SetActive(false);
 
                 if (ProgressPanel != null)
                     ProgressPanel.gameObject.SetActive(true);
-                
+
                 RefreshProgress();
 
-				if (MissionTitle != null)
-					MissionTitle.OnTextUpdate.Invoke(windowInterface.ProgressTitle);
+                if (MissionTitle != null)
+                    MissionTitle.OnTextUpdate.Invoke(windowInterface.ProgressTitle);
 
-				if (MainPanelTooltip != null)
-					MainPanelTooltip.TooltipIndex = 0;
-			}
-			else
+                if (MainPanelTooltip != null)
+                    MainPanelTooltip.TooltipIndex = 0;
+            }
+            else
             {
-                if (ProgressPanel != null)
+                if (ProgressPanel != null && ProgressPanel.Loaded)
                     ProgressPanel.gameObject.SetActive(false);
 
                 if (MissionSection != null)
                     MissionSection.gameObject.SetActive(true);
 
                 if (MissionTitle != null && MissionSection != null)
-					MissionTitle.OnTextUpdate.Invoke(MissionSection.MasterMission ? windowInterface.AllMissionTitle : MissionSection.MissionTitle + ":");
+                    MissionTitle.OnTextUpdate.Invoke(MissionSection.MasterMission ? windowInterface.AllMissionTitle : MissionSection.MissionTitle + ":");
 
-				if (MainPanelTooltip != null)
-					MainPanelTooltip.TooltipIndex = 1;
-			}
+                if (MainPanelTooltip != null)
+                    MainPanelTooltip.TooltipIndex = 1;
+            }
 
-			showingContracts = !showProgress;
+            showingContracts = !showProgress;
 
-			ProcessTooltips();
-		}
+            ProcessTooltips();
+        }
 
 		public void ToggleTooltips(bool isOn)
 		{
