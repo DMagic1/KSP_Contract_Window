@@ -51,6 +51,7 @@ namespace ContractsWindow.PanelInterfaces
         private bool _isVisible;
         private bool _inputLock;
         private bool windowGenerated;
+        private bool positionSet;
         private bool progressLoaded, contractsLoaded;
         private int sceneInt;
         private contractMission currentMission;
@@ -669,6 +670,9 @@ namespace ContractsWindow.PanelInterfaces
             if (UIWindow == null)
                 return;
 
+            if (!positionSet)
+                SetPosition();
+
             if (_repeatingWorker != null)
                 StopCoroutine(_repeatingWorker);
 
@@ -700,11 +704,17 @@ namespace ContractsWindow.PanelInterfaces
             UIWindow = Instantiate(contractLoader.WindowPrefab, DialogCanvasUtil.DialogCanvasRect, false).GetComponent<CW_Window>();
 
             UIWindow.setWindow(this);
+            
+            windowGenerated = true;
+        }
+
+        private void SetPosition()
+        {
+            positionSet = true;
 
             windowPos = contractScenario.Instance.windowRects[sceneInt];
 
             UIWindow.SetPosition(windowPos);
-            windowGenerated = true;
         }
 
         private void onContractsLoaded()
