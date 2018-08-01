@@ -64,22 +64,20 @@ namespace ContractsWindow.Unity.Unity
 		private List<CW_StandardNode> standardNodes = new List<CW_StandardNode>();
 		private List<CW_BodyNode> bodyNodes = new List<CW_BodyNode>();
 
-        private Canvas panelCanvas;
+        private bool loaded;
 
-        private void Awake()
+        public bool Loaded
         {
-            panelCanvas = GetComponent<Canvas>();
+            get { return loaded; }
         }
-
-        public IEnumerator GeneratePanel(IProgressPanel panel, bool active)
+        
+        public IEnumerator GeneratePanel(IProgressPanel panel)
         {
             if (panel == null)
                 yield break;
 
             gameObject.SetActive(true);
-
-            panelCanvas.enabled = false;
-
+            
             panelInterface = panel;
 
             if (panelInterface.GetIntervalNodes != null)
@@ -138,10 +136,9 @@ namespace ContractsWindow.Unity.Unity
 
             FinishPanel();
 
-            panelCanvas.enabled = true;
-
-            if (gameObject.activeSelf != active)
-                gameObject.SetActive(active);
+            loaded = true;
+            
+            gameObject.SetActive(false);
         }
 
         private void FinishPanel()
