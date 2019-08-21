@@ -104,6 +104,8 @@ namespace ContractsWindow.Unity.Unity
 		private bool loaded;
 		private bool showingContracts = true;
 
+        //private ContentSizeFitter contentFitter;
+
 		private bool popupOpen;
         
 		public bool ShowingContracts
@@ -117,19 +119,23 @@ namespace ContractsWindow.Unity.Unity
             
 			rect = GetComponent<RectTransform>();
             windowCanvas = GetComponent<Canvas>();
+
+            //contentFitter = GetComponentInChildren<ContentSizeFitter>();
+
+            Alpha(0);
         }
 
 		private void Start()
 		{
-			Alpha(1);
+			//Alpha(1);
 
-			Fade(1, true);
+			//Fade(1, true);
 		}
 
-		public void setWindow(ICW_Window window)
+		public IEnumerator setWindow(ICW_Window window)
 		{
 			if (window == null)
-				return;
+				yield break;
             
 			windowInterface = window;
             
@@ -141,24 +147,24 @@ namespace ContractsWindow.Unity.Unity
 
             MissionSection.Init(ProcessTooltips, AddContract, windowInterface.ContractStorageContainer);
 
-            StartCoroutine(GenerateContracts(window.GetAllContracts));
+            if (ContractCanvas != null)
+            {
+                ContractCanvas.overridePixelPerfect = true;
+                ContractCanvas.pixelPerfect = false;
+            }
+
+            if (ProgressCanvas != null)
+            {
+                ProgressCanvas.overridePixelPerfect = true;
+                ProgressCanvas.pixelPerfect = false;
+            }
+
+            yield return StartCoroutine(GenerateContracts(window.GetAllContracts));
 
 			if (window.IgnoreScale)
 				transform.localScale /= window.MasterScale;
 
 			transform.localScale *= window.Scale;
-
-            if (ContractCanvas != null)
-            {
-                ContractCanvas.overridePixelPerfect = !window.PixelPerfect;
-                ContractCanvas.pixelPerfect = window.PixelPerfect;
-            }
-
-            if (ProgressCanvas != null)
-            {
-                ProgressCanvas.overridePixelPerfect = !window.PixelPerfect;
-                ProgressCanvas.pixelPerfect = window.PixelPerfect;
-            }
         }
 
         public void setScale()
@@ -784,6 +790,8 @@ namespace ContractsWindow.Unity.Unity
 
 			mouseStart = eventData.position;
 			windowStart = rect.anchoredPosition;
+
+            //contentFitter.enabled = false;
 		}
 
 		public void OnDrag(PointerEventData eventData)
@@ -818,6 +826,8 @@ namespace ContractsWindow.Unity.Unity
 
 			if (rect == null)
 				return;
+
+            //contentFitter.enabled = true;
 
             windowInterface.SetWindowPosition(new Rect(rect.anchoredPosition.x, rect.anchoredPosition.y, rect.sizeDelta.x, rect.sizeDelta.y));
         }
