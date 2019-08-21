@@ -51,6 +51,7 @@ namespace ContractsWindow.PanelInterfaces
         private bool _isVisible;
         private bool _inputLock;
         private bool windowGenerated;
+        private bool windowGenerating;
         private bool positionSet;
         private bool progressLoaded, contractsLoaded;
         private int sceneInt;
@@ -227,16 +228,20 @@ namespace ContractsWindow.PanelInterfaces
 
                 if (_isVisible)
                 {
-                    if (UIWindow != null)
-                    {
-                        UIWindow.gameObject.SetActive(false);
+                    StartCoroutine(WaitForRebuild());
+                    //if (UIWindow != null)
+                    //{
+                    //    UIWindow.gameObject.SetActive(false);
 
-                        DestroyImmediate(UIWindow.gameObject);
-                    }
+                    //    Destroy(UIWindow.gameObject);
 
-                    windowGenerated = false;
+                    //    contractUtils.LogFormatted("Destroying window");
+                    //}
 
-                    Open();
+                    //windowGenerated = false;
+                    //windowGenerating = false;
+
+                    //Open();
                 }
             }
         }
@@ -353,8 +358,13 @@ namespace ContractsWindow.PanelInterfaces
         
         private void onSettingsApplied()
         {
+            if (!windowGenerated || windowGenerating)
+                return;
+
             if (UIWindow != null)
             {
+                windowPos = contractScenario.Instance.windowRects[sceneInt];
+
                 UIWindow.setScale();
                 UIWindow.SetPosition(windowPos);
             }
@@ -662,13 +672,45 @@ namespace ContractsWindow.PanelInterfaces
             return pinnedList.Count;
         }
 
+        private IEnumerator WaitForRebuild()
+        {
+            if (UIWindow != null)
+            {
+                UIWindow.gameObject.SetActive(false);
+
+                Destroy(UIWindow.gameObject);
+            }
+
+            yield return null;
+
+            UIWindow = null;
+
+            windowGenerated = false;
+            windowGenerating = false;
+
+            positionSet = false;
+            
+            if (!windowGenerated && !windowGenerating)
+                yield return StartCoroutine(GenerateWindow());
+
+            Open();
+        }
+
         public void Open()
         {
-            if (!windowGenerated)
-                GenerateWindow();
+            if (!windowGenerated && !windowGenerating)
+                StartCoroutine(GenerateWindow());
+
+            StartCoroutine(WaitForOpen());
+        }
+
+        private IEnumerator WaitForOpen()
+        {
+            while (!windowGenerated)
+                yield return null;
 
             if (UIWindow == null)
-                return;
+                yield break;
 
             if (!positionSet)
                 SetPosition();
@@ -688,24 +730,35 @@ namespace ContractsWindow.PanelInterfaces
             if (UIWindow == null)
                 return;
 
-            StopCoroutine(_repeatingWorker);
-            _repeatingWorker = null;
+            if (_repeatingWorker != null)
+            {
+                StopCoroutine(_repeatingWorker);
+                _repeatingWorker = null;
+            }
 
             _isVisible = false;
 
             UIWindow.Close();
         }
 
-        private void GenerateWindow()
+        private IEnumerator GenerateWindow()
         {
-            if (contractLoader.WindowPrefab == null || UIWindow != null)
-                return;
+            if (contractLoader.WindowPrefab == null)
+                yield break;
+
+            if (UIWindow != null)
+                yield break;
+            
+            windowGenerating = true;
 
             UIWindow = Instantiate(contractLoader.WindowPrefab, DialogCanvasUtil.DialogCanvasRect, false).GetComponent<CW_Window>();
 
-            UIWindow.setWindow(this);
-            
+            yield return StartCoroutine(UIWindow.setWindow(this));
+
+            Close();
+
             windowGenerated = true;
+            windowGenerating = false;
         }
 
         private void SetPosition()
@@ -821,8 +874,8 @@ namespace ContractsWindow.PanelInterfaces
             //    _firstLoad = false;
             //}
 
-            if (!windowGenerated)
-                GenerateWindow();
+            if (!windowGenerated && !windowGenerating)
+                yield return StartCoroutine(GenerateWindow());
 
             if (contractScenario.Instance.windowVisible[sceneInt])
             {
@@ -830,6 +883,10 @@ namespace ContractsWindow.PanelInterfaces
                 
                 if (StockToolbar || ReplaceToolbar)
                     SetAppState(true);
+            }
+            else
+            {
+                Close();
             }
         }
 
